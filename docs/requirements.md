@@ -27,7 +27,9 @@ Legend: **Done** · **Partial** (category covered, not production samples) · **
 - **Done**
 - Contract: `IEmlExtractor.Extract` → `EmlExtractionResult` in `src/EmlExtraction/Models.cs`
 - Implementation: `EmlExtractor.Extract` in `src/EmlExtraction/EmlExtractor.cs` (`HeaderMapper`, `BodySelector`, `PartCollector`)
-- Tests: `ExtractionTests.cs`, `AttachmentTests.cs`, `GoldenTests.cs`
+- Mbox `From ` first line is skipped via `MimeParser` + `MimeFormat.Mbox` (SpamAssassin / mbox files)
+- Registers `CodePagesEncodingProvider` so TNEF / GB2312 / Shift_JIS decode
+- Tests: `ExtractionTests.cs`, `AttachmentTests.cs`, `GoldenTests.cs`, `InternalCorpusTests.cs` (public samples if present)
 
 ---
 
@@ -84,7 +86,7 @@ Legend: **Done** · **Partial** (category covered, not production samples) · **
 - Path in filename: `ExtractionTests.PathInFileNameIsPreservedSeparately`
 - No Office/PDF inner parse in this component
 
-Note: Outlook `winmail.dat` (TNEF) is unpacked to flat attachments (`TnefPart` in `PartCollector.Walk`). That peels the Outlook wrapper; it does not parse Office content. There is **no TNEF sample** in the golden set yet.
+Note: Outlook `winmail.dat` (TNEF) is unpacked to flat attachments (`TnefPart` in `PartCollector.Walk`). That peels the Outlook wrapper; it does not parse Office content. `EmlExtractor` registers `CodePagesEncodingProvider` (required by MimeKit TNEF). Public samples live under gitignored `corpus/internal/` (MimeKit `ukr.eml`, Zimbra `tnef.msg`, Apache POI HMEF with real `.doc`/`.pdf`). They are not in the committed golden set.
 
 ---
 
@@ -103,24 +105,25 @@ Note: Outlook `winmail.dat` (TNEF) is unpacked to flat attachments (`TnefPart` i
 
 **Requirement:** Support emoji and exotic languages.
 
-- **Done** on generated mail
+- **Done** on generated mail **and** public samples (ISO-2022-JP, Shift_JIS, GB2312, Hebrew ISO-8859-8)
 - `tests/EmlExtraction.Tests/ExoticLanguageTests.cs` (Hebrew, Arabic, Chinese, Japanese, Hindi, Thai, Russian, emoji)
 - Also: `ExtractionTests.Windows1255BodyDecodes`, goldens `E01-emoji`, `E02-hebrew`, `E04-win1255`
-- **Gap:** no real Gmail/Outlook messages in the set
+- Public: `InternalCorpusTests` Shift_JIS / ISO-2022-JP / GB2312 under `corpus/internal/gaps/`; Gmail Hebrew subject (`spec/php-mails/issue149`); 1992 Bellcore Hebrew body (`spec/unicode/jwz-hebrew-01.eml`)
+- **Gap:** no live Outlook/Gmail **Arabic** body in the public harvest; Hebrew Gmail subject is covered, Hebrew Outlook body is not
 
 ### 3. Correctness B — attachment variety
 
 **Requirement:** Mix of Office files, nested emails, attached images, copy-paste (CID) images, etc.
 
-- **Partial** — MIME paths covered; Office payloads are dummy bytes
+- **Done** on generated stubs **and** public files (real OLE `.doc` / PDF from TNEF, real OOXML docx from php-mime-mail-parser)
 
 | Kind | Status | Where |
 | --- | --- | --- |
-| Office-like (docx/xlsx/pptx/pdf/zip) | Done as named MIME parts + SHA-256 of fake payload | `AttachmentTests.OfficeAndBinaryAttachmentsRoundTrip`, golden `E05-docx` |
-| Nested email | Done, no recurse | `AttachmentTests.NestedEmlIsOpaqueBinaryAndNotRecursed`, golden `E06-nested` |
-| Attached image | Done | `AttachmentTests.AttachedImageIsNotTreatedAsBody`, golden `E07-png-attach` |
-| Copy-paste / CID image | Done on synthetic `multipart/related` | `AttachmentTests.CopyPasteCidImageIsExtracted`, `SampleFactory.RelatedHtmlWithCid`, golden `E08-cid` |
-| Real Outlook paste / real OOXML / TNEF | Gap | `docs/edge-cases.md` E17, E18 |
+| Office-like (docx/xlsx/pptx/pdf/zip) | Named MIME parts + SHA-256 of fake payload in CI; real docx/pdf/odt under `corpus/internal/spec/` | `AttachmentTests.OfficeAndBinaryAttachmentsRoundTrip`, `InternalCorpusTests.SwiftMailerHasRealOfficeAndOpaqueNestedEml` |
+| Nested email | Done, no recurse (synthetic + `issue158a` / `issue274.eml`) | `AttachmentTests.NestedEmlIsOpaqueBinaryAndNotRecursed` |
+| Attached image | Done | `AttachmentTests.AttachedImageIsNotTreatedAsBody` |
+| Copy-paste / CID image | Synthetic + public CID PNG (`m0129`) + Outlook-shaped `image001.png@01D…` | `AttachmentTests.CopyPasteCidImageIsExtracted`, `InternalCorpusTests.OutlookPasteImage001At01DIsInlinePng` |
+| TNEF with Office | Apache POI `quick-winmail.dat` unpacks OLE `.doc` + PDF; not modern docx-inside-TNEF | `InternalCorpusTests.PoiTnefUnpacksRealOleDocAndPdf` |
 
 ---
 

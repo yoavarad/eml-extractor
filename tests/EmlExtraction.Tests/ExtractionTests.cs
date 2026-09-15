@@ -50,6 +50,20 @@ public sealed class ExtractionTests
     }
 
     [Fact]
+    public void MboxFromPrefixDoesNotPolluteHeaders()
+    {
+        var inner = SampleFactory.ToBytes(SampleFactory.Plain("mbox-subject", "mbox-body"));
+        var raw = Encoding.ASCII.GetBytes("From alice@example.com Tue Sep 15 07:00:00 2026\n")
+            .Concat(inner)
+            .ToArray();
+        var result = _extractor.Extract(raw);
+        Assert.Equal("mbox-subject", result.Metadata["subject"]);
+        Assert.Equal("mbox-body", result.MainContent);
+        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed"));
+        Assert.DoesNotContain(result.Metadata, kv => kv.Value.Contains("Tue Sep 15 07:00:00", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void HeadersOnlyDoesNotThrow()
     {
         var raw = """

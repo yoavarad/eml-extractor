@@ -1,10 +1,13 @@
 using System.Runtime.InteropServices;
+using System.Text;
 using MimeKit;
 
 namespace EmlExtraction;
 
 public sealed class EmlExtractor : IEmlExtractor
 {
+    static EmlExtractor() => Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
     private static readonly ParserOptions Options = CreateOptions();
 
     public EmlExtractionResult Extract(ReadOnlyMemory<byte> eml)
@@ -13,10 +16,22 @@ public sealed class EmlExtractor : IEmlExtractor
         try
         {
             using var stream = Open(eml);
-            var message = MimeMessage.Load(Options, stream);
+            MimeMessage message;
+            if (StartsWithMboxFrom(eml.Span))
+            {
+                var parser = new MimeParser(Options, stream, MimeFormat.Mbox);
+                message = parser.ParseMessage();
+            }
+            else
+            {
+                message = MimeMessage.Load(Options, stream);
+            }
+
             return Extract(message, warnings);
         }
-        catch (Exception ex) when (ex is FormatException or ParseException or IOException or InvalidOperationException)
+        catch (Exception ex) when (ex is FormatException or ParseException or IOException
+                                       or InvalidOperationException or ArgumentException
+                                       or NotSupportedException or DecoderFallbackException)
         {
             warnings.Add($"parse_failed: {ex.GetType().Name}: {ex.Message}");
             return new EmlExtractionResult(
@@ -28,6 +43,9 @@ public sealed class EmlExtractor : IEmlExtractor
                 warnings);
         }
     }
+
+    public EmlExtractionResult Extract(MimeMessage message)
+        => Extract(message, []);
 
     internal static EmlExtractionResult Extract(MimeMessage message, List<string> warnings)
     {
@@ -73,5 +91,17 @@ public sealed class EmlExtractor : IEmlExtractor
         }
 
         return new MemoryStream(eml.ToArray(), writable: false);
+    }
+
+    private static bool StartsWithMboxFrom(ReadOnlySpan<byte> data)
+    {
+        if (data.Length >= 3 && data[0] == 0xEF && data[1] == 0xBB && data[2] == 0xBF)
+            data = data[3..];
+        return data.Length >= 5
+               && data[0] == (byte)'F'
+               && data[1] == (byte)'r'
+               && data[2] == (byte)'o'
+               && data[3] == (byte)'m'
+               && data[4] == (byte)' ';
     }
 }

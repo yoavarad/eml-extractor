@@ -9,8 +9,12 @@ switch (cmd)
         return 0;
     case "score":
         return Scorer.Run(repo);
+    case "probe":
+        return Probe.Run(repo, args.Skip(1).FirstOrDefault());
+    case "inspect":
+        return Inspect.Run(repo, args.Skip(1));
     default:
-        Console.WriteLine("Usage: golden gen | golden score");
+        Console.WriteLine("Usage: golden gen | golden score | golden probe [dir] | golden inspect <path>…");
         return 2;
 }
 

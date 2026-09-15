@@ -78,8 +78,9 @@ Reference `src/EmlExtraction/EmlExtraction.csproj` and call `EmlDetector` / `Eml
 ### Tests, score, throughput
 
 ```bash
-dotnet test                                                    # unit tests + seed goldens
+dotnet test                                                    # unit tests + seed goldens (+ public fixtures if present)
 dotnet run --project tools/GoldenKit -c Release -- score       # 1200-case quality score
+dotnet run --project tools/GoldenKit -c Release -- probe       # harvest local public mail under corpus/internal/
 dotnet run --project benches/EmlExtraction.Bench -c Release    # max files/sec on this machine
 ```
 
@@ -99,6 +100,7 @@ tools/GoldenKit/             generate and score goldens
 corpus/golden/seed/          small set run by `dotnet test`
 corpus/golden/bulk/          1200 tagged cases
 corpus/golden/catalog.jsonl  one row per bulk case
+corpus/internal/             public real mail (gitignored; see Real-world tests)
 docs/                        requirements map, golden plan, perf, edge cases
 ```
 
@@ -128,7 +130,34 @@ Golden tags: `hebrew` (12/12), `arabic` (10/10), `rtl`, `emoji`, `unicode`, `rfc
 
 Office-like parts (doc/docx/xls/xlsx/ppt/pptx/odt/ods/odp/rtf/pdf), nested emails (`message/rfc822`, not recursed), attached images, copy-paste CID images, plus zip/ics/vcf/media/exe stubs.
 
-Quality bar: **name + decoded SHA-256**. Payloads are tiny typed stubs, not full real OOXML files.
+Quality bar in CI: **name + decoded SHA-256**. Payloads there are tiny typed stubs. Real Office/CID/TNEF files are covered by the public harvest below, not by the committed goldens.
+
+---
+
+## Real-world tests
+
+Public mail, not in git (`corpus/internal/` is gitignored; licenses and PII vary). Two layers:
+
+1. **Harvest** — detector + extract over every local public sample (`golden probe`). Last run: **12,853** detected messages, **0** throws, **0** parse failures, **0** warnings, ~3,500 extract/s.
+2. **Targeted asserts** — `InternalCorpusTests` (17 cases). Skipped automatically if the files are not on disk; CI does not require them.
+
+`dotnet test` includes those asserts when the files exist. Re-run the harvest with `golden probe` (see commands above). Full map: [docs/edge-cases.md](docs/edge-cases.md).
+
+| What was proven | Source | Result |
+| --- | --- | --- |
+| Does not crash on mixed real mail | SpamAssassin 2003/2005, Nazario phishing mboxes, [cw-l/email-corpus](https://github.com/cw-l/email-corpus), MimeKit TestData | 12,853 / 12,853 detected; mbox `From ` handled |
+| TNEF / `winmail.dat` unpacks to real files | Apache POI HMEF `quick-winmail.dat`, `bug52400-…dat`; Zimbra Outlook 11 `tnef.msg`; MimeKit `ukr.eml` | OLE `.doc` + PDF + PNG; **0** leftover `winmail.dat` (82 TNEF-header mails) |
+| Real Office MIME (not stubs) | php-mime-mail-parser `issue274.eml`; ProtonMail parser `forwarding_html_attachment.eml` | OOXML `docx` (PK, 11 KB) + PDF + ODT; Proton `docx`/`xlsx`/`pdf` (PK / `%PDF-` magic; Proton zips are truncated) |
+| Nested `message/rfc822` stays opaque | `issue158a`, `issue274.eml`; 154 nested `.eml` in harvest | One `.eml` blob; inner parts not promoted |
+| CID paste image | php-mails `m0129`; Chatwoot Outlook 16.0 fixture | Complete PNG + `cid:` left in HTML. Chatwoot JPEG is truncated upstream |
+| Outlook `image001.png@01D…` shape | Headers from [Freescout #1162](https://github.com/freescout-help-desk/freescout/issues/1162) | HTML `cid:` matches inline `Content-ID`; PNG is a stand-in (GitHub stripped the original base64) |
+| Hebrew from real clients | Gmail `issue149` (`iso-8859-8-i`); 1992 Bellcore ISO-8859-8 in MimeKit `jwz.mbox` | Subject `מענה 'אני לא נמצא': Invoice …`; body/subject `תירבע` |
+| Exchange-style headers / `xfields` | [Lee Holmes O365 gist](https://gist.github.com/LeeHolmes/d83dbfd7d4683de2f3e517fdd71e1923); 113 harvest mails | Max 71 headers, 68 xfield lines |
+| Legacy charsets, DSN, S/MIME | Jimmy Shift_JIS; GB2312 spam; Thunderbird signed | Decode without throw; `.p7s` kept as attachment |
+
+Not used: **Enron** (attachments already stripped; 422 MB download aborted). **TREC 2007** Waterloo tarball is 404.
+
+Still missing vs live corp mail: Outlook/Gmail Arabic body, Outlook Hebrew body, header block >16 KB, TNEF wrapping modern `.docx`.
 
 ---
 
@@ -145,4 +174,4 @@ Last score: **1212/1212 cases**, **11126/11126 checks** (seed + bulk). Report: [
 
 Bulk families include detection, classic headers, `xfields`, unicode/emoji/RTL, charsets, HTML vs plain, transfer encodings, CID paste, SMTPUTF8, Office/PDF, nested mail, images, archives, folded headers, path-in-filename, and RFC 2047 / 2183 / 2387 / 2392 / 6532 extras.
 
-Still missing from real corp mail (not in this set): Outlook `winmail.dat` (TNEF), real Outlook paste, Exchange mega-headers. How to add: [docs/edge-cases.md](docs/edge-cases.md). Spec ↔ code: [docs/requirements.md](docs/requirements.md).
+Spec ↔ code: [docs/requirements.md](docs/requirements.md). Edge-case map (including the public harvest): [docs/edge-cases.md](docs/edge-cases.md).
