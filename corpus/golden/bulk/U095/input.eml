@@ -1,0 +1,17 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: Բարեւ աշխարհ
+Message-Id: <U095@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="=-g79W2Ha2iDbEe0dqlr3jmg=="
+
+--=-g79W2Ha2iDbEe0dqlr3jmg==
+Content-Type: text/plain; charset=utf-8
+
+plain-Հայերեն
+--=-g79W2Ha2iDbEe0dqlr3jmg==
+Content-Type: text/html; charset=utf-8
+
+<p>Հայերեն</p>
+--=-g79W2Ha2iDbEe0dqlr3jmg==--

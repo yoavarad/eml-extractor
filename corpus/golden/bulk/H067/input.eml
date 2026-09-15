@@ -1,0 +1,13 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: received-67
+Message-Id: <H067@golden.example>
+To: Bob <bob@example.com>
+Received: from mx4.example.net
+Return-Path: <bounce@example.com>
+Delivered-To: bob@example.com
+In-Reply-To: <prev@example.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+recv

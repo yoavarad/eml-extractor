@@ -1,0 +1,46 @@
+{
+  "id": "A009",
+  "tags": [
+    "attachment",
+    "office",
+    "rfc2046"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "office-9",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "see",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "report.docx",
+        "size": 13,
+        "sha256": "938695af05613f2433c7023fa9e72b1dd7fe4fa7a0ec879711ac38c68f758b31",
+        "disposition": "attachment"
+      }
+    ]
+  }
+}

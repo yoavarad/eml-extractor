@@ -1,0 +1,39 @@
+{
+  "id": "U034",
+  "tags": [
+    "unicode",
+    "rfc2047",
+    "html-body"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "\u0393\u03B5\u03B9\u03AC \u03C3\u03BF\u03C5",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "\u003Cp\u003E\u0395\u03BB\u03BB\u03B7\u03BD\u03B9\u03BA\u03AC\u003C/p\u003E",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/html",
+    "attachment_count": 0,
+    "attachments": []
+  }
+}

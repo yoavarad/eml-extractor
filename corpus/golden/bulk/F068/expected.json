@@ -1,0 +1,46 @@
+{
+  "id": "F068",
+  "tags": [
+    "attachment",
+    "binary",
+    "rfc2046"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "file-68",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "see",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "a.exe",
+        "size": 10,
+        "sha256": "f94f88acd8652f57845a65935d22b2cee3f56262ec308beb82107e0c01afe337",
+        "disposition": "attachment"
+      }
+    ]
+  }
+}

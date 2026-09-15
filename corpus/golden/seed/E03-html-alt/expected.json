@@ -1,0 +1,12 @@
+{
+  "id": "E03-html-alt",
+  "tags": ["multipart-alternative", "html-body", "no-plain-as-attachment"],
+  "source": "generated",
+  "is_eml": true,
+  "expect": {
+    "metadata": { "subject": { "eq": "alternative" } },
+    "main_content": { "eq": "<p>html version</p>", "not_contains": ["plain version"] },
+    "main_content_mime_type": "text/html",
+    "attachment_count": 0
+  }
+}

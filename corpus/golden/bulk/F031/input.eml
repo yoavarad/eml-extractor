@@ -1,0 +1,20 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: file-31
+Message-Id: <F031@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-NE9nI0z8JE/AmmlK3A/lmg=="
+
+--=-NE9nI0z8JE/AmmlK3A/lmg==
+Content-Type: text/plain; charset=utf-8
+
+see
+--=-NE9nI0z8JE/AmmlK3A/lmg==
+Content-Type: application/xml; name=a.xml
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=a.xml
+
+cGF5bG9hZC1GMDMxLTM=
+
+--=-NE9nI0z8JE/AmmlK3A/lmg==--

@@ -1,0 +1,18 @@
+{
+  "id": "E10-xfields",
+  "tags": ["x-headers"],
+  "source": "generated",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": { "eq": "xheaders" },
+      "dkim_signature": { "contains": ["v=1"] }
+    },
+    "xfields": {
+      "contains": ["X-Mailer: SandboxMail", "X_Custom_Field: team-value", "X-Spam-Score: 1.2"],
+      "not_contains": ["DKIM-Signature"]
+    },
+    "main_content": { "eq": "x" },
+    "attachment_count": 0
+  }
+}

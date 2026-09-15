@@ -1,0 +1,20 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: img-28
+Message-Id: <I028@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-CtuEvqqouaLUujeus+e4zw=="
+
+--=-CtuEvqqouaLUujeus+e4zw==
+Content-Type: text/plain; charset=utf-8
+
+see pic
+--=-CtuEvqqouaLUujeus+e4zw==
+Content-Type: image/webp; name="photos/pic.webp"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="photos/pic.webp"
+
+UklGRhAAAABXRUJQd2VicDpJMDI4
+
+--=-CtuEvqqouaLUujeus+e4zw==--

@@ -1,0 +1,55 @@
+GOLDEN SCORE
+cases: 1212/1212 passed (100.0% cases)
+checks: 11126/11126 (100.0% assertions)
+
+By tag (case pass rate):
+  arabic                         10/10   100.0%
+  archive                        16/16   100.0%
+  attachment                    293/293  100.0%
+  binary                         12/12   100.0%
+  calendar                        8/8    100.0%
+  charset-legacy                 51/51   100.0%
+  cid                           211/211  100.0%
+  cjk                            18/18   100.0%
+  corrupt-transfer-encoding      10/10   100.0%
+  detect                         40/40   100.0%
+  docx                            1/1    100.0%
+  emoji                          79/79   100.0%
+  empty-body                      6/6    100.0%
+  folded-header                  16/16   100.0%
+  hebrew                         12/12   100.0%
+  html-body                     137/137  100.0%
+  image                         172/172  100.0%
+  inline                         61/61   100.0%
+  mbox                            1/1    100.0%
+  media                          12/12   100.0%
+  msg                             1/1    100.0%
+  multipart-alternative          56/56   100.0%
+  multipart-related               1/1    100.0%
+  nested-rfc822                  45/45   100.0%
+  no-plain-as-attachment          1/1    100.0%
+  no-recurse                     41/41   100.0%
+  not-eml                        21/21   100.0%
+  office                        165/165  100.0%
+  ole                             1/1    100.0%
+  path-in-filename               30/30   100.0%
+  pdf                            10/10   100.0%
+  plain-body                     27/27   100.0%
+  png                             1/1    100.0%
+  rfc2045                        90/90   100.0%
+  rfc2046                       380/380  100.0%
+  rfc2047                       233/233  100.0%
+  rfc2183                        90/90   100.0%
+  rfc2387                       100/100  100.0%
+  rfc2392                       140/140  100.0%
+  rfc5322                       160/160  100.0%
+  rfc6532                        70/70   100.0%
+  rfc822                        110/110  100.0%
+  rtl                            65/65   100.0%
+  signed-smime                   15/15   100.0%
+  text                           24/24   100.0%
+  unicode                       332/332  100.0%
+  windows-1255                    1/1    100.0%
+  x-headers                     121/121  100.0%
+
+Failures: 0

@@ -1,0 +1,47 @@
+{
+  "id": "A052",
+  "tags": [
+    "attachment",
+    "office",
+    "rfc2046"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "office-52",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "contains": [
+        "\u003C"
+      ],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/html",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "legacy.ppt",
+        "size": 8,
+        "sha256": "c48bfd7f32607a31eee672755d2cd12d982de19b58fe661c45658628f30c1530",
+        "disposition": "attachment"
+      }
+    ]
+  }
+}

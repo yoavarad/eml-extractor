@@ -1,0 +1,46 @@
+{
+  "id": "F070",
+  "tags": [
+    "attachment",
+    "nested-rfc822",
+    "rfc2046"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "file-70",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "see",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "mail.msg",
+        "size": 16,
+        "sha256": "f7669395e9b7ee01352700e26d3bbed3aac1d5741f298c3ae6510274f4520eef",
+        "disposition": "attachment"
+      }
+    ]
+  }
+}

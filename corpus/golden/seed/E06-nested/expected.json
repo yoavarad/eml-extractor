@@ -1,0 +1,20 @@
+{
+  "id": "E06-nested",
+  "tags": ["nested-rfc822", "no-recurse", "attachment"],
+  "source": "generated",
+  "is_eml": true,
+  "expect": {
+    "main_content": { "eq": "outer-body" },
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "forwarded.eml",
+        "reextract": {
+          "metadata": { "subject": { "eq": "inner" } },
+          "main_content": { "eq": "inner-body" },
+          "attachment_count": 0
+        }
+      }
+    ]
+  }
+}

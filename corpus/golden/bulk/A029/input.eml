@@ -1,0 +1,21 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: office-29
+Message-Id: <A029@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-pkVsXmsG5di/Nykqits6fg=="
+
+--=-pkVsXmsG5di/Nykqits6fg==
+Content-Type: text/plain; charset=utf-8
+
+see
+--=-pkVsXmsG5di/Nykqits6fg==
+Content-Type: application/vnd.openxmlformats-officedocument.presentationml.presentation;
+	name=deck.pptx
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=deck.pptx
+
+UEsDBHBwdHg6QTAyOQ==
+
+--=-pkVsXmsG5di/Nykqits6fg==--

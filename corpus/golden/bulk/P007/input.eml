@@ -1,0 +1,20 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: disp-a-7
+Message-Id: <P007@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-hMP82aczIWOtleas9wgpsQ=="
+
+--=-hMP82aczIWOtleas9wgpsQ==
+Content-Type: text/plain; charset=utf-8
+
+x
+--=-hMP82aczIWOtleas9wgpsQ==
+Content-Type: application/octet-stream; name=file-7.bin
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=file-7.bin
+
+YmluOlAwMDc=
+
+--=-hMP82aczIWOtleas9wgpsQ==--

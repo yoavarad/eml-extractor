@@ -1,0 +1,24 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: paste
+Message-Id: <O2387-027@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/related; boundary="=-O+3mV9FEpgTwVb+UY4c5wQ==";
+	type="text/html"
+
+--=-O+3mV9FEpgTwVb+UY4c5wQ==
+Content-Type: text/html; charset=utf-8
+
+<p>paste</p><img src="cid:start27@rel" />
+--=-O+3mV9FEpgTwVb+UY4c5wQ==
+Content-Type: image/png; name=rel.png
+Content-Transfer-Encoding: base64
+Content-Disposition: inline; filename=rel.png
+Content-Location: rel.png
+Content-Id: <start27@rel>
+
+iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
+IQAAAABJRU5ErkJggg==
+
+--=-O+3mV9FEpgTwVb+UY4c5wQ==--

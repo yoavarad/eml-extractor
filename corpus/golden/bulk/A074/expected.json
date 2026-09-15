@@ -1,0 +1,47 @@
+{
+  "id": "A074",
+  "tags": [
+    "attachment",
+    "office",
+    "rfc2046"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "office-74",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "contains": [
+        "\u003C"
+      ],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/html",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "calc.ods",
+        "size": 12,
+        "sha256": "e946b389a34b3f6ee21f7a4a2b933e93d4b3e4266fc6f9fe97c5ed6a7d096ba3",
+        "disposition": "attachment"
+      }
+    ]
+  }
+}

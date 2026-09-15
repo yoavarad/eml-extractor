@@ -1,0 +1,46 @@
+{
+  "id": "O2183-027",
+  "tags": [
+    "rfc2183",
+    "rfc2047",
+    "unicode"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "fn-27",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "x",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "\u0444\u0430\u0439\u043B-27.txt",
+        "size": 5,
+        "sha256": "d9c565fc9155a2aabb89aa6efed870a660f766a8eddd7c11a754ce6284e7fbaf",
+        "disposition": "attachment"
+      }
+    ]
+  }
+}

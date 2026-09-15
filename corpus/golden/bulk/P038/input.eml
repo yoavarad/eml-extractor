@@ -1,0 +1,19 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: disp-win-38
+Message-Id: <P038@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-KF0UIYnP3aVlkqWvaRVB3w=="
+
+--=-KF0UIYnP3aVlkqWvaRVB3w==
+Content-Type: text/plain; charset=utf-8
+
+x
+--=-KF0UIYnP3aVlkqWvaRVB3w==
+Content-Type: text/plain; name="C:\\Temp\\file-38.txt"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="C:\\Temp\\file-38.txt"
+
+txt:P038
+--=-KF0UIYnP3aVlkqWvaRVB3w==--

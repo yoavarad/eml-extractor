@@ -1,0 +1,11 @@
+{
+  "id": "E13-empty",
+  "tags": ["empty-body"],
+  "source": "generated",
+  "is_eml": true,
+  "expect": {
+    "metadata": { "subject": { "eq": "empty" } },
+    "main_content": { "eq": "" },
+    "attachment_count": 0
+  }
+}

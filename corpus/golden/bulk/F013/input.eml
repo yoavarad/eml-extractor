@@ -1,0 +1,20 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: file-13
+Message-Id: <F013@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-KCnRs/AHCGQ99gi+70j/Gg=="
+
+--=-KCnRs/AHCGQ99gi+70j/Gg==
+Content-Type: text/plain; charset=utf-8
+
+see
+--=-KCnRs/AHCGQ99gi+70j/Gg==
+Content-Type: application/gzip; name=a.gz
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=a.gz
+
+H4sIZ3o6RjAxMw==
+
+--=-KCnRs/AHCGQ99gi+70j/Gg==--

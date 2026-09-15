@@ -1,0 +1,27 @@
+{
+  "id": "C047",
+  "tags": [
+    "charset-legacy",
+    "rfc2045",
+    "rfc2047"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "Za\u017C\u00F3\u0142\u0107",
+        "contains": [],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "Za\u017C\u00F3\u0142\u0107",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 0,
+    "attachments": []
+  }
+}

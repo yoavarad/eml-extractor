@@ -1,0 +1,17 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: 你好世界
+Message-Id: <U011@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="=-AbK0wLI8aKV/E3CwtGsmZQ=="
+
+--=-AbK0wLI8aKV/E3CwtGsmZQ==
+Content-Type: text/plain; charset=utf-8
+
+plain-中文正文
+--=-AbK0wLI8aKV/E3CwtGsmZQ==
+Content-Type: text/html; charset=utf-8
+
+<p>中文正文</p>
+--=-AbK0wLI8aKV/E3CwtGsmZQ==--

@@ -1,0 +1,39 @@
+{
+  "id": "U063",
+  "tags": [
+    "unicode",
+    "rfc2047",
+    "multipart-alternative"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "S\u00E3o Paulo",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "\u003Cp\u003EPortugu\u00EAs\u003C/p\u003E",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/html",
+    "attachment_count": 0,
+    "attachments": []
+  }
+}

@@ -1,0 +1,19 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: disp-win-37
+Message-Id: <P037@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-hdCPwz/S5WzSqhMkdms68g=="
+
+--=-hdCPwz/S5WzSqhMkdms68g==
+Content-Type: text/plain; charset=utf-8
+
+x
+--=-hdCPwz/S5WzSqhMkdms68g==
+Content-Type: text/plain; name="C:\\Temp\\file-37.txt"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="C:\\Temp\\file-37.txt"
+
+txt:P037
+--=-hdCPwz/S5WzSqhMkdms68g==--

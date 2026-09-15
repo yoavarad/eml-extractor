@@ -1,0 +1,39 @@
+{
+  "id": "U100",
+  "tags": [
+    "unicode",
+    "rfc2047",
+    "rtl"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "\u05E2\u05D1\u05E8\u05D9\u05EA \u002B English #3",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "bidi body #3",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 0,
+    "attachments": []
+  }
+}

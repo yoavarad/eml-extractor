@@ -1,0 +1,27 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: outer
+Message-Id: <N011@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-/znmYOCdXrzhGGSHwkfZHw=="
+
+--=-/znmYOCdXrzhGGSHwkfZHw==
+Content-Type: text/plain; charset=utf-8
+
+outer-body
+--=-/znmYOCdXrzhGGSHwkfZHw==
+Content-Type: message/rfc822
+Content-Disposition: attachment; filename=forwarded-11.eml
+
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: inner-11
+Message-Id: <N011-inner@golden.example>
+To: Bob <bob@example.com>
+From: inner@example.com
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+inner-body-11
+
+--=-/znmYOCdXrzhGGSHwkfZHw==--

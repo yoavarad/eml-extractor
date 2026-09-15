@@ -1,0 +1,27 @@
+{
+  "id": "C034",
+  "tags": [
+    "charset-legacy",
+    "rfc2045",
+    "rfc2047"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "\u3053\u3093\u306B\u3061\u306F",
+        "contains": [],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "\u3053\u3093\u306B\u3061\u306F",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 0,
+    "attachments": []
+  }
+}

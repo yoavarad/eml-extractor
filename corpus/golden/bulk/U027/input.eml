@@ -1,0 +1,17 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: สวัสดี
+Message-Id: <U027@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="=-INL61s1dyjhtyUQog9VCvg=="
+
+--=-INL61s1dyjhtyUQog9VCvg==
+Content-Type: text/plain; charset=utf-8
+
+plain-ข้อความไทย
+--=-INL61s1dyjhtyUQog9VCvg==
+Content-Type: text/html; charset=utf-8
+
+<p>ข้อความไทย</p>
+--=-INL61s1dyjhtyUQog9VCvg==--

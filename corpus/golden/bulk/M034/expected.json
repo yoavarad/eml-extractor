@@ -1,0 +1,38 @@
+{
+  "id": "M034",
+  "tags": [
+    "rfc2046",
+    "multipart-alternative"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "malt-34",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "\u003Cp\u003Eh\u003C/p\u003E",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/html",
+    "attachment_count": 0,
+    "attachments": []
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "id": "M014",
+  "tags": [
+    "rfc2046",
+    "attachment"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "mixed-14",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "see file",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "note-14.txt",
+        "size": 8,
+        "sha256": "99b236278d04a882e7c3e156d5ad390ec2eef48e4d1f229505ad6f0d29543d6e",
+        "disposition": "attachment"
+      }
+    ]
+  }
+}

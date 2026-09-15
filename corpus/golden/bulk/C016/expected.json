@@ -1,0 +1,27 @@
+{
+  "id": "C016",
+  "tags": [
+    "charset-legacy",
+    "rfc2045",
+    "rfc2047"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "\u05E9\u05DC\u05D5\u05DD",
+        "contains": [],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "\u05E9\u05DC\u05D5\u05DD",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 0,
+    "attachments": []
+  }
+}

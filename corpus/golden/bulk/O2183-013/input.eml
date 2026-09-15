@@ -1,0 +1,19 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: fn-13
+Message-Id: <O2183-013@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-cXz8JLFnk1+GwOlW/7uHWA=="
+
+--=-cXz8JLFnk1+GwOlW/7uHWA==
+Content-Type: text/plain; charset=utf-8
+
+x
+--=-cXz8JLFnk1+GwOlW/7uHWA==
+Content-Type: text/plain; name="файл-13.txt"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="файл-13.txt"
+
+fn-13
+--=-cXz8JLFnk1+GwOlW/7uHWA==--

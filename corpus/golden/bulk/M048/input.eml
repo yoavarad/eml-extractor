@@ -1,0 +1,18 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: signed-48
+Message-Id: <M048@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-q8uPfsL3eYw3Wsmy1AsoeA=="
+
+--=-q8uPfsL3eYw3Wsmy1AsoeA==
+Content-Type: text/plain; charset=utf-8
+
+signed-48
+--=-q8uPfsL3eYw3Wsmy1AsoeA==
+Content-Type: application/pkcs7-signature; name=smime.p7s
+Content-Disposition: attachment; filename=smime.p7s
+
+SIG-48
+--=-q8uPfsL3eYw3Wsmy1AsoeA==--

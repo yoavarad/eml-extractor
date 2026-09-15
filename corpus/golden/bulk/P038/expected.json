@@ -1,0 +1,46 @@
+{
+  "id": "P038",
+  "tags": [
+    "rfc2183",
+    "path-in-filename"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "disp-win-38",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "x",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "file-38.txt",
+        "size": 8,
+        "sha256": "971c8ec5e14f7a9afb9fd7efb31a7e8260dfdedc7047d649cd265f896fa6a4fb",
+        "disposition": "attachment",
+        "full_path": "C:\\Temp\\file-38.txt"
+      }
+    ]
+  }
+}

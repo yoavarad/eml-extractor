@@ -1,0 +1,26 @@
+{
+  "id": "D019",
+  "tags": [
+    "detect",
+    "rfc5322"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "bom-subject",
+        "contains": [],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "bom-body",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 0,
+    "attachments": []
+  }
+}

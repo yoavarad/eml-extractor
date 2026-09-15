@@ -1,0 +1,19 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: file-42
+Message-Id: <F042@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-2PgxGbaA+pe5nAKrg3vdFQ=="
+
+--=-2PgxGbaA+pe5nAKrg3vdFQ==
+Content-Type: text/plain; charset=utf-8
+
+see
+--=-2PgxGbaA+pe5nAKrg3vdFQ==
+Content-Type: text/calendar; name=meet.ics
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename=meet.ics
+
+payload-F042-2
+--=-2PgxGbaA+pe5nAKrg3vdFQ==--

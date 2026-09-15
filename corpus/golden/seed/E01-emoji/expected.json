@@ -1,0 +1,16 @@
+{
+  "id": "E01-emoji",
+  "tags": ["unicode", "emoji", "rfc2047", "plain-body"],
+  "source": "generated",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": { "eq": "שלום 😀 中文" },
+      "from": { "contains": ["alice@example.com"] },
+      "to": { "contains": ["bob@example.com"] }
+    },
+    "main_content": { "eq": "hello emoji" },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 0
+  }
+}

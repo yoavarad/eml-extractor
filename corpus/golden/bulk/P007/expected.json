@@ -1,0 +1,45 @@
+{
+  "id": "P007",
+  "tags": [
+    "rfc2183",
+    "attachment"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "disp-a-7",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "x",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "file-7.bin",
+        "size": 8,
+        "sha256": "93e12e970fa97a56d73a30d6d5c6971411b4c37b19e0ca7c720aab831ece1fb5",
+        "disposition": "attachment"
+      }
+    ]
+  }
+}

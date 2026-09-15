@@ -1,0 +1,20 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: file-71
+Message-Id: <F071@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-p1g4idl9hCWRu0gAQBQXoQ=="
+
+--=-p1g4idl9hCWRu0gAQBQXoQ==
+Content-Type: text/plain; charset=utf-8
+
+see
+--=-p1g4idl9hCWRu0gAQBQXoQ==
+Content-Type: application/vnd.ms-outlook; name=mail.msg
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=mail.msg
+
+0M8R4KGxGuFtc2c6RjA3MQ==
+
+--=-p1g4idl9hCWRu0gAQBQXoQ==--

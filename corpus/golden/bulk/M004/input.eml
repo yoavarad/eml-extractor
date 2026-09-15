@@ -1,0 +1,19 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: mixed-4
+Message-Id: <M004@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-G1pKe2f4vBFSFhcGcoDm3g=="
+
+--=-G1pKe2f4vBFSFhcGcoDm3g==
+Content-Type: text/plain; charset=utf-8
+
+see file
+--=-G1pKe2f4vBFSFhcGcoDm3g==
+Content-Type: text/plain; name=note-4.txt
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename=note-4.txt
+
+txt:M004
+--=-G1pKe2f4vBFSFhcGcoDm3g==--

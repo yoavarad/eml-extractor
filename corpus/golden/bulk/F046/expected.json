@@ -1,0 +1,46 @@
+{
+  "id": "F046",
+  "tags": [
+    "attachment",
+    "calendar",
+    "rfc2046"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "file-46",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "see",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "me.vcf",
+        "size": 14,
+        "sha256": "60b4045770569708652ab54b78fd68643ba8c4fa7347af1c6558c8424121fabd",
+        "disposition": "attachment"
+      }
+    ]
+  }
+}

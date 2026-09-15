@@ -1,0 +1,48 @@
+{
+  "id": "A040",
+  "tags": [
+    "attachment",
+    "office",
+    "rfc2046"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "office-40",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "contains": [
+        "\u003C"
+      ],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/html",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "legacy.doc",
+        "size": 8,
+        "sha256": "46b67b7daef67fb6aaf9b39af732ca827be7f5f7c66f61306ec278040ba6be22",
+        "disposition": "attachment",
+        "full_path": "docs/legacy.doc"
+      }
+    ]
+  }
+}

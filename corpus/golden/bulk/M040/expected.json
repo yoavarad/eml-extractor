@@ -1,0 +1,44 @@
+{
+  "id": "M040",
+  "tags": [
+    "rfc2046",
+    "signed-smime"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "signed-40",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "signed-40",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "smime.p7s",
+        "size": 6,
+        "sha256": "008c6e065e1d53ef67c41ce1260bbba038c024833757de6741bca1b3d98e1acf"
+      }
+    ]
+  }
+}

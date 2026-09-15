@@ -1,0 +1,46 @@
+{
+  "id": "P037",
+  "tags": [
+    "rfc2183",
+    "path-in-filename"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "disp-win-37",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "x",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "file-37.txt",
+        "size": 8,
+        "sha256": "67fd0c6440895fa401a8fec79346b6c6b68dcf0b8a2f9d95eaafabfb17722644",
+        "disposition": "attachment",
+        "full_path": "C:\\Temp\\file-37.txt"
+      }
+    ]
+  }
+}

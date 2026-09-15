@@ -1,0 +1,20 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: office-68
+Message-Id: <A068@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-xiRMaNSV9eNS4Ycej5OChQ=="
+
+--=-xiRMaNSV9eNS4Ycej5OChQ==
+Content-Type: text/html; charset=utf-8
+
+<p>see</p>
+--=-xiRMaNSV9eNS4Ycej5OChQ==
+Content-Type: application/vnd.oasis.opendocument.text; name=text.odt
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=text.odt
+
+UEsDBG9kdDpBMDY4
+
+--=-xiRMaNSV9eNS4Ycej5OChQ==--

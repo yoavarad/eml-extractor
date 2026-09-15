@@ -1,0 +1,20 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: img-44
+Message-Id: <I044@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-tmzWyTNm9wU4S7w9JgBZAw=="
+
+--=-tmzWyTNm9wU4S7w9JgBZAw==
+Content-Type: text/plain; charset=utf-8
+
+see pic
+--=-tmzWyTNm9wU4S7w9JgBZAw==
+Content-Type: image/svg+xml; name=pic.svg
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=pic.svg
+
+PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIGlkPSdJMDQ0Jy8+
+
+--=-tmzWyTNm9wU4S7w9JgBZAw==--

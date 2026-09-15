@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/benches/">
+    <Project Path="benches/EmlExtraction.Bench/EmlExtraction.Bench.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/EmlExtraction/EmlExtraction.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/EmlExtraction.Tests/EmlExtraction.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/GoldenKit/GoldenKit.csproj" />
+  </Folder>
+</Solution>

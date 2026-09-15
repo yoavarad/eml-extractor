@@ -1,0 +1,47 @@
+{
+  "id": "I021",
+  "tags": [
+    "image",
+    "attachment",
+    "rfc2046"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "img-21",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "see pic",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "pic.gif",
+        "size": 14,
+        "sha256": "6c05bf0fd3d1dfd825525f53c98d11d9e2d0a79bf59cda4310e9007764c08f55",
+        "disposition": "attachment",
+        "full_path": "photos/pic.gif"
+      }
+    ]
+  }
+}

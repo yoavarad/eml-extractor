@@ -1,0 +1,12 @@
+{
+  "id": "E04-win1255",
+  "tags": ["charset-legacy", "windows-1255", "hebrew", "rfc2047"],
+  "source": "generated",
+  "is_eml": true,
+  "expect": {
+    "metadata": { "subject": { "eq": "שלום" } },
+    "main_content": { "eq": "שלום" },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 0
+  }
+}

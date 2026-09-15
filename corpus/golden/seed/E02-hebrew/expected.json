@@ -1,0 +1,15 @@
+{
+  "id": "E02-hebrew",
+  "tags": ["unicode", "rtl", "hebrew", "rfc2047", "plain-body"],
+  "source": "generated",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": { "eq": "שלום עולם בודק" },
+      "from": { "contains": ["yossi@example.com"] }
+    },
+    "main_content": { "eq": "שלום עולם" },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 0
+  }
+}

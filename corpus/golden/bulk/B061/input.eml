@@ -1,0 +1,17 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: alt-61
+Message-Id: <B061@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="=-EADqPFPeaNG/rj48V0gTOQ=="
+
+--=-EADqPFPeaNG/rj48V0gTOQ==
+Content-Type: text/plain; charset=utf-8
+
+plain-61
+--=-EADqPFPeaNG/rj48V0gTOQ==
+Content-Type: text/html; charset=utf-8
+
+<p>html-61</p>
+--=-EADqPFPeaNG/rj48V0gTOQ==--

@@ -1,0 +1,52 @@
+{
+  "id": "O2392-037",
+  "tags": [
+    "rfc2392",
+    "cid",
+    "image"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "two-cid-37",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "contains": [
+        "cid:a37@x",
+        "cid:b37@x"
+      ],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/html",
+    "attachment_count": 2,
+    "attachments": [
+      {
+        "name": "a.png",
+        "sha256": "c414cd0e204de974f73753c7e28d7638e7b3691bb8b1a2bab6b25bb7fed7ce77",
+        "disposition": "inline"
+      },
+      {
+        "name": "b.gif",
+        "sha256": "a84aaf86b281adbe86980c6e4b11239b945b49e0b4278c7bc22899faed2229ae",
+        "disposition": "inline"
+      }
+    ]
+  }
+}

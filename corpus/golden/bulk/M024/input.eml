@@ -1,0 +1,17 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: malt-24
+Message-Id: <M024@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="=-RyWE4pQ3dlQWjm1kLtmcjA=="
+
+--=-RyWE4pQ3dlQWjm1kLtmcjA==
+Content-Type: text/plain; charset=utf-8
+
+p
+--=-RyWE4pQ3dlQWjm1kLtmcjA==
+Content-Type: text/html; charset=utf-8
+
+<p>h</p>
+--=-RyWE4pQ3dlQWjm1kLtmcjA==--

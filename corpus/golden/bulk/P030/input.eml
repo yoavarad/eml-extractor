@@ -1,0 +1,19 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: disp-path-30
+Message-Id: <P030@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-C8YlK37NMFJE+RfpB/ovQQ=="
+
+--=-C8YlK37NMFJE+RfpB/ovQQ==
+Content-Type: text/plain; charset=utf-8
+
+x
+--=-C8YlK37NMFJE+RfpB/ovQQ==
+Content-Type: text/plain; name="inbox/30/file.txt"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="inbox/30/file.txt"
+
+txt:P030
+--=-C8YlK37NMFJE+RfpB/ovQQ==--

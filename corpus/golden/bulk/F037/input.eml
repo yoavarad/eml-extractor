@@ -1,0 +1,19 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: file-37
+Message-Id: <F037@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-Qz+6n+0/EJtXZ9z3kAqwJQ=="
+
+--=-Qz+6n+0/EJtXZ9z3kAqwJQ==
+Content-Type: text/plain; charset=utf-8
+
+see
+--=-Qz+6n+0/EJtXZ9z3kAqwJQ==
+Content-Type: text/markdown; name=a.md
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename=a.md
+
+payload-F037-1
+--=-Qz+6n+0/EJtXZ9z3kAqwJQ==--

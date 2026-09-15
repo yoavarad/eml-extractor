@@ -1,0 +1,10 @@
+From: alice@example.com
+To: bob@example.com
+Subject: =?gbk?B?xOO6ww==?=
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Message-ID: <C026@golden.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=gbk
+Content-Transfer-Encoding: base64
+
+xOO6ww==

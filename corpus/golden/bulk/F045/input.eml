@@ -1,0 +1,19 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: file-45
+Message-Id: <F045@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-jb3MLd70jp+b4X+RprEPmA=="
+
+--=-jb3MLd70jp+b4X+RprEPmA==
+Content-Type: text/plain; charset=utf-8
+
+see
+--=-jb3MLd70jp+b4X+RprEPmA==
+Content-Type: text/vcard; name=me.vcf
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename=me.vcf
+
+payload-F045-1
+--=-jb3MLd70jp+b4X+RprEPmA==--

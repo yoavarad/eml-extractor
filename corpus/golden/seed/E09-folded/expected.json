@@ -1,0 +1,13 @@
+{
+  "id": "E09-folded",
+  "tags": ["folded-header"],
+  "source": "generated",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": { "contains": ["hello", "world"] }
+    },
+    "main_content": { "eq": "folded" },
+    "attachment_count": 0
+  }
+}

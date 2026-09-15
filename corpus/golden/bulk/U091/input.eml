@@ -1,0 +1,17 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: გამარჯობა
+Message-Id: <U091@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="=-87wDY/si+OZ27sFiE8Gapw=="
+
+--=-87wDY/si+OZ27sFiE8Gapw==
+Content-Type: text/plain; charset=utf-8
+
+plain-ქართული
+--=-87wDY/si+OZ27sFiE8Gapw==
+Content-Type: text/html; charset=utf-8
+
+<p>ქართული</p>
+--=-87wDY/si+OZ27sFiE8Gapw==--

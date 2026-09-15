@@ -1,0 +1,9 @@
+bin/
+obj/
+.vs/
+*.user
+.DS_Store
+BenchmarkDotNet.Artifacts/
+corpus/internal/
+docs/golden-score.json
+

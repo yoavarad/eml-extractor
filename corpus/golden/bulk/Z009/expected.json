@@ -1,0 +1,27 @@
+{
+  "id": "Z009",
+  "tags": [
+    "folded-header",
+    "rfc5322"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "contains": [
+          "hello",
+          "folded-9"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "folded-body-9",
+      "contains": [],
+      "not_contains": []
+    },
+    "attachment_count": 0,
+    "attachments": []
+  }
+}

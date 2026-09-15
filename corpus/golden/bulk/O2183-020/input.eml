@@ -1,0 +1,19 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: fn-20
+Message-Id: <O2183-020@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-PQQnBCEFxoDWE7BBsrx+lg=="
+
+--=-PQQnBCEFxoDWE7BBsrx+lg==
+Content-Type: text/plain; charset=utf-8
+
+x
+--=-PQQnBCEFxoDWE7BBsrx+lg==
+Content-Type: text/plain; name="קובץ-20.txt"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="קובץ-20.txt"
+
+fn-20
+--=-PQQnBCEFxoDWE7BBsrx+lg==--

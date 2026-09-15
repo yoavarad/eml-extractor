@@ -1,0 +1,33 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: two-cid-20
+Message-Id: <O2392-020@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/related; boundary="=-wqpcJPTMGBi76GbCebFLPA==";
+	type="text/html"
+
+--=-wqpcJPTMGBi76GbCebFLPA==
+Content-Type: text/html; charset=utf-8
+
+<img src="cid:a20@x" /><img src="cid:b20@x" />
+--=-wqpcJPTMGBi76GbCebFLPA==
+Content-Type: image/png; name=a.png
+Content-Transfer-Encoding: base64
+Content-Disposition: inline; filename=a.png
+Content-Location: a.png
+Content-Id: <a20@x>
+
+iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
+IQAAAABJRU5ErkJggg==
+
+--=-wqpcJPTMGBi76GbCebFLPA==
+Content-Type: image/jpeg; name=b.jpg
+Content-Transfer-Encoding: base64
+Content-Disposition: inline; filename=b.jpg
+Content-Location: b.jpg
+Content-Id: <b20@x>
+
+/9j/4GpwZzpvMjM5MmItMjA=
+
+--=-wqpcJPTMGBi76GbCebFLPA==--

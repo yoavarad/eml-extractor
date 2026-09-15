@@ -1,0 +1,20 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: file-74
+Message-Id: <F074@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-xMqKq/752XQOQACdr+iSyg=="
+
+--=-xMqKq/752XQOQACdr+iSyg==
+Content-Type: text/plain; charset=utf-8
+
+see
+--=-xMqKq/752XQOQACdr+iSyg==
+Content-Type: application/octet-stream; name=a.dat
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=a.dat
+
+YmluOkYwNzQ=
+
+--=-xMqKq/752XQOQACdr+iSyg==--

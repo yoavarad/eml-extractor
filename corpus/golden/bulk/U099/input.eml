@@ -1,0 +1,17 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: עברית + English
+Message-Id: <U099@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="=-9h/L1Yckhprt6lFVWU8PhQ=="
+
+--=-9h/L1Yckhprt6lFVWU8PhQ==
+Content-Type: text/plain; charset=utf-8
+
+plain-bidi body
+--=-9h/L1Yckhprt6lFVWU8PhQ==
+Content-Type: text/html; charset=utf-8
+
+<p>bidi body</p>
+--=-9h/L1Yckhprt6lFVWU8PhQ==--

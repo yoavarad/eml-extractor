@@ -1,0 +1,17 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: नमस्ते दुनिया
+Message-Id: <U023@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="=-2D8OZuJuOzR5s3i9H/9LQA=="
+
+--=-2D8OZuJuOzR5s3i9H/9LQA==
+Content-Type: text/plain; charset=utf-8
+
+plain-हिन्दी पाठ
+--=-2D8OZuJuOzR5s3i9H/9LQA==
+Content-Type: text/html; charset=utf-8
+
+<p>हिन्दी पाठ</p>
+--=-2D8OZuJuOzR5s3i9H/9LQA==--

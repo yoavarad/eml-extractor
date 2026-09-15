@@ -1,0 +1,20 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: file-12
+Message-Id: <F012@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-gfmeBVUc/9CdPWr9LSYHOg=="
+
+--=-gfmeBVUc/9CdPWr9LSYHOg==
+Content-Type: text/plain; charset=utf-8
+
+see
+--=-gfmeBVUc/9CdPWr9LSYHOg==
+Content-Type: application/x-tar; name=a.tar
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=a.tar
+
+YmluOkYwMTI=
+
+--=-gfmeBVUc/9CdPWr9LSYHOg==--

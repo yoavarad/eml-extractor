@@ -1,0 +1,46 @@
+{
+  "id": "P036",
+  "tags": [
+    "rfc2183",
+    "path-in-filename"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "disp-win-36",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "x",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "file-36.txt",
+        "size": 8,
+        "sha256": "f2f23b77ce22718b881f7895834023871bb8fe95455a6867ea1b97415b1cc999",
+        "disposition": "attachment",
+        "full_path": "C:\\Temp\\file-36.txt"
+      }
+    ]
+  }
+}

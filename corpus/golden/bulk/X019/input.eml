@@ -1,0 +1,12 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: x-19
+Message-Id: <X019@golden.example>
+To: Bob <bob@example.com>
+X-Mailer: Mailer-19
+X_Custom_Field: team-19
+X-Spam-Score: 1.5
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+x

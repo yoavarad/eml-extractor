@@ -1,0 +1,20 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: office-96
+Message-Id: <A096@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-ylOzRvK/pIfpCa9ye/chAQ=="
+
+--=-ylOzRvK/pIfpCa9ye/chAQ==
+Content-Type: text/html; charset=utf-8
+
+<p>see</p>
+--=-ylOzRvK/pIfpCa9ye/chAQ==
+Content-Type: application/pdf; name=file.pdf
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=file.pdf
+
+JVBERi0xLjQtcGRmOkEwOTY=
+
+--=-ylOzRvK/pIfpCa9ye/chAQ==--

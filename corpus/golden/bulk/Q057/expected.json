@@ -1,0 +1,60 @@
+{
+  "id": "Q057",
+  "tags": [
+    "unicode",
+    "emoji",
+    "cid",
+    "office",
+    "x-headers",
+    "html-body"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "combo 57 \u4E2D\u6587",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "x_fields": {
+      "contains": [
+        "X-Mailer: Combo-57"
+      ],
+      "not_contains": []
+    },
+    "main_content": {
+      "contains": [
+        "cid:c57@x"
+      ],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/html",
+    "attachment_count": 2,
+    "attachments": [
+      {
+        "name": "p.png",
+        "sha256": "c414cd0e204de974f73753c7e28d7638e7b3691bb8b1a2bab6b25bb7fed7ce77",
+        "disposition": "inline"
+      },
+      {
+        "name": "r.docx",
+        "size": 13,
+        "sha256": "aa72b967f7c1e51c7dfd91ef33fe62eed4d4e29f3ec7d9ebfdcd571690d57ca5"
+      }
+    ]
+  }
+}

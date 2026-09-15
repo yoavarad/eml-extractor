@@ -1,0 +1,10 @@
+From: alice@example.com
+To: bob@example.com
+Subject: =?windows-1252?B?Y2Fm6Q==?=
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Message-ID: <C010@golden.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: base64
+
+Y2Fm6Q==

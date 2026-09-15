@@ -1,0 +1,47 @@
+{
+  "id": "A016",
+  "tags": [
+    "attachment",
+    "office",
+    "rfc2046"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "office-16",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "contains": [
+        "\u003C"
+      ],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/html",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "sheet.xlsx",
+        "size": 13,
+        "sha256": "a8f836e2d2ad0f5f7f1b87f07b13907772f1ee82f2a3ca56f0e8649fef608b11",
+        "disposition": "attachment"
+      }
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: file-61
+Message-Id: <F061@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-XExvG6jWv7D3+q/ieA8PZA=="
+
+--=-XExvG6jWv7D3+q/ieA8PZA==
+Content-Type: text/plain; charset=utf-8
+
+see
+--=-XExvG6jWv7D3+q/ieA8PZA==
+Content-Type: application/octet-stream; name=a.bin
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=a.bin
+
+YmluOkYwNjE=
+
+--=-XExvG6jWv7D3+q/ieA8PZA==--

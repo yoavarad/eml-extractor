@@ -1,0 +1,20 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: file-57
+Message-Id: <F057@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-NtIpeQcI/hWJ/LdKW+5YVA=="
+
+--=-NtIpeQcI/hWJ/LdKW+5YVA==
+Content-Type: text/plain; charset=utf-8
+
+see
+--=-NtIpeQcI/hWJ/LdKW+5YVA==
+Content-Type: video/mp4; name=a.mp4
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=a.mp4
+
+AAAAGGZ0eXBtcDQybXA0OkYwNTc=
+
+--=-NtIpeQcI/hWJ/LdKW+5YVA==--

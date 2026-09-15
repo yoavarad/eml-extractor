@@ -1,0 +1,35 @@
+{
+  "id": "O6532-016",
+  "tags": [
+    "rfc6532",
+    "unicode",
+    "rtl"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "contains": [
+          "\u05E2\u05D1\u05E8\u05D9\u05EA \u05D2\u05D5\u05DC\u05DE\u05D9\u05EA"
+        ],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "yossi@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "contains": [
+        "\u05D2\u05D5\u05E3"
+      ],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 0,
+    "attachments": []
+  }
+}

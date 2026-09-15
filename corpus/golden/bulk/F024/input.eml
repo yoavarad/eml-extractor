@@ -1,0 +1,19 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: file-24
+Message-Id: <F024@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-awdAL4PwvVPrPt+Tbu3qiA=="
+
+--=-awdAL4PwvVPrPt+Tbu3qiA==
+Content-Type: text/plain; charset=utf-8
+
+see
+--=-awdAL4PwvVPrPt+Tbu3qiA==
+Content-Type: text/csv; name=a.csv
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename=a.csv
+
+payload-F024-4
+--=-awdAL4PwvVPrPt+Tbu3qiA==--

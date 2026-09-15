@@ -1,0 +1,46 @@
+{
+  "id": "P023",
+  "tags": [
+    "rfc2183",
+    "path-in-filename"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "disp-path-23",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "x",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "file.txt",
+        "size": 8,
+        "sha256": "1230544c90d10f4c4a007580f30ab427d10edbba93f3672f692bd40be1ecbbe2",
+        "disposition": "attachment",
+        "full_path": "inbox/23/file.txt"
+      }
+    ]
+  }
+}

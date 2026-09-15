@@ -1,0 +1,27 @@
+{
+  "id": "C025",
+  "tags": [
+    "charset-legacy",
+    "rfc2045",
+    "rfc2047"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "\u041F\u0440\u0438\u0432\u0435\u0442",
+        "contains": [],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "\u041F\u0440\u0438\u0432\u0435\u0442",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 0,
+    "attachments": []
+  }
+}

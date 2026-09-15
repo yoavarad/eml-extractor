@@ -1,0 +1,19 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: fn-34
+Message-Id: <O2183-034@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-jiyOWfIJ7EJM0mNcx1OSrg=="
+
+--=-jiyOWfIJ7EJM0mNcx1OSrg==
+Content-Type: text/plain; charset=utf-8
+
+x
+--=-jiyOWfIJ7EJM0mNcx1OSrg==
+Content-Type: text/plain; name="קובץ-34.txt"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="קובץ-34.txt"
+
+fn-34
+--=-jiyOWfIJ7EJM0mNcx1OSrg==--

@@ -1,0 +1,40 @@
+{
+  "id": "S028",
+  "tags": [
+    "rfc6532",
+    "unicode",
+    "arabic",
+    "rtl"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "utf8-28",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "mohammed@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "hello \u0645\u062D\u0645\u062F",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 0,
+    "attachments": []
+  }
+}

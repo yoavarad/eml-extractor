@@ -1,0 +1,48 @@
+{
+  "id": "A090",
+  "tags": [
+    "attachment",
+    "office",
+    "rfc2046"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "office-90",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "contains": [
+        "\u003C"
+      ],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/html",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "show.odp",
+        "size": 12,
+        "sha256": "5710e580589d5e9cc50a6a2bc1a9eb1a796a6e7927a1962d85cb8c05b3fe8309",
+        "disposition": "attachment",
+        "full_path": "docs/show.odp"
+      }
+    ]
+  }
+}

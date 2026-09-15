@@ -1,0 +1,19 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: fn-35
+Message-Id: <O2183-035@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-HC+fDjLNKPLzCSsbYmS3nw=="
+
+--=-HC+fDjLNKPLzCSsbYmS3nw==
+Content-Type: text/plain; charset=utf-8
+
+x
+--=-HC+fDjLNKPLzCSsbYmS3nw==
+Content-Type: text/plain; name="файл-35.txt"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="файл-35.txt"
+
+fn-35
+--=-HC+fDjLNKPLzCSsbYmS3nw==--

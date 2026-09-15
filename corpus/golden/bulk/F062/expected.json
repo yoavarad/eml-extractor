@@ -1,0 +1,46 @@
+{
+  "id": "F062",
+  "tags": [
+    "attachment",
+    "binary",
+    "rfc2046"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "file-62",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "see",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "a.bin",
+        "size": 8,
+        "sha256": "a8710649468462cbdf5cf93dfda7f09c6c8c3d36934ba5651d2064f089c32856",
+        "disposition": "attachment"
+      }
+    ]
+  }
+}

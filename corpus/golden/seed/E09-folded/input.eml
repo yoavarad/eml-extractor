@@ -1,0 +1,10 @@
+From: Alice <alice@example.com>
+To: Bob <bob@example.com>
+Subject: hello
+ world and more
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Message-ID: <e09@example.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+folded

@@ -1,0 +1,46 @@
+{
+  "id": "F042",
+  "tags": [
+    "attachment",
+    "calendar",
+    "rfc2046"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "file-42",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "see",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "meet.ics",
+        "size": 14,
+        "sha256": "e59d13cf4fed84f183683454f3dcb7a6a8e3ca269e97916e240a6f237114eabd",
+        "disposition": "attachment"
+      }
+    ]
+  }
+}

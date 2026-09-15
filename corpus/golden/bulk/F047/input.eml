@@ -1,0 +1,19 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: file-47
+Message-Id: <F047@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-A7l/PE7Rb39vx0lXqLcYZg=="
+
+--=-A7l/PE7Rb39vx0lXqLcYZg==
+Content-Type: text/plain; charset=utf-8
+
+see
+--=-A7l/PE7Rb39vx0lXqLcYZg==
+Content-Type: text/vcard; name=me.vcf
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename=me.vcf
+
+payload-F047-3
+--=-A7l/PE7Rb39vx0lXqLcYZg==--

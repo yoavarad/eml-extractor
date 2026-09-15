@@ -1,0 +1,56 @@
+{
+  "id": "H059",
+  "tags": [
+    "rfc5322",
+    "rfc822"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "received-59",
+        "contains": [],
+        "not_contains": []
+      },
+      "received": {
+        "contains": [
+          "example.net"
+        ],
+        "not_contains": []
+      },
+      "returnpath": {
+        "contains": [
+          "bounce@example.com"
+        ],
+        "not_contains": []
+      },
+      "inreplyto": {
+        "contains": [
+          "prev@example.com"
+        ],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "recv",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 0,
+    "attachments": []
+  }
+}

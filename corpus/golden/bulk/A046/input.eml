@@ -1,0 +1,20 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: office-46
+Message-Id: <A046@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-WklOKI7bgMatCpfpBVtUxA=="
+
+--=-WklOKI7bgMatCpfpBVtUxA==
+Content-Type: text/html; charset=utf-8
+
+<p>see</p>
+--=-WklOKI7bgMatCpfpBVtUxA==
+Content-Type: application/vnd.ms-excel; name=legacy.xls
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=legacy.xls
+
+YmluOkEwNDY=
+
+--=-WklOKI7bgMatCpfpBVtUxA==--

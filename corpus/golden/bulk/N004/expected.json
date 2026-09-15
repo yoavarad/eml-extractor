@@ -1,0 +1,59 @@
+{
+  "id": "N004",
+  "tags": [
+    "nested-rfc822",
+    "no-recurse",
+    "rfc822"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "outer",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "outer-body",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "forwarded-4.eml",
+        "reextract": {
+          "metadata": {
+            "subject": {
+              "eq": "inner-4",
+              "contains": [],
+              "not_contains": []
+            }
+          },
+          "main_content": {
+            "eq": "inner-body-4",
+            "contains": [],
+            "not_contains": []
+          },
+          "attachment_count": 0,
+          "attachments": []
+        }
+      }
+    ]
+  }
+}

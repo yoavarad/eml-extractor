@@ -1,0 +1,9 @@
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: utf8-6
+Message-Id: <S006@golden.example>
+To: Bob <bob@example.com>
+From: יוסי <yossi@example.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+hello יוסי

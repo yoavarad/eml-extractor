@@ -1,0 +1,20 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: file-51
+Message-Id: <F051@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-I3BCwpauBQrRZh30Yb9NoA=="
+
+--=-I3BCwpauBQrRZh30Yb9NoA==
+Content-Type: text/plain; charset=utf-8
+
+see
+--=-I3BCwpauBQrRZh30Yb9NoA==
+Content-Type: audio/mpeg; name=a.mp3
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=a.mp3
+
+SUQzbXAzOkYwNTE=
+
+--=-I3BCwpauBQrRZh30Yb9NoA==--

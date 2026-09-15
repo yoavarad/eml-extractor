@@ -1,0 +1,18 @@
+{
+  "id": "E05-docx",
+  "tags": ["attachment", "office", "docx"],
+  "source": "generated",
+  "is_eml": true,
+  "expect": {
+    "main_content": { "eq": "see attach" },
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "report.docx",
+        "size": 17,
+        "sha256": "90c08aca87e13b1272ae46b66537280d13b92263dde610a1c7b7cae6ac592ea3",
+        "disposition": "attachment"
+      }
+    ]
+  }
+}

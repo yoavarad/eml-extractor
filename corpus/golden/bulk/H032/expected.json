@@ -1,0 +1,44 @@
+{
+  "id": "H032",
+  "tags": [
+    "rfc5322",
+    "rfc822"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "classic-32",
+        "contains": [],
+        "not_contains": []
+      },
+      "cc": {
+        "contains": [
+          "carol@example.com"
+        ],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "hbody-32",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 0,
+    "attachments": []
+  }
+}

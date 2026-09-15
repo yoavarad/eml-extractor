@@ -1,0 +1,47 @@
+{
+  "id": "A094",
+  "tags": [
+    "attachment",
+    "pdf",
+    "rfc2046"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "office-94",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "contains": [
+        "\u003C"
+      ],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/html",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "file.pdf",
+        "size": 17,
+        "sha256": "b250227f9a6a960afcf8d3b66660097bd5d30e2a68334be8641d81ad6c9c0e44",
+        "disposition": "attachment"
+      }
+    ]
+  }
+}

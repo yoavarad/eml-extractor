@@ -1,0 +1,20 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: img-36
+Message-Id: <I036@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-w4PKeD/3RSbfpI2QvRmpBQ=="
+
+--=-w4PKeD/3RSbfpI2QvRmpBQ==
+Content-Type: text/plain; charset=utf-8
+
+see pic
+--=-w4PKeD/3RSbfpI2QvRmpBQ==
+Content-Type: image/tiff; name=pic.tif
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=pic.tif
+
+SUkqAHRpZjpJMDM2
+
+--=-w4PKeD/3RSbfpI2QvRmpBQ==--

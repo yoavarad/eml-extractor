@@ -1,0 +1,13 @@
+{
+  "id": "D022",
+  "tags": [
+    "detect",
+    "not-eml"
+  ],
+  "source": "generated-bulk",
+  "is_eml": false,
+  "expect": {
+    "metadata": {},
+    "attachments": []
+  }
+}

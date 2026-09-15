@@ -1,0 +1,7 @@
+{
+  "id": "E19-ole",
+  "tags": ["not-eml", "ole", "msg"],
+  "source": "generated",
+  "is_eml": false,
+  "expect": {}
+}

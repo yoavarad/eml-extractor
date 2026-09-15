@@ -1,0 +1,19 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: disp-win-34
+Message-Id: <P034@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-KA4OFalPa4Dile5fX9q46w=="
+
+--=-KA4OFalPa4Dile5fX9q46w==
+Content-Type: text/plain; charset=utf-8
+
+x
+--=-KA4OFalPa4Dile5fX9q46w==
+Content-Type: text/plain; name="C:\\Temp\\file-34.txt"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="C:\\Temp\\file-34.txt"
+
+txt:P034
+--=-KA4OFalPa4Dile5fX9q46w==--

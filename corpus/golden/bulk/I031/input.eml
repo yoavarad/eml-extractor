@@ -1,0 +1,20 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: img-31
+Message-Id: <I031@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-COhPa846CqPYVztkPfXaMw=="
+
+--=-COhPa846CqPYVztkPfXaMw==
+Content-Type: text/plain; charset=utf-8
+
+see pic
+--=-COhPa846CqPYVztkPfXaMw==
+Content-Type: image/bmp; name=pic.bmp
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=pic.bmp
+
+Qk1ibXA6STAzMQ==
+
+--=-COhPa846CqPYVztkPfXaMw==--

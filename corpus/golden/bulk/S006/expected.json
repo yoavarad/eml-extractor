@@ -1,0 +1,40 @@
+{
+  "id": "S006",
+  "tags": [
+    "rfc6532",
+    "unicode",
+    "hebrew",
+    "rtl"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "utf8-6",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "yossi@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "hello \u05D9\u05D5\u05E1\u05D9",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 0,
+    "attachments": []
+  }
+}

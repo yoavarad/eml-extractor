@@ -1,0 +1,38 @@
+{
+  "id": "S019",
+  "tags": [
+    "rfc6532",
+    "unicode"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "utf8-19",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "vlad@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "hello \u0412\u043B\u0430\u0434\u0438\u043C\u0438\u0440",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 0,
+    "attachments": []
+  }
+}

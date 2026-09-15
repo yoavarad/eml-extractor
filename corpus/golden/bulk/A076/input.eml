@@ -1,0 +1,20 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: office-76
+Message-Id: <A076@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-yE6tasi+gwDkKbRfVojrrQ=="
+
+--=-yE6tasi+gwDkKbRfVojrrQ==
+Content-Type: text/html; charset=utf-8
+
+<p>see</p>
+--=-yE6tasi+gwDkKbRfVojrrQ==
+Content-Type: application/vnd.oasis.opendocument.spreadsheet; name=calc.ods
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=calc.ods
+
+UEsDBG9kczpBMDc2
+
+--=-yE6tasi+gwDkKbRfVojrrQ==--

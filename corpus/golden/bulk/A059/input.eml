@@ -1,0 +1,20 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: office-59
+Message-Id: <A059@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-SNOzhHxGX66C1SFA9ZD3Pg=="
+
+--=-SNOzhHxGX66C1SFA9ZD3Pg==
+Content-Type: text/plain; charset=utf-8
+
+see
+--=-SNOzhHxGX66C1SFA9ZD3Pg==
+Content-Type: application/vnd.ms-powerpoint; name=legacy.ppt
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=legacy.ppt
+
+YmluOkEwNTk=
+
+--=-SNOzhHxGX66C1SFA9ZD3Pg==--

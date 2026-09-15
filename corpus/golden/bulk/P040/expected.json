@@ -1,0 +1,46 @@
+{
+  "id": "P040",
+  "tags": [
+    "rfc2183",
+    "path-in-filename"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "disp-win-40",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "x",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "file-40.txt",
+        "size": 8,
+        "sha256": "99c0f53d014d45cd8530bf5cabf6943b9e8a5aa499a49abbce3e9ef626fe7b45",
+        "disposition": "attachment",
+        "full_path": "C:\\Temp\\file-40.txt"
+      }
+    ]
+  }
+}

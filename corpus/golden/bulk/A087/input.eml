@@ -1,0 +1,20 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: office-87
+Message-Id: <A087@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-xAxeuSoyWYgv6i9ULc0VXw=="
+
+--=-xAxeuSoyWYgv6i9ULc0VXw==
+Content-Type: text/plain; charset=utf-8
+
+see
+--=-xAxeuSoyWYgv6i9ULc0VXw==
+Content-Type: application/vnd.oasis.opendocument.presentation; name=show.odp
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=show.odp
+
+UEsDBG9kcDpBMDg3
+
+--=-xAxeuSoyWYgv6i9ULc0VXw==--

@@ -1,0 +1,39 @@
+{
+  "id": "S007",
+  "tags": [
+    "rfc6532",
+    "unicode",
+    "cjk"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "utf8-7",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "li@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "hello \u674E",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 0,
+    "attachments": []
+  }
+}

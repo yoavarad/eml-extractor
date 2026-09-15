@@ -1,0 +1,46 @@
+{
+  "id": "P033",
+  "tags": [
+    "rfc2183",
+    "path-in-filename"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "disp-win-33",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "x",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "file-33.txt",
+        "size": 8,
+        "sha256": "5974c1ee960254873733226cfbc0e44273d0192b53cfe44d7965ed0b8fc6ca6b",
+        "disposition": "attachment",
+        "full_path": "C:\\Temp\\file-33.txt"
+      }
+    ]
+  }
+}

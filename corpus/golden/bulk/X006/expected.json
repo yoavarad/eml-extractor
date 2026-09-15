@@ -1,0 +1,54 @@
+{
+  "id": "X006",
+  "tags": [
+    "x-headers",
+    "rfc5322"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "x-6",
+        "contains": [],
+        "not_contains": []
+      },
+      "dkim_signature": {
+        "contains": [
+          "v=1"
+        ],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "x_fields": {
+      "contains": [
+        "X-Mailer: Mailer-6",
+        "X_Custom_Field: team-6",
+        "X-Spam-Score:"
+      ],
+      "not_contains": [
+        "DKIM-Signature"
+      ]
+    },
+    "main_content": {
+      "eq": "x",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 0,
+    "attachments": []
+  }
+}

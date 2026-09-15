@@ -1,0 +1,20 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: file-6
+Message-Id: <F006@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-K/3fkvm/i3st+Xqj6dO7nQ=="
+
+--=-K/3fkvm/i3st+Xqj6dO7nQ==
+Content-Type: text/plain; charset=utf-8
+
+see
+--=-K/3fkvm/i3st+Xqj6dO7nQ==
+Content-Type: application/x-7z-compressed; name=a.7z
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=a.7z
+
+N3q8ryccN3o6RjAwNg==
+
+--=-K/3fkvm/i3st+Xqj6dO7nQ==--

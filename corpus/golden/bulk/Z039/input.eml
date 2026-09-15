@@ -1,0 +1,17 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: nameless-39
+Message-Id: <Z039@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-BYSVNXvlt4owpyNV3cYgAQ=="
+
+--=-BYSVNXvlt4owpyNV3cYgAQ==
+Content-Type: text/plain; charset=utf-8
+
+x
+--=-BYSVNXvlt4owpyNV3cYgAQ==
+Content-Type: application/octet-stream
+
+nameless-39
+--=-BYSVNXvlt4owpyNV3cYgAQ==--

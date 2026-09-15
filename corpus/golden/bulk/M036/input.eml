@@ -1,0 +1,18 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: signed-36
+Message-Id: <M036@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-Gz1LKynxzJeZh0V35YTjqQ=="
+
+--=-Gz1LKynxzJeZh0V35YTjqQ==
+Content-Type: text/plain; charset=utf-8
+
+signed-36
+--=-Gz1LKynxzJeZh0V35YTjqQ==
+Content-Type: application/pkcs7-signature; name=smime.p7s
+Content-Disposition: attachment; filename=smime.p7s
+
+SIG-36
+--=-Gz1LKynxzJeZh0V35YTjqQ==--

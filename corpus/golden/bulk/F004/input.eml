@@ -1,0 +1,20 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: file-4
+Message-Id: <F004@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-4v19wrSd9nsWwO8A9umVBQ=="
+
+--=-4v19wrSd9nsWwO8A9umVBQ==
+Content-Type: text/plain; charset=utf-8
+
+see
+--=-4v19wrSd9nsWwO8A9umVBQ==
+Content-Type: application/zip; name=a.zip
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=a.zip
+
+UEsDBHppcDpGMDA0
+
+--=-4v19wrSd9nsWwO8A9umVBQ==--

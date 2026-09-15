@@ -1,0 +1,25 @@
+{
+  "id": "B066",
+  "tags": [
+    "empty-body",
+    "rfc5322"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "empty-66",
+        "contains": [],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "",
+      "contains": [],
+      "not_contains": []
+    },
+    "attachment_count": 0,
+    "attachments": []
+  }
+}

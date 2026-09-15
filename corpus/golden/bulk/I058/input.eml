@@ -1,0 +1,20 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: img-58
+Message-Id: <I058@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-P0B5QG6bEdAa2aLYKO2XCQ=="
+
+--=-P0B5QG6bEdAa2aLYKO2XCQ==
+Content-Type: text/plain; charset=utf-8
+
+see pic
+--=-P0B5QG6bEdAa2aLYKO2XCQ==
+Content-Type: image/heic; name=pic.heic
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=pic.heic
+
+AAAAGGZ0eXBoZWljaGVpYzpJMDU4
+
+--=-P0B5QG6bEdAa2aLYKO2XCQ==--

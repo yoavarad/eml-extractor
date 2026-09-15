@@ -1,0 +1,19 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: trav-16
+Message-Id: <Z016@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-mhkzjl/T+lLY1agrgvbJjg=="
+
+--=-mhkzjl/T+lLY1agrgvbJjg==
+Content-Type: text/plain; charset=utf-8
+
+x
+--=-mhkzjl/T+lLY1agrgvbJjg==
+Content-Type: text/plain; name="../../etc/passwd-16.txt"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="../../etc/passwd-16.txt"
+
+secret
+--=-mhkzjl/T+lLY1agrgvbJjg==--

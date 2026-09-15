@@ -1,0 +1,21 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: office-17
+Message-Id: <A017@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-1hkWDAz/pSq+f58TR0n52A=="
+
+--=-1hkWDAz/pSq+f58TR0n52A==
+Content-Type: text/plain; charset=utf-8
+
+see
+--=-1hkWDAz/pSq+f58TR0n52A==
+Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;
+	name=sheet.xlsx
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=sheet.xlsx
+
+UEsDBHhsc3g6QTAxNw==
+
+--=-1hkWDAz/pSq+f58TR0n52A==--

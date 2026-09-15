@@ -1,0 +1,10 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: classic-34
+Message-Id: <H034@golden.example>
+To: Bob <bob@example.com>
+Cc: Carol <carol@example.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+hbody-34

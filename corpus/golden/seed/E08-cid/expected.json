@@ -1,0 +1,19 @@
+{
+  "id": "E08-cid",
+  "tags": ["cid", "inline", "image", "multipart-related", "html-body"],
+  "source": "generated",
+  "is_eml": true,
+  "expect": {
+    "main_content": { "contains": ["cid:paste@local"], "not_contains": ["iVBORw0KGgo"] },
+    "main_content_mime_type": "text/html",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "paste.png",
+        "size": 70,
+        "sha256": "c414cd0e204de974f73753c7e28d7638e7b3691bb8b1a2bab6b25bb7fed7ce77",
+        "disposition": "inline"
+      }
+    ]
+  }
+}

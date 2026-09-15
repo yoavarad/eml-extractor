@@ -1,0 +1,47 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: combo 18 中文
+Message-Id: <Q018@golden.example>
+To: Bob <bob@example.com>
+X-Mailer: Combo-18
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-wvvYLxvwiQibZWW0GGC3yg=="
+
+--=-wvvYLxvwiQibZWW0GGC3yg==
+Content-Type: multipart/alternative; boundary="=-NxNbPfvxwkCLd0Ky1sctBg=="
+
+--=-NxNbPfvxwkCLd0Ky1sctBg==
+Content-Type: text/plain; charset=utf-8
+
+plain-18
+--=-NxNbPfvxwkCLd0Ky1sctBg==
+Content-Type: multipart/related; boundary="=-2J2SPX4u/viAywLWW/FNCw==";
+	type="text/html"
+
+--=-2J2SPX4u/viAywLWW/FNCw==
+Content-Type: text/html; charset=utf-8
+
+<p>שלום 18 😀</p><img src="cid:c18@x" />
+--=-2J2SPX4u/viAywLWW/FNCw==
+Content-Type: image/png; name=p.png
+Content-Transfer-Encoding: base64
+Content-Disposition: inline; filename=p.png
+Content-Location: p.png
+Content-Id: <c18@x>
+
+iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
+IQAAAABJRU5ErkJggg==
+
+--=-2J2SPX4u/viAywLWW/FNCw==--
+
+--=-NxNbPfvxwkCLd0Ky1sctBg==--
+
+--=-wvvYLxvwiQibZWW0GGC3yg==
+Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document;
+	name=r.docx
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=r.docx
+
+UEsDBGRvY3g6UTAxOA==
+
+--=-wvvYLxvwiQibZWW0GGC3yg==--

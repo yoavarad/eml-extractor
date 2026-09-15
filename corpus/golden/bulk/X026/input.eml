@@ -1,0 +1,13 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: x-26
+Message-Id: <X026@golden.example>
+To: Bob <bob@example.com>
+X-Mailer: Mailer-26
+X_Custom_Field: team-26
+X-Spam-Score: 8.5
+DKIM-Signature: v=1; dummy
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+x

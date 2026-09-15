@@ -1,0 +1,17 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: السلام عليكم
+Message-Id: <U007@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="=-d5zu06uVZ/wkEtRKoN35EQ=="
+
+--=-d5zu06uVZ/wkEtRKoN35EQ==
+Content-Type: text/plain; charset=utf-8
+
+plain-نص عربي
+--=-d5zu06uVZ/wkEtRKoN35EQ==
+Content-Type: text/html; charset=utf-8
+
+<p>نص عربي</p>
+--=-d5zu06uVZ/wkEtRKoN35EQ==--

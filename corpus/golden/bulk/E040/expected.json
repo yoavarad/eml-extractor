@@ -1,0 +1,20 @@
+{
+  "id": "E040",
+  "tags": [
+    "rfc2045",
+    "corrupt-transfer-encoding"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "corrupt-40",
+        "contains": [],
+        "not_contains": []
+      }
+    },
+    "attachment_count": 0,
+    "attachments": []
+  }
+}

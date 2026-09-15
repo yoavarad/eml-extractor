@@ -1,0 +1,10 @@
+From: alice@example.com
+To: bob@example.com
+Subject: =?iso-8859-2?B?WmG/87Pm?=
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Message-ID: <C046@golden.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-2
+Content-Transfer-Encoding: base64
+
+WmG/87Pm

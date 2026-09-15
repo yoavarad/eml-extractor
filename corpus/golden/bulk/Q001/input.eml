@@ -1,0 +1,47 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: combo 1 中文
+Message-Id: <Q001@golden.example>
+To: Bob <bob@example.com>
+X-Mailer: Combo-1
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-79FtRs6UqKKIZKo6kcKX5Q=="
+
+--=-79FtRs6UqKKIZKo6kcKX5Q==
+Content-Type: multipart/alternative; boundary="=-d21XI+HFKSH1lv1ZoWt+kQ=="
+
+--=-d21XI+HFKSH1lv1ZoWt+kQ==
+Content-Type: text/plain; charset=utf-8
+
+plain-1
+--=-d21XI+HFKSH1lv1ZoWt+kQ==
+Content-Type: multipart/related; boundary="=-A24zo/IJJ5N6QSRhsL++hw==";
+	type="text/html"
+
+--=-A24zo/IJJ5N6QSRhsL++hw==
+Content-Type: text/html; charset=utf-8
+
+<p>שלום 1 😀</p><img src="cid:c1@x" />
+--=-A24zo/IJJ5N6QSRhsL++hw==
+Content-Type: image/png; name=p.png
+Content-Transfer-Encoding: base64
+Content-Disposition: inline; filename=p.png
+Content-Location: p.png
+Content-Id: <c1@x>
+
+iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
+IQAAAABJRU5ErkJggg==
+
+--=-A24zo/IJJ5N6QSRhsL++hw==--
+
+--=-d21XI+HFKSH1lv1ZoWt+kQ==--
+
+--=-79FtRs6UqKKIZKo6kcKX5Q==
+Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document;
+	name=r.docx
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=r.docx
+
+UEsDBGRvY3g6UTAwMQ==
+
+--=-79FtRs6UqKKIZKo6kcKX5Q==--

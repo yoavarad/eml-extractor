@@ -1,0 +1,17 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: xin chào
+Message-Id: <U087@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="=-LgQoCK3AvWGICK041Vb5Vw=="
+
+--=-LgQoCK3AvWGICK041Vb5Vw==
+Content-Type: text/plain; charset=utf-8
+
+plain-Tiếng Việt
+--=-LgQoCK3AvWGICK041Vb5Vw==
+Content-Type: text/html; charset=utf-8
+
+<p>Tiếng Việt</p>
+--=-LgQoCK3AvWGICK041Vb5Vw==--

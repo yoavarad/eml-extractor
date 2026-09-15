@@ -1,0 +1,46 @@
+{
+  "id": "P032",
+  "tags": [
+    "rfc2183",
+    "path-in-filename"
+  ],
+  "source": "generated-bulk",
+  "is_eml": true,
+  "expect": {
+    "metadata": {
+      "subject": {
+        "eq": "disp-win-32",
+        "contains": [],
+        "not_contains": []
+      },
+      "from": {
+        "contains": [
+          "alice@example.com"
+        ],
+        "not_contains": []
+      },
+      "to": {
+        "contains": [
+          "bob@example.com"
+        ],
+        "not_contains": []
+      }
+    },
+    "main_content": {
+      "eq": "x",
+      "contains": [],
+      "not_contains": []
+    },
+    "main_content_mime_type": "text/plain",
+    "attachment_count": 1,
+    "attachments": [
+      {
+        "name": "file-32.txt",
+        "size": 8,
+        "sha256": "df1d9b2d9ccc6a3a6db423697c55c2839a498ffacd3883243ab6f394e1c6daa8",
+        "disposition": "attachment",
+        "full_path": "C:\\Temp\\file-32.txt"
+      }
+    ]
+  }
+}

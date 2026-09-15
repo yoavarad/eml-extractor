@@ -1,0 +1,19 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: file-25
+Message-Id: <F025@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-hexmcSRWsUZg3sIeVglqxw=="
+
+--=-hexmcSRWsUZg3sIeVglqxw==
+Content-Type: text/plain; charset=utf-8
+
+see
+--=-hexmcSRWsUZg3sIeVglqxw==
+Content-Type: text/html; name=a.html
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename=a.html
+
+payload-F025-1
+--=-hexmcSRWsUZg3sIeVglqxw==--

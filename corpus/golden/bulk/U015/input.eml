@@ -1,0 +1,17 @@
+From: Alice <alice@example.com>
+Date: Tue, 15 Sep 2026 07:00:00 +0000
+Subject: こんにちは
+Message-Id: <U015@golden.example>
+To: Bob <bob@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="=-O0RyyCwEPlWmAVIiCa6JWw=="
+
+--=-O0RyyCwEPlWmAVIiCa6JWw==
+Content-Type: text/plain; charset=utf-8
+
+plain-日本語の本文
+--=-O0RyyCwEPlWmAVIiCa6JWw==
+Content-Type: text/html; charset=utf-8
+
+<p>日本語の本文</p>
+--=-O0RyyCwEPlWmAVIiCa6JWw==--
