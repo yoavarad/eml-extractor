@@ -4,16 +4,16 @@ Subject: mixed-8
 Message-Id: <M008@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-kRGaDbCqyX5QLdrRySlRoA=="
+Content-Type: multipart/mixed; boundary="=-FUXBkWa+OkLB4GMCqh4TBQ=="
 
---=-kRGaDbCqyX5QLdrRySlRoA==
+--=-FUXBkWa+OkLB4GMCqh4TBQ==
 Content-Type: text/plain; charset=utf-8
 
 see file
---=-kRGaDbCqyX5QLdrRySlRoA==
+--=-FUXBkWa+OkLB4GMCqh4TBQ==
 Content-Type: text/plain; name=note-8.txt
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename=note-8.txt
 
 txt:M008
---=-kRGaDbCqyX5QLdrRySlRoA==--
+--=-FUXBkWa+OkLB4GMCqh4TBQ==--

@@ -4,15 +4,15 @@ Subject: signed-45
 Message-Id: <M045@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-LnsTVKBOte4wF+vMfryRUA=="
+Content-Type: multipart/signed; boundary="=-SqlXGVC0e+Q2j6HJ6exC+w=="
 
---=-LnsTVKBOte4wF+vMfryRUA==
+--=-SqlXGVC0e+Q2j6HJ6exC+w==
 Content-Type: text/plain; charset=utf-8
 
 signed-45
---=-LnsTVKBOte4wF+vMfryRUA==
+--=-SqlXGVC0e+Q2j6HJ6exC+w==
 Content-Type: application/pkcs7-signature; name=smime.p7s
 Content-Disposition: attachment; filename=smime.p7s
 
 SIG-45
---=-LnsTVKBOte4wF+vMfryRUA==--
+--=-SqlXGVC0e+Q2j6HJ6exC+w==--

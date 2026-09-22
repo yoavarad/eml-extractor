@@ -4,17 +4,17 @@ Subject: office-51
 Message-Id: <A051@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-pfF4XTzYeUQwE0SVA71G7w=="
+Content-Type: multipart/mixed; boundary="=-pXS3lyQ5hzb1gFqAUZ7RKw=="
 
---=-pfF4XTzYeUQwE0SVA71G7w==
+--=-pXS3lyQ5hzb1gFqAUZ7RKw==
 Content-Type: text/plain; charset=utf-8
 
 see
---=-pfF4XTzYeUQwE0SVA71G7w==
+--=-pXS3lyQ5hzb1gFqAUZ7RKw==
 Content-Type: application/vnd.ms-powerpoint; name=legacy.ppt
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=legacy.ppt
 
 YmluOkEwNTE=
 
---=-pfF4XTzYeUQwE0SVA71G7w==--
+--=-pXS3lyQ5hzb1gFqAUZ7RKw==--

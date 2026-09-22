@@ -4,16 +4,16 @@ Subject: fn-37
 Message-Id: <O2183-037@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-zQuq5vSRqIodYh4IGwnMGQ=="
+Content-Type: multipart/mixed; boundary="=-Pj6WVH/8UuDfJtdcu4UVlg=="
 
---=-zQuq5vSRqIodYh4IGwnMGQ==
+--=-Pj6WVH/8UuDfJtdcu4UVlg==
 Content-Type: text/plain; charset=utf-8
 
 x
---=-zQuq5vSRqIodYh4IGwnMGQ==
+--=-Pj6WVH/8UuDfJtdcu4UVlg==
 Content-Type: text/plain; name="файл-37.txt"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename="файл-37.txt"
 
 fn-37
---=-zQuq5vSRqIodYh4IGwnMGQ==--
+--=-Pj6WVH/8UuDfJtdcu4UVlg==--

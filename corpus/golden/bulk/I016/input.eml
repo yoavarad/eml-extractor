@@ -4,17 +4,17 @@ Subject: img-16
 Message-Id: <I016@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-fiO2iOM178h0PCxoz48RhA=="
+Content-Type: multipart/mixed; boundary="=-VXSL0Y4VYlPJU1MeKqdpZg=="
 
---=-fiO2iOM178h0PCxoz48RhA==
+--=-VXSL0Y4VYlPJU1MeKqdpZg==
 Content-Type: text/plain; charset=utf-8
 
 see pic
---=-fiO2iOM178h0PCxoz48RhA==
+--=-VXSL0Y4VYlPJU1MeKqdpZg==
 Content-Type: image/gif; name=pic.gif
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=pic.gif
 
 R0lGODlhZ2lmOkkwMTY=
 
---=-fiO2iOM178h0PCxoz48RhA==--
+--=-VXSL0Y4VYlPJU1MeKqdpZg==--

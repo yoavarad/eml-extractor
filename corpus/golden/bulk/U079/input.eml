@@ -4,14 +4,14 @@ Subject: Été français
 Message-Id: <U079@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-KqAVij7DYBVfI6jkYD19yw=="
+Content-Type: multipart/alternative; boundary="=-fE41VXXTZ8Sg87EEHTUeLA=="
 
---=-KqAVij7DYBVfI6jkYD19yw==
+--=-fE41VXXTZ8Sg87EEHTUeLA==
 Content-Type: text/plain; charset=utf-8
 
 plain-Français
---=-KqAVij7DYBVfI6jkYD19yw==
+--=-fE41VXXTZ8Sg87EEHTUeLA==
 Content-Type: text/html; charset=utf-8
 
 <p>Français</p>
---=-KqAVij7DYBVfI6jkYD19yw==--
+--=-fE41VXXTZ8Sg87EEHTUeLA==--

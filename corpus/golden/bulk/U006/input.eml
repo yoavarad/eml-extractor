@@ -6,4 +6,4 @@ To: Bob <bob@example.com>
 MIME-Version: 1.0
 Content-Type: text/html; charset=utf-8
 
-<p>نص عربي</p>
+<html dir="rtl"><body dir="rtl"><p>نص عربي</p></body></html>

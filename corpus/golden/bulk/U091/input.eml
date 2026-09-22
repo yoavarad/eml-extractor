@@ -4,14 +4,14 @@ Subject: გამარჯობა
 Message-Id: <U091@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-87wDY/si+OZ27sFiE8Gapw=="
+Content-Type: multipart/alternative; boundary="=-fTkIIHkd/uEt4eTW1dZQzA=="
 
---=-87wDY/si+OZ27sFiE8Gapw==
+--=-fTkIIHkd/uEt4eTW1dZQzA==
 Content-Type: text/plain; charset=utf-8
 
 plain-ქართული
---=-87wDY/si+OZ27sFiE8Gapw==
+--=-fTkIIHkd/uEt4eTW1dZQzA==
 Content-Type: text/html; charset=utf-8
 
 <p>ქართული</p>
---=-87wDY/si+OZ27sFiE8Gapw==--
+--=-fTkIIHkd/uEt4eTW1dZQzA==--

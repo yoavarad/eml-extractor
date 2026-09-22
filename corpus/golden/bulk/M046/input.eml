@@ -4,15 +4,15 @@ Subject: signed-46
 Message-Id: <M046@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-0e3OfoAmJqyVqPJH1uwHfA=="
+Content-Type: multipart/signed; boundary="=-7PSP3pcMBqx/iNkeKBtaBw=="
 
---=-0e3OfoAmJqyVqPJH1uwHfA==
+--=-7PSP3pcMBqx/iNkeKBtaBw==
 Content-Type: text/plain; charset=utf-8
 
 signed-46
---=-0e3OfoAmJqyVqPJH1uwHfA==
+--=-7PSP3pcMBqx/iNkeKBtaBw==
 Content-Type: application/pkcs7-signature; name=smime.p7s
 Content-Disposition: attachment; filename=smime.p7s
 
 SIG-46
---=-0e3OfoAmJqyVqPJH1uwHfA==--
+--=-7PSP3pcMBqx/iNkeKBtaBw==--

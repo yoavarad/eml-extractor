@@ -4,14 +4,14 @@ Subject: 안녕하세요
 Message-Id: <U019@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-Vys6M43Vllk/CupBEEybMw=="
+Content-Type: multipart/alternative; boundary="=-ud0UFqpHkciiWDRft4IOQw=="
 
---=-Vys6M43Vllk/CupBEEybMw==
+--=-ud0UFqpHkciiWDRft4IOQw==
 Content-Type: text/plain; charset=utf-8
 
 plain-한국어 본문
---=-Vys6M43Vllk/CupBEEybMw==
+--=-ud0UFqpHkciiWDRft4IOQw==
 Content-Type: text/html; charset=utf-8
 
 <p>한국어 본문</p>
---=-Vys6M43Vllk/CupBEEybMw==--
+--=-ud0UFqpHkciiWDRft4IOQw==--

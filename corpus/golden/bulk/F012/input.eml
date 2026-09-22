@@ -4,17 +4,17 @@ Subject: file-12
 Message-Id: <F012@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-gfmeBVUc/9CdPWr9LSYHOg=="
+Content-Type: multipart/mixed; boundary="=-9sgsRyIZJ3Z6oc8SuQm2YQ=="
 
---=-gfmeBVUc/9CdPWr9LSYHOg==
+--=-9sgsRyIZJ3Z6oc8SuQm2YQ==
 Content-Type: text/plain; charset=utf-8
 
 see
---=-gfmeBVUc/9CdPWr9LSYHOg==
+--=-9sgsRyIZJ3Z6oc8SuQm2YQ==
 Content-Type: application/x-tar; name=a.tar
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=a.tar
 
 YmluOkYwMTI=
 
---=-gfmeBVUc/9CdPWr9LSYHOg==--
+--=-9sgsRyIZJ3Z6oc8SuQm2YQ==--

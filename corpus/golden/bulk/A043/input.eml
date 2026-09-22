@@ -4,17 +4,17 @@ Subject: office-43
 Message-Id: <A043@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-V1EVZKzMP393SVHP0tw7ow=="
+Content-Type: multipart/mixed; boundary="=-naT04M+Zi++xb2FHxSalYA=="
 
---=-V1EVZKzMP393SVHP0tw7ow==
+--=-naT04M+Zi++xb2FHxSalYA==
 Content-Type: text/plain; charset=utf-8
 
 see
---=-V1EVZKzMP393SVHP0tw7ow==
+--=-naT04M+Zi++xb2FHxSalYA==
 Content-Type: application/vnd.ms-excel; name=legacy.xls
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=legacy.xls
 
 YmluOkEwNDM=
 
---=-V1EVZKzMP393SVHP0tw7ow==--
+--=-naT04M+Zi++xb2FHxSalYA==--

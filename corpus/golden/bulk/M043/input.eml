@@ -4,15 +4,15 @@ Subject: signed-43
 Message-Id: <M043@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-cRho1DER9y5J4HAOF6+fow=="
+Content-Type: multipart/signed; boundary="=-xbcIrstn2Y9QRA/2xan8UA=="
 
---=-cRho1DER9y5J4HAOF6+fow==
+--=-xbcIrstn2Y9QRA/2xan8UA==
 Content-Type: text/plain; charset=utf-8
 
 signed-43
---=-cRho1DER9y5J4HAOF6+fow==
+--=-xbcIrstn2Y9QRA/2xan8UA==
 Content-Type: application/pkcs7-signature; name=smime.p7s
 Content-Disposition: attachment; filename=smime.p7s
 
 SIG-43
---=-cRho1DER9y5J4HAOF6+fow==--
+--=-xbcIrstn2Y9QRA/2xan8UA==--

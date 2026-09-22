@@ -30,7 +30,8 @@ Does not throw on malformed MIME; problems go into `result.Warnings`.
 
 #### Metadata
 
-- Classic fields: `from`, `to`, `cc`, `bcc`, `replyto`, `sender`, `subject`, `date`, `messageid`, and the rest of the usual envelope headers
+- Classic fields: `from`, `to`, `cc`, `bcc` (always present; empty string if the header is missing), plus `replyto`, `sender`, `subject`, `date`, `messageid`, and the rest of the usual envelope headers
+- `subject_direction` and `content_direction`: `ltr` or `rtl` (HTML `dir` / CSS `direction`, otherwise Unicode first-strong letter)
 - Every other header as well (keys lowercased, `-` → `_`)
 - Headers that start with `X_` **or** `X-` (the usual custom-header form) are concatenated into one string: `result.XFields`  
   (`Name: value` per line)
@@ -38,6 +39,8 @@ Does not throw on malformed MIME; problems go into `result.Warnings`.
 #### Content
 
 `result.MainContent` is the main body of the mail. If both HTML and plain exist (`multipart/alternative`), HTML is used.
+
+Text direction: HTML `dir="rtl"` / `dir="ltr"` (and `direction:` CSS) is kept in the HTML and copied to `result.ContentDirection`. Plain text uses the first strong character (Hebrew/Arabic → `rtl`, Latin/CJK → `ltr`). Unicode bidi marks (`U+200F` RLM, `U+200E` LRM) are not stripped.
 
 #### Nested files (attachments)
 
@@ -170,7 +173,7 @@ Expected values are written with the EML (subject, body, hashes). The parser is 
 | Seed | ~12 cases | `dotnet test` |
 | Bulk | 1000 core + 200 RFC extras = **1200** | `golden score` |
 
-Last score: **1212/1212 cases**, **11126/11126 checks** (seed + bulk). Report: [docs/golden-score.txt](docs/golden-score.txt). Slices: [docs/golden.md](docs/golden.md).
+Last score: **1212/1212 cases**, **11333/11333 checks** (seed + bulk). Report: [docs/golden-score.txt](docs/golden-score.txt). Slices: [docs/golden.md](docs/golden.md).
 
 Bulk families include detection, classic headers, `xfields`, unicode/emoji/RTL, charsets, HTML vs plain, transfer encodings, CID paste, SMTPUTF8, Office/PDF, nested mail, images, archives, folded headers, path-in-filename, and RFC 2047 / 2183 / 2387 / 2392 / 6532 extras.
 

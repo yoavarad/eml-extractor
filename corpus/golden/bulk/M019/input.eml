@@ -4,16 +4,16 @@ Subject: mixed-19
 Message-Id: <M019@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-RJ7fTHEWL/Bhd3d/sUaBxw=="
+Content-Type: multipart/mixed; boundary="=-AsICK6MVxWKpyxX4uUvmWg=="
 
---=-RJ7fTHEWL/Bhd3d/sUaBxw==
+--=-AsICK6MVxWKpyxX4uUvmWg==
 Content-Type: text/plain; charset=utf-8
 
 see file
---=-RJ7fTHEWL/Bhd3d/sUaBxw==
+--=-AsICK6MVxWKpyxX4uUvmWg==
 Content-Type: text/plain; name=note-19.txt
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename=note-19.txt
 
 txt:M019
---=-RJ7fTHEWL/Bhd3d/sUaBxw==--
+--=-AsICK6MVxWKpyxX4uUvmWg==--

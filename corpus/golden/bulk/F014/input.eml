@@ -4,17 +4,17 @@ Subject: file-14
 Message-Id: <F014@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-fxRrMGouNUrD9sInVwaQeA=="
+Content-Type: multipart/mixed; boundary="=-klFa6+g0L+KXOW2S42YKJw=="
 
---=-fxRrMGouNUrD9sInVwaQeA==
+--=-klFa6+g0L+KXOW2S42YKJw==
 Content-Type: text/plain; charset=utf-8
 
 see
---=-fxRrMGouNUrD9sInVwaQeA==
+--=-klFa6+g0L+KXOW2S42YKJw==
 Content-Type: application/gzip; name=a.gz
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=a.gz
 
 H4sIZ3o6RjAxNA==
 
---=-fxRrMGouNUrD9sInVwaQeA==--
+--=-klFa6+g0L+KXOW2S42YKJw==--

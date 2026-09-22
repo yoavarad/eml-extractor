@@ -4,17 +4,17 @@ Subject: file-62
 Message-Id: <F062@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-cSBlrJUPqCXEDsrjPH5VjQ=="
+Content-Type: multipart/mixed; boundary="=-59IPhyxQqWL4mPu2ewKEMQ=="
 
---=-cSBlrJUPqCXEDsrjPH5VjQ==
+--=-59IPhyxQqWL4mPu2ewKEMQ==
 Content-Type: text/plain; charset=utf-8
 
 see
---=-cSBlrJUPqCXEDsrjPH5VjQ==
+--=-59IPhyxQqWL4mPu2ewKEMQ==
 Content-Type: application/octet-stream; name=a.bin
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=a.bin
 
 YmluOkYwNjI=
 
---=-cSBlrJUPqCXEDsrjPH5VjQ==--
+--=-59IPhyxQqWL4mPu2ewKEMQ==--

@@ -4,17 +4,17 @@ Subject: img-35
 Message-Id: <I035@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-GsyrePsCtDzFB1m6keChsw=="
+Content-Type: multipart/mixed; boundary="=-odA2wD0MsBgXQsljvjsknQ=="
 
---=-GsyrePsCtDzFB1m6keChsw==
+--=-odA2wD0MsBgXQsljvjsknQ==
 Content-Type: text/plain; charset=utf-8
 
 see pic
---=-GsyrePsCtDzFB1m6keChsw==
+--=-odA2wD0MsBgXQsljvjsknQ==
 Content-Type: image/bmp; name="photos/pic.bmp"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="photos/pic.bmp"
 
 Qk1ibXA6STAzNQ==
 
---=-GsyrePsCtDzFB1m6keChsw==--
+--=-odA2wD0MsBgXQsljvjsknQ==--

@@ -16,7 +16,14 @@ public sealed record EmlExtractionResult(
     string? MainContent,
     string? MainContentMimeType,
     IReadOnlyList<ExtractedAttachment> Attachments,
-    IReadOnlyList<string> Warnings);
+    IReadOnlyList<string> Warnings)
+{
+    /// <summary>Paragraph direction of <c>subject</c>: <c>ltr</c> or <c>rtl</c>.</summary>
+    public string SubjectDirection { get; init; } = "ltr";
+
+    /// <summary>Paragraph direction of <c>MainContent</c>: <c>ltr</c> or <c>rtl</c>.</summary>
+    public string ContentDirection { get; init; } = "ltr";
+}
 
 public sealed record ExtractedAttachment(
     string Name,

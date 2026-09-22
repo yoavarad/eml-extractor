@@ -4,17 +4,17 @@ Subject: img-65
 Message-Id: <I065@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-uH4AZGpg35pX/VMLh5jZVw=="
+Content-Type: multipart/mixed; boundary="=-atcK3YAJawbvsRLyO3fU2w=="
 
---=-uH4AZGpg35pX/VMLh5jZVw==
+--=-atcK3YAJawbvsRLyO3fU2w==
 Content-Type: text/plain; charset=utf-8
 
 see pic
---=-uH4AZGpg35pX/VMLh5jZVw==
+--=-atcK3YAJawbvsRLyO3fU2w==
 Content-Type: image/jpeg; name=pic.jpeg
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=pic.jpeg
 
 /9j/4GpwZzpJMDY1
 
---=-uH4AZGpg35pX/VMLh5jZVw==--
+--=-atcK3YAJawbvsRLyO3fU2w==--

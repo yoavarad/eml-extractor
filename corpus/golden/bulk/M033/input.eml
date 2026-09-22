@@ -4,14 +4,14 @@ Subject: malt-33
 Message-Id: <M033@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-Q0BSE8UvO/yvbQnM9LMEvg=="
+Content-Type: multipart/alternative; boundary="=-WO9l+HROBIcg+G4u12Rb6w=="
 
---=-Q0BSE8UvO/yvbQnM9LMEvg==
+--=-WO9l+HROBIcg+G4u12Rb6w==
 Content-Type: text/plain; charset=utf-8
 
 p
---=-Q0BSE8UvO/yvbQnM9LMEvg==
+--=-WO9l+HROBIcg+G4u12Rb6w==
 Content-Type: text/html; charset=utf-8
 
 <p>h</p>
---=-Q0BSE8UvO/yvbQnM9LMEvg==--
+--=-WO9l+HROBIcg+G4u12Rb6w==--

@@ -87,11 +87,13 @@ internal static class Catalog
             if (i % 2 == 0) m.Cc.Add(MailboxAddress.Parse("Carol <carol@example.com>"));
             if (i % 3 == 0) m.ReplyTo.Add(MailboxAddress.Parse("reply@example.com"));
             if (i % 5 == 0) m.Sender = MailboxAddress.Parse("sender@example.com");
+            if (i % 7 == 0) m.Bcc.Add(MailboxAddress.Parse("hidden@example.com"));
             m.Body = new TextPart("plain") { Text = $"hbody-{i}" };
             var expect = PlainExpect($"classic-{i}", $"hbody-{i}");
             if (i % 2 == 0) expect.Metadata["cc"] = MimeBuild.Contains("carol@example.com");
             if (i % 3 == 0) expect.Metadata["replyto"] = MimeBuild.Contains("reply@example.com");
             if (i % 5 == 0) expect.Metadata["sender"] = MimeBuild.Contains("sender@example.com");
+            if (i % 7 == 0) expect.Metadata["bcc"] = MimeBuild.Contains("hidden@example.com");
             list.Add(MimeBuild.FromMessage($"H{i:D3}", tags, m, expect));
         }
 
@@ -179,13 +181,25 @@ internal static class Catalog
                 n++;
                 var id = $"U{n:D3}";
                 var t = tags.Concat(lang.Extra).ToArray();
-                list.Add(v switch
+                var wrapRtl = lang.Extra.Contains("rtl");
+                var htmlBody = wrapRtl
+                    ? $"<html dir=\"rtl\"><body dir=\"rtl\"><p>{lang.Body}</p></body></html>"
+                    : $"<p>{lang.Body}</p>";
+                var subject = v == 3 ? lang.Subj + " #" + v : lang.Subj;
+                var plainBody = v == 3 ? lang.Body + " #" + v : lang.Body;
+                var c = v switch
                 {
-                    0 => MimeBuild.Plain(id, t, lang.Subj, lang.Body),
-                    1 => MimeBuild.Html(id, t.Concat(["html-body"]).ToArray(), lang.Subj, $"<p>{lang.Body}</p>"),
-                    2 => MimeBuild.Alternative(id, t.Concat(["multipart-alternative"]).ToArray(), lang.Subj, "plain-" + lang.Body, $"<p>{lang.Body}</p>"),
-                    _ => MimeBuild.Plain(id, t, lang.Subj + " #" + v, lang.Body + " #" + v)
-                });
+                    0 => MimeBuild.Plain(id, t, subject, plainBody),
+                    1 => MimeBuild.Html(id, t.Concat(["html-body"]).ToArray(), subject, htmlBody),
+                    2 => MimeBuild.Alternative(id, t.Concat(["multipart-alternative"]).ToArray(), subject, "plain-" + lang.Body, htmlBody),
+                    _ => MimeBuild.Plain(id, t, subject, plainBody)
+                };
+                c.Expect.Metadata["subject_direction"] = MimeBuild.Eq(StartsRtl(subject) ? "rtl" : "ltr");
+                var contentDir = v is 1 or 2 && wrapRtl
+                    ? "rtl"
+                    : StartsRtl(v is 1 or 2 ? lang.Body : plainBody) ? "rtl" : "ltr";
+                c.Expect.Metadata["content_direction"] = MimeBuild.Eq(contentDir);
+                list.Add(c);
             }
         }
 
@@ -781,6 +795,24 @@ internal static class Catalog
         MainContentMimeType = "text/plain",
         AttachmentCount = 0
     };
+
+    private static bool StartsRtl(string text)
+    {
+        foreach (var rune in text.EnumerateRunes())
+        {
+            var v = rune.Value;
+            if (v is >= 0x0590 and <= 0x08FF or >= 0xFB1D and <= 0xFDFF)
+                return true;
+            var cat = System.Text.Rune.GetUnicodeCategory(rune);
+            if (cat is System.Globalization.UnicodeCategory.UppercaseLetter
+                or System.Globalization.UnicodeCategory.LowercaseLetter
+                or System.Globalization.UnicodeCategory.TitlecaseLetter
+                or System.Globalization.UnicodeCategory.OtherLetter)
+                return false;
+        }
+
+        return false;
+    }
 
     private static byte[] Concat(params byte[][] parts)
     {

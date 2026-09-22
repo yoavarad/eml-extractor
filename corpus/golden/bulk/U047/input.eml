@@ -4,14 +4,14 @@ Subject: Ahoj světe
 Message-Id: <U047@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-OE0WJ+UHXyrvv/O449E5pA=="
+Content-Type: multipart/alternative; boundary="=-3y/IV2qig2bqZ93N2k9PFQ=="
 
---=-OE0WJ+UHXyrvv/O449E5pA==
+--=-3y/IV2qig2bqZ93N2k9PFQ==
 Content-Type: text/plain; charset=utf-8
 
 plain-Český text
---=-OE0WJ+UHXyrvv/O449E5pA==
+--=-3y/IV2qig2bqZ93N2k9PFQ==
 Content-Type: text/html; charset=utf-8
 
 <p>Český text</p>
---=-OE0WJ+UHXyrvv/O449E5pA==--
+--=-3y/IV2qig2bqZ93N2k9PFQ==--

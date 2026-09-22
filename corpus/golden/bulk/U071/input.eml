@@ -4,14 +4,14 @@ Subject: føljeton
 Message-Id: <U071@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-/AjouNrgUAFW58nUnVpr7g=="
+Content-Type: multipart/alternative; boundary="=-UbkVp1Pu9suLwKp4e1vfZw=="
 
---=-/AjouNrgUAFW58nUnVpr7g==
+--=-UbkVp1Pu9suLwKp4e1vfZw==
 Content-Type: text/plain; charset=utf-8
 
 plain-Norsk
---=-/AjouNrgUAFW58nUnVpr7g==
+--=-UbkVp1Pu9suLwKp4e1vfZw==
 Content-Type: text/html; charset=utf-8
 
 <p>Norsk</p>
---=-/AjouNrgUAFW58nUnVpr7g==--
+--=-UbkVp1Pu9suLwKp4e1vfZw==--

@@ -27,10 +27,20 @@
           "bob@example.com"
         ],
         "not_contains": []
+      },
+      "subject_direction": {
+        "eq": "rtl",
+        "contains": [],
+        "not_contains": []
+      },
+      "content_direction": {
+        "eq": "rtl",
+        "contains": [],
+        "not_contains": []
       }
     },
     "main_content": {
-      "eq": "\u003Cp\u003E\u0646\u0635 \u0639\u0631\u0628\u064A\u003C/p\u003E",
+      "eq": "\u003Chtml dir=\u0022rtl\u0022\u003E\u003Cbody dir=\u0022rtl\u0022\u003E\u003Cp\u003E\u0646\u0635 \u0639\u0631\u0628\u064A\u003C/p\u003E\u003C/body\u003E\u003C/html\u003E",
       "contains": [],
       "not_contains": []
     },

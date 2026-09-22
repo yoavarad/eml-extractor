@@ -6,4 +6,4 @@ To: Bob <bob@example.com>
 MIME-Version: 1.0
 Content-Type: text/html; charset=utf-8
 
-<p>bidi body</p>
+<html dir="rtl"><body dir="rtl"><p>bidi body</p></body></html>

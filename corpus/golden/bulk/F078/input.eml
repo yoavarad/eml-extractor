@@ -4,17 +4,17 @@ Subject: file-78
 Message-Id: <F078@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-ERy4Wx7cRUpjTbJqJ0hfKw=="
+Content-Type: multipart/mixed; boundary="=-706zLY6p8qmZMfOQwGjQoQ=="
 
---=-ERy4Wx7cRUpjTbJqJ0hfKw==
+--=-706zLY6p8qmZMfOQwGjQoQ==
 Content-Type: text/plain; charset=utf-8
 
 see
---=-ERy4Wx7cRUpjTbJqJ0hfKw==
+--=-706zLY6p8qmZMfOQwGjQoQ==
 Content-Type: application/rtf; name=a.rtf
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=a.rtf
 
 cGF5bG9hZC1GMDc4LTI=
 
---=-ERy4Wx7cRUpjTbJqJ0hfKw==--
+--=-706zLY6p8qmZMfOQwGjQoQ==--

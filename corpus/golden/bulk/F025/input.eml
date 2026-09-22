@@ -4,16 +4,16 @@ Subject: file-25
 Message-Id: <F025@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-hexmcSRWsUZg3sIeVglqxw=="
+Content-Type: multipart/mixed; boundary="=-XWRfmzs+EDy9ewsQK9YIkw=="
 
---=-hexmcSRWsUZg3sIeVglqxw==
+--=-XWRfmzs+EDy9ewsQK9YIkw==
 Content-Type: text/plain; charset=utf-8
 
 see
---=-hexmcSRWsUZg3sIeVglqxw==
+--=-XWRfmzs+EDy9ewsQK9YIkw==
 Content-Type: text/html; name=a.html
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename=a.html
 
 payload-F025-1
---=-hexmcSRWsUZg3sIeVglqxw==--
+--=-XWRfmzs+EDy9ewsQK9YIkw==--

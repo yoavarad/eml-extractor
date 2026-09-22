@@ -13,6 +13,12 @@
         "contains": [],
         "not_contains": []
       },
+      "bcc": {
+        "contains": [
+          "hidden@example.com"
+        ],
+        "not_contains": []
+      },
       "from": {
         "contains": [
           "alice@example.com"

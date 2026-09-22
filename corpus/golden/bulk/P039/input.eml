@@ -4,16 +4,16 @@ Subject: disp-win-39
 Message-Id: <P039@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-xL/liabvw+dsH9X2DekXoA=="
+Content-Type: multipart/mixed; boundary="=-KJ5iroNgqu7rYSj49Kfbow=="
 
---=-xL/liabvw+dsH9X2DekXoA==
+--=-KJ5iroNgqu7rYSj49Kfbow==
 Content-Type: text/plain; charset=utf-8
 
 x
---=-xL/liabvw+dsH9X2DekXoA==
+--=-KJ5iroNgqu7rYSj49Kfbow==
 Content-Type: text/plain; name="C:\\Temp\\file-39.txt"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename="C:\\Temp\\file-39.txt"
 
 txt:P039
---=-xL/liabvw+dsH9X2DekXoA==--
+--=-KJ5iroNgqu7rYSj49Kfbow==--

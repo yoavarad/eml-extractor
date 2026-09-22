@@ -4,16 +4,16 @@ Subject: file-48
 Message-Id: <F048@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-cnO4W14mYAdBgSN4LlfK2w=="
+Content-Type: multipart/mixed; boundary="=-DY0E60O319VkhhEtdBycBQ=="
 
---=-cnO4W14mYAdBgSN4LlfK2w==
+--=-DY0E60O319VkhhEtdBycBQ==
 Content-Type: text/plain; charset=utf-8
 
 see
---=-cnO4W14mYAdBgSN4LlfK2w==
+--=-DY0E60O319VkhhEtdBycBQ==
 Content-Type: text/vcard; name=me.vcf
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename=me.vcf
 
 payload-F048-4
---=-cnO4W14mYAdBgSN4LlfK2w==--
+--=-DY0E60O319VkhhEtdBycBQ==--

@@ -4,17 +4,17 @@ Subject: file-7
 Message-Id: <F007@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-QMp0cxgAbGqC/Mjs+qMZFg=="
+Content-Type: multipart/mixed; boundary="=-OuWI3BDLFNokx872sI4Sxg=="
 
---=-QMp0cxgAbGqC/Mjs+qMZFg==
+--=-OuWI3BDLFNokx872sI4Sxg==
 Content-Type: text/plain; charset=utf-8
 
 see
---=-QMp0cxgAbGqC/Mjs+qMZFg==
+--=-OuWI3BDLFNokx872sI4Sxg==
 Content-Type: application/x-7z-compressed; name=a.7z
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=a.7z
 
 N3q8ryccN3o6RjAwNw==
 
---=-QMp0cxgAbGqC/Mjs+qMZFg==--
+--=-OuWI3BDLFNokx872sI4Sxg==--

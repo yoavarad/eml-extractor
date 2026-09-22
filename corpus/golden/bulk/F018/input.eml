@@ -4,16 +4,16 @@ Subject: file-18
 Message-Id: <F018@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-zXTzuykDd0/ni22nJh9UnA=="
+Content-Type: multipart/mixed; boundary="=-jTuaukkGGUaeqKCY/Nnb9A=="
 
---=-zXTzuykDd0/ni22nJh9UnA==
+--=-jTuaukkGGUaeqKCY/Nnb9A==
 Content-Type: text/plain; charset=utf-8
 
 see
---=-zXTzuykDd0/ni22nJh9UnA==
+--=-jTuaukkGGUaeqKCY/Nnb9A==
 Content-Type: text/plain; name=a.txt
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename=a.txt
 
 payload-F018-2
---=-zXTzuykDd0/ni22nJh9UnA==--
+--=-jTuaukkGGUaeqKCY/Nnb9A==--

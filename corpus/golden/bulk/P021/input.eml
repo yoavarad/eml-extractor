@@ -4,16 +4,16 @@ Subject: disp-path-21
 Message-Id: <P021@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-T3EOt7LumjK2i3oF8DPLHg=="
+Content-Type: multipart/mixed; boundary="=-d9JLDEiJVEAGKH3HekVQ9w=="
 
---=-T3EOt7LumjK2i3oF8DPLHg==
+--=-d9JLDEiJVEAGKH3HekVQ9w==
 Content-Type: text/plain; charset=utf-8
 
 x
---=-T3EOt7LumjK2i3oF8DPLHg==
+--=-d9JLDEiJVEAGKH3HekVQ9w==
 Content-Type: text/plain; name="inbox/21/file.txt"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename="inbox/21/file.txt"
 
 txt:P021
---=-T3EOt7LumjK2i3oF8DPLHg==--
+--=-d9JLDEiJVEAGKH3HekVQ9w==--

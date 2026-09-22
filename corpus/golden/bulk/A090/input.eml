@@ -4,13 +4,13 @@ Subject: office-90
 Message-Id: <A090@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-upLiCguySQIRjW+NenjgYw=="
+Content-Type: multipart/mixed; boundary="=-kmPtHWd9b3Yjq1W6FiUWDA=="
 
---=-upLiCguySQIRjW+NenjgYw==
+--=-kmPtHWd9b3Yjq1W6FiUWDA==
 Content-Type: text/html; charset=utf-8
 
 <p>see</p>
---=-upLiCguySQIRjW+NenjgYw==
+--=-kmPtHWd9b3Yjq1W6FiUWDA==
 Content-Type: application/vnd.oasis.opendocument.presentation;
 	name="docs/show.odp"
 Content-Transfer-Encoding: base64
@@ -18,4 +18,4 @@ Content-Disposition: attachment; filename="docs/show.odp"
 
 UEsDBG9kcDpBMDkw
 
---=-upLiCguySQIRjW+NenjgYw==--
+--=-kmPtHWd9b3Yjq1W6FiUWDA==--

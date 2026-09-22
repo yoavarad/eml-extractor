@@ -4,17 +4,17 @@ Subject: disp-a-7
 Message-Id: <P007@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-hMP82aczIWOtleas9wgpsQ=="
+Content-Type: multipart/mixed; boundary="=-AtqkU8Vp1I6Wx3HmtNGCrg=="
 
---=-hMP82aczIWOtleas9wgpsQ==
+--=-AtqkU8Vp1I6Wx3HmtNGCrg==
 Content-Type: text/plain; charset=utf-8
 
 x
---=-hMP82aczIWOtleas9wgpsQ==
+--=-AtqkU8Vp1I6Wx3HmtNGCrg==
 Content-Type: application/octet-stream; name=file-7.bin
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=file-7.bin
 
 YmluOlAwMDc=
 
---=-hMP82aczIWOtleas9wgpsQ==--
+--=-AtqkU8Vp1I6Wx3HmtNGCrg==--

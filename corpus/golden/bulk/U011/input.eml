@@ -4,14 +4,14 @@ Subject: 你好世界
 Message-Id: <U011@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-AbK0wLI8aKV/E3CwtGsmZQ=="
+Content-Type: multipart/alternative; boundary="=-4E/NqBwZpL/yimJFOj+Nag=="
 
---=-AbK0wLI8aKV/E3CwtGsmZQ==
+--=-4E/NqBwZpL/yimJFOj+Nag==
 Content-Type: text/plain; charset=utf-8
 
 plain-中文正文
---=-AbK0wLI8aKV/E3CwtGsmZQ==
+--=-4E/NqBwZpL/yimJFOj+Nag==
 Content-Type: text/html; charset=utf-8
 
 <p>中文正文</p>
---=-AbK0wLI8aKV/E3CwtGsmZQ==--
+--=-4E/NqBwZpL/yimJFOj+Nag==--

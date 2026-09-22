@@ -4,16 +4,16 @@ Subject: disp-win-33
 Message-Id: <P033@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-znyrHHLIJzz24O+YC1J0Jg=="
+Content-Type: multipart/mixed; boundary="=-0IsiakLPFZUsyF1YqtThHg=="
 
---=-znyrHHLIJzz24O+YC1J0Jg==
+--=-0IsiakLPFZUsyF1YqtThHg==
 Content-Type: text/plain; charset=utf-8
 
 x
---=-znyrHHLIJzz24O+YC1J0Jg==
+--=-0IsiakLPFZUsyF1YqtThHg==
 Content-Type: text/plain; name="C:\\Temp\\file-33.txt"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename="C:\\Temp\\file-33.txt"
 
 txt:P033
---=-znyrHHLIJzz24O+YC1J0Jg==--
+--=-0IsiakLPFZUsyF1YqtThHg==--

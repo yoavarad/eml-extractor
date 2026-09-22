@@ -4,16 +4,16 @@ Subject: fn-36
 Message-Id: <O2183-036@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-+4u8n2ljMbWPoe/+HR5WFA=="
+Content-Type: multipart/mixed; boundary="=-P3Bslo9RgK12XqdiumQn2A=="
 
---=-+4u8n2ljMbWPoe/+HR5WFA==
+--=-P3Bslo9RgK12XqdiumQn2A==
 Content-Type: text/plain; charset=utf-8
 
 x
---=-+4u8n2ljMbWPoe/+HR5WFA==
+--=-P3Bslo9RgK12XqdiumQn2A==
 Content-Type: text/plain; name="קובץ-36.txt"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename="קובץ-36.txt"
 
 fn-36
---=-+4u8n2ljMbWPoe/+HR5WFA==--
+--=-P3Bslo9RgK12XqdiumQn2A==--

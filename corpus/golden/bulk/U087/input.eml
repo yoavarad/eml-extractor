@@ -4,14 +4,14 @@ Subject: xin chào
 Message-Id: <U087@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-LgQoCK3AvWGICK041Vb5Vw=="
+Content-Type: multipart/alternative; boundary="=-pomN3OexUYg4tA4rqRv7GA=="
 
---=-LgQoCK3AvWGICK041Vb5Vw==
+--=-pomN3OexUYg4tA4rqRv7GA==
 Content-Type: text/plain; charset=utf-8
 
 plain-Tiếng Việt
---=-LgQoCK3AvWGICK041Vb5Vw==
+--=-pomN3OexUYg4tA4rqRv7GA==
 Content-Type: text/html; charset=utf-8
 
 <p>Tiếng Việt</p>
---=-LgQoCK3AvWGICK041Vb5Vw==--
+--=-pomN3OexUYg4tA4rqRv7GA==--

@@ -4,17 +4,17 @@ Subject: img-19
 Message-Id: <I019@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-qBv0TBqjtDOaRmkd8N+nVg=="
+Content-Type: multipart/mixed; boundary="=-vb9GJ/4Erld/WmYU7VkPKg=="
 
---=-qBv0TBqjtDOaRmkd8N+nVg==
+--=-vb9GJ/4Erld/WmYU7VkPKg==
 Content-Type: text/plain; charset=utf-8
 
 see pic
---=-qBv0TBqjtDOaRmkd8N+nVg==
+--=-vb9GJ/4Erld/WmYU7VkPKg==
 Content-Type: image/gif; name=pic.gif
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=pic.gif
 
 R0lGODlhZ2lmOkkwMTk=
 
---=-qBv0TBqjtDOaRmkd8N+nVg==--
+--=-vb9GJ/4Erld/WmYU7VkPKg==--

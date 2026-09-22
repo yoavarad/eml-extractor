@@ -4,14 +4,14 @@ Subject: Γειά σου
 Message-Id: <U035@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-xlgNBCEe0I5a+SvJrnB12g=="
+Content-Type: multipart/alternative; boundary="=-gYmqE2V5yRbHwN1f2IimPQ=="
 
---=-xlgNBCEe0I5a+SvJrnB12g==
+--=-gYmqE2V5yRbHwN1f2IimPQ==
 Content-Type: text/plain; charset=utf-8
 
 plain-Ελληνικά
---=-xlgNBCEe0I5a+SvJrnB12g==
+--=-gYmqE2V5yRbHwN1f2IimPQ==
 Content-Type: text/html; charset=utf-8
 
 <p>Ελληνικά</p>
---=-xlgNBCEe0I5a+SvJrnB12g==--
+--=-gYmqE2V5yRbHwN1f2IimPQ==--

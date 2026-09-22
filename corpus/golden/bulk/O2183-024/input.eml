@@ -4,16 +4,16 @@ Subject: fn-24
 Message-Id: <O2183-024@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-hNbQlbd0HBobzo785ssfZA=="
+Content-Type: multipart/mixed; boundary="=-n0RjgL4jCgBvMgBRMKkOVQ=="
 
---=-hNbQlbd0HBobzo785ssfZA==
+--=-n0RjgL4jCgBvMgBRMKkOVQ==
 Content-Type: text/plain; charset=utf-8
 
 x
---=-hNbQlbd0HBobzo785ssfZA==
+--=-n0RjgL4jCgBvMgBRMKkOVQ==
 Content-Type: text/plain; name="קובץ-24.txt"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename="קובץ-24.txt"
 
 fn-24
---=-hNbQlbd0HBobzo785ssfZA==--
+--=-n0RjgL4jCgBvMgBRMKkOVQ==--

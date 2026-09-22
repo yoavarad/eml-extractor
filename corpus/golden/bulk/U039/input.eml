@@ -4,14 +4,14 @@ Subject: Merhaba dünya
 Message-Id: <U039@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-oEt2bVQqkKgA2/a0b+QQ1A=="
+Content-Type: multipart/alternative; boundary="=-D+pBuF3C9LqA+Ale9QlsZQ=="
 
---=-oEt2bVQqkKgA2/a0b+QQ1A==
+--=-D+pBuF3C9LqA+Ale9QlsZQ==
 Content-Type: text/plain; charset=utf-8
 
 plain-Türkçe gövde
---=-oEt2bVQqkKgA2/a0b+QQ1A==
+--=-D+pBuF3C9LqA+Ale9QlsZQ==
 Content-Type: text/html; charset=utf-8
 
 <p>Türkçe gövde</p>
---=-oEt2bVQqkKgA2/a0b+QQ1A==--
+--=-D+pBuF3C9LqA+Ale9QlsZQ==--

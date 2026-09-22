@@ -4,17 +4,17 @@ Subject: disp-a-9
 Message-Id: <P009@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-/7ptearw9PBJbBCeL589sg=="
+Content-Type: multipart/mixed; boundary="=-TPUOS1B47gzSc4/3V0vBOg=="
 
---=-/7ptearw9PBJbBCeL589sg==
+--=-TPUOS1B47gzSc4/3V0vBOg==
 Content-Type: text/plain; charset=utf-8
 
 x
---=-/7ptearw9PBJbBCeL589sg==
+--=-TPUOS1B47gzSc4/3V0vBOg==
 Content-Type: application/octet-stream; name=file-9.bin
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=file-9.bin
 
 YmluOlAwMDk=
 
---=-/7ptearw9PBJbBCeL589sg==--
+--=-TPUOS1B47gzSc4/3V0vBOg==--

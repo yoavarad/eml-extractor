@@ -4,13 +4,13 @@ Subject: img-4
 Message-Id: <I004@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-uAW4YtE8sI3y4Az/A0yXAA=="
+Content-Type: multipart/mixed; boundary="=-31Quz5srHO8dHyCtzjbHRw=="
 
---=-uAW4YtE8sI3y4Az/A0yXAA==
+--=-31Quz5srHO8dHyCtzjbHRw==
 Content-Type: text/plain; charset=utf-8
 
 see pic
---=-uAW4YtE8sI3y4Az/A0yXAA==
+--=-31Quz5srHO8dHyCtzjbHRw==
 Content-Type: image/png; name=pic.png
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=pic.png
@@ -18,4 +18,4 @@ Content-Disposition: attachment; filename=pic.png
 iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
 IQAAAABJRU5ErkJggg==
 
---=-uAW4YtE8sI3y4Az/A0yXAA==--
+--=-31Quz5srHO8dHyCtzjbHRw==--

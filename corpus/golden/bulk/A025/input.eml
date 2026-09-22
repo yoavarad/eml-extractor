@@ -4,13 +4,13 @@ Subject: office-25
 Message-Id: <A025@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-mNsoA502Kyys7WeiQIqHig=="
+Content-Type: multipart/mixed; boundary="=-Y7L+BXotG5E4Lie9Tc8O4A=="
 
---=-mNsoA502Kyys7WeiQIqHig==
+--=-Y7L+BXotG5E4Lie9Tc8O4A==
 Content-Type: text/plain; charset=utf-8
 
 see
---=-mNsoA502Kyys7WeiQIqHig==
+--=-Y7L+BXotG5E4Lie9Tc8O4A==
 Content-Type: application/vnd.openxmlformats-officedocument.presentationml.presentation;
 	name=deck.pptx
 Content-Transfer-Encoding: base64
@@ -18,4 +18,4 @@ Content-Disposition: attachment; filename=deck.pptx
 
 UEsDBHBwdHg6QTAyNQ==
 
---=-mNsoA502Kyys7WeiQIqHig==--
+--=-Y7L+BXotG5E4Lie9Tc8O4A==--

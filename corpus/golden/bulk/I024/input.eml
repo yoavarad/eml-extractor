@@ -4,17 +4,17 @@ Subject: img-24
 Message-Id: <I024@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-pvhj00IseJEAPpIECO1/+Q=="
+Content-Type: multipart/mixed; boundary="=-OjNhpYeR0cUTMlhr8UXiJA=="
 
---=-pvhj00IseJEAPpIECO1/+Q==
+--=-OjNhpYeR0cUTMlhr8UXiJA==
 Content-Type: text/plain; charset=utf-8
 
 see pic
---=-pvhj00IseJEAPpIECO1/+Q==
+--=-OjNhpYeR0cUTMlhr8UXiJA==
 Content-Type: image/webp; name=pic.webp
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=pic.webp
 
 UklGRhAAAABXRUJQd2VicDpJMDI0
 
---=-pvhj00IseJEAPpIECO1/+Q==--
+--=-OjNhpYeR0cUTMlhr8UXiJA==--

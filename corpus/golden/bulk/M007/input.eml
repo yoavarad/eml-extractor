@@ -4,16 +4,16 @@ Subject: mixed-7
 Message-Id: <M007@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-x6sqS3iVfRcli2NUFT9lkg=="
+Content-Type: multipart/mixed; boundary="=-GcZ6teDmIU28/Hmyzaio7Q=="
 
---=-x6sqS3iVfRcli2NUFT9lkg==
+--=-GcZ6teDmIU28/Hmyzaio7Q==
 Content-Type: text/plain; charset=utf-8
 
 see file
---=-x6sqS3iVfRcli2NUFT9lkg==
+--=-GcZ6teDmIU28/Hmyzaio7Q==
 Content-Type: text/plain; name=note-7.txt
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename=note-7.txt
 
 txt:M007
---=-x6sqS3iVfRcli2NUFT9lkg==--
+--=-GcZ6teDmIU28/Hmyzaio7Q==--

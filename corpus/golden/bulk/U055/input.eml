@@ -4,14 +4,14 @@ Subject: mix שלום 中文 😀
 Message-Id: <U055@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-OwMmz4C9lw0AesnLWPy+uQ=="
+Content-Type: multipart/alternative; boundary="=-aB3GgbVt4woKW2nrWa70/g=="
 
---=-OwMmz4C9lw0AesnLWPy+uQ==
+--=-aB3GgbVt4woKW2nrWa70/g==
 Content-Type: text/plain; charset=utf-8
 
 plain-mix body
---=-OwMmz4C9lw0AesnLWPy+uQ==
+--=-aB3GgbVt4woKW2nrWa70/g==
 Content-Type: text/html; charset=utf-8
 
 <p>mix body</p>
---=-OwMmz4C9lw0AesnLWPy+uQ==--
+--=-aB3GgbVt4woKW2nrWa70/g==--

@@ -4,16 +4,16 @@ Subject: fn-8
 Message-Id: <O2183-008@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-LmaALLrTRd5/WMXC8DlRjQ=="
+Content-Type: multipart/mixed; boundary="=-wkdXKR+/qmJSHg6rMsmJBQ=="
 
---=-LmaALLrTRd5/WMXC8DlRjQ==
+--=-wkdXKR+/qmJSHg6rMsmJBQ==
 Content-Type: text/plain; charset=utf-8
 
 x
---=-LmaALLrTRd5/WMXC8DlRjQ==
+--=-wkdXKR+/qmJSHg6rMsmJBQ==
 Content-Type: text/plain; name="קובץ-8.txt"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename="קובץ-8.txt"
 
 fn-8
---=-LmaALLrTRd5/WMXC8DlRjQ==--
+--=-wkdXKR+/qmJSHg6rMsmJBQ==--

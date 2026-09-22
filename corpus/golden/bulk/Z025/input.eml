@@ -4,16 +4,16 @@ Subject: trav-25
 Message-Id: <Z025@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-370bjyM0y2A96H0SE8/+Aw=="
+Content-Type: multipart/mixed; boundary="=-cAz87Wl5aQemXqIEeIPmBQ=="
 
---=-370bjyM0y2A96H0SE8/+Aw==
+--=-cAz87Wl5aQemXqIEeIPmBQ==
 Content-Type: text/plain; charset=utf-8
 
 x
---=-370bjyM0y2A96H0SE8/+Aw==
+--=-cAz87Wl5aQemXqIEeIPmBQ==
 Content-Type: text/plain; name="../../etc/passwd-25.txt"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename="../../etc/passwd-25.txt"
 
 secret
---=-370bjyM0y2A96H0SE8/+Aw==--
+--=-cAz87Wl5aQemXqIEeIPmBQ==--

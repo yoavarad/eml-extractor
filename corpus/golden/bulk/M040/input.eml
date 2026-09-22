@@ -4,15 +4,15 @@ Subject: signed-40
 Message-Id: <M040@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-0oCUd2ED7QZ5BPmceZXDow=="
+Content-Type: multipart/signed; boundary="=-xU4IFahPUhMeu0jphpkJig=="
 
---=-0oCUd2ED7QZ5BPmceZXDow==
+--=-xU4IFahPUhMeu0jphpkJig==
 Content-Type: text/plain; charset=utf-8
 
 signed-40
---=-0oCUd2ED7QZ5BPmceZXDow==
+--=-xU4IFahPUhMeu0jphpkJig==
 Content-Type: application/pkcs7-signature; name=smime.p7s
 Content-Disposition: attachment; filename=smime.p7s
 
 SIG-40
---=-0oCUd2ED7QZ5BPmceZXDow==--
+--=-xU4IFahPUhMeu0jphpkJig==--

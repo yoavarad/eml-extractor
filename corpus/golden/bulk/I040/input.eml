@@ -4,17 +4,17 @@ Subject: img-40
 Message-Id: <I040@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-z0kbWSsdAQ7c1swcbA3wbA=="
+Content-Type: multipart/mixed; boundary="=-Xy0Dy8iWzPF4kIq+R65hJQ=="
 
---=-z0kbWSsdAQ7c1swcbA3wbA==
+--=-Xy0Dy8iWzPF4kIq+R65hJQ==
 Content-Type: text/plain; charset=utf-8
 
 see pic
---=-z0kbWSsdAQ7c1swcbA3wbA==
+--=-Xy0Dy8iWzPF4kIq+R65hJQ==
 Content-Type: image/tiff; name=pic.tif
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=pic.tif
 
 SUkqAHRpZjpJMDQw
 
---=-z0kbWSsdAQ7c1swcbA3wbA==--
+--=-Xy0Dy8iWzPF4kIq+R65hJQ==--

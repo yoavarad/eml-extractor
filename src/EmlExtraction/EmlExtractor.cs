@@ -68,7 +68,17 @@ public sealed class EmlExtractor : IEmlExtractor
         }
 
         var attachments = PartCollector.Collect(message.Body, body, warnings);
-        return new EmlExtractionResult(metadata, xfields, content, contentType, attachments, warnings);
+        var html = contentType is not null
+                   && contentType.Contains("html", StringComparison.OrdinalIgnoreCase);
+        var subjectDir = TextDirection.Detect(metadata.GetValueOrDefault("subject"), html: false);
+        var contentDir = TextDirection.Detect(content, html);
+        metadata["subject_direction"] = subjectDir;
+        metadata["content_direction"] = contentDir;
+        return new EmlExtractionResult(metadata, xfields, content, contentType, attachments, warnings)
+        {
+            SubjectDirection = subjectDir,
+            ContentDirection = contentDir
+        };
     }
 
     private static ParserOptions CreateOptions()

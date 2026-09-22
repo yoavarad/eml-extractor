@@ -4,14 +4,14 @@ Subject: São Paulo
 Message-Id: <U063@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-sN4QX6OCF20xryEl7GUD7A=="
+Content-Type: multipart/alternative; boundary="=-aEEyXt5XOPla2ria91cmyg=="
 
---=-sN4QX6OCF20xryEl7GUD7A==
+--=-aEEyXt5XOPla2ria91cmyg==
 Content-Type: text/plain; charset=utf-8
 
 plain-Português
---=-sN4QX6OCF20xryEl7GUD7A==
+--=-aEEyXt5XOPla2ria91cmyg==
 Content-Type: text/html; charset=utf-8
 
 <p>Português</p>
---=-sN4QX6OCF20xryEl7GUD7A==--
+--=-aEEyXt5XOPla2ria91cmyg==--

@@ -4,6 +4,7 @@ Subject: classic-35
 Message-Id: <H035@golden.example>
 To: Bob <bob@example.com>
 Sender: sender@example.com
+Bcc: hidden@example.com
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 

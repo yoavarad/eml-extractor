@@ -4,14 +4,14 @@ Subject: alt-61
 Message-Id: <B061@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-EADqPFPeaNG/rj48V0gTOQ=="
+Content-Type: multipart/alternative; boundary="=-5BJssWmWVnHv4/2Keq6tag=="
 
---=-EADqPFPeaNG/rj48V0gTOQ==
+--=-5BJssWmWVnHv4/2Keq6tag==
 Content-Type: text/plain; charset=utf-8
 
 plain-61
---=-EADqPFPeaNG/rj48V0gTOQ==
+--=-5BJssWmWVnHv4/2Keq6tag==
 Content-Type: text/html; charset=utf-8
 
 <p>html-61</p>
---=-EADqPFPeaNG/rj48V0gTOQ==--
+--=-5BJssWmWVnHv4/2Keq6tag==--

@@ -4,17 +4,17 @@ Subject: office-93
 Message-Id: <A093@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-4/OMw4V+O8hAtzFeYOcjuA=="
+Content-Type: multipart/mixed; boundary="=-gf2C+EM0tr5ElBexTJBINQ=="
 
---=-4/OMw4V+O8hAtzFeYOcjuA==
+--=-gf2C+EM0tr5ElBexTJBINQ==
 Content-Type: text/plain; charset=utf-8
 
 see
---=-4/OMw4V+O8hAtzFeYOcjuA==
+--=-gf2C+EM0tr5ElBexTJBINQ==
 Content-Type: application/pdf; name=file.pdf
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=file.pdf
 
 JVBERi0xLjQtcGRmOkEwOTM=
 
---=-4/OMw4V+O8hAtzFeYOcjuA==--
+--=-gf2C+EM0tr5ElBexTJBINQ==--

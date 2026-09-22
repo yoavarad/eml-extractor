@@ -4,14 +4,14 @@ Subject: Witaj świecie
 Message-Id: <U043@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-YkScpUWFRlB751+PR99ijQ=="
+Content-Type: multipart/alternative; boundary="=-X1RDqjhLPFC6eXdDduBTWw=="
 
---=-YkScpUWFRlB751+PR99ijQ==
+--=-X1RDqjhLPFC6eXdDduBTWw==
 Content-Type: text/plain; charset=utf-8
 
 plain-Polski tekst
---=-YkScpUWFRlB751+PR99ijQ==
+--=-X1RDqjhLPFC6eXdDduBTWw==
 Content-Type: text/html; charset=utf-8
 
 <p>Polski tekst</p>
---=-YkScpUWFRlB751+PR99ijQ==--
+--=-X1RDqjhLPFC6eXdDduBTWw==--

@@ -4,14 +4,14 @@ Subject: עברית + English
 Message-Id: <U099@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-9h/L1Yckhprt6lFVWU8PhQ=="
+Content-Type: multipart/alternative; boundary="=-CRtUeY7KxXwToFLFWS9/Tg=="
 
---=-9h/L1Yckhprt6lFVWU8PhQ==
+--=-CRtUeY7KxXwToFLFWS9/Tg==
 Content-Type: text/plain; charset=utf-8
 
 plain-bidi body
---=-9h/L1Yckhprt6lFVWU8PhQ==
+--=-CRtUeY7KxXwToFLFWS9/Tg==
 Content-Type: text/html; charset=utf-8
 
-<p>bidi body</p>
---=-9h/L1Yckhprt6lFVWU8PhQ==--
+<html dir="rtl"><body dir="rtl"><p>bidi body</p></body></html>
+--=-CRtUeY7KxXwToFLFWS9/Tg==--

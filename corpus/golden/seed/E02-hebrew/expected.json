@@ -6,7 +6,9 @@
   "expect": {
     "metadata": {
       "subject": { "eq": "שלום עולם בודק" },
-      "from": { "contains": ["yossi@example.com"] }
+      "from": { "contains": ["yossi@example.com"] },
+      "subject_direction": { "eq": "rtl" },
+      "content_direction": { "eq": "rtl" }
     },
     "main_content": { "eq": "שלום עולם" },
     "main_content_mime_type": "text/plain",

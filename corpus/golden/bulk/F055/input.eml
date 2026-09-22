@@ -4,17 +4,17 @@ Subject: file-55
 Message-Id: <F055@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-ubAB6Y2gk4xLFOSbi7Fy6Q=="
+Content-Type: multipart/mixed; boundary="=-lh++isLFnHGZNd/9TvGCww=="
 
---=-ubAB6Y2gk4xLFOSbi7Fy6Q==
+--=-lh++isLFnHGZNd/9TvGCww==
 Content-Type: text/plain; charset=utf-8
 
 see
---=-ubAB6Y2gk4xLFOSbi7Fy6Q==
+--=-lh++isLFnHGZNd/9TvGCww==
 Content-Type: audio/wav; name=a.wav
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=a.wav
 
 UklGRgAAAABXQVZFd2F2OkYwNTU=
 
---=-ubAB6Y2gk4xLFOSbi7Fy6Q==--
+--=-lh++isLFnHGZNd/9TvGCww==--

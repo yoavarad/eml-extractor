@@ -5,24 +5,24 @@ Message-Id: <Q035@golden.example>
 To: Bob <bob@example.com>
 X-Mailer: Combo-35
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-NK4Ooj8nAQrSUMFc8LXXIA=="
+Content-Type: multipart/mixed; boundary="=-1/fTXh0xFY2hW6yBN5+tBQ=="
 
---=-NK4Ooj8nAQrSUMFc8LXXIA==
-Content-Type: multipart/alternative; boundary="=-JFwvFx9kkiyBklyQ18Wd4g=="
+--=-1/fTXh0xFY2hW6yBN5+tBQ==
+Content-Type: multipart/alternative; boundary="=-q4OMH3BZpZnin2/KlZu/hQ=="
 
---=-JFwvFx9kkiyBklyQ18Wd4g==
+--=-q4OMH3BZpZnin2/KlZu/hQ==
 Content-Type: text/plain; charset=utf-8
 
 plain-35
---=-JFwvFx9kkiyBklyQ18Wd4g==
-Content-Type: multipart/related; boundary="=-wGJCZMJsaL7xMI/NoF22DQ==";
+--=-q4OMH3BZpZnin2/KlZu/hQ==
+Content-Type: multipart/related; boundary="=-0ziahef/miCoMSCtaswOWQ==";
 	type="text/html"
 
---=-wGJCZMJsaL7xMI/NoF22DQ==
+--=-0ziahef/miCoMSCtaswOWQ==
 Content-Type: text/html; charset=utf-8
 
 <p>שלום 35 😀</p><img src="cid:c35@x" />
---=-wGJCZMJsaL7xMI/NoF22DQ==
+--=-0ziahef/miCoMSCtaswOWQ==
 Content-Type: image/png; name=p.png
 Content-Transfer-Encoding: base64
 Content-Disposition: inline; filename=p.png
@@ -32,11 +32,11 @@ Content-Id: <c35@x>
 iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
 IQAAAABJRU5ErkJggg==
 
---=-wGJCZMJsaL7xMI/NoF22DQ==--
+--=-0ziahef/miCoMSCtaswOWQ==--
 
---=-JFwvFx9kkiyBklyQ18Wd4g==--
+--=-q4OMH3BZpZnin2/KlZu/hQ==--
 
---=-NK4Ooj8nAQrSUMFc8LXXIA==
+--=-1/fTXh0xFY2hW6yBN5+tBQ==
 Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document;
 	name=r.docx
 Content-Transfer-Encoding: base64
@@ -44,4 +44,4 @@ Content-Disposition: attachment; filename=r.docx
 
 UEsDBGRvY3g6UTAzNQ==
 
---=-NK4Ooj8nAQrSUMFc8LXXIA==--
+--=-1/fTXh0xFY2hW6yBN5+tBQ==--

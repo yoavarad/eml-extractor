@@ -4,17 +4,17 @@ Subject: file-59
 Message-Id: <F059@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-GeeTCHuNNVE7+87Hn5ZnEw=="
+Content-Type: multipart/mixed; boundary="=-QD7vDZkrhof2YtKC4LEQ8A=="
 
---=-GeeTCHuNNVE7+87Hn5ZnEw==
+--=-QD7vDZkrhof2YtKC4LEQ8A==
 Content-Type: text/plain; charset=utf-8
 
 see
---=-GeeTCHuNNVE7+87Hn5ZnEw==
+--=-QD7vDZkrhof2YtKC4LEQ8A==
 Content-Type: video/mp4; name=a.mp4
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=a.mp4
 
 AAAAGGZ0eXBtcDQybXA0OkYwNTk=
 
---=-GeeTCHuNNVE7+87Hn5ZnEw==--
+--=-QD7vDZkrhof2YtKC4LEQ8A==--

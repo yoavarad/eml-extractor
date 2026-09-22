@@ -4,14 +4,14 @@ Subject: paste
 Message-Id: <R031@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/related; boundary="=-sNMB4y0EePQqy/qIMDBWbA==";
+Content-Type: multipart/related; boundary="=-ZiLAFM0XzEOdJCpuW4eEiA==";
 	type="text/html"
 
---=-sNMB4y0EePQqy/qIMDBWbA==
+--=-ZiLAFM0XzEOdJCpuW4eEiA==
 Content-Type: text/html; charset=utf-8
 
 <p>paste</p><img src="cid:img31@golden.local" />
---=-sNMB4y0EePQqy/qIMDBWbA==
+--=-ZiLAFM0XzEOdJCpuW4eEiA==
 Content-Type: image/png; name=paste.png
 Content-Transfer-Encoding: base64
 Content-Disposition: inline; filename=paste.png
@@ -21,4 +21,4 @@ Content-Id: <img31@golden.local>
 iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
 IQAAAABJRU5ErkJggg==
 
---=-sNMB4y0EePQqy/qIMDBWbA==--
+--=-ZiLAFM0XzEOdJCpuW4eEiA==--

@@ -4,17 +4,17 @@ Subject: disp-a-16
 Message-Id: <P016@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-1uoTV3a5M86nwS/576e8nw=="
+Content-Type: multipart/mixed; boundary="=-FWlC86e5/oxZs9Vp+7DI1w=="
 
---=-1uoTV3a5M86nwS/576e8nw==
+--=-FWlC86e5/oxZs9Vp+7DI1w==
 Content-Type: text/plain; charset=utf-8
 
 x
---=-1uoTV3a5M86nwS/576e8nw==
+--=-FWlC86e5/oxZs9Vp+7DI1w==
 Content-Type: application/octet-stream; name=file-16.bin
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=file-16.bin
 
 YmluOlAwMTY=
 
---=-1uoTV3a5M86nwS/576e8nw==--
+--=-FWlC86e5/oxZs9Vp+7DI1w==--

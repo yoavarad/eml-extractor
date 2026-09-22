@@ -4,16 +4,16 @@ Subject: fn-18
 Message-Id: <O2183-018@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-78MqhYtXyNYKlNAveKUAPA=="
+Content-Type: multipart/mixed; boundary="=-SuCn4zTN8ljzUtTYoDne+w=="
 
---=-78MqhYtXyNYKlNAveKUAPA==
+--=-SuCn4zTN8ljzUtTYoDne+w==
 Content-Type: text/plain; charset=utf-8
 
 x
---=-78MqhYtXyNYKlNAveKUAPA==
+--=-SuCn4zTN8ljzUtTYoDne+w==
 Content-Type: text/plain; name="קובץ-18.txt"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename="קובץ-18.txt"
 
 fn-18
---=-78MqhYtXyNYKlNAveKUAPA==--
+--=-SuCn4zTN8ljzUtTYoDne+w==--

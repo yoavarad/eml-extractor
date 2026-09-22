@@ -4,16 +4,16 @@ Subject: fn-3
 Message-Id: <O2183-003@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-nTIXVHsJI5UQK1y3q6ANEA=="
+Content-Type: multipart/mixed; boundary="=-TwR2wdJdU+8I7vugnhhvyg=="
 
---=-nTIXVHsJI5UQK1y3q6ANEA==
+--=-TwR2wdJdU+8I7vugnhhvyg==
 Content-Type: text/plain; charset=utf-8
 
 x
---=-nTIXVHsJI5UQK1y3q6ANEA==
+--=-TwR2wdJdU+8I7vugnhhvyg==
 Content-Type: text/plain; name="файл-3.txt"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename="файл-3.txt"
 
 fn-3
---=-nTIXVHsJI5UQK1y3q6ANEA==--
+--=-TwR2wdJdU+8I7vugnhhvyg==--

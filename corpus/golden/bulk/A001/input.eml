@@ -4,13 +4,13 @@ Subject: office-1
 Message-Id: <A001@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-lMGrqL8BXTHsBxH2bMkxZg=="
+Content-Type: multipart/mixed; boundary="=-mc4VJ6uxoz357SXYCID7jQ=="
 
---=-lMGrqL8BXTHsBxH2bMkxZg==
+--=-mc4VJ6uxoz357SXYCID7jQ==
 Content-Type: text/plain; charset=utf-8
 
 see
---=-lMGrqL8BXTHsBxH2bMkxZg==
+--=-mc4VJ6uxoz357SXYCID7jQ==
 Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document;
 	name=report.docx
 Content-Transfer-Encoding: base64
@@ -18,4 +18,4 @@ Content-Disposition: attachment; filename=report.docx
 
 UEsDBGRvY3g6QTAwMQ==
 
---=-lMGrqL8BXTHsBxH2bMkxZg==--
+--=-mc4VJ6uxoz357SXYCID7jQ==--

@@ -4,14 +4,14 @@ Subject: שלום עולם
 Message-Id: <U003@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-Wxgk1KSgCJ/WU/kH7CpZvA=="
+Content-Type: multipart/alternative; boundary="=-7jiiCuLyIK2EMgcIAi6lBg=="
 
---=-Wxgk1KSgCJ/WU/kH7CpZvA==
+--=-7jiiCuLyIK2EMgcIAi6lBg==
 Content-Type: text/plain; charset=utf-8
 
 plain-גוף עברי
---=-Wxgk1KSgCJ/WU/kH7CpZvA==
+--=-7jiiCuLyIK2EMgcIAi6lBg==
 Content-Type: text/html; charset=utf-8
 
-<p>גוף עברי</p>
---=-Wxgk1KSgCJ/WU/kH7CpZvA==--
+<html dir="rtl"><body dir="rtl"><p>גוף עברי</p></body></html>
+--=-7jiiCuLyIK2EMgcIAi6lBg==--

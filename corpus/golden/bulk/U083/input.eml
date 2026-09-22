@@ -4,14 +4,14 @@ Subject: ខ្ញុំស្រឡាញ់
 Message-Id: <U083@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-if1EPDkfUPilzWx3QdQPvg=="
+Content-Type: multipart/alternative; boundary="=-NGMfG+kSwZmDhUFEgE/yVA=="
 
---=-if1EPDkfUPilzWx3QdQPvg==
+--=-NGMfG+kSwZmDhUFEgE/yVA==
 Content-Type: text/plain; charset=utf-8
 
 plain-Khmer
---=-if1EPDkfUPilzWx3QdQPvg==
+--=-NGMfG+kSwZmDhUFEgE/yVA==
 Content-Type: text/html; charset=utf-8
 
 <p>Khmer</p>
---=-if1EPDkfUPilzWx3QdQPvg==--
+--=-NGMfG+kSwZmDhUFEgE/yVA==--

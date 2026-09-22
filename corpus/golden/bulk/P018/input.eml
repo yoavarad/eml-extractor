@@ -4,17 +4,17 @@ Subject: disp-a-18
 Message-Id: <P018@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-unPb/LYnAeAzeYB2PEDAIA=="
+Content-Type: multipart/mixed; boundary="=-jjXUg1FG4rTkhLRw2h+yuA=="
 
---=-unPb/LYnAeAzeYB2PEDAIA==
+--=-jjXUg1FG4rTkhLRw2h+yuA==
 Content-Type: text/plain; charset=utf-8
 
 x
---=-unPb/LYnAeAzeYB2PEDAIA==
+--=-jjXUg1FG4rTkhLRw2h+yuA==
 Content-Type: application/octet-stream; name=file-18.bin
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=file-18.bin
 
 YmluOlAwMTg=
 
---=-unPb/LYnAeAzeYB2PEDAIA==--
+--=-jjXUg1FG4rTkhLRw2h+yuA==--

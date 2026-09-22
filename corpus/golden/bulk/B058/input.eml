@@ -4,14 +4,14 @@ Subject: alt-58
 Message-Id: <B058@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-9vPfrWT45tGuquuUw4I7JQ=="
+Content-Type: multipart/alternative; boundary="=-ebftq2dIOY2qALOR97F2Bg=="
 
---=-9vPfrWT45tGuquuUw4I7JQ==
+--=-ebftq2dIOY2qALOR97F2Bg==
 Content-Type: text/plain; charset=utf-8
 
 plain-58
---=-9vPfrWT45tGuquuUw4I7JQ==
+--=-ebftq2dIOY2qALOR97F2Bg==
 Content-Type: text/html; charset=utf-8
 
 <p>html-58</p>
---=-9vPfrWT45tGuquuUw4I7JQ==--
+--=-ebftq2dIOY2qALOR97F2Bg==--

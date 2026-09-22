@@ -4,15 +4,15 @@ Subject: signed-44
 Message-Id: <M044@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-AU/tMwuLSJd7n4sotrCcNg=="
+Content-Type: multipart/signed; boundary="=-vowCFLL8o8bilJ2gNECjLg=="
 
---=-AU/tMwuLSJd7n4sotrCcNg==
+--=-vowCFLL8o8bilJ2gNECjLg==
 Content-Type: text/plain; charset=utf-8
 
 signed-44
---=-AU/tMwuLSJd7n4sotrCcNg==
+--=-vowCFLL8o8bilJ2gNECjLg==
 Content-Type: application/pkcs7-signature; name=smime.p7s
 Content-Disposition: attachment; filename=smime.p7s
 
 SIG-44
---=-AU/tMwuLSJd7n4sotrCcNg==--
+--=-vowCFLL8o8bilJ2gNECjLg==--

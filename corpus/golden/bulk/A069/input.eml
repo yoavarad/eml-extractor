@@ -4,17 +4,17 @@ Subject: office-69
 Message-Id: <A069@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-47xev5RlHwI0TnQfliIAvQ=="
+Content-Type: multipart/mixed; boundary="=-Z3OsKCORbNb+qa9KZskJaA=="
 
---=-47xev5RlHwI0TnQfliIAvQ==
+--=-Z3OsKCORbNb+qa9KZskJaA==
 Content-Type: text/plain; charset=utf-8
 
 see
---=-47xev5RlHwI0TnQfliIAvQ==
+--=-Z3OsKCORbNb+qa9KZskJaA==
 Content-Type: application/vnd.oasis.opendocument.text; name=text.odt
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=text.odt
 
 UEsDBG9kdDpBMDY5
 
---=-47xev5RlHwI0TnQfliIAvQ==--
+--=-Z3OsKCORbNb+qa9KZskJaA==--

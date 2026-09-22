@@ -4,14 +4,14 @@ Subject: こんにちは
 Message-Id: <U015@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-O0RyyCwEPlWmAVIiCa6JWw=="
+Content-Type: multipart/alternative; boundary="=-yAz4Tqwe4ff17I/+ItsIng=="
 
---=-O0RyyCwEPlWmAVIiCa6JWw==
+--=-yAz4Tqwe4ff17I/+ItsIng==
 Content-Type: text/plain; charset=utf-8
 
 plain-日本語の本文
---=-O0RyyCwEPlWmAVIiCa6JWw==
+--=-yAz4Tqwe4ff17I/+ItsIng==
 Content-Type: text/html; charset=utf-8
 
 <p>日本語の本文</p>
---=-O0RyyCwEPlWmAVIiCa6JWw==--
+--=-yAz4Tqwe4ff17I/+ItsIng==--

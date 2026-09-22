@@ -9,7 +9,7 @@ Added this pass (all public, gitignored): Apache POI HMEF TNEF (real `.doc` + `.
 | ID | Case | Status | Notes |
 | --- | --- | --- | --- |
 | E01 | Subject with emoji + RFC2047 | tested | `ExoticLanguageTests` |
-| E02 | Hebrew / Arabic RTL in subject and body | tested + public-sample | Gmail Hebrew subject (`issue149`); 1992 Bellcore Hebrew body. Arabic still generated-only. No live Outlook Hebrew/Arabic body |
+| E02 | Hebrew / Arabic RTL in subject and body | tested + public-sample | Direction reported as `rtl`/`ltr`. HTML `dir` preserved. Gmail Hebrew subject (`issue149`); 1992 Bellcore Hebrew body. |
 | E03 | CJK, Hindi, Thai, Russian | tested | plus real ISO-2022-JP (`gaps/iso2022jp.eml`) |
 | E04 | charset Windows-1255 | tested | `ExtractionTests.Windows1255BodyDecodes` |
 | E05 | docx/xlsx/pptx/pdf/zip/jpg/gif payloads | tested + public-sample | CI goldens are SHA-256 stubs. Public: SwiftMailer `Hello from SwiftMailer.docx` (PK, 11 KB) + PDF + ODT; ProtonMail `test.docx`/`test.xlsx` (PK magic, truncated zip); TNEF `quick.doc` (OLE) + `quick.pdf` |

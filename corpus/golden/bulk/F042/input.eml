@@ -4,16 +4,16 @@ Subject: file-42
 Message-Id: <F042@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-2PgxGbaA+pe5nAKrg3vdFQ=="
+Content-Type: multipart/mixed; boundary="=-wHWyoJNyDb04j852/lBzvA=="
 
---=-2PgxGbaA+pe5nAKrg3vdFQ==
+--=-wHWyoJNyDb04j852/lBzvA==
 Content-Type: text/plain; charset=utf-8
 
 see
---=-2PgxGbaA+pe5nAKrg3vdFQ==
+--=-wHWyoJNyDb04j852/lBzvA==
 Content-Type: text/calendar; name=meet.ics
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename=meet.ics
 
 payload-F042-2
---=-2PgxGbaA+pe5nAKrg3vdFQ==--
+--=-wHWyoJNyDb04j852/lBzvA==--

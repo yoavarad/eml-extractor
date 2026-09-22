@@ -4,17 +4,17 @@ Subject: office-34
 Message-Id: <A034@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-vtYDKfGKg1dXSOGJ0qwBWg=="
+Content-Type: multipart/mixed; boundary="=-n6i8BSmITGhLctswqJrrjA=="
 
---=-vtYDKfGKg1dXSOGJ0qwBWg==
+--=-n6i8BSmITGhLctswqJrrjA==
 Content-Type: text/html; charset=utf-8
 
 <p>see</p>
---=-vtYDKfGKg1dXSOGJ0qwBWg==
+--=-n6i8BSmITGhLctswqJrrjA==
 Content-Type: application/msword; name=legacy.doc
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=legacy.doc
 
 YmluOkEwMzQ=
 
---=-vtYDKfGKg1dXSOGJ0qwBWg==--
+--=-n6i8BSmITGhLctswqJrrjA==--

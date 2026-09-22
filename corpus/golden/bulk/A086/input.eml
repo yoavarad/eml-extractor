@@ -4,17 +4,17 @@ Subject: office-86
 Message-Id: <A086@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-xl7BUE0Puynatw0SVmAJ2A=="
+Content-Type: multipart/mixed; boundary="=-IgsI/E8s5ASy2+8L2+ojhw=="
 
---=-xl7BUE0Puynatw0SVmAJ2A==
+--=-IgsI/E8s5ASy2+8L2+ojhw==
 Content-Type: text/html; charset=utf-8
 
 <p>see</p>
---=-xl7BUE0Puynatw0SVmAJ2A==
+--=-IgsI/E8s5ASy2+8L2+ojhw==
 Content-Type: application/vnd.oasis.opendocument.presentation; name=show.odp
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=show.odp
 
 UEsDBG9kcDpBMDg2
 
---=-xl7BUE0Puynatw0SVmAJ2A==--
+--=-IgsI/E8s5ASy2+8L2+ojhw==--

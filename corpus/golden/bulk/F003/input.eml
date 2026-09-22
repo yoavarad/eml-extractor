@@ -4,17 +4,17 @@ Subject: file-3
 Message-Id: <F003@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-Lll2KRpmfwrJn/1gDZQVsA=="
+Content-Type: multipart/mixed; boundary="=-ehVMs82exhKJr8mlETrPNw=="
 
---=-Lll2KRpmfwrJn/1gDZQVsA==
+--=-ehVMs82exhKJr8mlETrPNw==
 Content-Type: text/plain; charset=utf-8
 
 see
---=-Lll2KRpmfwrJn/1gDZQVsA==
+--=-ehVMs82exhKJr8mlETrPNw==
 Content-Type: application/zip; name=a.zip
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=a.zip
 
 UEsDBHppcDpGMDAz
 
---=-Lll2KRpmfwrJn/1gDZQVsA==--
+--=-ehVMs82exhKJr8mlETrPNw==--

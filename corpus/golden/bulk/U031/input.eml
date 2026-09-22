@@ -4,14 +4,14 @@ Subject: Привет мир
 Message-Id: <U031@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-7yjuFaYhXoy2QuapISfriw=="
+Content-Type: multipart/alternative; boundary="=-Co0dDu7uf4Lhlxzwi28flQ=="
 
---=-7yjuFaYhXoy2QuapISfriw==
+--=-Co0dDu7uf4Lhlxzwi28flQ==
 Content-Type: text/plain; charset=utf-8
 
 plain-Русский текст
---=-7yjuFaYhXoy2QuapISfriw==
+--=-Co0dDu7uf4Lhlxzwi28flQ==
 Content-Type: text/html; charset=utf-8
 
 <p>Русский текст</p>
---=-7yjuFaYhXoy2QuapISfriw==--
+--=-Co0dDu7uf4Lhlxzwi28flQ==--

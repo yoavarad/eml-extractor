@@ -4,15 +4,15 @@ Subject: signed-49
 Message-Id: <M049@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-XPnEXe5r8eDl6gMV5qIfXA=="
+Content-Type: multipart/signed; boundary="=-ZJVrLpdInjbm9wEluN94bg=="
 
---=-XPnEXe5r8eDl6gMV5qIfXA==
+--=-ZJVrLpdInjbm9wEluN94bg==
 Content-Type: text/plain; charset=utf-8
 
 signed-49
---=-XPnEXe5r8eDl6gMV5qIfXA==
+--=-ZJVrLpdInjbm9wEluN94bg==
 Content-Type: application/pkcs7-signature; name=smime.p7s
 Content-Disposition: attachment; filename=smime.p7s
 
 SIG-49
---=-XPnEXe5r8eDl6gMV5qIfXA==--
+--=-ZJVrLpdInjbm9wEluN94bg==--

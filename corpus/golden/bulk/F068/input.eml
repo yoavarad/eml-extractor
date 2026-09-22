@@ -4,17 +4,17 @@ Subject: file-68
 Message-Id: <F068@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-0e+3KzZKCfbiklPWxkpN1w=="
+Content-Type: multipart/mixed; boundary="=-hpVZQd6/7aUoeDrZP6BzzQ=="
 
---=-0e+3KzZKCfbiklPWxkpN1w==
+--=-hpVZQd6/7aUoeDrZP6BzzQ==
 Content-Type: text/plain; charset=utf-8
 
 see
---=-0e+3KzZKCfbiklPWxkpN1w==
+--=-hpVZQd6/7aUoeDrZP6BzzQ==
 Content-Type: application/octet-stream; name=a.exe
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=a.exe
 
 TVpleGU6RjA2OA==
 
---=-0e+3KzZKCfbiklPWxkpN1w==--
+--=-hpVZQd6/7aUoeDrZP6BzzQ==--

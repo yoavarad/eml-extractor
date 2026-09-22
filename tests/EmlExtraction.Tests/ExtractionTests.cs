@@ -8,6 +8,79 @@ public sealed class ExtractionTests
     private readonly EmlExtractor _extractor = new();
 
     [Fact]
+    public void FromToCcBccAreAlwaysPresent()
+    {
+        var raw = """
+            From: alice@example.com
+            To: bob@example.com
+            Subject: no-cc
+            Date: Tue, 15 Sep 2026 07:00:00 +0000
+            Message-ID: <addr@example.com>
+            MIME-Version: 1.0
+            Content-Type: text/plain; charset=utf-8
+
+            body
+            """;
+        var result = _extractor.Extract(Encoding.ASCII.GetBytes(raw.Replace("\n", "\r\n")));
+        Assert.Equal("alice@example.com", result.Metadata["from"].Trim());
+        Assert.Contains("bob@example.com", result.Metadata["to"]);
+        Assert.Equal("", result.Metadata["cc"]);
+        Assert.Equal("", result.Metadata["bcc"]);
+    }
+
+    [Fact]
+    public void ExtractsFromToCcBccIncludingMultiplesAndRtlNames()
+    {
+        var message = SampleFactory.Plain("recipients", "body");
+        message.From.Clear();
+        message.From.Add(new MailboxAddress("יוסי", "yossi@example.com"));
+        message.From.Add(MailboxAddress.Parse("alice@example.com"));
+        message.To.Clear();
+        message.To.Add(new MailboxAddress("فاطمة", "fatima@example.com"));
+        message.Cc.Add(MailboxAddress.Parse("Carol <carol@example.com>"));
+        message.Cc.Add(MailboxAddress.Parse("dave@example.com"));
+        message.Bcc.Add(MailboxAddress.Parse("hidden@example.com"));
+        message.Bcc.Add(new MailboxAddress("סודי", "secret@example.com"));
+
+        var result = _extractor.Extract(SampleFactory.ToBytes(message));
+        Assert.Contains("yossi@example.com", result.Metadata["from"]);
+        Assert.Contains("יוסי", result.Metadata["from"]);
+        Assert.Contains("alice@example.com", result.Metadata["from"]);
+        Assert.Contains("fatima@example.com", result.Metadata["to"]);
+        Assert.Contains("فاطمة", result.Metadata["to"]);
+        Assert.Contains("carol@example.com", result.Metadata["cc"]);
+        Assert.Contains("dave@example.com", result.Metadata["cc"]);
+        Assert.Contains("hidden@example.com", result.Metadata["bcc"]);
+        Assert.Contains("secret@example.com", result.Metadata["bcc"]);
+        Assert.Contains("סודי", result.Metadata["bcc"]);
+    }
+
+    [Fact]
+    public void RawBccHeaderIsExtracted()
+    {
+        var raw = """
+            From: Alice <alice@example.com>
+            To: Bob <bob@example.com>
+            Cc: Carol <carol@example.com>, dave@example.com
+            Bcc: hidden@example.com, "סודי" <secret@example.com>
+            Subject: bcc-raw
+            Date: Tue, 15 Sep 2026 07:00:00 +0000
+            Message-ID: <bcc@example.com>
+            MIME-Version: 1.0
+            Content-Type: text/plain; charset=utf-8
+
+            body
+            """;
+        var result = _extractor.Extract(Encoding.UTF8.GetBytes(raw.Replace("\n", "\r\n")));
+        Assert.Contains("alice@example.com", result.Metadata["from"]);
+        Assert.Contains("bob@example.com", result.Metadata["to"]);
+        Assert.Contains("carol@example.com", result.Metadata["cc"]);
+        Assert.Contains("dave@example.com", result.Metadata["cc"]);
+        Assert.Contains("hidden@example.com", result.Metadata["bcc"]);
+        Assert.Contains("secret@example.com", result.Metadata["bcc"]);
+    }
+
+    [Fact]
     public void ExtractsClassicHeadersAndUnicodeSubject()
     {
         var message = SampleFactory.Plain("שלום 😀 中文 हिंदी", "hello");

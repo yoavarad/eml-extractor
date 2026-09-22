@@ -4,15 +4,15 @@ Subject: signed-38
 Message-Id: <M038@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-ndzl9yjW4/U0sbZE8b21MQ=="
+Content-Type: multipart/signed; boundary="=-3QIdkAeGuDclul1pGdc+/g=="
 
---=-ndzl9yjW4/U0sbZE8b21MQ==
+--=-3QIdkAeGuDclul1pGdc+/g==
 Content-Type: text/plain; charset=utf-8
 
 signed-38
---=-ndzl9yjW4/U0sbZE8b21MQ==
+--=-3QIdkAeGuDclul1pGdc+/g==
 Content-Type: application/pkcs7-signature; name=smime.p7s
 Content-Disposition: attachment; filename=smime.p7s
 
 SIG-38
---=-ndzl9yjW4/U0sbZE8b21MQ==--
+--=-3QIdkAeGuDclul1pGdc+/g==--

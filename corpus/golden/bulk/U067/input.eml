@@ -4,14 +4,14 @@ Subject: Smörgåsbord
 Message-Id: <U067@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-1Z7UlyO7qHkbYDSlddePkg=="
+Content-Type: multipart/alternative; boundary="=-a0Bvr4FhcBgdK6pUjHnLFA=="
 
---=-1Z7UlyO7qHkbYDSlddePkg==
+--=-a0Bvr4FhcBgdK6pUjHnLFA==
 Content-Type: text/plain; charset=utf-8
 
 plain-Svenska
---=-1Z7UlyO7qHkbYDSlddePkg==
+--=-a0Bvr4FhcBgdK6pUjHnLFA==
 Content-Type: text/html; charset=utf-8
 
 <p>Svenska</p>
---=-1Z7UlyO7qHkbYDSlddePkg==--
+--=-a0Bvr4FhcBgdK6pUjHnLFA==--

@@ -4,14 +4,14 @@ Subject: alt-60
 Message-Id: <B060@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-OR5eFu+JUhIJNjKJGALQ5w=="
+Content-Type: multipart/alternative; boundary="=-GvFc2TfGlNstE9t7boFB2g=="
 
---=-OR5eFu+JUhIJNjKJGALQ5w==
+--=-GvFc2TfGlNstE9t7boFB2g==
 Content-Type: text/plain; charset=utf-8
 
 plain-60
---=-OR5eFu+JUhIJNjKJGALQ5w==
+--=-GvFc2TfGlNstE9t7boFB2g==
 Content-Type: text/html; charset=utf-8
 
 <p>html-60</p>
---=-OR5eFu+JUhIJNjKJGALQ5w==--
+--=-GvFc2TfGlNstE9t7boFB2g==--

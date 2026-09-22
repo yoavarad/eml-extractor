@@ -4,17 +4,17 @@ Subject: office-76
 Message-Id: <A076@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-yE6tasi+gwDkKbRfVojrrQ=="
+Content-Type: multipart/mixed; boundary="=-lm9rKdu92I0ypQgl9VK+hA=="
 
---=-yE6tasi+gwDkKbRfVojrrQ==
+--=-lm9rKdu92I0ypQgl9VK+hA==
 Content-Type: text/html; charset=utf-8
 
 <p>see</p>
---=-yE6tasi+gwDkKbRfVojrrQ==
+--=-lm9rKdu92I0ypQgl9VK+hA==
 Content-Type: application/vnd.oasis.opendocument.spreadsheet; name=calc.ods
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=calc.ods
 
 UEsDBG9kczpBMDc2
 
---=-yE6tasi+gwDkKbRfVojrrQ==--
+--=-lm9rKdu92I0ypQgl9VK+hA==--

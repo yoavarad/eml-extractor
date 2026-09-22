@@ -4,13 +4,13 @@ Subject: outer
 Message-Id: <N031@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-MnSrTeizG5o0/X4fnOGDgw=="
+Content-Type: multipart/mixed; boundary="=-Aarbr0V+qVwIhkzwWavySg=="
 
---=-MnSrTeizG5o0/X4fnOGDgw==
+--=-Aarbr0V+qVwIhkzwWavySg==
 Content-Type: text/plain; charset=utf-8
 
 outer-body
---=-MnSrTeizG5o0/X4fnOGDgw==
+--=-Aarbr0V+qVwIhkzwWavySg==
 Content-Type: message/rfc822
 Content-Disposition: attachment; filename=forwarded-31.eml
 
@@ -24,4 +24,4 @@ Content-Type: text/plain; charset=utf-8
 
 inner-body-31
 
---=-MnSrTeizG5o0/X4fnOGDgw==--
+--=-Aarbr0V+qVwIhkzwWavySg==--

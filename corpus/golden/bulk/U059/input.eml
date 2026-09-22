@@ -4,14 +4,14 @@ Subject: Ñandú pingüino
 Message-Id: <U059@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-mjQjpiTYZRBW9fsP89RVBQ=="
+Content-Type: multipart/alternative; boundary="=-TKjhkKKsIkBT9QFdVDQFVQ=="
 
---=-mjQjpiTYZRBW9fsP89RVBQ==
+--=-TKjhkKKsIkBT9QFdVDQFVQ==
 Content-Type: text/plain; charset=utf-8
 
 plain-Español con tildes
---=-mjQjpiTYZRBW9fsP89RVBQ==
+--=-TKjhkKKsIkBT9QFdVDQFVQ==
 Content-Type: text/html; charset=utf-8
 
 <p>Español con tildes</p>
---=-mjQjpiTYZRBW9fsP89RVBQ==--
+--=-TKjhkKKsIkBT9QFdVDQFVQ==--

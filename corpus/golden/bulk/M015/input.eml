@@ -4,16 +4,16 @@ Subject: mixed-15
 Message-Id: <M015@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-st1Miz5RqNYYiP3NfKJDMw=="
+Content-Type: multipart/mixed; boundary="=-2B39ylzlSDhvLwH9DoogFg=="
 
---=-st1Miz5RqNYYiP3NfKJDMw==
+--=-2B39ylzlSDhvLwH9DoogFg==
 Content-Type: text/plain; charset=utf-8
 
 see file
---=-st1Miz5RqNYYiP3NfKJDMw==
+--=-2B39ylzlSDhvLwH9DoogFg==
 Content-Type: text/plain; name=note-15.txt
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename=note-15.txt
 
 txt:M015
---=-st1Miz5RqNYYiP3NfKJDMw==--
+--=-2B39ylzlSDhvLwH9DoogFg==--

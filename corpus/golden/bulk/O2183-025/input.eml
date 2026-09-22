@@ -4,16 +4,16 @@ Subject: fn-25
 Message-Id: <O2183-025@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-Bfik8sUZdjuVz2dq23FIRg=="
+Content-Type: multipart/mixed; boundary="=-YGFxcqspCQsa8qo3Btp8Zg=="
 
---=-Bfik8sUZdjuVz2dq23FIRg==
+--=-YGFxcqspCQsa8qo3Btp8Zg==
 Content-Type: text/plain; charset=utf-8
 
 x
---=-Bfik8sUZdjuVz2dq23FIRg==
+--=-YGFxcqspCQsa8qo3Btp8Zg==
 Content-Type: text/plain; name="файл-25.txt"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename="файл-25.txt"
 
 fn-25
---=-Bfik8sUZdjuVz2dq23FIRg==--
+--=-YGFxcqspCQsa8qo3Btp8Zg==--

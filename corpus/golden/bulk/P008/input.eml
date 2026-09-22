@@ -4,17 +4,17 @@ Subject: disp-a-8
 Message-Id: <P008@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-RHWRQfIRFZrdameMI58aVQ=="
+Content-Type: multipart/mixed; boundary="=-W8A/dhQjomuqbMY2lZtQTA=="
 
---=-RHWRQfIRFZrdameMI58aVQ==
+--=-W8A/dhQjomuqbMY2lZtQTA==
 Content-Type: text/plain; charset=utf-8
 
 x
---=-RHWRQfIRFZrdameMI58aVQ==
+--=-W8A/dhQjomuqbMY2lZtQTA==
 Content-Type: application/octet-stream; name=file-8.bin
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=file-8.bin
 
 YmluOlAwMDg=
 
---=-RHWRQfIRFZrdameMI58aVQ==--
+--=-W8A/dhQjomuqbMY2lZtQTA==--

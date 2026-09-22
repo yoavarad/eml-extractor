@@ -4,17 +4,17 @@ Subject: img-61
 Message-Id: <I061@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-6lf4aJ5DZsdkw/XLSEqzNg=="
+Content-Type: multipart/mixed; boundary="=-zlkDWKvY2Kl1JLpql93qmw=="
 
---=-6lf4aJ5DZsdkw/XLSEqzNg==
+--=-zlkDWKvY2Kl1JLpql93qmw==
 Content-Type: text/plain; charset=utf-8
 
 see pic
---=-6lf4aJ5DZsdkw/XLSEqzNg==
+--=-zlkDWKvY2Kl1JLpql93qmw==
 Content-Type: image/heic; name=pic.heic
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=pic.heic
 
 AAAAGGZ0eXBoZWljaGVpYzpJMDYx
 
---=-6lf4aJ5DZsdkw/XLSEqzNg==--
+--=-zlkDWKvY2Kl1JLpql93qmw==--

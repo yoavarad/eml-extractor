@@ -4,17 +4,17 @@ Subject: file-71
 Message-Id: <F071@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-p1g4idl9hCWRu0gAQBQXoQ=="
+Content-Type: multipart/mixed; boundary="=-g84SUjLe6YuHYD8kWKyaFQ=="
 
---=-p1g4idl9hCWRu0gAQBQXoQ==
+--=-g84SUjLe6YuHYD8kWKyaFQ==
 Content-Type: text/plain; charset=utf-8
 
 see
---=-p1g4idl9hCWRu0gAQBQXoQ==
+--=-g84SUjLe6YuHYD8kWKyaFQ==
 Content-Type: application/vnd.ms-outlook; name=mail.msg
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=mail.msg
 
 0M8R4KGxGuFtc2c6RjA3MQ==
 
---=-p1g4idl9hCWRu0gAQBQXoQ==--
+--=-g84SUjLe6YuHYD8kWKyaFQ==--

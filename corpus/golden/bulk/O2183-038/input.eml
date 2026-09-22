@@ -4,16 +4,16 @@ Subject: fn-38
 Message-Id: <O2183-038@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-/IwLtEaLhPUb5DoNYmXAAA=="
+Content-Type: multipart/mixed; boundary="=-dn7LE1hcJMhcekkaU9s4eQ=="
 
---=-/IwLtEaLhPUb5DoNYmXAAA==
+--=-dn7LE1hcJMhcekkaU9s4eQ==
 Content-Type: text/plain; charset=utf-8
 
 x
---=-/IwLtEaLhPUb5DoNYmXAAA==
+--=-dn7LE1hcJMhcekkaU9s4eQ==
 Content-Type: text/plain; name="קובץ-38.txt"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename="קובץ-38.txt"
 
 fn-38
---=-/IwLtEaLhPUb5DoNYmXAAA==--
+--=-dn7LE1hcJMhcekkaU9s4eQ==--

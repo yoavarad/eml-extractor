@@ -4,17 +4,17 @@ Subject: file-29
 Message-Id: <F029@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-auXfp9X3TQ4RsfMt594dcA=="
+Content-Type: multipart/mixed; boundary="=-t/7oWHK7+RzEktYe+M9OUQ=="
 
---=-auXfp9X3TQ4RsfMt594dcA==
+--=-t/7oWHK7+RzEktYe+M9OUQ==
 Content-Type: text/plain; charset=utf-8
 
 see
---=-auXfp9X3TQ4RsfMt594dcA==
+--=-t/7oWHK7+RzEktYe+M9OUQ==
 Content-Type: application/xml; name=a.xml
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=a.xml
 
 cGF5bG9hZC1GMDI5LTE=
 
---=-auXfp9X3TQ4RsfMt594dcA==--
+--=-t/7oWHK7+RzEktYe+M9OUQ==--

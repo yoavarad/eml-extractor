@@ -4,16 +4,16 @@ Subject: disp-win-40
 Message-Id: <P040@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-Hjg1RJtMEkgeHSX7pj77hA=="
+Content-Type: multipart/mixed; boundary="=-+pMm9U5sj262LZTphmQInQ=="
 
---=-Hjg1RJtMEkgeHSX7pj77hA==
+--=-+pMm9U5sj262LZTphmQInQ==
 Content-Type: text/plain; charset=utf-8
 
 x
---=-Hjg1RJtMEkgeHSX7pj77hA==
+--=-+pMm9U5sj262LZTphmQInQ==
 Content-Type: text/plain; name="C:\\Temp\\file-40.txt"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename="C:\\Temp\\file-40.txt"
 
 txt:P040
---=-Hjg1RJtMEkgeHSX7pj77hA==--
+--=-+pMm9U5sj262LZTphmQInQ==--

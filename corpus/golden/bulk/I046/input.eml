@@ -4,17 +4,17 @@ Subject: img-46
 Message-Id: <I046@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-MzuqYIVXgDNADLjk1WmMPw=="
+Content-Type: multipart/mixed; boundary="=-NXConh0wE4csJV3QL6+snA=="
 
---=-MzuqYIVXgDNADLjk1WmMPw==
+--=-NXConh0wE4csJV3QL6+snA==
 Content-Type: text/plain; charset=utf-8
 
 see pic
---=-MzuqYIVXgDNADLjk1WmMPw==
+--=-NXConh0wE4csJV3QL6+snA==
 Content-Type: image/svg+xml; name=pic.svg
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=pic.svg
 
 PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIGlkPSdJMDQ2Jy8+
 
---=-MzuqYIVXgDNADLjk1WmMPw==--
+--=-NXConh0wE4csJV3QL6+snA==--

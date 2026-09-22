@@ -4,17 +4,17 @@ Subject: img-51
 Message-Id: <I051@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-k+rlvGiFUyWswH9aFFbZ4g=="
+Content-Type: multipart/mixed; boundary="=-q+DYvj/bziXdV3eOTvA4Ig=="
 
---=-k+rlvGiFUyWswH9aFFbZ4g==
+--=-q+DYvj/bziXdV3eOTvA4Ig==
 Content-Type: text/plain; charset=utf-8
 
 see pic
---=-k+rlvGiFUyWswH9aFFbZ4g==
+--=-q+DYvj/bziXdV3eOTvA4Ig==
 Content-Type: image/x-icon; name=pic.ico
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=pic.ico
 
 AAABAGljbzpJMDUx
 
---=-k+rlvGiFUyWswH9aFFbZ4g==--
+--=-q+DYvj/bziXdV3eOTvA4Ig==--

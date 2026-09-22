@@ -4,17 +4,17 @@ Subject: file-51
 Message-Id: <F051@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-I3BCwpauBQrRZh30Yb9NoA=="
+Content-Type: multipart/mixed; boundary="=-p7kbJf7CWdRAWeyqHSS9vg=="
 
---=-I3BCwpauBQrRZh30Yb9NoA==
+--=-p7kbJf7CWdRAWeyqHSS9vg==
 Content-Type: text/plain; charset=utf-8
 
 see
---=-I3BCwpauBQrRZh30Yb9NoA==
+--=-p7kbJf7CWdRAWeyqHSS9vg==
 Content-Type: audio/mpeg; name=a.mp3
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=a.mp3
 
 SUQzbXAzOkYwNTE=
 
---=-I3BCwpauBQrRZh30Yb9NoA==--
+--=-p7kbJf7CWdRAWeyqHSS9vg==--

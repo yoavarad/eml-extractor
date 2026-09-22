@@ -4,16 +4,16 @@ Subject: trav-20
 Message-Id: <Z020@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-H/h/MNv+N6DKZXZD2do2Wg=="
+Content-Type: multipart/mixed; boundary="=-z3HJ8DS3e3x6KzaJxWpsoA=="
 
---=-H/h/MNv+N6DKZXZD2do2Wg==
+--=-z3HJ8DS3e3x6KzaJxWpsoA==
 Content-Type: text/plain; charset=utf-8
 
 x
---=-H/h/MNv+N6DKZXZD2do2Wg==
+--=-z3HJ8DS3e3x6KzaJxWpsoA==
 Content-Type: text/plain; name="../../etc/passwd-20.txt"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename="../../etc/passwd-20.txt"
 
 secret
---=-H/h/MNv+N6DKZXZD2do2Wg==--
+--=-z3HJ8DS3e3x6KzaJxWpsoA==--

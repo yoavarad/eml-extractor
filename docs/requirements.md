@@ -40,9 +40,9 @@ Legend: **Done** · **Partial** (category covered, not production samples) · **
 **Requirement:** Classic envelope/header fields.
 
 - **Done**
-- `HeaderMapper.Map` overlays: `from`, `to`, `cc`, `bcc`, `replyto`, `sender`, `subject`, `date`, `messageid`, `inreplyto`, `references`, `mimeversion`, `contenttype`, `returnpath`, `deliveredto`, `received`
+- `HeaderMapper.Map` overlays: `from`, `to`, `cc`, `bcc` (always present; empty if missing), `replyto`, `sender`, `subject`, `date`, `messageid`, `inreplyto`, `references`, `mimeversion`, `contenttype`, `returnpath`, `deliveredto`, `received`
 - File: `src/EmlExtraction/HeaderMapper.cs`
-- Tests: `ExtractionTests.ExtractsClassicHeadersAndUnicodeSubject`
+- Tests: `ExtractionTests.ExtractsClassicHeadersAndUnicodeSubject`, `ExtractionTests.ExtractsFromToCcBccIncludingMultiplesAndRtlNames`, `ExtractionTests.RawBccHeaderIsExtracted`
 
 ### As many headers as possible
 
@@ -70,8 +70,10 @@ Legend: **Done** · **Partial** (category covered, not production samples) · **
 
 - **Done**
 - `BodySelector.Select` prefers HTML over plain in `multipart/alternative`; result is `MainContent`
-- File: `src/EmlExtraction/BodySelector.cs`
-- Tests: `ExtractionTests.PrefersHtmlOverPlain`, golden `E03-html-alt`, `E01-emoji`, `E02-hebrew`, `E13-empty`
+- Direction: `TextDirection.Detect` → `subject_direction` / `content_direction` and `EmlExtractionResult.SubjectDirection` / `ContentDirection` (`ltr` or `rtl`)
+- HTML `dir` / CSS `direction` wins over letter script; otherwise Unicode first-strong. Bidi marks are kept.
+- File: `src/EmlExtraction/BodySelector.cs`, `src/EmlExtraction/TextDirection.cs`
+- Tests: `ExtractionTests.PrefersHtmlOverPlain`, `ExoticLanguageTests` (Hebrew/Arabic RTL, HTML dir, RLM/LRM), golden `E03-html-alt`, `E01-emoji`, `E02-hebrew`, `E13-empty`
 
 ---
 

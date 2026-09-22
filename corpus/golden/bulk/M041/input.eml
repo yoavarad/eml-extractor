@@ -4,15 +4,15 @@ Subject: signed-41
 Message-Id: <M041@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-TI1kvQ2rrq0GhnfAfyA/tQ=="
+Content-Type: multipart/signed; boundary="=-WqmW70Pw/KIz1lad6tkzjQ=="
 
---=-TI1kvQ2rrq0GhnfAfyA/tQ==
+--=-WqmW70Pw/KIz1lad6tkzjQ==
 Content-Type: text/plain; charset=utf-8
 
 signed-41
---=-TI1kvQ2rrq0GhnfAfyA/tQ==
+--=-WqmW70Pw/KIz1lad6tkzjQ==
 Content-Type: application/pkcs7-signature; name=smime.p7s
 Content-Disposition: attachment; filename=smime.p7s
 
 SIG-41
---=-TI1kvQ2rrq0GhnfAfyA/tQ==--
+--=-WqmW70Pw/KIz1lad6tkzjQ==--

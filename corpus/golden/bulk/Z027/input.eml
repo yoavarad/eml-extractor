@@ -4,14 +4,14 @@ Subject: nameless-27
 Message-Id: <Z027@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-6ZS+MG5Fo+p0PXp3hkvpnA=="
+Content-Type: multipart/mixed; boundary="=-JvLUgUg3f6WTkuTWsvqJFw=="
 
---=-6ZS+MG5Fo+p0PXp3hkvpnA==
+--=-JvLUgUg3f6WTkuTWsvqJFw==
 Content-Type: text/plain; charset=utf-8
 
 x
---=-6ZS+MG5Fo+p0PXp3hkvpnA==
+--=-JvLUgUg3f6WTkuTWsvqJFw==
 Content-Type: application/octet-stream
 
 nameless-27
---=-6ZS+MG5Fo+p0PXp3hkvpnA==--
+--=-JvLUgUg3f6WTkuTWsvqJFw==--
