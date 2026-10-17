@@ -19,10 +19,8 @@ The original ask covers detection, metadata, body, attachments, and correctness 
 
 ## Consequences
 - After a change to extraction behaviour, bulk cases are regenerated from the catalog, not re-recorded from output.
-- CI (`ci.yml`) runs only `dotnet test`, i.e. the seed set. The 1200-case bulk score is a manual command (see Open questions).
-
-## Open questions
-- The repo does not say whether the bulk score is meant to be a CI gate; today it is not wired into CI.
+- CI (`ci.yml`) runs restore, build with warnings as errors, format verification, `dotnet test`, and a vulnerable-package audit. Of the golden set, only the 12 seed cases run there, inside `dotnet test` alongside the unit and internal-corpus tests. The 1200-case bulk score is a manual command.
+- Whether the bulk score should gate CI is decided in ADR-011.
 
 ## Evidence
 `docs/golden.md`, `docs/golden-score.txt`, `README.md` ("Golden set"), `tools/GoldenKit/Generator.cs`, `tools/GoldenKit/Scorer.cs`, `tests/EmlExtraction.Tests/GoldenTests.cs`.

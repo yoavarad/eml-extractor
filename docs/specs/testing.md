@@ -7,11 +7,11 @@
 | Unit | Each rule of detection, metadata, body choice, direction, and attachment collection, on messages built in code | Yes |
 | Seed golden | Authored end-to-end expectations on 12 committed messages | Yes |
 | Internal corpus | Behaviour on specific real public samples | Only when the samples are present locally; CI skips them |
-| Bulk golden score | 1,200 authored cases across 48 tags | No, run by hand |
+| Bulk golden score | 1,200 authored cases across 48 tags | Not yet. Target is a CI gate at the 1212 of 1212 baseline (ADR-011); today it is run by hand |
 | Harvest probe | No crash across every local public sample | No, run by hand |
 | Throughput bench | Files per second on the current machine | No, run by hand |
 
-The unit layer is split by concern. [ydk:test:detection/detector.unit] covers detection, [ydk:test:extraction/extraction.unit] covers metadata and body, [ydk:test:extraction/exotic-language.unit] covers scripts and direction, and [ydk:test:attachments/attachment.unit] covers attachments. The seed golden layer is [ydk:test:quality/seed-golden.integration] and the internal corpus layer is [ydk:test:quality/internal-corpus.integration]. The manual layers feed [ydk:nfr:reliability/golden-pass-rate], [ydk:nfr:reliability/real-world-harvest-no-throw], and the throughput baselines in [quality.md](quality.md).
+The unit layer is split by concern. [ydk:test:detection/detector.unit] covers detection, [ydk:test:extraction/extraction.unit] covers metadata and body, [ydk:test:extraction/exotic-language.unit] covers scripts and direction, and [ydk:test:attachments/attachment.unit] covers attachments. The seed golden layer is [ydk:test:quality/seed-golden.integration] and the internal corpus layer is [ydk:test:quality/internal-corpus.integration]. The bulk score, the harvest probe, and the bench feed [ydk:nfr:reliability/golden-pass-rate], [ydk:nfr:reliability/real-world-harvest-no-throw], and the throughput baselines in [quality.md](quality.md).
 
 ## What is real and what is stubbed
 

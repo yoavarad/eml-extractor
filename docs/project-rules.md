@@ -26,6 +26,6 @@ We are building an in-process C# / .NET 10 class library that decides whether a 
 - mbox-prefixed files (`From ` first line) must be parsed with `MimeParser(..., MimeFormat.Mbox)`. Before this, mbox `From_` lines "were breaking SpamAssassin" (commit 251657d).
 - The detector sniffs only the first 16 KB. Header blocks larger than that have no real-world sample yet (edge case E27).
 - The top-level `Extract` catch filters by exception type. An exception type outside that list propagates despite the "does not throw" wording in the README.
-- `ydk` (Python) on Windows reads manifests and narratives with the cp1252 codepage. Non-Latin characters (Hebrew, CJK) in `.ydk/components/**` or `docs/specs/**` crash `ydk component validate` with `UnicodeDecodeError`. Keep those files ASCII, or set `PYTHONUTF8=1`.
-- The YDK cross-ref linker treats a `.` directly after a `ydk:type:ns/name` ID in a manifest as part of the ID. Put a space before sentence-ending punctuation.
+- `ydk` (Python) on Windows reads manifests and narratives with the cp1252 codepage. Non-Latin characters (Hebrew, CJK) in `.ydk/components/**` or `docs/specs/**` crash `ydk component validate` with `UnicodeDecodeError`. Keep those files ASCII, or set `PYTHONUTF8=1`. (Observed with ydk 1.6.0 on Windows.)
+- The YDK cross-ref linker treats a `.` directly after a `ydk:type:ns/name` ID in a manifest as part of the ID. Put a space before sentence-ending punctuation. (Observed with ydk 1.6.0 on Windows.)
 - `tools/GoldenKit` locates the repo root via `EmlExtraction.slnx`; its other marker, `docs/golden-1200-plan.md`, no longer exists (renamed to `docs/golden.md`).

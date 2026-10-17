@@ -18,7 +18,7 @@ Not recorded in the repo. The original specification set the stack.
 
 ## Consequences
 - Consumers must target .NET 10 or later.
-- CI enforces formatting and warnings; local `ydk verify` runs the same dotnet build/format/test plugins.
+- CI enforces formatting and warnings; local `ydk verify` runs the same dotnet build/format/test plugins plus `dotnet-quality` and `dotnet-tdd-guard` (`.ydk/config.yaml`).
 
 ## Evidence
 `global.json`, `docs/requirements.md` (header), `README.md` ("Setup and run"), `.github/workflows/ci.yml`, commit `dd83290`.

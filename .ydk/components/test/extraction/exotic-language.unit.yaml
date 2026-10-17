@@ -21,7 +21,7 @@ cases:
     then: Content direction follows dir (rtl, then ltr); subject stays rtl; dir attribute and Hebrew text kept in MainContent
   - name: CssDirectionRtlIsDetected
     description: CSS direction is honoured
-    given: HTML body with style="direction - rtl" around English text; subject "hi"
+    given: 'HTML body with style="direction: rtl" around English text; subject "hi"'
     when: Extract is called
     then: SubjectDirection ltr, ContentDirection rtl
   - name: BidiMarksSurviveAndSetDirection

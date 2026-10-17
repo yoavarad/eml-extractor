@@ -20,8 +20,8 @@ Not recorded in the repo.
 ## Consequences
 Callers receive HTML for most modern mail and must strip markup themselves if they need plain text. The result carries the selected part's MIME type next to the content.
 
-## Open questions
-- The repo states the rule but not why HTML wins over plain text.
+## Rationale
+Per project owner, 2026-10-17: extracted content feeds a downstream indexer / LLM pipeline, and HTML keeps the document structure (headings, lists, tables, links) that the plain-text rendering loses.
 
 ## Evidence
 `README.md` ("Content"), `docs/requirements.md` ("Content"), `src/EmlExtraction/BodySelector.cs`, `src/EmlExtraction/PartCollector.cs`, test `ExtractionTests.PrefersHtmlOverPlain`, golden `E03-html-alt`.

@@ -13,6 +13,7 @@ The original specification is translated in [docs/requirements.md](../requiremen
 - Returning every other MIME part as a flat attachment record with decoded bytes: [ydk:req:attachments/attachment-record], including pasted inline images [ydk:req:attachments/inline-cid-images] and the files inside Outlook TNEF wrappers [ydk:req:attachments/tnef-unwrap].
 - Never crashing the caller on malformed MIME of the handled kinds, and reporting problems as warnings: [ydk:req:extraction/no-throw-on-malformed]. The original spec did not ask for this; it was implemented anyway.
 - The authored golden set, the public-mail harvest tool, and the throughput bench as developer tooling: [quality.md](quality.md).
+- A CI gate on the full golden score (1,200 bulk plus 12 seed cases), failing below the 1212 of 1212 baseline: [ydk:nfr:reliability/golden-pass-rate] (ADR-011). Accepted but not implemented yet; CI runs only the seed cases today. Tracked as Stage 02 work.
 
 ## OUT of scope
 
@@ -39,4 +40,3 @@ These are recorded gaps in [edge-cases.md](../edge-cases.md) and [requirements.m
 - A single part of 50 MB or more (E30). The harvest tool skips files over 40 MB.
 - An original, unstripped Outlook paste image (E08 uses a stand-in PNG).
 - Throughput measured on generated mail only; real corporate mail and production server hardware are not measured ([quality.md](quality.md)).
-- Wiring the 1200-case bulk score into CI. Today it is run by hand (ADR-007).

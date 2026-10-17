@@ -33,4 +33,3 @@ failure_modes:
   - TNEF unpack exceptions -> ydk:warning:extraction/tnef-extract-failed
 used_by:
   - ydk:contract:api/eml-extractor
-  - ydk:library:deps/system-security-cryptography-pkcs

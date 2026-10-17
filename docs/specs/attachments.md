@@ -2,7 +2,7 @@
 
 ## What the caller gets
 
-Every part of the message that is not the chosen body comes back as one [ydk:entity:extraction/ExtractedAttachment]. Each record holds the file's name, its decoded size, the original path when the sender's filename carried one, and the decoded bytes. The original specification asks for these four; the implementation also reports the part's content identifier and disposition so callers can match inline images to the HTML ([ydk:req:attachments/attachment-record]).
+Every part of the message that is not the chosen body comes back as one [ydk:entity:extraction/ExtractedAttachment]. The one exception is the other renderings of the chosen body (see Naming rules below), which are dropped rather than returned. Each record holds the file's name, its decoded size, the original path when the sender's filename carried one, the decoded bytes, the part's content identifier, and its disposition. The original specification asks for the first four; the code also returns the content identifier and disposition (each empty when the part has none) so callers can match inline images to the HTML ([ydk:req:attachments/attachment-record]).
 
 The list is flat and follows document order. No record nests inside another.
 

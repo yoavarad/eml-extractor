@@ -9,9 +9,11 @@ A golden set copied from the parser's own output would only prove that the parse
 There are two tiers:
 
 - **Seed** - 12 cases that run with every normal test run, including CI ([ydk:test:quality/seed-golden.integration]).
-- **Bulk** - 1,000 core cases plus 200 RFC-edge cases, grouped into families: detection, classic headers, custom headers, unicode and right-to-left text, legacy charsets, body choice, transfer encodings, multipart shapes, dispositions and filenames, inline images, international addresses, Office and PDF files, nested mail, images, other file types, edge cases, and combinations. The bulk set is scored by hand with the GoldenKit tool, and the report is committed.
+- **Bulk** - 1,000 core cases plus 200 RFC-edge cases, grouped into families: detection, classic headers, custom headers, unicode and right-to-left text, legacy charsets, body choice, transfer encodings, multipart shapes, dispositions and filenames, inline images, international addresses, Office and PDF files, nested mail, images, other file types, edge cases, and combinations. The bulk set is scored with the GoldenKit tool, and the report is committed.
 
 The bar is that every case passes: [ydk:nfr:reliability/golden-pass-rate]. The last committed report shows 1212 of 1212 cases and 11,333 of 11,333 checks, across 48 tags.
+
+The target is that CI runs the full score, all 1,200 bulk cases plus the 12 seed cases, on every change and fails when the result drops below the 1212 of 1212 baseline (ADR-011). This is not wired up yet: today CI runs only the seed cases, as part of the normal test run, and the bulk score is run by hand. Wiring it is Stage 02 work.
 
 Attachment payloads in the golden set are tiny typed stubs with the correct leading bytes, checked by name, size, and hash. They prove decoding and naming, not real-world document variety. The harvest covers that.
 
@@ -33,4 +35,4 @@ The pipeline team needs a per-core figure to size servers. The bench measures si
 - message with a 1 MB attachment: [ydk:nfr:performance/extract-1mb-attachment-throughput]
 - detection alone: [ydk:nfr:performance/detect-tiny-throughput]
 
-Each manifest carries the capacity formula from [perf-results.md](../perf-results.md): single-thread rate times cores times a contention factor of 0.7. They also carry the memory formula that bounds concurrency for attachment-heavy mail. These numbers are baselines, not commitments. The repo sets no throughput target, and the figures must be re-measured on production hardware.
+Two of these manifests also carry the sizing formulas from [perf-results.md](../perf-results.md). The tiny-message manifest carries the capacity formula: single-thread rate times cores times a contention factor of 0.7. The 1 MB attachment manifest carries the memory formula that bounds concurrency for attachment-heavy mail. The other two record only the measured rate. These numbers are baselines, not commitments. The repo sets no throughput target, and the figures must be re-measured on production hardware.

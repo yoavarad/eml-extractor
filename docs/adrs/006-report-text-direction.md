@@ -19,8 +19,8 @@ Not recorded in the repo.
 ## Consequences
 Direction is a paragraph-level hint, not a per-run bidi analysis. A subject that starts with a Latin word but is mostly Hebrew reports `ltr` (test `FirstStrongLetterWinsInMixedSubject`).
 
-## Open questions
-- The repo does not say which downstream consumer needs direction.
+## Rationale
+Per project owner, 2026-10-17: extracted content feeds a downstream indexer / LLM pipeline. Reporting direction lets those consumers handle right-to-left text (e.g. Hebrew) correctly without running their own detection.
 
 ## Evidence
 `src/EmlExtraction/TextDirection.cs`, `src/EmlExtraction/EmlExtractor.cs`, `README.md`, commit `c3b39bb`, `tests/EmlExtraction.Tests/ExoticLanguageTests.cs`.
