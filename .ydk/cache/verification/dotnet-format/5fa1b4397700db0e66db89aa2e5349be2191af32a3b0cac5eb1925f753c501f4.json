@@ -1,0 +1,9 @@
+{
+  "name": "dotnet-format",
+  "passed": true,
+  "output": "Warnings were encountered while loading the workspace. Set the verbosity option to the 'diagnostic' level to log warnings.",
+  "duration_seconds": 7.3,
+  "detail": {
+    "target": "C:\\Users\\yoava\\Projects\\eml-extraction\\benches\\EmlExtraction.Bench\\EmlExtraction.Bench.csproj"
+  }
+}
