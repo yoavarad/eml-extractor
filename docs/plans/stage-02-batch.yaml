@@ -1,0 +1,1065 @@
+# Stage 02 batch: decomposition of the ADR-004/011..019 target work into epics, stories, tasks.
+# Validate:  ydk task create-batch --from docs/plans/stage-02-batch.yaml --dry-run
+#
+# Planning conventions (apply to every task below):
+# - Existing items are NOT recreated: epic #8, story #9, task #10 ("Normalize repo structure and config to .NET
+#   conventions"). Task "10" is referenced as a dependency: it adds Directory.Packages.props, splits Models.cs into one
+#   type per file, dedupes the golden schema and fixes corpus path resolution, so every task that edits a csproj,
+#   package versions, Models.cs, the golden schema or GoldenKit waits for it.
+# - Goldens policy (decision for item 14): each behaviour-changing task updates the GoldenKit catalog/generator/scorer,
+#   regenerates corpus/golden (bulk + seed) from the catalog (ADR-007: never from extractor output) and keeps the score
+#   at 1212/1212 cases in the SAME PR. No separate "fix goldens" task: the CI golden gate (T-golden-gate, lands first)
+#   would otherwise be red between PRs. If two PRs both regenerate corpus/golden/bulk, resolve the conflict by
+#   rebasing and re-running `dotnet run --project tools/GoldenKit -- gen`, never by hand-merging expected.json.
+#   A deliberate re-baseline (case count changes) must be called out in the PR and in docs/golden-score.txt.
+# - TDD: write the failing test first (dotnet test), then code. Every code task ends with: dotnet build -warnaserror,
+#   dotnet format --verify-no-changes, dotnet test (net8.0 and net10.0 once T-net8 has landed), GoldenKit score 1212/1212,
+#   and zero internal_error warnings once T-no-throw has landed.
+# - Team questions (docs/team-questions.md): no task is blocked. Q4 (license) was answered by the owner on 2026-10-18:
+#   MIT, "Copyright (c) 2026 Yoav Arad". The error-model divergence (Q1), template integration (Q2), framework
+#   timeline (Q3) and X_ usage (Q5) do NOT block any task; each has a recorded default that the tasks implement.
+# - No human gates (owner, 2026-10-18). T-load-baseline is blocked by every contract/behaviour task so the baseline
+#   measures shipped code; the agent runs the sweep on the owner's machine, pointing --corpus at the main checkout's
+#   gitignored corpus/internal.
+
+epics:
+  - id: E-contract
+    title: "Shared extractor contract: request, detection result, sub-file fields, metadata keys"
+    description: >-
+      Implement the breaking API change of ADR-012, ADR-013, ADR-014 and ADR-016 in one release while the library has
+      no consumers: EmlExtractionRequest, EmlDetector.Detect, shared sub-file names and container FullPath, canonical
+      metadata keys and literal X_ xfields in the metadata. Goldens are regenerated from the catalog in the same PRs.
+    spec_refs:
+      - overview.md
+      - extraction.md
+      - attachments.md
+      - detection.md
+      - docs/adrs/012-shared-team-extractor-contract.md
+      - docs/adrs/013-fullpath-is-container-path.md
+      - docs/adrs/014-xfields-literal-x-underscore.md
+      - docs/adrs/016-canonical-metadata-keys.md
+
+  - id: E-robustness
+    title: "Robust extraction: per-stage no-throw contract and input-size guard"
+    description: >-
+      Close the ADR-004 gap (unexpected exceptions escape Extract) with per-stage guards and an internal_error warning,
+      and add the configurable input-size guard with the input_too_large warning.
+    spec_refs:
+      - extraction.md
+      - cross-cutting.md
+      - docs/adrs/004-warnings-not-exceptions.md
+
+  - id: E-quality
+    title: "Quality evidence: full golden gate in CI, realistic samples, emoji fidelity"
+    description: >-
+      Make CI prove correctness A and B from the brief: full GoldenKit score as a CI gate (ADR-011), committed licensed
+      realistic samples run in CI with absent internal samples reported as Skipped (ADR-018), and exact-equality emoji
+      and combining-sequence cases (unicode-fidelity).
+    spec_refs:
+      - quality.md
+      - testing.md
+      - docs/adrs/011-gate-ci-on-full-golden-score.md
+      - docs/adrs/018-committed-realistic-samples.md
+
+  - id: E-load
+    title: "Load test and hardware sizing (ADR-015)"
+    description: >-
+      Replace the single-thread bench and the guessed 0.7 contention factor with a measured DOP sweep (both GC modes,
+      memory, hardware block, sizing formula), a committed baseline with a warn-only nightly, and then set every
+      provisional limit (maxInputBytes default, memory ceiling, thresholds) from the measured data.
+    spec_refs:
+      - quality.md
+      - docs/adrs/015-load-test-method.md
+
+  - id: E-platform
+    title: "Open source, platform targets and hand-off docs"
+    description: >-
+      MIT license and third-party notices (ADR-017), net8.0 + net10.0 multi-targeting with CI on both (ADR-019), the
+      brief's C# capability assessment, and fixing doc/tooling drift including the README for the new API.
+    spec_refs:
+      - overview.md
+      - scope.md
+      - glossary.md
+      - docs/adrs/017-mit-license.md
+      - docs/adrs/019-multi-target-net8-net10.md
+
+stories:
+  # ---------------- E-contract ----------------
+  - id: S-api-surface
+    title: "Caller extracts via EmlExtractionRequest and gets a typed detection result"
+    epic: E-contract
+    description: >-
+      As the team template, I call EmlDetector.Detect(bytes) for {IsSupported, MimeType} (IsEml kept) and
+      EmlExtractor.Extract(EmlExtractionRequest) as the primary method; Extract(ReadOnlyMemory<byte>) stays as a thin
+      wrapper and Extract(MimeMessage) is internal, so no MimeKit type is public (ADR-012).
+    spec_refs:
+      - extraction.md
+      - detection.md
+      - cross-cutting.md
+      - docs/adrs/012-shared-team-extractor-contract.md
+    component_refs:
+      - ydk:contract:api/eml-detector
+      - ydk:contract:api/eml-extractor
+      - ydk:entity:extraction/EmlDetectionResult
+      - ydk:entity:extraction/EmlExtractionRequest
+      - ydk:crosscut:core/library-surface
+    acceptance:
+      - "Detect(bytes).IsSupported == IsEml(bytes) for every detector unit case and every golden detection case; MimeType is message/rfc822 when supported, else empty string"
+      - "Extract(new EmlExtractionRequest(bytes, name)) and Extract(bytes) return identical results and warnings for every seed and bulk golden case"
+      - "FileName on the request never changes the result"
+      - "Extract(null request) throws ArgumentNullException"
+      - "Public API (reflection test) exposes no MimeKit type; Extract(MimeMessage) is internal"
+      - "GoldenKit score stays 1212/1212"
+
+  - id: S-subfiles
+    title: "Each attachment carries the shared sub-file fields and a unique container FullPath"
+    epic: E-contract
+    description: >-
+      As the factory, every attachment has FileName, SizeInBytes, FullPath, BinaryData (+ ContentId, Disposition,
+      OriginalPath, ContentLocation); FullPath is the always-set, per-result-unique container path such as
+      winmail.dat/budget.xlsx (ADR-012, ADR-013).
+    spec_refs:
+      - attachments.md
+      - docs/adrs/012-shared-team-extractor-contract.md
+      - docs/adrs/013-fullpath-is-container-path.md
+    component_refs:
+      - ydk:entity:extraction/ExtractedAttachment
+      - ydk:req:attachments/attachment-record
+      - ydk:req:attachments/container-path
+      - ydk:req:attachments/tnef-unwrap
+    acceptance:
+      - "ExtractedAttachment exposes FileName, SizeInBytes, FullPath (non-null), BinaryData, ContentId, Disposition, OriginalPath, ContentLocation; Name/Size/Data are gone"
+      - "Top-level attachment: FullPath == FileName; TNEF-unpacked file: FullPath == '<wrapper FileName>/<FileName>'; nameless wrapper uses winmail.dat"
+      - "Parts named image001.png, image001.png, image001~2.png get FullPaths image001.png, image001~3.png, image001~2.png"
+      - "FullPath is unique per result under ordinal case-insensitive comparison; FileName is never changed by de-duplication"
+      - "Path-bearing sender filename ../../etc/passwd.txt gives FileName passwd.txt, OriginalPath ../../etc/passwd.txt, FullPath passwd.txt"
+      - "Golden expectations regenerated from the catalog; score 1212/1212"
+
+  - id: S-metadata
+    title: "Metadata has one canonical key per header and the literal X_ xfields field"
+    epic: E-contract
+    description: >-
+      As the indexer, every header appears once under its lower-cased name (no '-'/'_' folding), classic headers are
+      overlaid in place, direction values are only result properties, the fixed keys from/to/cc/bcc/xfields are always
+      present, and Metadata["xfields"] joins only headers starting with literal 'X_' (ADR-014, ADR-016).
+    spec_refs:
+      - extraction.md
+      - docs/adrs/014-xfields-literal-x-underscore.md
+      - docs/adrs/016-canonical-metadata-keys.md
+    component_refs:
+      - ydk:entity:extraction/Metadata
+      - ydk:entity:extraction/EmlExtractionResult
+      - ydk:req:metadata/canonical-keys
+      - ydk:req:metadata/all-headers
+      - ydk:req:metadata/classic-fields
+      - ydk:req:metadata/xfields
+      - ydk:req:content/text-direction
+    acceptance:
+      - "X-Foo and X_Foo headers land under x-foo and x_foo with their own values"
+      - "message-id, reply-to, dkim-signature keys exist; messageid, replyto, contenttype, subject_direction, content_direction do not"
+      - "from, to, cc, bcc, xfields present (\"\" when unknown) in every result including parse_failed"
+      - "Metadata[\"xfields\"] contains only headers whose name starts with ordinal 'X_', one 'Name: value' line each, joined by \\n; X- headers are absent from it"
+      - "EmlExtractionResult has no XFields property"
+      - "Golden expectations regenerated from the catalog; score 1212/1212"
+
+  # ---------------- E-robustness ----------------
+  - id: S-no-throw
+    title: "Extraction never throws on content and reports library bugs as internal_error"
+    epic: E-robustness
+    description: >-
+      As the batch pipeline, one bad message never aborts a batch: each stage (metadata, body+direction, attachments)
+      is guarded, a failing stage yields its empty default plus one internal_error warning, the other stages keep their
+      output, and tests/GoldenKit fail on any internal_error (ADR-004).
+    spec_refs:
+      - extraction.md
+      - cross-cutting.md
+      - docs/adrs/004-warnings-not-exceptions.md
+    component_refs:
+      - ydk:req:extraction/no-throw-on-malformed
+      - ydk:warning:extraction/internal-error
+      - ydk:crosscut:core/warning-format
+    acceptance:
+      - "An injected exception in any one stage gives one 'internal_error: <stage>: <ExceptionType>: ...' warning, that stage's default, and the other stages' output"
+      - "Both the request method and the internal MimeMessage overload follow the same contract"
+      - "Null argument still throws ArgumentNullException"
+      - "dotnet test and GoldenKit score/probe fail when any result carries internal_error"
+
+  - id: S-size-guard
+    title: "Inputs over a host-set size limit are refused with input_too_large"
+    epic: E-robustness
+    description: >-
+      As the host, I set maxInputBytes when constructing EmlExtractor (provisional default 150 MiB); longer inputs are
+      not parsed and return the fixed-key empty result with input_too_large.
+    spec_refs:
+      - extraction.md
+      - cross-cutting.md
+    component_refs:
+      - ydk:req:extraction/max-input-size
+      - ydk:warning:extraction/input-too-large
+    acceptance:
+      - "maxInputBytes 1024: 1025-byte input gives exactly one input_too_large warning, fixed keys only, no attachments; 1024-byte input is extracted normally"
+      - "new EmlExtractor(0) throws ArgumentOutOfRangeException"
+      - "Default limit accepts exactly 157286400 bytes and rejects one more; both Extract overloads apply it"
+
+  # ---------------- E-quality ----------------
+  - id: S-golden-gate
+    title: "CI fails on any failed golden case across all 1212 cases"
+    epic: E-quality
+    spec_refs:
+      - quality.md
+      - testing.md
+      - docs/adrs/011-gate-ci-on-full-golden-score.md
+    component_refs:
+      - ydk:nfr:reliability/golden-pass-rate
+      - ydk:req:quality/golden-independence
+    acceptance:
+      - "CI runs GoldenKit score over all 1200 bulk + 12 seed cases on net10.0 on every PR and push to main"
+      - "A PR that breaks one golden case fails CI"
+
+  - id: S-realistic
+    title: "CI proves correctness B on committed, licensed realistic samples; absent internal samples show as Skipped"
+    epic: E-quality
+    spec_refs:
+      - quality.md
+      - testing.md
+      - attachments.md
+      - docs/adrs/018-committed-realistic-samples.md
+    component_refs:
+      - ydk:req:quality/realistic-attachment-samples
+      - ydk:test:quality/realistic-samples.integration
+      - ydk:test:quality/internal-corpus.integration
+    acceptance:
+      - "corpus/realistic/ holds OOXML (docx/xlsx/pptx), legacy .doc/.xls, PDF, attached .msg, attached .eml, TNEF winmail.dat holding an OOXML file, attached image, Outlook- and Gmail-style pasted inline images"
+      - "corpus/realistic/manifest.json records file, source URL or generator script, license, SHA-256 and expected values for every sample"
+      - "Expected values come from generator inputs or published contents, never from extractor output"
+      - "Realistic-sample tests run in CI on every PR"
+      - "With corpus/internal/ absent, every InternalCorpusTests case reports Skipped naming the missing path; none reports Passed"
+
+  - id: S-unicode
+    title: "Emoji and combining sequences round-trip exactly"
+    epic: E-quality
+    spec_refs:
+      - extraction.md
+      - quality.md
+    component_refs:
+      - ydk:req:content/unicode-fidelity
+      - ydk:test:extraction/exotic-language.unit
+    acceptance:
+      - "ZWJ family, skin-tone modifier, regional-indicator flag, keycap and combining-mark strings round-trip with ordinal equality in subject, plain body, HTML body and attachment filename"
+      - "A ZWJ sequence split across two RFC 2047 encoded-words and an RFC 2231 filename with a flag emoji round-trip exactly"
+
+  # ---------------- E-load ----------------
+  - id: S-load-test
+    title: "Team can size hardware from a measured DOP sweep with memory and a sizing formula"
+    epic: E-load
+    spec_refs:
+      - quality.md
+      - docs/adrs/015-load-test-method.md
+    component_refs:
+      - ydk:nfr:performance/throughput-dop-sweep
+      - ydk:nfr:performance/memory-footprint
+    acceptance:
+      - "Sweep n=1..ProcessorCount under Workstation and Server GC reports T(n), P50/P95, P(n), A and E(n) per input set and as a mix"
+      - "Hardware block present; the run exits non-zero if the CPU model cannot be read"
+      - "Large-file pass at 25/50/100% of maxInputBytes and one byte over yields M"
+      - "docs/perf-baseline.json committed; comparable runs warn (never fail) past the threshold; nightly CI synthetic run against docs/perf-baseline-ci.json"
+      - "Every provisional number in ADR-015, max-input-size and memory-footprint is replaced by a measured value plus headroom with its source run recorded"
+
+  # ---------------- E-platform ----------------
+  - id: S-license
+    title: "The repo is open source with a license and audited third-party notices"
+    epic: E-platform
+    spec_refs:
+      - overview.md
+      - scope.md
+      - docs/adrs/017-mit-license.md
+    component_refs:
+      - ydk:req:quality/license-notices
+      - ydk:library:deps/bouncycastle-cryptography
+    acceptance:
+      - "LICENSE (MIT, 'Copyright (c) 2026 Yoav Arad') at the repo root; ADR-017 Accepted; team-questions Q4 closed"
+      - "THIRD-PARTY-NOTICES.md lists all eight packages with version, license, copyright, plus every committed non-authored sample"
+      - "CI fails when a restore-graph package is missing from the notices or has a disallowed license"
+
+  - id: S-net8
+    title: "A .NET 8 host can load the library; tests pass on net8.0 and net10.0"
+    epic: E-platform
+    spec_refs:
+      - overview.md
+      - testing.md
+      - docs/adrs/019-multi-target-net8-net10.md
+    component_refs:
+      - ydk:req:quality/net8-multi-targeting
+    acceptance:
+      - "src/EmlExtraction and tests/EmlExtraction.Tests target net8.0;net10.0; tools and bench stay net10.0"
+      - "CI builds and tests both targets with the .NET 8 runtime installed; the vulnerability audit passes on both"
+
+  - id: S-capability
+    title: "The brief's C#-vs-other-language capability assessment exists"
+    epic: E-platform
+    spec_refs:
+      - overview.md
+      - docs/research/brief-gap-analysis.md
+    component_refs:
+      - ydk:req:research/capability-assessment
+    acceptance:
+      - "docs/research/csharp-capability-assessment.md compares MimeKit/.NET with Python, Java and Go per brief capability, with evidence and license per row and one of the three allowed conclusions"
+      - "ADR-001 Alternatives links to it"
+
+  - id: S-docs
+    title: "Docs and tooling match the code"
+    epic: E-platform
+    spec_refs:
+      - overview.md
+      - glossary.md
+      - scope.md
+      - detection.md
+    component_refs:
+      - ydk:req:detection/reject-non-email-magic
+      - ydk:crosscut:core/library-surface
+    acceptance:
+      - "GoldenKit finds the repo root without the removed docs/golden-1200-plan.md marker"
+      - "README and specs state that '{', '[' and '<' first bytes are rejected"
+      - "docs/golden.md TNEF statement matches what is actually tested"
+      - "README documents the Stage 02 API (request, Detect, attachment fields and FullPath, canonical keys, Metadata[\"xfields\"], warnings incl. internal_error and input_too_large, maxInputBytes)"
+
+tasks:
+  # ======================= Wave after #10: CI safety net =======================
+  - id: T-golden-gate
+    title: "CI: run the full GoldenKit score (1212/1212) as a required gate on net10.0"
+    story: S-golden-gate
+    component_refs:
+      - ydk:nfr:reliability/golden-pass-rate
+      - ydk:req:quality/golden-independence
+      - ydk:test:quality/seed-golden.integration
+    spec_refs:
+      - quality.md
+      - testing.md
+      - docs/adrs/011-gate-ci-on-full-golden-score.md
+    description: >-
+      Size S. Add a step to .github/workflows/ci.yml (build-test job, after Test) that runs
+      `dotnet run --project tools/GoldenKit -c Release --no-build -- score` over the committed corpus/golden (1200 bulk +
+      12 seed) on net10.0. GoldenKit score already exits non-zero on any failed case; verify that, and make it so if not
+      (tools/GoldenKit/Scorer.cs / Program.cs). Upload the score report as an artifact on failure. Do not change
+      golden data. Lands right after #10 (which fixes corpus path resolution and dedupes the golden schema) and before
+      the contract tasks, so every contract PR is held to 1212/1212.
+    acceptance:
+      - "CI log shows the GoldenKit score step with 1212/1212 cases"
+      - "Flipping one expected value in a bulk expected.json (throwaway branch) makes CI fail at that step"
+      - "GoldenKit score exit code is non-zero on any failed case (covered by a test or documented manual check in the PR)"
+    test_strategy: >-
+      Run GoldenKit score locally (expect 1212/1212, exit 0); on a throwaway branch corrupt one expected.json and
+      confirm non-zero exit and a red CI run; existing dotnet test suite unchanged.
+    depends_on:
+      - "10:blocks"
+
+  - id: T-net8
+    title: "Multi-target library and tests to net8.0 + net10.0; CI on both"
+    story: S-net8
+    component_refs:
+      - ydk:req:quality/net8-multi-targeting
+      - ydk:crosscut:core/library-surface
+      - ydk:library:deps/mimekit
+      - ydk:library:deps/system-security-cryptography-pkcs
+      - ydk:library:deps/bouncycastle-cryptography
+    spec_refs:
+      - overview.md
+      - testing.md
+      - scope.md
+      - docs/adrs/019-multi-target-net8-net10.md
+    description: >-
+      Size M. Set <TargetFrameworks>net8.0;net10.0</TargetFrameworks> in src/EmlExtraction and tests/EmlExtraction.Tests
+      (Directory.Build.props default stays net10.0 for tools/GoldenKit and benches). Verify the ADR-019 risks:
+      Pkcs 10.0.13 pin restores and passes the audit on net8.0 (else a conditional PackageVersion in
+      Directory.Packages.props from #10); MimeKit 4.18.0 behaves the same; no .NET 9/10-only API or language feature
+      breaks net8.0 (add #if NET9_0_OR_GREATER or rewrite). CI: install the .NET 8 runtime next to the global.json SDK
+      (setup-dotnet with both), run dotnet test for both TFMs (one multi-target run or matrix) and the vulnerable-package
+      audit on both. Golden gate stays net10.0. Not blocked by team-questions Q3 (default net8+net10 until the template
+      moves).
+    acceptance:
+      - "dotnet build -warnaserror and dotnet test pass for net8.0 and net10.0 locally and in CI"
+      - "CI vulnerability audit passes for both TFMs"
+      - "GoldenKit and Bench still net10.0 only"
+      - "Public API identical on both targets (same reflection-based API test passes on both)"
+    test_strategy: >-
+      Existing unit + seed golden suite run per TFM (dotnet test -f net8.0 / -f net10.0); GoldenKit score unchanged
+      1212/1212; CI run shows both TFM test results.
+    depends_on:
+      - "10:blocks"
+      - "T-golden-gate:related"
+
+  # ======================= E-contract =======================
+  - id: T-detect-result
+    title: "Add EmlDetector.Detect returning EmlDetectionResult {IsSupported, MimeType}; keep IsEml"
+    story: S-api-surface
+    component_refs:
+      - ydk:contract:api/eml-detector
+      - ydk:entity:extraction/EmlDetectionResult
+      - ydk:req:detection/detect-eml
+      - ydk:req:detection/reject-non-email-magic
+      - ydk:test:detection/detector.unit
+    spec_refs:
+      - detection.md
+      - docs/adrs/012-shared-team-extractor-contract.md
+    description: >-
+      Size S. New public sealed record EmlDetectionResult (own file, per #10's one-type-per-file rule) with IsSupported
+      (bool) and MimeType (string: "message/rfc822" when supported, else ""). EmlDetector.Detect(ReadOnlySpan<byte>)
+      returns it; IsEml(data) becomes `Detect(data).IsSupported` (no behaviour change). Detection stays bytes-in, no
+      request (ADR-012). Never throws. GoldenKit detection checks may keep using IsEml; add an assertion that Detect
+      agrees. No golden data change expected.
+      Goldens: on a corpus/golden conflict, rebase and re-run `dotnet run --project tools/GoldenKit -- gen`;
+      never hand-merge goldens.
+    acceptance:
+      - "Every existing DetectorTests case also asserts Detect(x).IsSupported == IsEml(x) and the MimeType rule"
+      - "Empty span, 1-byte span and a 20 KB non-mail buffer return IsSupported false, MimeType empty, no throw"
+      - "GoldenKit score 1212/1212; detection slice unchanged"
+    test_strategy: >-
+      TDD in tests/EmlExtraction.Tests/DetectorTests.cs: write Detect tests first (red), implement, then parametrise the
+      existing accept/reject cases over both entry points. dotnet test; GoldenKit score.
+    depends_on:
+      - "10:blocks"
+      - "T-golden-gate:blocks"
+
+  - id: T-request-api
+    title: "Add EmlExtractionRequest; Extract(request) primary, bytes overload as wrapper, Extract(MimeMessage) internal"
+    story: S-api-surface
+    component_refs:
+      - ydk:contract:api/eml-extractor
+      - ydk:entity:extraction/EmlExtractionRequest
+      - ydk:crosscut:core/library-surface
+      - ydk:req:extraction/mbox-from-line
+      - ydk:test:extraction/extraction.unit
+    spec_refs:
+      - extraction.md
+      - cross-cutting.md
+      - docs/adrs/012-shared-team-extractor-contract.md
+    description: >-
+      Size M. Public sealed record EmlExtractionRequest { ReadOnlyMemory<byte> FileBytes (required); string? FileName }
+      with an implicit conversion path so byte[] callers compile unchanged (FileBytes accepts byte[] implicitly).
+      EmlExtractor.Extract(EmlExtractionRequest) holds all logic; null request -> ArgumentNullException.
+      Extract(ReadOnlyMemory<byte>) only builds a request (no FileName) and forwards. Extract(MimeMessage) becomes
+      internal; add InternalsVisibleTo for EmlExtraction.Tests, GoldenKit and EmlExtraction.Bench if they use it.
+      FileName never affects the result. mbox "From " handling must keep working through the request path. Add a
+      reflection test that no public member signature mentions a MimeKit type. Update GoldenKit/bench call sites;
+      golden data unchanged. Do not add the size limit or stage guards here (T-size-guard, T-no-throw).
+      Goldens: on a corpus/golden conflict, rebase and re-run `dotnet run --project tools/GoldenKit -- gen`;
+      never hand-merge goldens.
+    acceptance:
+      - "For every seed and bulk golden input, Extract(request) and Extract(bytes) results are equal (metadata, body, directions, attachments, warnings)"
+      - "Same bytes with FileName null vs 'x.eml' give equal results"
+      - "Extract((EmlExtractionRequest)null) throws ArgumentNullException"
+      - "Reflection test: no public type/member in EmlExtraction exposes a MimeKit type"
+      - "Existing mbox-from-line tests pass via the request path; GoldenKit score 1212/1212"
+    test_strategy: >-
+      TDD: add request-equivalence and API-surface tests in ExtractionTests (red), implement. GoldenKit gets a
+      one-off equivalence check (or test iterating seed cases). dotnet test; GoldenKit score.
+    depends_on:
+      - "10:blocks"
+      - "T-golden-gate:blocks"
+
+  - id: T-subfile-fields
+    title: "Rename attachment fields to FileName/SizeInBytes/BinaryData; add OriginalPath and ContentLocation"
+    story: S-subfiles
+    component_refs:
+      - ydk:entity:extraction/ExtractedAttachment
+      - ydk:req:attachments/attachment-record
+      - ydk:library:deps/mimekit
+      - ydk:test:attachments/attachment.unit
+    spec_refs:
+      - attachments.md
+      - cross-cutting.md
+      - docs/adrs/012-shared-team-extractor-contract.md
+      - docs/adrs/013-fullpath-is-container-path.md
+    description: >-
+      Size M. In ExtractedAttachment: Name -> FileName, Size -> SizeInBytes, Data -> BinaryData; ContentId and
+      Disposition unchanged; add OriginalPath (string?: raw trimmed sender filename when it contains '/' or '\', else
+      null; today's FullPath meaning) and ContentLocation (string?: decoded, trimmed Content-Location header via
+      MimeEntity.ContentLocation, else null). FullPath keeps today's value in this task (redefined in T-fullpath) so the
+      change is a pure rename + two new fields. Update tests, GoldenKit (Scorer/Models/Generator: the path-in-filename
+      slice now asserts original_path; add content_location where the catalog knows it, e.g. O2392 cases), bench, and
+      regenerate corpus/golden from the catalog. README update is T-readme-api.
+      Goldens: on a corpus/golden conflict, rebase and re-run `dotnet run --project tools/GoldenKit -- gen`;
+      never hand-merge goldens.
+    acceptance:
+      - "ExtractedAttachment has FileName, SizeInBytes, BinaryData, OriginalPath, ContentLocation; no Name/Size/Data"
+      - "../../etc/passwd.txt sender filename -> FileName passwd.txt, OriginalPath ../../etc/passwd.txt"
+      - "A part with Content-Location: images/logo.png reports ContentLocation 'images/logo.png'; absent header -> null"
+      - "Golden path-in-filename slice checks original_path; data regenerated from catalog (not extractor); GoldenKit score 1212/1212"
+    test_strategy: >-
+      TDD in AttachmentTests/ExtractionTests: new OriginalPath and ContentLocation cases first, then mechanical rename.
+      dotnet test; GoldenKit gen + score (1212/1212, check count unchanged or deliberately re-baselined in PR text).
+    depends_on:
+      - "10:blocks"
+      - "T-golden-gate:blocks"
+
+  - id: T-fullpath
+    title: "FullPath = container path: processing order, TNEF segment, fallback-name sanitising, two-pass ~N de-dupe"
+    story: S-subfiles
+    component_refs:
+      - ydk:req:attachments/container-path
+      - ydk:req:attachments/tnef-unwrap
+      - ydk:entity:extraction/ExtractedAttachment
+      - ydk:test:attachments/attachment.unit
+    spec_refs:
+      - attachments.md
+      - docs/adrs/013-fullpath-is-container-path.md
+    description: >-
+      Size M (complexity ~6; split candidate if review finds it heavy: ordering+segments vs de-dupe). Implement ADR-013
+      exactly in PartCollector: (1) deterministic processing order = depth-first MIME document order, TNEF-unpacked files
+      inserted at the wrapper's position in container order; part-<index> uses this order. (2) Segments: TNEF wrapper
+      adds its FileName (nameless -> winmail.dat); multipart adds nothing; nested message/rfc822 stays opaque (no
+      fwd.eml/... paths). (3) Nameless parts: <content-id>.<subtype> else part-<index>.<subtype> (bin when empty);
+      nameless nested message attached.eml; empty/'.'/'..' counts as nameless; in fallback names replace
+      / \ : * ? " < > | and U+0000-001F, U+007F with '_'. (4) Two-pass de-dupe: reserve all literal paths, then the
+      first keeps, later duplicates get ~n before the last segment's extension (n=2.. smallest free, not in reserved
+      set), ordinal case-insensitive (invariant upper). FullPath never null; FileName unchanged. Update GoldenKit
+      full_path expectations from the catalog (top-level: equals file name) and regenerate corpus/golden.
+      Goldens: on a corpus/golden conflict, rebase and re-run `dotnet run --project tools/GoldenKit -- gen`;
+      never hand-merge goldens.
+    acceptance:
+      - "image001.png, image001.png, image001~2.png -> image001.png, image001~3.png, image001~2.png"
+      - "IMAGE.PNG and image.png in one message -> image.png/IMAGE.PNG keeps first, second gets ~2 (case-insensitive uniqueness)"
+      - "TNEF wrapper winmail.dat with budget.xlsx -> FullPath winmail.dat/budget.xlsx; nameless wrapper -> winmail.dat/<name>"
+      - "Fallback name from Content-ID 'a/b:c' -> 'a_b_c.<subtype>'; nested message stays one opaque attachment with FullPath equal to its FileName"
+      - "Every attachment in every golden case has non-null, per-result-unique FullPath; GoldenKit score 1212/1212"
+    test_strategy: >-
+      TDD: one AttachmentTests case per ADR-013 rule (ordering, TNEF segment, nameless wrapper, sanitising, de-dupe
+      example, case-insensitive collision, nested opaque) built with MimeKit builders and a TnefWriter-built winmail.dat.
+      Property test over all golden results: FullPath unique per result. GoldenKit gen + score.
+    depends_on:
+      - "T-subfile-fields:blocks"
+
+  - id: T-metadata-keys
+    title: "Canonical metadata keys (ADR-016): lower-cased names, in-place overlay, fixed keys always present, direction out"
+    story: S-metadata
+    component_refs:
+      - ydk:req:metadata/canonical-keys
+      - ydk:req:metadata/all-headers
+      - ydk:req:metadata/classic-fields
+      - ydk:entity:extraction/Metadata
+      - ydk:entity:extraction/EmlExtractionResult
+      - ydk:req:content/text-direction
+      - ydk:warning:extraction/parse-failed
+      - ydk:test:extraction/extraction.unit
+    spec_refs:
+      - extraction.md
+      - cross-cutting.md
+      - docs/adrs/016-canonical-metadata-keys.md
+      - docs/adrs/005-always-emit-address-fields.md
+    description: >-
+      Size M. HeaderMapper: key = header name trimmed + ToLowerInvariant, nothing else ('-' and '_' kept); repeated
+      headers joined with \n in order. Classic overlay writes the parsed form into the header's own key (from, to, cc,
+      bcc, reply-to, sender, date ISO 8601 round-trip or raw, message-id, in-reply-to without brackets, references
+      space-joined) and adds no second key; remove contenttype/messageid/replyto etc. A header literally named xfields
+      (any case) is stored under 'header:xfields'. Remove subject_direction/content_direction from the map (properties
+      only). Introduce one helper for the fixed-key empty metadata (from, to, cc, bcc, xfields = "") and use it for
+      parse_failed; it is reused by T-no-throw and T-size-guard. Metadata["xfields"] is populated with today's XFields
+      string here so the key exists; T-xfields changes the rule and removes the property. Update ExtractionTests,
+      GoldenKit catalog/scorer keys and regenerate corpus/golden from the catalog.
+      Goldens: on a corpus/golden conflict, rebase and re-run `dotnet run --project tools/GoldenKit -- gen`;
+      never hand-merge goldens.
+    acceptance:
+      - "X-Foo: a and X_Foo: b -> Metadata['x-foo']=='a', Metadata['x_foo']=='b'"
+      - "Keys message-id, reply-to, dkim-signature present; messageid, replyto, dkim_signature, contenttype, subject_direction, content_direction absent"
+      - "Header 'XFields: q' stored under 'header:xfields'"
+      - "parse_failed result: Metadata has exactly from,to,cc,bcc,xfields, each \"\""
+      - "Golden data regenerated from catalog; GoldenKit score 1212/1212"
+    test_strategy: >-
+      TDD in ExtractionTests: collision, overlay-in-place, reserved key, parse_failed fixed keys, direction-not-in-map
+      tests first. dotnet test; GoldenKit gen + score.
+    depends_on:
+      - "10:blocks"
+      - "T-golden-gate:blocks"
+
+  - id: T-xfields
+    title: "xfields = literal 'X_' headers in Metadata[\"xfields\"]; remove the XFields property"
+    story: S-metadata
+    component_refs:
+      - ydk:req:metadata/xfields
+      - ydk:entity:extraction/EmlExtractionResult
+      - ydk:entity:extraction/Metadata
+      - ydk:test:quality/internal-corpus.integration
+    spec_refs:
+      - extraction.md
+      - docs/adrs/014-xfields-literal-x-underscore.md
+      - docs/team-questions.md
+    description: >-
+      Size S. HeaderMapper.IsXHeader: name.StartsWith("X_", StringComparison.Ordinal) only; x_foo, X-Foo, x-foo do not
+      match. Value: '<original name>: <decoded unfolded value>' per occurrence, header order, joined by \n, no trailing
+      newline; "" when none. Remove EmlExtractionResult.XFields. Update the Exchange header test (X-MS-* lines now in
+      general metadata; rename InternalCorpusTests.ExchangeMegaHeadersLandInXFields -> ExchangeMegaHeadersLandInMetadata)
+      and seed E10 + bulk x-headers cases from the catalog. Not blocked by team-questions Q5: the owner chose the literal
+      rule as default.
+      Goldens: on a corpus/golden conflict, rebase and re-run `dotnet run --project tools/GoldenKit -- gen`;
+      never hand-merge goldens.
+    acceptance:
+      - "Headers X_A: 1, X-B: 2, x_c: 3, X_A: 4 -> Metadata['xfields'] == \"X_A: 1\\nX_A: 4\"; x-b and x_c under their own keys"
+      - "Message with only X- headers -> xfields == \"\""
+      - "EmlExtractionResult has no XFields member"
+      - "Seed E10 and x-headers bulk cases regenerated from the catalog; GoldenKit score 1212/1212"
+    test_strategy: >-
+      TDD in ExtractionTests (literal-prefix matrix, ordering, repeat, empty) first; rename/adjust internal-corpus test.
+      dotnet test; GoldenKit gen + score.
+    depends_on:
+      - "T-metadata-keys:blocks"
+
+  # ======================= E-robustness =======================
+  - id: T-no-throw
+    title: "Per-stage guards with internal_error warning in both Extract paths; tests and GoldenKit fail on internal_error"
+    story: S-no-throw
+    component_refs:
+      - ydk:req:extraction/no-throw-on-malformed
+      - ydk:warning:extraction/internal-error
+      - ydk:crosscut:core/warning-format
+      - ydk:contract:api/eml-extractor
+      - ydk:req:content/main-content-selection
+      - ydk:warning:extraction/body-decode-failed
+      - ydk:warning:extraction/part-decode-failed
+      - ydk:warning:extraction/rfc822-extract-failed
+      - ydk:warning:extraction/tnef-extract-failed
+      - ydk:nfr:reliability/real-world-harvest-no-throw
+    spec_refs:
+      - extraction.md
+      - cross-cutting.md
+      - docs/adrs/004-warnings-not-exceptions.md
+    description: >-
+      Size M. In EmlExtractor: parse step keeps parse_failed for the known parse exceptions (empty result = fixed-key
+      helper from T-metadata-keys); any other exception during parsing is also caught. After parsing, guard three
+      stages separately: metadata (header map + xfields), body (selection + directions), attachments (collection). A
+      throwing stage contributes its default (fixed-key metadata / MainContent + MimeType null and both directions ltr /
+      no attachments) and appends 'internal_error: <stage>: <ExceptionTypeName>: <message>' after earlier warnings;
+      other stages keep their output. Same for the internal MimeMessage overload. ArgumentNullException still thrown.
+      Provide an internal test seam (e.g. internal stage-fault hook, InternalsVisibleTo) to inject a throw per stage.
+      Tests: a shared assertion/xunit fixture that fails any test whose result has an internal_error warning;
+      GoldenKit score and probe count internal_error and exit non-zero on any. Known per-part warnings unchanged.
+      Error-model divergence with OLE (team-questions Q1) does NOT block this task.
+      Goldens: on a corpus/golden conflict, rebase and re-run `dotnet run --project tools/GoldenKit -- gen`;
+      never hand-merge goldens.
+    acceptance:
+      - "Injected throw in metadata stage: Metadata == fixed keys only, body and attachments intact, exactly one internal_error warning naming 'metadata' and the exception type"
+      - "Same for body stage (MainContent null, directions ltr) and attachments stage (no attachments)"
+      - "A non-listed exception during parse (injected) gives a result, not a throw"
+      - "MimeMessage overload behaves identically (test via InternalsVisibleTo)"
+      - "GoldenKit score/probe exit non-zero when any result has internal_error (verified with the fault seam)"
+      - "All existing tests and GoldenKit score 1212/1212 with zero internal_error"
+    test_strategy: >-
+      TDD: fault-injection tests per stage and per overload first (red), implement guards. Add the global internal_error
+      check to test helpers. GoldenKit score + probe (probe over corpus/internal when present locally).
+    depends_on:
+      - "T-request-api:blocks"
+      - "T-metadata-keys:blocks"
+
+  - id: T-size-guard
+    title: "maxInputBytes constructor option with input_too_large warning (provisional default 150 MiB)"
+    story: S-size-guard
+    component_refs:
+      - ydk:req:extraction/max-input-size
+      - ydk:warning:extraction/input-too-large
+      - ydk:crosscut:core/warning-format
+      - ydk:contract:api/eml-extractor
+    spec_refs:
+      - extraction.md
+      - cross-cutting.md
+      - docs/adrs/012-shared-team-extractor-contract.md
+    description: >-
+      Size S. EmlExtractor(long maxInputBytes = 157_286_400) (provisional; final value set by T-load-limits);
+      <= 0 -> ArgumentOutOfRangeException. In Extract(request), before parsing: FileBytes.Length > limit -> return the
+      fixed-key empty result (T-metadata-keys helper), MainContent null, no attachments, directions ltr, one warning
+      'input_too_large: <length> > <limit>'. Length == limit is parsed. Bytes overload inherits it via forwarding.
+      Detector not limited. Expose the default as a public const for the load test's large-file pass.
+      Goldens: on a corpus/golden conflict, rebase and re-run `dotnet run --project tools/GoldenKit -- gen`;
+      never hand-merge goldens.
+    acceptance:
+      - "maxInputBytes 1024: 1025-byte message -> exactly one warning starting 'input_too_large', fixed keys only, no attachments"
+      - "maxInputBytes 1024: 1024-byte message extracted normally"
+      - "new EmlExtractor(0) and new EmlExtractor(-1) throw ArgumentOutOfRangeException"
+      - "Default instance accepts a 157286400-byte input and rejects 157286401 (test allocates once; mark [Trait(\"Category\",\"Large\")] if slow)"
+      - "GoldenKit score 1212/1212"
+    test_strategy: >-
+      TDD in ExtractionTests: boundary tests at limit-1/limit/limit+1 with a small limit, ctor validation, default
+      boundary. dotnet test both TFMs.
+    depends_on:
+      - "T-request-api:blocks"
+      - "T-metadata-keys:blocks"
+      - "T-no-throw:related"
+
+  # ======================= E-quality =======================
+  - id: T-unicode
+    title: "Exact-equality emoji tests: ZWJ, skin tone, flags, keycap, combining marks, split encoded-words, RFC 2231 flag filename"
+    story: S-unicode
+    component_refs:
+      - ydk:req:content/unicode-fidelity
+      - ydk:test:extraction/exotic-language.unit
+    spec_refs:
+      - extraction.md
+      - quality.md
+      - testing.md
+    description: >-
+      Size S. Add [Theory] cases to tests/EmlExtraction.Tests/ExoticLanguageTests.cs for: ZWJ family
+      (U+1F468 U+200D U+1F469 U+200D U+1F467), skin tone (U+1F44D U+1F3FD), flag (U+1F1EE U+1F1F1), keycap
+      (U+0031 U+FE0F U+20E3), combining marks (e.g. 'e' U+0301, Hebrew with niqqud), each in subject (B and Q
+      encoded-words), plain body (base64, QP, 8bit), HTML body and attachment filename; a ZWJ sequence split across two
+      adjacent RFC 2047 encoded-words; RFC 2231 filename* with a flag. Assert string.Equals(..., Ordinal), no
+      normalisation. If a case fails, fix the cause in the library (record in PR) rather than weaken the assert.
+      Attachment-name asserts use the field name current at merge time (Name before T-subfile-fields, FileName after).
+    acceptance:
+      - "Each sequence form x each carrier has a passing ordinal-equality case"
+      - "Split encoded-word ZWJ case and RFC 2231 flag filename case pass"
+      - "No NormalizationForm call in the asserts"
+    test_strategy: "Unit tests only (dotnet test, both TFMs once T-net8 lands); GoldenKit score unchanged."
+    depends_on:
+      - "10:blocks"
+      - "T-subfile-fields:related"
+
+  - id: T-visible-skip
+    title: "InternalCorpusTests report Skipped (naming the missing path) instead of passing when samples are absent"
+    story: S-realistic
+    component_refs:
+      - ydk:test:quality/internal-corpus.integration
+    spec_refs:
+      - testing.md
+      - quality.md
+      - docs/adrs/018-committed-realistic-samples.md
+    description: >-
+      Size S. Replace the early `return` in each of the 17 InternalCorpusTests facts with a dynamic skip that names the
+      missing file (xunit 2.9.3 has no Assert.Skip: add Xunit.SkippableFact via Directory.Packages.props, or an
+      equivalent custom FactAttribute that sets Skip when the file is missing). Update project-rules.md "pass
+      vacuously" wording if present. Notices entry for any new test package goes to THIRD-PARTY-NOTICES.md if T-license
+      already landed.
+    acceptance:
+      - "On a clone without corpus/internal/, dotnet test reports the 17 internal-corpus tests as Skipped with the missing path in the reason; zero of them Passed"
+      - "With the samples present they run and pass as before"
+    test_strategy: "Run dotnet test with and without corpus/internal/ (rename the folder) and compare TRX outcomes."
+    depends_on:
+      - "10:blocks"
+
+  - id: T-samples-generated
+    title: "Generate realistic samples (OOXML, PDF, TNEF with docx, attached .eml, image, Outlook/Gmail paste images) with manifest.json"
+    story: S-realistic
+    component_refs:
+      - ydk:req:quality/realistic-attachment-samples
+      - ydk:req:attachments/inline-cid-images
+      - ydk:req:attachments/tnef-unwrap
+      - ydk:req:attachments/no-recursion
+    spec_refs:
+      - quality.md
+      - attachments.md
+      - docs/adrs/018-committed-realistic-samples.md
+    description: >-
+      Size M. Committed generator (e.g. tools/RealisticSamples, net10.0, IsPackable=false, or a script under
+      corpus/realistic/gen/) using open-source tooling only: DocumentFormat.OpenXml (MIT) for real .docx/.xlsx/.pptx,
+      a minimal valid PDF, MimeKit TnefWriter for a winmail.dat holding the .docx, MimeKit builders for the outer .eml
+      messages: attached OOXML, PDF, attached image, attached .eml (nested message), TNEF wrapper, Outlook-style paste
+      (multipart/related, image001.png@01D... Content-ID, cid: in HTML) and Gmail-style paste (ii_... Content-ID).
+      Deterministic output (fixed timestamps/ids) so re-running reproduces identical bytes. Write
+      corpus/realistic/manifest.json: per sample file, generator script, license (generated: repo license), SHA-256,
+      and expected values (subfile FileName, SizeInBytes, SHA-256, FullPath e.g. winmail.dat/report.docx) taken from the
+      generator's inputs, never from the extractor. Packages via Directory.Packages.props (after #10).
+    acceptance:
+      - "Running the generator twice yields byte-identical files (SHA-256 in manifest match)"
+      - "manifest.json has file, generator, license, sha256, expected for every sample; expected values derive from generator inputs"
+      - "Sample set covers docx, xlsx, pptx, PDF, attached .eml, TNEF with docx, attached image, Outlook and Gmail paste images"
+    test_strategy: >-
+      Generator self-check (re-run + hash compare) in CI or as a test; manifest schema validated by a unit test.
+      Extraction assertions are T-realistic-tests.
+    depends_on:
+      - "10:blocks"
+
+  - id: T-samples-public
+    title: "Add licensed public samples (legacy .doc/.xls, Outlook .msg) to corpus/realistic with provenance"
+    story: S-realistic
+    component_refs:
+      - ydk:req:quality/realistic-attachment-samples
+    spec_refs:
+      - quality.md
+      - docs/adrs/018-committed-realistic-samples.md
+      - docs/adrs/017-mit-license.md
+    description: >-
+      Size S-M. Legacy OLE .doc/.xls and an Outlook .msg cannot be produced by permissively licensed generators, so
+      pick public files whose license allows redistribution (MIT, Apache-2.0, BSD, CC0, CC-BY), e.g. Apache POI test
+      data (Apache-2.0); verify each file's license at its source and record source URL + commit, license and SHA-256 in
+      manifest.json. Wrap each in an .eml via the T-samples-generated generator (attached file). Expected subfile
+      values = the published file's own bytes (name, size, SHA-256), never extractor output. No personal data.
+    acceptance:
+      - "corpus/realistic contains a .doc, a .xls and a .msg sample, each with source URL, license and SHA-256 in manifest.json"
+      - "Each license is in the allowed list and linked to the exact source revision"
+    test_strategy: "Manifest unit test checks every entry has source/license/sha256 and the file hash matches."
+    depends_on:
+      - "T-samples-generated:blocks"
+
+  - id: T-realistic-tests
+    title: "Data-driven realistic-sample integration tests in CI from corpus/realistic/manifest.json"
+    story: S-realistic
+    component_refs:
+      - ydk:test:quality/realistic-samples.integration
+      - ydk:req:quality/realistic-attachment-samples
+      - ydk:req:attachments/inline-cid-images
+      - ydk:req:attachments/no-recursion
+    spec_refs:
+      - testing.md
+      - quality.md
+      - attachments.md
+    description: >-
+      Size M. New RealisticSampleTests ([Theory] with MemberData over manifest.json; samples copied to test output or
+      repo-root resolved per #10's convention). Per sample assert: detection true; no internal_error; exact attachment
+      set by FullPath with FileName, SizeInBytes and SHA-256 of BinaryData; TNEF sample gives winmail.dat/<docx> and no
+      leftover winmail.dat; nested .eml stays one opaque attachment; paste-image samples keep cid: in HTML and the image
+      ContentId matches. A missing manifest file fails (committed samples are never skipped). Runs in normal dotnet test
+      so CI covers both TFMs.
+    acceptance:
+      - "Every manifest sample has a test row that passes in CI on net8.0 and net10.0"
+      - "Deleting one committed sample makes its row fail (not skip)"
+      - "TNEF row asserts FullPath winmail.dat/<name>; nested .eml row asserts one opaque attachment"
+    test_strategy: "Integration tests in tests/EmlExtraction.Tests; CI run; deliberate negative check (remove a file) on a throwaway branch."
+    depends_on:
+      - "T-samples-generated:blocks"
+      - "T-samples-public:blocks"
+      - "T-fullpath:blocks"
+
+  # ======================= E-platform =======================
+  - id: T-license
+    title: "Add LICENSE and THIRD-PARTY-NOTICES.md with a CI license audit of the restore graph"
+    story: S-license
+    component_refs:
+      - ydk:req:quality/license-notices
+      - ydk:library:deps/mimekit
+      - ydk:library:deps/bouncycastle-cryptography
+      - ydk:library:deps/system-security-cryptography-pkcs
+    spec_refs:
+      - overview.md
+      - scope.md
+      - docs/adrs/017-mit-license.md
+      - docs/team-questions.md
+    description: >-
+      Size S. Owner decision 2026-10-18 (answers team-questions Q4): MIT, copyright line
+      "Copyright (c) 2026 Yoav Arad". Add LICENSE with the standard MIT text and that line. Flip ADR-017 status from
+      Proposed to Accepted (per project owner, 2026-10-18) and mark Q4 in docs/team-questions.md as closed with the
+      decision; update overview.md/scope.md "owner confirmation pending" wording. THIRD-PARTY-NOTICES.md: runtime packages (MimeKit
+      4.18.0, BouncyCastle.Cryptography 2.7.0 transitive, System.Security.Cryptography.Pkcs 10.0.13) with version,
+      license, copyright line; then test/bench packages (xunit, xunit.runner.visualstudio, Microsoft.NET.Test.Sdk,
+      coverlet.collector, BenchmarkDotNet, plus any added since, e.g. DocumentFormat.OpenXml, SkippableFact); then every
+      committed non-authored sample under corpus/ (from corpus/realistic/manifest.json if it exists). CI step: list the
+      restore graph (`dotnet list package --include-transitive --format json`) and fail when a package is missing from
+      the notices or has a license outside MIT/Apache-2.0/BSD-2/BSD-3. Coordinate with #10: #10 sets
+      PackageLicenseExpression in the csproj; whichever lands second makes them agree.
+    acceptance:
+      - "LICENSE at repo root: MIT text with 'Copyright (c) 2026 Yoav Arad'"
+      - "ADR-017 status is Accepted (owner, 2026-10-18) and team-questions Q4 is marked closed with the decision"
+      - "THIRD-PARTY-NOTICES.md lists all eight ADR-017 packages with version and license, plus every committed non-authored sample"
+      - "Adding a package without a notices entry fails the CI audit step (shown on a throwaway branch)"
+      - "csproj PackageLicenseExpression matches LICENSE"
+    test_strategy: "CI audit script run locally and in CI; negative check with an extra unlisted package on a throwaway branch."
+    depends_on:
+      - "10:related"
+      - "T-samples-public:related"
+
+  - id: T-capability
+    title: "Write docs/research/csharp-capability-assessment.md (MimeKit/.NET vs Python, Java, Go)"
+    story: S-capability
+    component_refs:
+      - ydk:req:research/capability-assessment
+      - ydk:library:deps/mimekit
+    spec_refs:
+      - overview.md
+      - docs/research/brief-gap-analysis.md
+      - docs/adrs/001-dotnet-10-stack.md
+    description: >-
+      Size M (research, no code). One row per brief capability (detection, header metadata, main content, sub-files
+      incl. TNEF and nested mail, unicode, throughput) x language: MimeKit on .NET 10, Python email stdlib, Java Jakarta
+      Mail + Apache POI HMEF, Go net/mail + enmime. Each row: supported yes/no/partial, evidence (doc/source link or a
+      measured result; cite docs/perf-results.md or the sweep when available), license. End with exactly one of: "no
+      big gap - stay on C#", "improve a named C# library (contribution plan)", "move capability X to language Y". Add a
+      link in ADR-001 Alternatives. Primary sources only.
+    acceptance:
+      - "Every capability x language cell filled with support level, evidence link and license"
+      - "Document ends with one of the three allowed conclusions"
+      - "ADR-001 Alternatives links to the document"
+    test_strategy: "Doc review against the ydk:req:research/capability-assessment acceptance list; ydk spec integrity check passes."
+    depends_on: []
+
+  - id: T-docs-drift
+    title: "Fix doc/tooling drift: GoldenKit root marker, detector '<' rejection, golden.md TNEF statement"
+    story: S-docs
+    component_refs:
+      - ydk:req:detection/reject-non-email-magic
+      - ydk:req:quality/golden-independence
+    spec_refs:
+      - detection.md
+      - quality.md
+      - docs/project-rules.md
+    description: >-
+      Size S. (1) tools/GoldenKit/Program.cs:26 looks for docs/golden-1200-plan.md, which no longer exists: use
+      EmlExtraction.slnx (or docs/golden.md) as the marker and drop the dead check; update the Known Gotcha in
+      docs/project-rules.md. (2) README "Rejects OLE .msg, PDF, ZIP, PNG, JPEG, JSON" omits markup: document that a
+      first byte of '{', '[' or '<' is rejected (EmlDetector.cs:49), matching detection.md. (3) docs/golden.md says real
+      TNEF is not golded "no public safe sample", while README's harvest lists public TNEF samples (Apache POI HMEF) and
+      ADR-018 adds a committed TNEF sample: reword to the true current state (link the realistic set once it exists).
+      Docs only plus a one-line tool fix; no library change.
+    acceptance:
+      - "GoldenKit runs from any subdirectory and finds the root without docs/golden-1200-plan.md; no reference to that file remains"
+      - "README detection paragraph lists the '{', '[', '<' rejection"
+      - "docs/golden.md TNEF line agrees with README and ADR-018"
+    test_strategy: "Run GoldenKit score from repo root and from tools/GoldenKit; grep for golden-1200-plan returns nothing."
+    depends_on:
+      - "10:related"
+
+  - id: T-readme-api
+    title: "Update README for the Stage 02 API (request, Detect, attachment table, metadata keys, xfields, warnings, size limit)"
+    story: S-docs
+    component_refs:
+      - ydk:crosscut:core/library-surface
+      - ydk:contract:api/eml-extractor
+      - ydk:contract:api/eml-detector
+    spec_refs:
+      - overview.md
+      - glossary.md
+      - extraction.md
+      - attachments.md
+    description: >-
+      Size S. Rewrite README API sections: Detect/IsEml with EmlDetectionResult; Extract(EmlExtractionRequest) primary
+      and the bytes wrapper; attachment table FileName, SizeInBytes, FullPath (container path, unique, not
+      filesystem-safe), BinaryData, ContentId, Disposition, OriginalPath, ContentLocation; canonical metadata keys and
+      fixed keys; Metadata["xfields"] literal X_ rule (replace the X_/X- line and result.XFields); warning codes incl.
+      internal_error and input_too_large; maxInputBytes ctor option; net8.0+net10.0 if T-net8 merged. Remove the
+      "README describes today's API until Stage 02" notes in overview.md and ADR-012 consequences. Code samples must
+      compile (copy into a test or doc snippet check).
+    acceptance:
+      - "README contains no Name/Size/Data/XFields/Extract(MimeMessage) references"
+      - "README attachment table lists the eight fields with ADR-013 FullPath meaning"
+      - "README code samples compile against the current library"
+    test_strategy: "Compile README snippets (doc-snippet test or manual build in PR); review against the contract manifests."
+    depends_on:
+      - "T-detect-result:blocks"
+      - "T-request-api:blocks"
+      - "T-fullpath:blocks"
+      - "T-xfields:blocks"
+      - "T-no-throw:blocks"
+      - "T-size-guard:blocks"
+      - "T-docs-drift:related"
+
+  # ======================= E-load =======================
+  - id: T-load-sweep
+    title: "Load-test harness: DOP sweep 1..cores, Workstation + Server GC, T(n), P50/P95, peak WS, alloc/byte, E(n), hardware block"
+    story: S-load-test
+    component_refs:
+      - ydk:nfr:performance/throughput-dop-sweep
+      - ydk:nfr:performance/memory-footprint
+      - ydk:nfr:performance/extract-tiny-throughput
+      - ydk:nfr:performance/extract-html-20kb-throughput
+      - ydk:nfr:performance/extract-1mb-attachment-throughput
+      - ydk:nfr:performance/detect-tiny-throughput
+    spec_refs:
+      - quality.md
+      - docs/adrs/015-load-test-method.md
+    description: >-
+      Size M (complexity ~6). Extend benches/EmlExtraction.Bench (net10.0) with a `sweep` mode: load all inputs into
+      memory (public mail from `--corpus <path>`, default corpus/internal, every file, mbox split per message; synthetic = 5 bench messages + 1212
+      golden inputs); for n = 1..Environment.ProcessorCount, n workers pull from a shared index and call Extract
+      (detection measured separately); provisional 2 s warm-up, >= 10 s and >= 3 passes window. Per n: T(n), P50/P95
+      latency, peak working set sampled every 50 ms, A = allocated-bytes delta / input bytes, E(n) = T(n)/(n*T(1));
+      report per set and mix. Run each GC mode in a child process with DOTNET_gcServer set explicitly (never rely on
+      the default). Hardware block: CPU model from registry ProcessorNameString / /proc/cpuinfo / sysctl
+      machdep.cpu.brand_string (exit non-zero if unreadable; never 'Unknown processor'), physical+logical cores, RAM,
+      OS, runtime, TFM, GC mode, date, git commit. Output JSON + markdown. Keep the existing single-thread table in
+      docs/perf-results.md as history; drop the 0.7 formula from extract-tiny-throughput usage.
+    acceptance:
+      - "`dotnet run -c Release --project benches/EmlExtraction.Bench -- sweep --set synthetic` prints T(n), P50, P95, P(n), A, E(n) for n=1..cores under both GC modes"
+      - "Hardware block fields all populated; forcing CPU lookup failure exits non-zero"
+      - "JSON output schema documented and stable (consumed by T-load-baseline)"
+      - "The harness takes a corpus path argument (`--corpus <path>`), so a task worktree can point at the main checkout's gitignored corpus/internal (C:\\Users\\yoava\\Projects\\eml-extraction\\corpus\\internal)"
+      - "When the --corpus path is absent or empty, the run prints a visible 'SKIPPED: public corpus not found at <path>' line and reports the set as skipped; it never reports the public set as passed or silently omits it"
+    test_strategy: >-
+      Unit tests for the pure parts (E(n), percentile, CPU-string parsers per OS fixtures) in a small test class; smoke
+      run of the sweep on the synthetic set with a short window flag.
+    depends_on:
+      - "10:blocks"
+
+  - id: T-load-largefile
+    title: "Load test: large-file pass (25/50/100% of maxInputBytes, +1 byte guard check), M, and the sizing formula"
+    story: S-load-test
+    component_refs:
+      - ydk:nfr:performance/memory-footprint
+      - ydk:req:extraction/max-input-size
+      - ydk:nfr:performance/throughput-dop-sweep
+    spec_refs:
+      - quality.md
+      - docs/adrs/015-load-test-method.md
+    description: >-
+      Size S-M. Single-thread pass, kept out of the DOP mix: generate messages at 25%, 50%, 100% of the configured
+      maxInputBytes, each with one base64 attachment, plus one at limit+1 that must return input_too_large. Forced full
+      GC before each; sample working set every 50 ms; M = (peak - pre-run WS) / input bytes. Emit the resource-derivation
+      formula with the measured values: cores_needed = ceil(R/(T(1) x E(n))), servers_needed = ceil(R/T(n_best)),
+      ram_per_server = P(n_best) + n_best x max_input_bytes x M, with a short "how the team reruns this" section.
+    acceptance:
+      - "Report shows M and peak WS for 25/50/100% inputs; limit+1 input yields input_too_large and no parse"
+      - "Sizing formula printed with measured T(1), E(n), n_best, P(n_best), M"
+    test_strategy: "Smoke run with a small --max-input-bytes; unit test for the formula computation."
+    depends_on:
+      - "T-load-sweep:blocks"
+      - "T-size-guard:blocks"
+
+  - id: T-load-baseline
+    title: "Commit perf baseline + comparability check + warn-only regression rule + nightly synthetic CI job"
+    story: S-load-test
+    component_refs:
+      - ydk:nfr:performance/throughput-dop-sweep
+      - ydk:nfr:performance/memory-footprint
+    spec_refs:
+      - quality.md
+      - docs/adrs/015-load-test-method.md
+    description: >-
+      Size M. Blocked by every contract/behaviour task so the baseline measures shipped code (owner, 2026-10-18). No
+      human gate: the agent runs the full sweep (public corpus + synthetic, both GC modes, net10.0) on this machine,
+      passing --corpus C:\Users\yoava\Projects\eml-extraction\corpus\internal (the main checkout's gitignored corpus;
+      a task worktree does not have it). Commit docs/perf-baseline.json with the hardware block. Implement compare:
+      only when CPU model, logical cores, runtime major.minor and GC mode match, else print
+      'baseline not comparable: <field>'; warn (never fail) when T(1) or T(ProcessorCount) drops, or A or
+      P(ProcessorCount) rises, by more than the provisional 20%. Add .github/workflows/perf-nightly.yml (schedule +
+      workflow_dispatch) running the synthetic set against docs/perf-baseline-ci.json (seeded from the first nightly
+      run), warn-only. Best run after the contract tasks land (baseline must reflect the shipped code); refresh rule
+      documented in docs/perf-results.md.
+    acceptance:
+      - "docs/perf-baseline.json committed with full hardware block and all per-DOP metrics for both GC modes"
+      - "A run on different hardware prints 'baseline not comparable: <field>' and skips comparison"
+      - "A synthetic 25% slowdown (test fixture) prints a warning and exit code 0"
+      - "Nightly workflow runs green and uploads its report"
+    test_strategy: "Unit tests for comparability and threshold logic with fixture JSON; one manual workflow_dispatch run of the nightly."
+    depends_on:
+      - "T-load-largefile:blocks"
+      - "T-detect-result:blocks"
+      - "T-request-api:blocks"
+      - "T-subfile-fields:blocks"
+      - "T-fullpath:blocks"
+      - "T-metadata-keys:blocks"
+      - "T-xfields:blocks"
+      - "T-no-throw:blocks"
+      - "T-size-guard:blocks"
+      - "T-net8:blocks"
+
+  - id: T-load-limits
+    title: "Set provisional limits from measured data: maxInputBytes default, memory ceiling, A ceiling, regression threshold, run windows"
+    story: S-load-test
+    component_refs:
+      - ydk:req:extraction/max-input-size
+      - ydk:nfr:performance/memory-footprint
+      - ydk:nfr:performance/throughput-dop-sweep
+      - ydk:nfr:performance/extract-tiny-throughput
+    spec_refs:
+      - quality.md
+      - extraction.md
+      - scope.md
+      - docs/adrs/015-load-test-method.md
+    description: >-
+      Size S. From the committed baseline: set the maxInputBytes default (code const + manifest), the memory ceiling
+      (peak WS growth per input), the A ceiling, the regression threshold (from run-to-run spread of >= 3 sweeps),
+      warm-up/window lengths, and sampling interval; each = measured value + stated headroom, with the source run id.
+      Update ADR-015 (status note), ydk:req:extraction/max-input-size, ydk:nfr:performance/memory-footprint,
+      ydk:nfr:performance/throughput-dop-sweep, docs/perf-results.md, quality.md. If measured M exceeds the ceiling,
+      stop and raise the streaming DEFERRED -> IN decision to the owner (scope.md) instead of picking a number.
+    acceptance:
+      - "No 'provisional' marker left on these numbers in ADR-015 and the three manifests; each cites its source run"
+      - "Default-limit boundary test updated to the new value and passing"
+      - "Streaming decision recorded (stays DEFERRED or raised to owner) with the measured M"
+    test_strategy: "dotnet test (size-guard boundary tests at the new default); ydk spec integrity check; review numbers against perf-baseline.json."
+    depends_on:
+      - "T-load-baseline:blocks"
