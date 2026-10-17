@@ -1,0 +1,30 @@
+$schema: ydk:schema:req
+id: ydk:req:detection/detect-eml
+description: >-
+  Original spec "Detect function": input is a bytes object, output is whether the file is EML.
+  Decision is made from content only; the file extension is never consulted.
+type: business-rule
+priority: critical
+rule: >-
+  IsEml returns true iff ALL hold, evaluated in order:
+  (1) length >= 20 bytes;
+  (2) after stripping one leading UTF-8 BOM (EF BB BF), the buffer does not match any magic in ydk:req:detection/reject-non-email-magic;
+  (3) sniff window = first 16,384 bytes of the BOM-stripped buffer;
+  (4) if the window starts with ASCII "From " (mbox), the first line is skipped; if there is no LF, or nothing follows it, return false;
+  (5) the window is decoded as ASCII and split on CRLF or LF; header scan stops at the first empty line;
+      a line starting with space/tab is a continuation (invalid if it is the very first line -> false);
+      every other line must be "<name>:" where name is non-empty, starts with a letter or digit, and contains only letters, digits, '-' or '_';
+      the first non-header line ends the scan and returns (headerLines >= 2 AND classic >= 1);
+  (6) at scan end: headerLines >= 2 AND classic >= 1 AND (a blank line ended the header block OR headerLines >= 3).
+  "classic" counts header names (case-insensitive) in: from, date, received, mime-version, message-id, subject,
+  return-path, to, delivered-to, cc, sender, reply-to, in-reply-to, references, content-type.
+failure_behavior: Returns false. Never throws.
+related_components:
+  - ydk:contract:api/eml-detector
+  - ydk:req:detection/reject-non-email-magic
+acceptance_criteria:
+  - A MimeKit-generated plain message is accepted (DetectorTests.AcceptsGeneratedEml)
+  - The same message prefixed with a UTF-8 BOM is accepted (AcceptsUtf8Bom)
+  - The same message prefixed with an mbox "From alice@example.com <date>" line is accepted (AcceptsMboxFromLine)
+  - Empty input and the 5-byte input "short" are rejected (RejectsEmpty)
+  - Golden detect slice (40 bulk D cases) passes 40/40 in GoldenKit score

@@ -1,0 +1,19 @@
+$schema: ydk:schema:req
+id: ydk:req:attachments/no-recursion
+description: >-
+  Original spec: "Do not extract further (no file-type detection, no nested content extraction)". ADR-008.
+type: constraint
+priority: critical
+rule: >-
+  A message/rfc822 part yields exactly one attachment whose Data is the embedded message re-serialised to bytes
+  (or the raw part if MimeKit holds no parsed message), named from its filename or "attached.eml"; its inner parts
+  are never added to Attachments. No attachment's bytes are inspected for type, and no Office/PDF/image/archive
+  content is parsed. Only the selected-body text is decoded to a string.
+failure_behavior: Serialisation failure skips the part with ydk:warning:extraction/rfc822-extract-failed .
+related_components:
+  - ydk:entity:extraction/ExtractedAttachment
+  - ydk:contract:api/eml-extractor
+acceptance_criteria:
+  - Outer message with a forwarded.eml part yields one attachment "forwarded.eml" whose bytes contain the inner body, and no attachment named after inner parts (AttachmentTests.NestedEmlIsOpaqueBinaryAndNotRecursed; golden E06-nested)
+  - Real-world nested forwards stay opaque (InternalCorpusTests.NestedRfc822ForwardStaysOpaque, when sample present)
+  - Golden nested-rfc822 45/45, no-recurse 41/41

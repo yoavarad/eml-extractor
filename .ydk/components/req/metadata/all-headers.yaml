@@ -1,0 +1,18 @@
+$schema: ydk:schema:req
+id: ydk:req:metadata/all-headers
+description: Original spec "As many headers as possible" - every header, not only the classic set.
+type: business-rule
+priority: high
+rule: >-
+  For every header in the top-level message header block, Metadata holds an entry whose key is the field name
+  trimmed, lower-cased (invariant culture) and with '-' replaced by '_', and whose value is the decoded, unfolded
+  header value. Repeated headers sharing a key are concatenated with \n in order. Headers of nested parts are not
+  included.
+failure_behavior: Not a failure path. On ydk:warning:extraction/parse-failed the map is empty.
+related_components:
+  - ydk:entity:extraction/Metadata
+  - ydk:contract:api/eml-extractor
+acceptance_criteria:
+  - A DKIM-Signature header appears under dkim_signature (ExtractionTests.ExtractsClassicHeadersAndUnicodeSubject; golden seed E10-xfields)
+  - A folded Subject is unfolded into one value containing both halves (FoldedSubjectIsJoined)
+  - An Exchange O365 header dump yields at least 50 metadata keys (InternalCorpusTests.ExchangeMegaHeadersLandInXFields, when sample present)

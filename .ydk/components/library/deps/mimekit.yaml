@@ -1,0 +1,35 @@
+$schema: ydk:schema:library
+id: ydk:library:deps/mimekit
+description: >-
+  RFC 822/2822/5322 and RFC 2045-2049 MIME parser that does all message parsing, header decoding (RFC 2047/2231/6532),
+  charset conversion, transfer decoding, and TNEF unpacking for the extractor (ADR-002). The detector does not use it.
+package: MimeKit
+registry: nuget
+version: 4.18.0
+license: MIT
+referenced_by:
+  - src/EmlExtraction/EmlExtraction.csproj
+  - tests/EmlExtraction.Tests/EmlExtraction.Tests.csproj (builds fixtures via MimeMessage/BodyBuilder)
+direct: true
+features_used:
+  - MimeMessage.Load(ParserOptions, Stream) for single-message input
+  - MimeParser(ParserOptions, Stream, MimeFormat.Mbox).ParseMessage() for mbox-prefixed input
+  - MimeMessage header list, From/To/Cc/Bcc/ReplyTo/Sender/Subject/Date/MessageId/InReplyTo/References
+  - TextPart.Text, IsHtml, IsPlain, IsAttachment; MultipartAlternative; MultipartRelated.Root
+  - MimePart.Content.DecodeTo, FileName, ContentId, ContentDisposition
+  - MessagePart.Message.WriteTo for opaque nested messages
+  - MimeKit.Tnef.TnefPart.ExtractAttachments
+configuration:
+  base: ParserOptions.Default.Clone()
+  AllowUnquotedCommasInAddresses: true
+  ParameterComplianceMode: RfcComplianceMode.Loose
+  Rfc2047ComplianceMode: RfcComplianceMode.Loose
+  encoding_provider: Encoding.RegisterProvider(CodePagesEncodingProvider.Instance) in EmlExtractor static constructor (needed for TNEF, GB2312, Shift_JIS, Windows-125x)
+failure_modes:
+  - Whole-message parse exceptions -> ydk:warning:extraction/parse-failed
+  - Body text decode exceptions -> ydk:warning:extraction/body-decode-failed
+  - Part decode exceptions -> ydk:warning:extraction/part-decode-failed
+  - Nested message write exceptions -> ydk:warning:extraction/rfc822-extract-failed
+  - TNEF unpack exceptions -> ydk:warning:extraction/tnef-extract-failed
+used_by:
+  - ydk:contract:api/eml-extractor

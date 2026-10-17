@@ -1,0 +1,18 @@
+$schema: ydk:schema:nfr
+id: ydk:nfr:performance/detect-tiny-throughput
+description: >-
+  Single-thread detector throughput on the 221 B tiny message. Recorded baseline from docs/perf-results.md.
+  Detect is 5-15x cheaper than extract on small mail and can share the same core. Measured baseline, not a
+  contractual SLA. Other recorded rows: headers-heavy 360,520/s, cid-image 404,156/s, small-20kb 23,675/s,
+  attach-1mb 21,814/s.
+category: performance
+tags: [throughput, baseline]
+target: 774668
+unit: detections/second/thread
+measurement: >-
+  benches/EmlExtraction.Bench ThroughputRunner: 50 warm-up calls, then IsEml calls counted over an 800 ms window on
+  one thread.
+test_method: dotnet run --project benches/EmlExtraction.Bench -c Release; read the "tiny" row Detect/s column.
+monitoring: none (library; no runtime telemetry)
+applies_to:
+  - ydk:contract:api/eml-detector

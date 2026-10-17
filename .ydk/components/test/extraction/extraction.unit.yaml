@@ -1,0 +1,78 @@
+$schema: ydk:schema:test
+id: ydk:test:extraction/extraction.unit
+description: >-
+  Unit tests for metadata, body selection, and robustness, tests/EmlExtraction.Tests/ExtractionTests.cs.
+  Inputs are MimeKit-built messages (SampleFactory) or raw-string EML fixtures converted with
+  ReplaceLineEndings("\r\n").
+level: unit
+target: ydk:contract:api/eml-extractor
+cases:
+  - name: FromToCcBccAreAlwaysPresent
+    description: Address keys exist even when headers are absent
+    given: Raw EML with only From and To
+    when: Extract is called
+    then: from = alice@example.com, to contains bob@example.com, cc = "", bcc = ""
+  - name: ExtractsFromToCcBccIncludingMultiplesAndRtlNames
+    description: Multiple mailboxes and RTL display names survive
+    given: Message with Hebrew From name, Arabic To name, two Cc, two Bcc (one Hebrew name)
+    when: Extract is called
+    then: Every address and display name appears in its key
+  - name: RawBccHeaderIsExtracted
+    description: A Bcc header present in the file is kept
+    given: Raw EML with From, To, two Cc, two Bcc
+    when: Extract is called
+    then: All addresses appear in from/to/cc/bcc
+  - name: ExtractsClassicHeadersAndUnicodeSubject
+    description: Classic keys, every-header copy, xfields, and a unicode subject
+    given: Message with mixed-script subject, DKIM-Signature, X-Mailer, X_Custom_Field, X-Spam-Score, plain body "hello"
+    when: Extract is called
+    then: subject exact, messageid and dkim_signature keys present, three X lines in XFields, MainContent "hello", type text/plain, no attachments
+  - name: PrefersHtmlOverPlain
+    description: HTML wins in multipart/alternative
+    given: multipart/alternative with "plain version" and "<p>html version</p>"
+    when: Extract is called
+    then: MainContent = HTML markup, type text/html, plain sibling not in attachments
+  - name: MboxFromPrefixDoesNotPolluteHeaders
+    description: mbox separator handled by the extractor
+    given: Message prefixed with an mbox From line
+    when: Extract is called
+    then: subject/body extracted, no parse_failed warning, no metadata value contains the separator date
+  - name: HeadersOnlyDoesNotThrow
+    description: Empty body is valid
+    given: Headers with no body
+    when: Extract is called
+    then: subject extracted, MainContent null or empty, no parse_failed warning
+  - name: FoldedSubjectIsJoined
+    description: Folded headers are unfolded
+    given: Raw EML with Subject folded over two lines
+    when: Extract is called
+    then: subject contains both halves
+  - name: Windows1255BodyDecodes
+    description: Legacy Hebrew charset decodes
+    given: Raw EML with RFC 2047 windows-1255 subject and base64 windows-1255 body
+    when: Extract is called
+    then: subject and MainContent equal the Hebrew string
+  - name: Smtputf8Addresses
+    description: Raw UTF-8 addresses (RFC 6532)
+    given: Message with UTF-8 display names
+    when: Extract is called
+    then: Hebrew name in from, li@example.com in to
+  - name: DuplicateReceivedAreConcatenated
+    description: All Received headers kept
+    given: Two Received headers (mx1, mx2)
+    when: Extract is called
+    then: received contains both hosts
+  - name: CorruptBase64DoesNotCrash
+    description: Bad transfer encoding is tolerated
+    given: Raw EML with base64 body "%%%%not-base64%%%%"
+    when: Extract is called
+    then: No exception; subject = "corrupt"
+  - name: PathInFileNameIsPreservedSeparately
+    description: Path-bearing filenames split into name and full path
+    given: Attachment named "../../etc/passwd.txt"
+    when: Extract is called
+    then: Name "passwd.txt", FullPath "../../etc/passwd.txt", Data equals payload
+stubs: []
+never_mock:
+  - EmlExtractor
+  - MimeKit (real parser; fixtures are built with real MimeKit writers or raw bytes)

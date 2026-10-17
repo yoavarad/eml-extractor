@@ -1,0 +1,19 @@
+$schema: ydk:schema:nfr
+id: ydk:nfr:performance/extract-html-20kb-throughput
+description: >-
+  Single-thread extract throughput on a ~20 KB multipart/alternative HTML message (25,433 B input), in-memory.
+  Recorded baseline from docs/perf-results.md (same machine and settings as
+  ydk:nfr:performance/extract-tiny-throughput). Measured baseline, not a contractual SLA.
+category: performance
+tags: [throughput, baseline]
+target: 16881
+unit: extracts/second/thread
+measurement: >-
+  benches/EmlExtraction.Bench ThroughputRunner "small-20kb" row: 50 warm-up calls, then Extract calls counted over
+  1,200 ms on one thread. Also reported: 2,893 alloc MB/s.
+test_method: >-
+  dotnet run --project benches/EmlExtraction.Bench -c Release; compare the "small-20kb" Extract/s column with this
+  baseline on the same hardware class.
+monitoring: none (library; no runtime telemetry)
+applies_to:
+  - ydk:contract:api/eml-extractor

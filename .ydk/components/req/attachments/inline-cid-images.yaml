@@ -1,0 +1,19 @@
+$schema: ydk:schema:req
+id: ydk:req:attachments/inline-cid-images
+description: >-
+  Copy-paste images (multipart/related + cid:) are attachments carrying the image bytes (README "Nested files";
+  original spec Correctness B "copy-paste (CID) images").
+type: business-rule
+priority: high
+rule: >-
+  In multipart/related, non-root image parts are attachments like any other leaf: Data = decoded image bytes,
+  ContentId = the part's Content-ID, Disposition = its Content-Disposition value (e.g. inline) or null. A nameless
+  image takes the fallback name "<content-id>.<subtype>". The HTML main content keeps its cid: references unchanged.
+failure_behavior: Decode failure skips the image with ydk:warning:extraction/part-decode-failed .
+related_components:
+  - ydk:entity:extraction/ExtractedAttachment
+  - ydk:req:attachments/attachment-record
+acceptance_criteria:
+  - HTML referencing cid:paste@local yields MainContent containing "cid:paste@local" and one attachment with the exact PNG bytes, a name containing "paste", and Disposition "inline" (AttachmentTests.CopyPasteCidImageIsExtracted; golden E08-cid)
+  - Outlook-shaped image001.png@01D... fixture yields an inline PNG whose Content-ID matches the HTML cid (InternalCorpusTests.OutlookPasteImage001At01DIsInlinePng, when sample present)
+  - Golden cid 211/211, rfc2392 140/140

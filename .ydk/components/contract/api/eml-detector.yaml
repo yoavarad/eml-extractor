@@ -1,0 +1,19 @@
+$schema: ydk:schema:contract
+id: ydk:contract:api/eml-detector
+description: >-
+  Public detection surface. Interface IEmlDetector, implementation EmlDetector
+  (src/EmlExtraction/Models.cs, src/EmlExtraction/EmlDetector.cs). Stateless; constructed with new EmlDetector().
+  Pure byte sniff: never parses MIME, never throws for any input, ignores file extension.
+methods:
+  IsEml:
+    description: >-
+      Return true when the buffer looks like an RFC 5322 message (optionally mbox-prefixed / BOM-prefixed).
+      Algorithm and thresholds are specified by ydk:req:detection/detect-eml and ydk:req:detection/reject-non-email-magic .
+    params:
+      data:
+        type: ReadOnlySpan<byte>
+        description: Raw file bytes. Any length, including empty.
+    returns:
+      type: bool
+      description: true = treat as EML and pass to ydk:contract:api/eml-extractor; false = not EML.
+    raises: []

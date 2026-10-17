@@ -1,0 +1,20 @@
+$schema: ydk:schema:nfr
+id: ydk:nfr:performance/extract-1mb-attachment-throughput
+description: >-
+  Single-thread extract throughput on a message carrying a 1,000,000-byte base64 attachment (1,351,406 B input),
+  decoded fully into memory. Recorded baseline from docs/perf-results.md. Memory, not CPU, is the stated cap:
+  peak bytes per in-flight file ~= input_bytes + decoded_attachment_bytes. Measured baseline, not a contractual SLA.
+category: performance
+tags: [throughput, memory, baseline]
+target: 259
+unit: extracts/second/thread
+measurement: >-
+  benches/EmlExtraction.Bench ThroughputRunner "attach-1mb" row (1,200 ms window, one thread). Also reported:
+  1,363 alloc MB/s.
+test_method: >-
+  dotnet run --project benches/EmlExtraction.Bench -c Release; compare the "attach-1mb" row. Size concurrency as
+  ram_budget_bytes / peak_bytes_per_file and cores as target_files_per_sec / extract_per_sec_single_thread.
+monitoring: none (library; no runtime telemetry)
+applies_to:
+  - ydk:contract:api/eml-extractor
+  - ydk:entity:extraction/ExtractedAttachment

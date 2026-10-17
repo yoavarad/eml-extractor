@@ -1,0 +1,39 @@
+$schema: ydk:schema:test
+id: ydk:test:detection/detector.unit
+description: Unit tests for the byte sniffer, tests/EmlExtraction.Tests/DetectorTests.cs.
+level: unit
+target: ydk:contract:api/eml-detector
+cases:
+  - name: AcceptsGeneratedEml
+    description: A normal message is detected
+    given: Bytes of a MimeKit-written plain message with From, To, Subject, Date, Message-ID
+    when: IsEml is called
+    then: Returns true
+  - name: AcceptsUtf8Bom
+    description: A leading UTF-8 BOM is tolerated
+    given: The same message prefixed with EF BB BF
+    when: IsEml is called
+    then: Returns true
+  - name: AcceptsMboxFromLine
+    description: An mbox separator line is skipped
+    given: The same message prefixed with "From alice@example.com Tue Sep 15 07:00:00 2026\n"
+    when: IsEml is called
+    then: Returns true
+  - name: RejectsEmpty
+    description: Inputs under the minimum length are rejected
+    given: An empty array, and the 5-byte ASCII "short"
+    when: IsEml is called on each
+    then: Returns false for both
+  - name: RejectsOleMsgMagic
+    description: Outlook .msg / OLE compound files are rejected
+    given: D0 CF 11 E0 A1 B1 1A E1 followed by 64 zero bytes
+    when: IsEml is called
+    then: Returns false
+  - name: RejectsPdfZipPngJpegJson
+    description: Common non-email formats are rejected even with header-like text
+    given: "%PDF-1.4 text containing \"From: x\"; a ZIP local header; a minimal PNG; JPEG FF D8 FF E0; a JSON object with from/date keys"
+    when: IsEml is called on each
+    then: Returns false for all five
+stubs: []
+never_mock:
+  - EmlDetector (tests call the real implementation on real bytes)
