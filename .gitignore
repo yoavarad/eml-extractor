@@ -7,3 +7,9 @@ BenchmarkDotNet.Artifacts/
 corpus/internal/
 docs/golden-score.json
 
+
+# YDK local state
+.ydk/active-task.json
+.ydk/cache/
+.ydk/worktrees/
+.ydk/tdd-state.json
