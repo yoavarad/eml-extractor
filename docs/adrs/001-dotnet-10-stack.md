@@ -1,7 +1,7 @@
 # ADR-001: C# / .NET 10 class library stack
 
 ## Status
-Accepted (recorded retroactively, Stage 01 Rewrite)
+Accepted (recorded retroactively, Stage 01 Rewrite). Amended by ADR-019: the library and test projects also target net8.0 (target, Stage 02).
 
 ## Context
 The original (Hebrew) specification, as translated in `docs/requirements.md`, states "Implementation: C# / .NET 10". The first commit (`dd83290`, "Add .NET 10 EML extraction core with tagged golden set") shipped the library on that stack.

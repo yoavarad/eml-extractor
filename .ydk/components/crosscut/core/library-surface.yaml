@@ -5,7 +5,8 @@ description: >-
   are settled once instead of per feature.
 kind: deployment-surface
 specification: >-
-  In-process .NET 10 class library (src/EmlExtraction) consumed by project reference. Public surface is exactly
+  In-process .NET 10 class library (src/EmlExtraction) consumed by project reference. Target (ADR-019; not implemented,
+  Stage 02): multi-targets net8.0 and net10.0 with identical behaviour (ydk:req:quality/net8-multi-targeting). Public surface is exactly
   ydk:contract:api/eml-detector and ydk:contract:api/eml-extractor plus the records
   ydk:entity:extraction/EmlExtractionResult and ydk:entity:extraction/ExtractedAttachment , and, as target
   (ADR-012, not implemented, Stage 02), ydk:entity:extraction/EmlExtractionRequest and

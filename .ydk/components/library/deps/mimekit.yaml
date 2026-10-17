@@ -5,6 +5,7 @@ description: >-
   charset conversion, transfer decoding, and TNEF unpacking for the extractor (ADR-002). The detector does not use it.
   Runtime transitive dependencies: ydk:library:deps/bouncycastle-cryptography and the pinned
   ydk:library:deps/system-security-cryptography-pkcs (license audit, ADR-017).
+  Ships net8.0 and net10.0 assets, so it serves both targets of ADR-019 (ydk:req:quality/net8-multi-targeting).
 package: MimeKit
 registry: nuget
 version: 4.18.0

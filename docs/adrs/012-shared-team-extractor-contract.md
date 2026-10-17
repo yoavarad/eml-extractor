@@ -1,7 +1,7 @@
 # ADR-012: Shared team extractor contract (request, detection result, subfile names)
 
 ## Status
-Accepted for EML; proposed to team (per project owner, 2026-10-17). Implementation pending, tracked as Stage 02 work.
+Accepted for EML; proposed to team (per project owner, 2026-10-17; bytes overload and batch API settled by the owner on 2026-10-18). Implementation pending, tracked as Stage 02 work.
 
 ## Context
 The team brief gives two functions per extractor: a detection function (bytes in, "is this the format?") and an extraction function (metadata, main content, sub-files with name, size, full path if it exists, and the binary). The extracted component goes into the team's extraction template, and the team wires it into the factory.
@@ -24,8 +24,9 @@ Per project owner, 2026-10-17. EML adopts the following now (target; not impleme
   - `FileBytes` - `ReadOnlyMemory<byte>`, required, the whole message. A `byte[]` converts implicitly, so callers holding an array pass it unchanged.
   - `FileName` - `string?`, optional, for traceability only. It never changes the result (detection and extraction stay content-only).
   - Room for later fields: a stream or file-path source (as OLE has) may be added as new optional members without breaking callers. None is added now.
-- `EmlExtractor.Extract(EmlExtractionRequest)` is the only public extraction method. A null request throws `ArgumentNullException` (programmer misuse, ADR-004).
-- `Extract(ReadOnlyMemory<byte>)` is removed from the public surface; `Extract(MimeMessage)` becomes `internal`. Tests and tools that need it use `InternalsVisibleTo`.
+- `EmlExtractor.Extract(EmlExtractionRequest)` is the primary public extraction method. A null request throws `ArgumentNullException` (programmer misuse, ADR-004).
+- Per project owner (2026-10-18), `Extract(ReadOnlyMemory<byte>)` stays public as a thin convenience wrapper: it builds a request with those bytes and no `FileName` and calls the primary method, so both give identical results, warnings, and size-limit behaviour. It holds no logic of its own.
+- `Extract(MimeMessage)` becomes `internal`. Tests and tools that need it use `InternalsVisibleTo`.
 - `EmlExtractor` takes one optional constructor argument, the input-size limit (`ydk:req:extraction/max-input-size`).
 
 ### Detection
@@ -61,11 +62,13 @@ The record and list names are not part of this decision. EML keeps `ExtractedAtt
 ## Alternatives
 - Keep the EML API as is and let the template adapt. Rejected: every consumer then learns two shapes, and `Extract(MimeMessage)` keeps MimeKit in the public contract.
 - Adopt OLE's names wholesale, including `PackagePath`. Rejected for the path field: the brief says "full path", and "package" means nothing for mail.
-- Keep both `Extract(ReadOnlyMemory<byte>)` and `Extract(EmlExtractionRequest)` public. Rejected: two entry points for one operation; the request is the one that can grow.
+- Remove the bytes overload and keep only the request method. Rejected by the project owner (2026-10-18): the brief describes bytes in, and a thin wrapper costs nothing as long as it only forwards to the request method.
+- A batch method, as OLE has (`ExtractManyAsync(IEnumerable<ExtractionRequest>, maxDOP)` returning per-item results with an `Error` slot). Rejected by the project owner (2026-10-18): the factory owns parallelism, each `Extract` call is independent and stateless, and a batch API would duplicate the factory's scheduling (YAGNI). OLE needs per-item error slots because it throws; EML already returns warnings per result. Revisit only if the team's template requires a batch entry point on every extractor (`docs/team-questions.md`).
 - Make detection take a request too (OLE's `MimeDetectionRequest`). Not adopted for EML: the brief's detection is bytes in, and the only extra field (`FileName`) must not affect the answer. Left to the team.
 - Adopt OLE's typed exceptions. Rejected for EML (ADR-004).
 
 ## Consequences
+- No batch API: callers, in practice the factory, run their own parallel loop over `Extract`.
 - Breaking change to every public type: `EmlDetector`, `EmlExtractor`, `ExtractedAttachment`, and new `EmlExtractionRequest` / `EmlDetectionResult`. Acceptable now because there are no consumers.
 - Golden `expected.json` files, GoldenKit, the bench, and the unit tests are updated in Stage 02 to the new names.
 - `README.md` describes today's API until the Stage 02 change lands.

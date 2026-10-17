@@ -7,7 +7,8 @@ The original specification is translated in [docs/requirements.md](../requiremen
 - Detecting whether a byte buffer is a mail message from its content alone, ignoring the file name, as a yes/no and (target) as a typed answer: [ydk:contract:api/eml-detector], [ydk:req:detection/detect-eml], [ydk:entity:extraction/EmlDetectionResult].
 - Rejecting common non-mail formats by their leading bytes. The original spec did not ask for this; it was implemented anyway: [ydk:req:detection/reject-non-email-magic].
 - Accepting files that start with an mbox separator line or a UTF-8 byte-order mark: [ydk:req:extraction/mbox-from-line].
-- The shared team contract for the public surface (target, ADR-012): a request record, [ydk:entity:extraction/EmlExtractionRequest], shared sub-file field names, and no MimeKit types in the public API.
+- The shared team contract for the public surface (target, ADR-012): a request record, [ydk:entity:extraction/EmlExtractionRequest], shared sub-file field names, and no parser-library types in the public API.
+- Supporting both .NET 8 and .NET 10 hosts with identical behaviour, with tests run on both in CI (target, ADR-019): [ydk:req:quality/net8-multi-targeting]. The developer tools stay on .NET 10 only.
 - Refusing inputs over a host-set size limit with a warning (target): [ydk:req:extraction/max-input-size].
 - Extracting every top-level header under one canonical key each, the classic envelope headers in parsed form (with the four address keys always present), and the brief's custom-header field: [ydk:req:metadata/all-headers], [ydk:req:metadata/canonical-keys], [ydk:req:metadata/classic-fields], [ydk:req:metadata/xfields]. The canonical keys and the literal custom-header rule are target (ADR-014, ADR-016).
 - Selecting one main body, with HTML preferred, and reporting its media type: [ydk:req:content/main-content-selection].
@@ -30,7 +31,7 @@ The original specification is translated in [docs/requirements.md](../requiremen
 - Deciding the error model for the OLE extractor, or changing the OLE repo. Divergences are listed for the team.
 - File-type detection of attachments, and parsing inside Office, PDF, image, archive, or calendar files: [ydk:req:attachments/no-recursion].
 - Recursing into nested messages. A forwarded message is one opaque attachment, and callers re-extract it themselves if they need to (ADR-013): [ydk:req:attachments/no-recursion].
-- A batch extraction call. The OLE extractor has one; for this library the caller runs its own parallel loop, since each call is independent.
+- A batch extraction call. The OLE extractor has one; per the project owner (ADR-012) the factory owns parallelism, and each call is independent.
 - Converting HTML to plain text, sanitising HTML, or resolving inline-image references into the body.
 - Decrypting S/MIME or PGP content, or verifying signatures. Signature and encrypted parts are kept as opaque attachments.
 - Reassembling `message/partial` fragments or uuencoded payloads (edge case E24 in [edge-cases.md](../edge-cases.md)).

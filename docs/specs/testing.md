@@ -14,6 +14,8 @@
 
 The unit layer is split by concern. [ydk:test:detection/detector.unit] covers detection, [ydk:test:extraction/extraction.unit] covers metadata and body, [ydk:test:extraction/exotic-language.unit] covers scripts, emoji, and direction, and [ydk:test:attachments/attachment.unit] covers attachments. The seed golden layer is [ydk:test:quality/seed-golden.integration], the realistic-sample layer is [ydk:test:quality/realistic-samples.integration], and the internal corpus layer is [ydk:test:quality/internal-corpus.integration]. The bulk score, the harvest probe, and the load test feed [ydk:nfr:reliability/golden-pass-rate], [ydk:nfr:reliability/real-world-harvest-no-throw], [ydk:nfr:performance/throughput-dop-sweep], and [ydk:nfr:performance/memory-footprint].
 
+Per the project owner (ADR-019), the unit, seed-golden, and realistic-sample layers run on both .NET 8 and .NET 10 in CI, and a failure on either fails the build ([ydk:req:quality/net8-multi-targeting]). The bulk golden gate runs on .NET 10; the developer tools stay on .NET 10 only. This is target behaviour for Stage 02.
+
 ## What is real and what is stubbed
 
 - **Parser.** MimeKit is always real ([ydk:library:deps/mimekit]). Fixtures are written either by MimeKit's own message builder or as raw message text.

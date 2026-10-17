@@ -15,7 +15,7 @@ EML has adopted the proposal below and asks the team to make it the contract for
 | Sub-file path meaning | Container path, `/`-separated, unique per result (ADR-013) | Path inside the package | Same separator, uniqueness, and "relative to the input file" rule for both? |
 | Sub-file record / list names | `ExtractedAttachment` / `Attachments` | `EmbeddedFileItem` / `EmbeddedFiles` | Pick one pair, or keep per-format names? |
 | Main content | `MainContent` + `MainContentMimeType` | `ExtractedText` | Align names? |
-| Batch entry point | none (caller's parallel loop) | `ExtractManyAsync(maxDOP)` | Does the template need a batch method on every extractor? |
+| Batch entry point | none: the factory owns parallelism (owner, 2026-10-18) | `ExtractManyAsync(maxDOP)` | EML will not add one; does the template require it of every extractor? |
 
 Default until answered: EML ships its target names; the template adapter maps OLE.
 
@@ -34,11 +34,21 @@ Neither repo specifies how a component is plugged into the team's extraction tem
 - How does the factory recurse into sub-files: does it call detection on every `BinaryData` and dispatch by `MimeType`? EML leaves nested `.eml` attachments opaque for exactly this (ADR-013).
 - How should paths compose across recursion? EML proposes outer `FullPath` + `/` + inner `FullPath` (for example `fwd.eml/report.docx`). Should the request carry a parent path instead?
 - What does the factory do with warnings: log, store with the record, or fail the file?
-- Which .NET target and packaging (project reference, NuGet) does the template use?
+- Which packaging (project reference, NuGet) does the template use? (Target framework: section 3.)
+- Which GC mode does the factory host use (Workstation or Server)? The load test reports both (ADR-015).
 
 Default: none; this repo stays a standalone class library until the template contract is known.
 
-## 3. License
+## 3. Target framework
+
+Per the owner (ADR-019), the library and its tests target both net8.0 and net10.0, because the template may still run on .NET 8 LTS. .NET 8 support ends on 2026-11-10.
+
+- When does the template move to .NET 10? net8.0 is dropped from this library at that point.
+- Does the template need any other target (for example .NET Framework or netstandard2.0)?
+
+Default: net8.0 + net10.0 until the template moves.
+
+## 4. License
 
 This repo has no license yet. Proposal: MIT, with `THIRD-PARTY-NOTICES.md` (ADR-017). All runtime dependencies (MimeKit, BouncyCastle.Cryptography, System.Security.Cryptography.Pkcs) are MIT; test dependencies are MIT or Apache-2.0.
 
@@ -47,7 +57,7 @@ This repo has no license yet. Proposal: MIT, with `THIRD-PARTY-NOTICES.md` (ADR-
 
 Default: no `LICENSE` file is added until the owner confirms.
 
-## 4. `X_` headers in internal mail
+## 5. `X_` headers in internal mail
 
 The brief says headers starting with `X_` (capital X, underscore) go into `xfields`. Public mail almost always uses `X-`. Per the owner, EML now applies the rule literally (ADR-014): only `X_` counts, case-sensitive, and `X-` headers stay in the general metadata.
 

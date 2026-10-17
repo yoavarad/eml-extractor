@@ -16,12 +16,12 @@ Status legend: **Met** (in code, tested) / **Partial** (in code, gaps listed) / 
 | 6 | Sub-files: name, size, binary | Met; renames Planned | Names differ from OLE (`Name`/`Size`/`Data` vs `FileName`/`SizeInBytes`/`BinaryData`) | Shared names `FileName`, `SizeInBytes`, `BinaryData` (ADR-012) |
 | 7 | Sub-files: full path if it exists | Partial | Set only when the filename contains `/` or `\`; `Content-Location` ignored; no position in the message | `FullPath` = container path, always set, unique per result (`winmail.dat/budget.xlsx`); raw path kept as `OriginalPath`; `ContentLocation` added (ADR-013) |
 | 8 | Sub-files: no deeper extraction | Met; one inconsistency resolved | TNEF unpacked but nested `.eml` opaque (ADR-008 open question) | Keep nested messages opaque; TNEF is a transport wrapper, a nested message is a mail file the factory extracts itself (ADR-013) |
-| 9 | Load test: max files/sec on available hardware, to derive resources | Partial | Single-thread only; synthetic mail; M1 laptop; 0.7 multi-core factor guessed (OLE measured ~0.07-0.1 per core); no RAM measured | DOP sweep 1..cores on real public mail + synthetic, P50/P95, peak working set, alloc bytes per input byte, measured scaling efficiency, hardware block (no "Unknown processor"), sizing formula, committed baseline with warn-only 20% rule (ADR-015) |
+| 9 | Load test: max files/sec on available hardware, to derive resources | Partial | Single-thread only; synthetic mail; M1 laptop; 0.7 multi-core factor guessed, never measured (context: OLE saw 19.8 items/s serial vs 43.5 at 22 cores, 2.2x, ole-extractor ADR-007 lines 64-76); no RAM measured | DOP sweep 1..cores on real public mail + synthetic, P50/P95, peak working set, alloc bytes per input byte, measured scaling efficiency, Workstation and Server GC both reported, large-file pass near the input limit, hardware block (no "Unknown processor"), sizing formula, committed baseline with warn-only regression rule; all thresholds provisional until the first sweep (ADR-015) |
 | 10 | Correctness A: emoji, exotic languages | Partial | One ZWJ emoji row; no skin-tone, flag, keycap, or combining-mark cases | Exact-equality cases for each form and encoding (`ydk:req:content/unicode-fidelity`) |
 | 11 | Correctness B: Office, other emails, attached and pasted images | Partial | CI uses typed stubs; real Office/`.msg`/TNEF samples only in gitignored `corpus/internal/`; those tests pass trivially when the files are absent | Committed realistic samples with provenance and license per sample, run in CI; absent-sample tests report Skipped, never Passed (ADR-018) |
 | 12 | Document edge cases for internal continuation | Met | None for documentation; real-sample gaps listed | `docs/edge-cases.md`, DEFERRED list in `docs/specs/scope.md` |
 | 13 | All open source | Partial | No `LICENSE`; no dependency license audit; transitive `BouncyCastle.Cryptography` undocumented | MIT proposed with `THIRD-PARTY-NOTICES.md` and a CI audit; all runtime deps are MIT (ADR-017). Owner confirmation pending |
-| 14 | C# / .NET 10 | Met | None | ADR-001 |
+| 14 | C# / .NET 10 | Met; net8.0 Planned | Template may still run on .NET 8 LTS (support ends 2026-11-10); net10.0-only library cannot load there | Multi-target net8.0 + net10.0 for library and tests, CI on both; tools stay net10.0; drop net8.0 once the template is on net10 (ADR-019) |
 | 15 | If big capability gap: assess improving C# libs vs another language | Planned | No assessment written (ADR-001 alternatives "not recorded") | `docs/research/csharp-capability-assessment.md`, Stage 02 task (`ydk:req:research/capability-assessment`) |
 | 16 | Component goes into the team's template; team does factory integration | Open | Neither repo specifies the template integration | Shared contract proposed (ADR-012); integration questions in `docs/team-questions.md` |
 
@@ -29,14 +29,14 @@ Status legend: **Met** (in code, tested) / **Partial** (in code, gaps listed) / 
 
 | Gap | Decision / plan |
 | --- | --- |
-| Public `Extract(MimeMessage)` leaks MimeKit types into the API | Made internal; single public `Extract(EmlExtractionRequest)` (ADR-012) |
-| No input-size guard; every attachment held in memory | `maxInputBytes` (default 150 MiB) with `input_too_large` warning; memory ceiling measured (`ydk:req:extraction/max-input-size`, `ydk:nfr:performance/memory-footprint`). Streaming DEFERRED unless measurement demands it |
+| Public `Extract(MimeMessage)` leaks MimeKit types into the API | Made internal; `Extract(EmlExtractionRequest)` primary, `Extract(ReadOnlyMemory<byte>)` kept as a thin wrapper (ADR-012) |
+| No input-size guard; every attachment held in memory | configurable `maxInputBytes` (provisional default 150 MiB, matching Exchange Online's documented 150 MB message limit; final value set from measurement) with `input_too_large` warning; memory ceiling measured (`ydk:req:extraction/max-input-size`, `ydk:nfr:performance/memory-footprint`). Streaming DEFERRED unless measurement demands it |
 | Direction values stored as metadata keys | Removed from metadata; result properties only (ADR-016) |
 | Unexpected exceptions can still escape `Extract` | Already decided in ADR-004 (`internal_error`); Stage 02 |
 
 ## Breaking API change summary (Stage 02)
 
-All of the following change at once, while the library has no consumers: `Extract(EmlExtractionRequest)` replaces the public byte and `MimeMessage` overloads; `EmlDetector.Detect` added; attachment fields renamed and `FullPath` redefined; `OriginalPath` and `ContentLocation` added; `XFields` property removed in favour of `Metadata["xfields"]`; metadata keys change to the canonical form. Golden expectations are regenerated from the catalog, never re-recorded from extractor output (ADR-007).
+All of the following change at once, while the library has no consumers: `Extract(EmlExtractionRequest)` becomes the primary method, the bytes overload becomes a thin wrapper over it, and the `MimeMessage` overload becomes internal; `EmlDetector.Detect` added; attachment fields renamed and `FullPath` redefined; `OriginalPath` and `ContentLocation` added; `XFields` property removed in favour of `Metadata["xfields"]`; metadata keys change to the canonical form. Golden expectations are regenerated from the catalog, never re-recorded from extractor output (ADR-007).
 
 ## OLE lessons
 
@@ -69,6 +69,6 @@ What the sibling extractor does, and whether this repo adopts it.
 | OLE practice | Why not |
 | --- | --- |
 | Typed exceptions | EML keeps no-throw + warnings (ADR-004): one bad message must not abort a batch. Divergence flagged for the team |
-| Batch API `ExtractManyAsync(maxDOP)` | Each call is independent and stateless; the caller's own parallel loop is enough. Revisit if the team's template requires a batch entry point |
+| Batch API `ExtractManyAsync(maxDOP)` | Rejected by the owner (2026-10-18, ADR-012): the factory owns parallelism (YAGNI); each call is independent and stateless, and EML has no exceptions that need per-item error slots |
 | `InputStream` / `FilePath` request sources | DEFERRED; the request record leaves room for them |
 | `DetectedFormat` enum | EML handles one format |

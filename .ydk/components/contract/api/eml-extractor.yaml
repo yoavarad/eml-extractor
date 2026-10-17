@@ -5,16 +5,20 @@ description: >-
   Stateless per call; the static constructor registers CodePagesEncodingProvider once and parser options are a
   static, read-only clone (see ydk:library:deps/mimekit). Caller is expected to have checked the buffer with
   ydk:contract:api/eml-detector first; the extractor does not re-run detection.
-  Target surface (ADR-012, shared team contract; not implemented, Stage 02): the only public method is
-  Extract(EmlExtractionRequest); the constructor takes an optional maxInputBytes (ydk:req:extraction/max-input-size);
-  Extract(MimeMessage) becomes internal (tests and tools reach it through InternalsVisibleTo) so MimeKit types leave the
-  public API; Extract(ReadOnlyMemory<byte>) is removed. Today IEmlExtractor declares Extract(ReadOnlyMemory<byte>) and
+  Target surface (ADR-012, shared team contract; not implemented, Stage 02): Extract(EmlExtractionRequest) is the
+  primary public method; Extract(ReadOnlyMemory<byte>) stays public as a thin wrapper that builds a request and
+  forwards (per project owner 2026-10-18); the constructor takes an optional maxInputBytes
+  (ydk:req:extraction/max-input-size); Extract(MimeMessage) becomes internal (tests and tools reach it through
+  InternalsVisibleTo) so MimeKit types leave the public API. No batch method: the factory owns parallelism. Today IEmlExtractor declares Extract(ReadOnlyMemory<byte>) and
   EmlExtractor also exposes a public Extract(MimeMessage).
   Throw contract (ADR-004, per project owner 2026-10-17; kept by ADR-012): content-driven failures never throw.
   Known content failures map to their existing warnings. After parsing, each stage (metadata, body plus direction,
   attachments) is guarded separately: a stage that throws unexpectedly contributes its empty default and records one
-  ydk:warning:extraction/internal-error naming the stage, while the other stages keep their output. A parse failure
-  stays an empty result with parse_failed. Only programmer misuse (null argument) throws ArgumentNullException.
+  ydk:warning:extraction/internal-error naming the stage, while the other stages keep their output. Stage defaults:
+  metadata -> Metadata with exactly from, to, cc, bcc, xfields, each ""; body -> MainContent and MainContentMimeType
+  null, directions ltr; attachments -> none. A parse failure stays an empty result with parse_failed, using the same
+  defaults (the five fixed metadata keys present as ""). Only programmer misuse (null argument) throws
+  ArgumentNullException.
   Current code (gap, Stage 02 work): the byte overload catches only the seven exception types listed on
   ydk:warning:extraction/parse-failed and lets others propagate; the MimeMessage overload has no try/catch.
 methods:
@@ -44,9 +48,10 @@ methods:
       - ydk:warning:extraction/internal-error
   Extract(ReadOnlyMemory<byte>):
     description: >-
-      Current public method; removed from the public surface by ADR-012 (Stage 02). Same behaviour as
-      Extract(EmlExtractionRequest) without the input-size guard. Wrapped without copy when backed by a full array
-      (offset 0, full length); otherwise copied once.
+      Convenience overload, kept public (ADR-012, per project owner 2026-10-18). Target (Stage 02): a thin wrapper
+      equal to Extract(new EmlExtractionRequest { FileBytes = eml }), so results, warnings, and the input-size guard
+      are identical; no logic of its own. Today it holds the extraction logic itself and has no size guard. Wrapped
+      without copy when backed by a full array (offset 0, full length); otherwise copied once.
     params:
       eml:
         type: ReadOnlyMemory<byte>
@@ -55,6 +60,7 @@ methods:
       type: EmlExtractionResult
       description: ydk:entity:extraction/EmlExtractionResult ; never null.
     raises:
+      - ydk:warning:extraction/input-too-large
       - ydk:warning:extraction/parse-failed
       - ydk:warning:extraction/body-decode-failed
       - ydk:warning:extraction/part-decode-failed

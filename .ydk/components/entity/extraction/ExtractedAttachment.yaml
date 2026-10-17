@@ -17,9 +17,11 @@ fields:
       Basename of the MIME filename (Content-Type name / Content-Disposition filename), trimmed of
       whitespace and surrounding quotes; path separators / and \ removed by taking the last segment.
       Empty, "." or ".." after that counts as nameless. Fallbacks when nameless: "<content-id without angle
-      brackets>.<media-subtype>" if a Content-ID exists, else "part-<index>.<media-subtype>" (index = attachments
-      collected so far, subtype "bin" if empty); nested message/rfc822 without a name -> "attached.eml".
-      "/" and "\" inside a fallback name are replaced by "_". Today this field is named Name.
+      brackets>.<media-subtype>" if a Content-ID exists, else "part-<index>.<media-subtype>" (index = records emitted
+      before this part in the processing order of ydk:req:attachments/container-path , from 0; subtype "bin" if
+      empty); nested message/rfc822 without a name -> "attached.eml". In a fallback name every character of
+      / \ : * ? " < > | and every control character is replaced by "_". Not filesystem-safe (reserved device names,
+      ":" streams, trailing dots/spaces possible); consumers sanitise before writing files. Today this field is named Name.
     description: File name to present for this part.
   SizeInBytes:
     type: long
@@ -33,8 +35,9 @@ fields:
     nullable: false
     constraints: >-
       Container path per ydk:req:attachments/container-path : container segments (TNEF wrapper name) then FileName,
-      joined by "/"; equals FileName for parts outside any container; unique within the result (case-insensitive,
-      "~<n>" suffix on collision). Today: the raw trimmed filename only when it contains / or \, otherwise null.
+      joined by "/"; equals FileName for parts outside any container; unique within the result (ordinal
+      case-insensitive, two-pass "~<n>" suffix on collision). A key, not a filesystem-safe path. Today: the raw
+      trimmed filename only when it contains / or \, otherwise null.
     description: Position of the subfile inside the message (brief "full path").
   BinaryData:
     type: byte[]
@@ -70,7 +73,7 @@ fields:
     required: true
     nullable: true
     constraints: >-
-      Decoded, trimmed Content-Location header value of the part; null when absent. Not used to build FullPath.
+      Decoded, trimmed Content-Location header value of the part, else null. Not used to build FullPath.
       Target (ADR-013); today Content-Location is ignored.
     description: Location the sender declared for this part (often a URL).
 state_transitions: {}

@@ -12,7 +12,8 @@ measurement: >-
   main_content, main_content_mime, attachment_count, and per-attachment presence/size/sha/disposition/path checks;
   prints totals and per-tag pass rates; exits 1 when any case fails.
 test_method: >-
-  Target (ADR-011, accepted, implementation pending as Stage 02 work): CI runs the GoldenKit score over all
+  Target (ADR-011, accepted, implementation pending as Stage 02 work): CI runs the GoldenKit score (net10.0; net8.0
+  optional per ADR-019) over all
   1200 bulk + 12 seed cases and fails when the result is below the 1212/1212 baseline. Current state: only the
   seed set (12 cases) runs in CI, via dotnet test; the bulk set is run manually with the score command and the
   report is committed to docs/golden-score.txt.

@@ -12,7 +12,7 @@ The list is flat and follows document order. No record nests inside another.
 
 Per the project owner (ADR-013), the full path tells the caller where in the message a file came from. It lists the file containers the part was found in, then the file's own name ([ydk:req:attachments/container-path]). A file attached directly to the message has a path equal to its name. A file unpacked from an Outlook wrapper has the wrapper's name in front, so the factory can see that a spreadsheet arrived inside `winmail.dat`. Multipart structure is not a file container and adds nothing.
 
-The path never includes the name the caller gave the whole message. When two files would end up with the same path, the later one gets a numbered suffix, so every path in one result is unique and safe to use as a key. The displayed name stays as the sender wrote it.
+The path never includes the name the caller gave the whole message. Files are visited in one fixed order, and when two files would end up with the same path, the later one gets a numbered suffix that never takes a name another file already has, so every path in one result is unique and usable as a key. The displayed name stays as the sender wrote it. Neither the name nor the path is safe to use directly as a file name on disk: reserved device names and characters some file systems reject can survive, so a consumer that writes files must clean them first.
 
 Two other location hints are kept beside the path, never mixed into it: the sender's original filename when it contained directory parts, and the part's declared content location. Both are sender-controlled, so they are reported and not trusted ([cross-cutting.md](cross-cutting.md), path traversal).
 
@@ -29,7 +29,7 @@ ADR-013 confirms that nested messages stay opaque. A nested message is a complet
 
 ## Outlook TNEF wrappers
 
-Outlook sometimes wraps all attachments in a single proprietary container, `winmail.dat`. The library unpacks it into the files it holds, using MimeKit's TNEF support ([ydk:library:deps/mimekit]), and walks those files like any other part ([ydk:req:attachments/tnef-unwrap]). The wrapper is a transport envelope around the outer message's own attachments, not a file the sender chose to attach, which is why it is unpacked while nested messages are not (ADR-013). Each unpacked file's path starts with the wrapper's name. If unpacking fails, the container itself is returned and [ydk:warning:extraction/tnef-extract-failed] is recorded.
+Outlook sometimes wraps all attachments in a single proprietary container, `winmail.dat`. The library unpacks it into the files it holds, using the parser library's TNEF support ([ydk:library:deps/mimekit]), and walks those files like any other part ([ydk:req:attachments/tnef-unwrap]). The wrapper is a transport envelope around the outer message's own attachments, not a file the sender chose to attach, which is why it is unpacked while nested messages are not (ADR-013). Each unpacked file's path starts with the wrapper's name. If unpacking fails, the container itself is returned and [ydk:warning:extraction/tnef-extract-failed] is recorded.
 
 ## Pasted images
 

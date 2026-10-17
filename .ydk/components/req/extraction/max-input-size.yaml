@@ -3,15 +3,19 @@ id: ydk:req:extraction/max-input-size
 description: >-
   Input-size guard. Target; not implemented (Stage 02). Today nothing caps input size and all attachments are decoded
   into memory, so one oversized message can exhaust the host's RAM. Streaming stays DEFERRED (docs/specs/scope.md)
-  unless ydk:nfr:performance/memory-footprint shows the in-memory model cannot meet its ceiling.
+  unless ydk:nfr:performance/memory-footprint shows the in-memory model cannot meet its ceiling. Per project owner
+  (2026-10-18), measure first: the default limit is a provisional placeholder until the first sweep.
 type: constraint
 priority: high
 rule: >-
-  EmlExtractor has one optional constructor parameter maxInputBytes (long, default 157286400 = 150 MiB, the largest
-  message size Exchange Online accepts; must be > 0, otherwise ArgumentOutOfRangeException at construction).
-  When EmlExtractionRequest.FileBytes.Length > maxInputBytes, Extract does not parse: it returns a result with
-  ydk:warning:extraction/input-too-large , Metadata holding only the fixed keys with "" (ydk:req:metadata/canonical-keys),
-  MainContent null, no attachments, directions ltr. A length equal to the limit is parsed. The detector is not limited:
+  EmlExtractor has one optional constructor parameter maxInputBytes (long; must be > 0, otherwise
+  ArgumentOutOfRangeException at construction). The limit is always configurable by the host. Default: provisional
+  placeholder 157286400 (150 MiB), chosen to match the 150 MB maximum message size Microsoft documents for Exchange
+  Online; it says nothing about other mail services. The load-test task sets the final default from measured memory
+  plus headroom (ydk:nfr:performance/memory-footprint). When EmlExtractionRequest.FileBytes.Length > maxInputBytes,
+  Extract does not parse: it returns a result with ydk:warning:extraction/input-too-large , Metadata holding only the
+  fixed keys with "" (ydk:req:metadata/canonical-keys), MainContent null, no attachments, directions ltr. A length
+  equal to the limit is parsed. The bytes convenience overload applies the same limit. The detector is not limited:
   it reads at most 16 KB.
 failure_behavior: Records ydk:warning:extraction/input-too-large ; never throws.
 related_components:
@@ -22,4 +26,4 @@ acceptance_criteria:
   - With maxInputBytes 1024, a 1025-byte message gives exactly one warning starting with "input_too_large" and no attachments
   - With maxInputBytes 1024, a 1024-byte message is extracted normally
   - new EmlExtractor(0) throws ArgumentOutOfRangeException
-  - Default construction accepts a 150 MiB input and rejects 150 MiB + 1 byte
+  - Default construction accepts an input exactly at the default limit and rejects one byte more

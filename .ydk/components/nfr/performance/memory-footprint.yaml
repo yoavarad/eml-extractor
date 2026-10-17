@@ -4,20 +4,25 @@ description: >-
   Memory ceiling for extraction (ADR-015). Target; not implemented (Stage 02). Today no RAM is measured. Allocation
   rates in docs/perf-results.md imply about 3.9 allocated bytes per input byte for the 1 MB attachment message
   (1,363 MB/s at 259/s on 1,351,406 B) and about 6.8 for the 20 KB HTML message (2,893 MB/s at 16,881/s on 25,433 B).
+  Per project owner (2026-10-18), measure first: every number in target, measurement, and test_method below is
+  provisional, a stated placeholder until the first sweep; the load-test task sets each from measured data plus
+  headroom and records the source run.
 category: performance
 tags: [memory, baseline]
 target: >-
-  Allocated bytes per input byte A <= 8 on the public-corpus mix; peak working-set growth for one extraction of a
-  maxInputBytes input (150 MiB by default) <= 10 x maxInputBytes (1.5 GiB). M = measured peak working-set growth per
-  input byte on that case, recorded in docs/perf-baseline.json.
+  Provisional placeholders, set from measured data plus headroom by the load-test task: allocated bytes per input
+  byte A <= 8 on the public-corpus mix; peak working-set growth for one extraction of a maxInputBytes input
+  <= 10 x maxInputBytes. M = measured peak working-set growth per input byte on that case, recorded in
+  docs/perf-baseline.json.
 measurement: >-
-  A = GC allocated-bytes delta over the sweep window / input bytes processed. Max-input case: one generated message
-  of exactly maxInputBytes holding one base64 attachment, extracted on one thread after a forced full GC; working set
-  sampled every 50 ms; M = (peak - pre-run working set) / input bytes.
+  A = GC allocated-bytes delta over the sweep window / input bytes processed. Large-file pass (ADR-015): generated
+  messages at 25%, 50%, and 100% of maxInputBytes, each with one base64 attachment, extracted on one thread after a
+  forced full GC; working set sampled at a fixed interval (provisional 50 ms); M = (peak - pre-run working set) /
+  input bytes.
 test_method: >-
-  Same run as ydk:nfr:performance/throughput-dop-sweep ; warn-only regression when A or P(ProcessorCount) is more
-  than 20% above the comparable baseline. If M exceeds 10, streaming moves from DEFERRED to IN scope
-  (docs/specs/scope.md).
+  Same run as ydk:nfr:performance/throughput-dop-sweep ; warn-only regression when A or P(ProcessorCount) rises by
+  more than the threshold (provisional 20%) versus the comparable baseline. If the measured M exceeds the ceiling
+  that the load-test task sets, streaming moves from DEFERRED to IN scope (docs/specs/scope.md).
 monitoring: none (library; no runtime telemetry)
 applies_to:
   - ydk:contract:api/eml-extractor

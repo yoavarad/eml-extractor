@@ -22,23 +22,33 @@ Per project owner, 2026-10-17.
 - It is relative to the message given to `Extract`. It never includes the request's `FileName`.
 - It is always set (never null). For a part not inside any file container, `FullPath` equals `FileName`.
 - Containers that add a segment: a TNEF wrapper (segment = the wrapper's `FileName`, usually `winmail.dat`) and a nested message (segment = its `FileName`, for example `fwd.eml`). MIME multipart nodes are structure, not files, and add no segment.
+- A TNEF wrapper without a usable filename uses the segment `winmail.dat`, the name Outlook gives these wrappers. The wrapper is not itself reported, so this name appears only as a path segment; if two nameless wrappers yield files with equal paths, the collision rule below separates them.
 - Because nested messages stay opaque (below), the only container one `Extract` call passes through is a TNEF wrapper. Example: `winmail.dat/budget.xlsx`.
 - A caller that re-extracts a nested message composes the deeper path itself: inner path = outer `FullPath` + `/` + inner `FullPath`, for example `fwd.eml` + `/` + `report.docx` = `fwd.eml/report.docx`. The golden harness `reextract` check does the same.
 
 ### Segment names
 - Each segment is a `FileName` as produced by the naming rules: the last segment of the sender's filename after splitting on `/` and `\`, trimmed of whitespace and quotes.
 - A filename that is empty, `.` or `..` after that step counts as nameless.
-- Nameless parts use the existing fallbacks: `<content-id>.<subtype>` when a Content-ID exists, otherwise `part-<index>.<subtype>` (index = attachments collected so far; subtype `bin` when empty); a nameless nested message is `attached.eml`.
-- In a fallback name, `/` and `\` (possible inside a Content-ID) are replaced by `_`, so a segment never contains the separator.
+- Nameless parts use the existing fallbacks: `<content-id>.<subtype>` when a Content-ID exists, otherwise `part-<index>.<subtype>` (index = number of attachment records emitted before this part in the processing order below, starting at 0; subtype `bin` when empty); a nameless nested message is `attached.eml`.
+- In a fallback name (Content-ID and subtype text), every character in the set `/ \ : * ? " < > |` and every control character (U+0000-U+001F, U+007F) is replaced by `_`. A segment therefore never contains the separator. Sender-supplied filenames are not rewritten beyond taking the last segment.
+
+### Not filesystem-safe
+- `FileName` and `FullPath` are identifiers inside the result, not safe file-system paths. They may still contain reserved device names (`CON`, `NUL`, `COM1`, ...), `:` (an NTFS alternate-data-stream marker), trailing dots or spaces, characters invalid on some file systems, or very long names. A consumer that writes files must sanitise them first. The library promises only the uniqueness rule below.
+
+### Processing order
+- Records are produced in one deterministic order: depth-first document order of the MIME tree; when a TNEF wrapper is met, its unpacked files are processed at the wrapper's position, in the order the container lists them, before the walk continues.
+- `part-<index>` and the collision rule both use this order.
 
 ### Name collisions
-- `FullPath` is unique within one result. Paths are compared ordinal, case-insensitive, so they are safe on case-insensitive file systems.
-- When a path is already taken, the last segment gets `~<n>` inserted before its extension, with n = 2, 3, ... the smallest free number: `image001.png`, `image001~2.png`. The extension is the text from the last `.` that is not the first character; a segment without one gets `~<n>` appended.
+- `FullPath` is unique within one result under ordinal, case-insensitive comparison (invariant upper-casing). This is a key-uniqueness rule, not a file-system guarantee.
+- Two passes. Pass 1 computes every record's literal path (segments + `FileName`) and reserves the set of all literal paths. Pass 2 walks the records in processing order: the first record with a given literal path keeps it; each later duplicate gets `~<n>` inserted before the extension of its last segment, with n = 2, 3, ... the smallest number whose resulting path is neither in the reserved set nor already assigned. A literal path such as `image001~2.png` is therefore never displaced.
+- The extension is the text from the last `.` of the last segment that is not its first character; a segment without one gets `~<n>` appended.
+- Example (testable): parts named `image001.png`, `image001.png`, `image001~2.png`, in that order, get `image001.png`, `image001~3.png`, `image001~2.png`.
 - `FileName` is not changed by de-duplication.
 
 ### Additional location info
 - `OriginalPath` (`string?`): the raw, trimmed sender filename when it contains `/` or `\`, else null. This is today's `FullPath` meaning, kept so path information is "neither lost nor trusted".
-- `ContentLocation` (`string?`): the part's `Content-Location` header value, decoded and trimmed, else null. For TNEF-unpacked files it is null unless MimeKit exposes one on the unpacked part.
+- `ContentLocation` (`string?`): the part's `Content-Location` header value, decoded and trimmed, else null.
 - Neither is used to build `FullPath`. Callers must not use either to write files.
 
 ### Nested messages stay opaque
