@@ -1,7 +1,7 @@
 # ADR-001: C# / .NET 10 class library stack
 
 ## Status
-Accepted (recorded retroactively, Stage 01 Rewrite)
+Accepted (recorded retroactively, Stage 01 Rewrite). Amended by ADR-019: the library and test projects also target net8.0 (target, Stage 02).
 
 ## Context
 The original (Hebrew) specification, as translated in `docs/requirements.md`, states "Implementation: C# / .NET 10". The first commit (`dd83290`, "Add .NET 10 EML extraction core with tagged golden set") shipped the library on that stack.
@@ -14,7 +14,7 @@ The original (Hebrew) specification, as translated in `docs/requirements.md`, st
 - CI gates (`.github/workflows/ci.yml`): `dotnet build -p:TreatWarningsAsErrors=true`, `dotnet format --verify-no-changes`, `dotnet test`, and a vulnerable-package audit that fails on High/Critical.
 
 ## Alternatives
-Not recorded in the repo. The original specification set the stack.
+Not recorded in the repo. The original specification set the stack. The brief also asks for an assessment of improving C# libraries versus another language if a large capability gap exists; it will be written as `docs/research/csharp-capability-assessment.md` (Stage 02 task, `ydk:req:research/capability-assessment`) and linked here.
 
 ## Consequences
 - Consumers must target .NET 10 or later.

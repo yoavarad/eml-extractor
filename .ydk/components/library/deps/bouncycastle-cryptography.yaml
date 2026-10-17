@@ -1,0 +1,19 @@
+$schema: ydk:schema:library
+id: ydk:library:deps/bouncycastle-cryptography
+description: >-
+  Cryptography library pulled in transitively by MimeKit 4.18.0 (S/MIME and PGP support inside MimeKit). Shipped with
+  the library at runtime but not called by library code. Previously undocumented; recorded by the license audit
+  (ADR-017). Ships a net6.0 asset, consumed by both net8.0 and net10.0 (ADR-019).
+package: BouncyCastle.Cryptography
+registry: nuget
+version: 2.7.0
+license: MIT
+referenced_by:
+  - src/EmlExtraction/EmlExtraction.csproj (transitive via MimeKit; resolved version in obj/project.assets.json)
+direct: false
+features_used:
+  - None directly. The library never verifies signatures or decrypts (docs/specs/scope.md OUT); S/MIME parts are opaque attachments.
+failure_modes:
+  - CI vulnerability audit (dotnet list package --vulnerable --include-transitive) fails the build on High/Critical findings
+used_by:
+  - ydk:library:deps/mimekit

@@ -1,0 +1,50 @@
+$schema: ydk:schema:req
+id: ydk:req:attachments/container-path
+description: >-
+  Brief "full path if it exists" read as the subfile's position inside the message (ADR-013). Target; not implemented
+  (Stage 02). Today FullPath is the raw filename only when it contains / or \ and is otherwise null.
+type: business-rule
+priority: high
+rule: >-
+  For every ydk:entity:extraction/ExtractedAttachment , FullPath is non-null and equals the segments of the file
+  containers the part was reached through, followed by the part's FileName, joined by "/".
+  Container segments: a TNEF wrapper (ydk:req:attachments/tnef-unwrap) contributes its FileName, or "winmail.dat" when
+  it has no usable filename; a nested message would contribute its FileName, but nested messages are not entered
+  (ydk:req:attachments/no-recursion), so within one Extract call the only possible container is a TNEF wrapper. MIME
+  multipart nodes contribute nothing. The path is relative to the message passed in and never includes
+  EmlExtractionRequest.FileName.
+  Processing order: depth-first document order of the MIME tree; a TNEF wrapper's unpacked files are processed at the
+  wrapper's position, in container order. part-<index> fallback names and de-duplication use this order.
+  Segment names: FileName as produced by the naming rule on the entity (basename after splitting on / and \, trimmed);
+  an empty, "." or ".." basename counts as nameless and takes the fallback name; in a fallback name every character of
+  / \ : * ? " < > | and every control character (U+0000-U+001F, U+007F) is replaced by "_".
+  Uniqueness (two passes): pass 1 computes each record's literal path and reserves the set of all literal paths; pass 2,
+  in processing order, lets the first record with a literal path keep it and gives each later duplicate "~<n>" before
+  the extension of its last segment (the text from the last "." that is not the first character; appended when none),
+  with n the smallest integer from 2 whose path is neither reserved nor already assigned. Comparison is ordinal
+  case-insensitive (invariant upper-casing). FileName is never changed by de-duplication.
+  Not filesystem-safe: FileName and FullPath may contain reserved device names (CON, NUL, COM1), ":" (NTFS stream
+  marker), trailing dots or spaces, or other characters invalid on some file systems; consumers sanitise before
+  writing files. Only uniqueness is promised.
+  Additional info: OriginalPath = raw trimmed sender filename when it contains / or \, else null; ContentLocation =
+  decoded, trimmed Content-Location header value of the part, else null. Neither is used to build FullPath.
+  Caller composition for re-extracted nested messages: inner path = outer FullPath + "/" + inner FullPath.
+failure_behavior: >-
+  Not a failure path. A part skipped by ydk:warning:extraction/part-decode-failed has no FullPath and does not
+  reserve one.
+related_components:
+  - ydk:entity:extraction/ExtractedAttachment
+  - ydk:req:attachments/attachment-record
+  - ydk:req:attachments/tnef-unwrap
+  - ydk:req:attachments/no-recursion
+acceptance_criteria:
+  - A top-level report.docx has FileName "report.docx" and FullPath "report.docx"
+  - A file budget.xlsx unpacked from winmail.dat has FullPath "winmail.dat/budget.xlsx"
+  - A file budget.xlsx unpacked from a TNEF wrapper with no filename has FullPath "winmail.dat/budget.xlsx"
+  - A forwarded fwd.eml has FullPath "fwd.eml"; re-extracting it and prefixing gives "fwd.eml/report.docx" for its report.docx
+  - Parts named image001.png, image001.png, image001~2.png (in that order) get FullPath image001.png, image001~3.png, image001~2.png; all keep their FileName
+  - Parts named Report.PDF and report.pdf get FullPath Report.PDF and report~2.pdf
+  - Filename "../../etc/passwd.txt" gives FileName "passwd.txt", FullPath "passwd.txt", OriginalPath "../../etc/passwd.txt"
+  - A part with Content-Location "http://example.com/a.png" reports it in ContentLocation and not in FullPath
+  - A nameless image/png part whose Content-ID is "a/b:c*d@x" gets FileName and FullPath "a_b_c_d@x.png"
+  - A nameless second attachment after one named record gets part-1.<subtype>

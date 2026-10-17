@@ -4,6 +4,8 @@ description: >-
   Single-thread extract throughput on a tiny message (plain headers + 1-char body, 221 B), in-memory byte[] input,
   no disk I/O. Recorded baseline from docs/perf-results.md (Apple M1 Pro, 10 logical cores, arm64, macOS 27.0.0,
   .NET 10.0.12, Release, 2026-09-15). This is a measured baseline, not a contractual SLA; the repo states no target.
+  Multi-core capacity is not derived from this figure: the former "x cores x 0.7" estimate is withdrawn (ADR-015) and
+  replaced by measured scaling in ydk:nfr:performance/throughput-dop-sweep .
 category: performance
 tags: [throughput, baseline]
 target: 48663
@@ -13,8 +15,8 @@ measurement: >-
   Stopwatch window on one thread; report count / elapsed seconds. Also reported: 1,127 alloc MB/s.
 test_method: >-
   dotnet run --project benches/EmlExtraction.Bench -c Release; read the "tiny" row. Re-measure on target hardware
-  (docs/perf-results.md: "M1 Pro != production Xeon/AMD"). Capacity estimate:
-  files_per_sec_total ~= extract_per_sec_single_thread x cores_used x 0.7.
+  (docs/perf-results.md: "M1 Pro != production Xeon/AMD"). For sizing use the DOP sweep and its formula
+  (ydk:nfr:performance/throughput-dop-sweep).
 monitoring: none (library; no runtime telemetry)
 applies_to:
   - ydk:contract:api/eml-extractor

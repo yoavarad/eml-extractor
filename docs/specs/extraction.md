@@ -1,26 +1,36 @@
 # Extraction - metadata, main content, direction
 
-The extractor, [ydk:contract:api/eml-extractor], turns one message into one [ydk:entity:extraction/EmlExtractionResult]. This page covers everything in that result except attachments, which have their own page ([attachments.md](attachments.md)).
+The extractor, [ydk:contract:api/eml-extractor], turns one request into one [ydk:entity:extraction/EmlExtractionResult]. This page covers everything in that result except attachments, which have their own page ([attachments.md](attachments.md)).
+
+## The request
+
+Per the shared team contract (ADR-012), the caller passes a request, [ydk:entity:extraction/EmlExtractionRequest], holding the message bytes and, optionally, the caller's name for the file. The name is for the caller's own tracing; it never changes the result. A request leaves room to add other input sources later without breaking callers. Per the project owner (2026-10-18), the call that takes plain bytes stays as a convenience: it only wraps the bytes in a request and forwards, so both calls give the same result. There is no batch call; the factory runs messages in parallel itself. The parsed-message entry point that exposed parser-library types becomes internal. This is target behaviour: today the public methods take raw bytes or an already-parsed message object, and the change lands in Stage 02. It is a breaking change, made now while the library has no consumers.
+
+## Input size
+
+Before parsing, the extractor compares the input length with a limit the host can set when it creates the extractor ([ydk:req:extraction/max-input-size]). The default is a provisional placeholder until the load test has measured real memory use; the host can always change it. A longer input is not parsed: the result is empty apart from the fixed metadata keys, and [ydk:warning:extraction/input-too-large] is recorded. This keeps one oversized file from exhausting the host's memory, since every attachment is held in memory. The memory each message needs is measured, not guessed ([ydk:nfr:performance/memory-footprint]). Today there is no limit; adding it is Stage 02 work.
 
 ## Parsing
 
-Parsing is delegated to MimeKit, [ydk:library:deps/mimekit] (ADR-002). The parser runs in its lenient modes for addresses, header parameters, and encoded words. The repo does not record why these modes were chosen (open question in ADR-002). When the buffer starts with an mbox separator line, the parser reads it as an mbox stream and keeps only the first message ([ydk:req:extraction/mbox-from-line]). Commit 251657d records that mbox separator lines and missing code-page registration were breaking extraction on the SpamAssassin corpus and on Outlook TNEF wrappers.
+Parsing is delegated to the parser library, [ydk:library:deps/mimekit] (ADR-002). The parser runs in its lenient modes for addresses, header parameters, and encoded words. The repo does not record why these modes were chosen (open question in ADR-002). When the buffer starts with an mbox separator line, the parser reads it as an mbox stream and keeps only the first message ([ydk:req:extraction/mbox-from-line]). Commit 251657d records that mbox separator lines and missing code-page registration were breaking extraction on the SpamAssassin corpus and on Outlook TNEF wrappers.
 
 ## Metadata
 
 The metadata map, [ydk:entity:extraction/Metadata], is built in three passes.
 
-1. **Every header.** Every top-level header is copied, decoded and unfolded, under a predictable key derived from its name. Repeated headers are kept, not dropped. This meets the original requirement to capture "as many headers as possible" ([ydk:req:metadata/all-headers]).
-2. **Classic overlay.** The usual envelope headers (addresses, subject, date, message identifiers, trace headers) are then written under fixed keys from MimeKit's parsed view, replacing the raw copy where both exist ([ydk:req:metadata/classic-fields]). The four address keys are always present, so callers can index them without a missing-key check. When a header is absent, its key holds an empty string (ADR-005).
-3. **Direction keys.** The two direction values described below are added last.
+1. **Every header.** Every top-level header is copied, decoded and unfolded, under one key derived from its name. Repeated headers are kept, not dropped. This meets the original requirement to capture "as many headers as possible" ([ydk:req:metadata/all-headers]).
+2. **Classic overlay.** The usual envelope headers (addresses, date, message identifiers) are rewritten in place from the parser's structured view, under the same key, so each header has one key only ([ydk:req:metadata/classic-fields]). The four address keys are always present, so callers can index them without a missing-key check. When a header is absent, its key holds an empty string (ADR-005).
+3. **Custom headers.** The joined custom-header string described below is added under its own fixed key.
 
-The exact key names and value formats are in [ydk:entity:extraction/Metadata].
+The keying rule is in [ydk:req:metadata/canonical-keys] (ADR-016). A key is the header name in lower case and nothing else, so two headers that differ only by a dash versus an underscore no longer merge. The text direction values are not metadata; they are reported only beside it on the result. The four address keys and the custom-header key are present in every result, including one for a message that could not be parsed ([ydk:warning:extraction/parse-failed]).
 
-If the message cannot be parsed at all, the map is empty ([ydk:warning:extraction/parse-failed]).
+Today the code still derives keys by folding dashes into underscores, writes a second key for each classic header, puts the two direction values in the map, and returns an empty map on parse failure. Closing these gaps is Stage 02 work. The exact key names and value formats are in [ydk:entity:extraction/Metadata].
 
 ## Custom headers
 
-The original specification asks for all fields starting with "X_" to be joined into one long string. Real mail writes custom headers as "X-", so both prefixes count. Each matching header becomes one "name: value" line in header order. The lines are joined into one string on the result and are also kept in the metadata map ([ydk:req:metadata/xfields]). Authentication headers such as DKIM signatures are not custom headers and never appear in this string.
+The original specification asks for all fields starting with a capital X and an underscore to be joined into one long string in a metadata field. Per the project owner (ADR-014), the rule is applied literally: only header names that begin with exactly those two characters count. Headers that begin with an X and a dash, the usual internet form, are not part of the string; they stay in the general metadata under their own keys. Each matching header becomes one "name: value" line in header order, and the lines are joined into one string held in the metadata map ([ydk:req:metadata/xfields]). Authentication headers such as DKIM signatures never appear in it.
+
+Today the code also matches the dash form, ignores case, and returns the string as a separate property instead of a metadata field. This changes in Stage 02. Whether the team's internal mail uses the underscore form is an open question in [docs/team-questions.md](../team-questions.md).
 
 ## Main content
 
@@ -32,6 +42,10 @@ One body part is chosen as the main content ([ydk:req:content/main-content-selec
 - A text part marked as an attachment is never the body. A named calendar file therefore stays an attachment.
 
 HTML is returned as markup with its inline-image references and direction attributes intact. The result also reports the chosen part's media type next to it, so callers know whether they got markup; both are empty when no body was chosen. If the chosen part cannot be decoded, the body is empty and [ydk:warning:extraction/body-decode-failed] is recorded.
+
+## Exotic languages and emoji
+
+The original correctness requirement covers emoji and exotic languages. Text comes back exactly as the sender wrote it: no normalisation and no stripping, whatever transfer or header encoding carried it ([ydk:req:content/unicode-fidelity]). Besides the seven scripts already tested, the requirement adds the emoji forms that break naive decoders: joined family sequences, skin-tone modifiers, national flags, keycaps, and letters with combining marks. Each is checked for exact equality. The added cases are target behaviour, tested from Stage 02.
 
 ## Text direction
 
@@ -47,7 +61,9 @@ Direction is reported, never applied. The text keeps its bidi marks, and the HTM
 
 ## Failure handling
 
-Content never makes extraction throw ([ydk:req:extraction/no-throw-on-malformed], ADR-004). Per the project owner (2026-10-17), the downstream indexer and language-model pipeline extracts messages in batches, and one bad message must not abort the batch. Both ways of calling the extractor behave the same. A whole-message parse failure returns an empty result with [ydk:warning:extraction/parse-failed]. A failure in one part affects that part only and is recorded as a warning while the rest of the message is still extracted. Any other, unexpected failure is caught too and recorded as [ydk:warning:extraction/internal-error], naming the stage that failed and the kind of failure. The three stages, headers, body with direction, and attachments, are guarded separately: a stage that fails comes back empty while the others keep their output. Per the project owner (2026-10-17), a partial result beats nothing for the downstream pipeline; for example, the headers survive a crash while choosing the body. Only a message that cannot be parsed at all comes back fully empty, with [ydk:warning:extraction/parse-failed]. That warning means a library bug, so the tests and the golden scorer fail whenever it appears, and bugs surface in CI instead of hiding. Only programmer misuse, such as passing no message at all, still throws.
+Content never makes extraction throw ([ydk:req:extraction/no-throw-on-malformed], ADR-004). Per the project owner (2026-10-17), the downstream indexer and language-model pipeline extracts messages in batches, and one bad message must not abort the batch. ADR-012 keeps this model for the shared contract; the OLE extractor throws typed exceptions instead, a divergence the team must settle ([docs/team-questions.md](../team-questions.md)).
+
+A whole-message parse failure returns an empty result with [ydk:warning:extraction/parse-failed]. A failure in one part affects that part only and is recorded as a warning while the rest of the message is still extracted. Any other, unexpected failure is caught too and recorded as [ydk:warning:extraction/internal-error], naming the stage that failed and the kind of failure. The three stages, headers, body with direction, and attachments, are guarded separately: a stage that fails comes back empty while the others keep their output. An empty header stage still carries the four address keys and the custom-header key, each holding an empty string, so callers never miss a key; the same holds for a message that could not be parsed ([ydk:req:metadata/canonical-keys]). Per the project owner (2026-10-17), a partial result beats nothing for the downstream pipeline; for example, the headers survive a crash while choosing the body. Only a message that cannot be parsed at all, or one over the size limit, comes back empty. An internal-error warning means a library bug, so the tests and the golden scorer fail whenever it appears, and bugs surface in CI instead of hiding. Only programmer misuse, such as passing no request at all, still throws.
 
 The code does not do this yet: today it catches a fixed list of failure kinds when parsing bytes, lets any other kind escape, and catches nothing at the top level when given an already-parsed message. Closing that gap is Stage 02 work. The warning format is defined once in [cross-cutting.md](cross-cutting.md).
 

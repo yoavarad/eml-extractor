@@ -1,0 +1,21 @@
+$schema: ydk:schema:req
+id: ydk:req:research/capability-assessment
+description: >-
+  Brief: "if there is a big capability gap, assess improving C# libraries versus another language". ADR-001 records no
+  alternatives. Target; not produced yet (Stage 02 task).
+type: policy
+priority: medium
+rule: >-
+  docs/research/csharp-capability-assessment.md exists and, for each brief capability (detection, header metadata,
+  main content, subfiles including TNEF and nested mail, unicode, throughput), compares MimeKit on .NET 10 with at least
+  Python (email stdlib), Java (Jakarta Mail with Apache POI HMEF for TNEF), and Go (net/mail with enmime). Each row
+  states: supported yes/no/partial, evidence (link or measured result), license. The document ends with one of:
+  "no big gap - stay on C#", "improve a named C# library (contribution plan)", or "move capability X to language Y",
+  and ADR-001's Alternatives section links to it.
+failure_behavior: Not a runtime rule. The Stage 02 task is not done until the document exists with every row filled.
+related_components:
+  - ydk:library:deps/mimekit
+acceptance_criteria:
+  - docs/research/csharp-capability-assessment.md exists with one row per capability and language
+  - Every row cites evidence and a license
+  - ADR-001 Alternatives links to the assessment

@@ -1,0 +1,26 @@
+$schema: ydk:schema:req
+id: ydk:req:quality/license-notices
+description: >-
+  Brief "all open source". License and third-party notices (ADR-017; MIT proposed, owner confirmation pending).
+  Target; not implemented (Stage 02). Today there is no LICENSE file and no dependency audit.
+type: policy
+priority: high
+rule: >-
+  The repo root has LICENSE (MIT text, copyright holder per owner confirmation) and THIRD-PARTY-NOTICES.md. The notices
+  file lists every runtime package in the restore graph (today ydk:library:deps/mimekit ,
+  ydk:library:deps/bouncycastle-cryptography , ydk:library:deps/system-security-cryptography-pkcs ) with version,
+  license, and copyright line; then test and bench packages (xunit 2.9.3 Apache-2.0, xunit.runner.visualstudio 3.1.4
+  Apache-2.0, Microsoft.NET.Test.Sdk 17.14.1 MIT, coverlet.collector 6.0.4 MIT, BenchmarkDotNet 0.15.8 MIT); then every
+  committed sample file under corpus/ that was not authored in this repo, with source and license
+  (ydk:req:quality/realistic-attachment-samples ). Samples in the gitignored corpus/internal/ are never redistributed.
+failure_behavior: >-
+  A CI step fails when a package in the restore graph is missing from THIRD-PARTY-NOTICES.md or has a license other
+  than MIT, Apache-2.0, BSD-2-Clause, or BSD-3-Clause.
+related_components:
+  - ydk:library:deps/mimekit
+  - ydk:library:deps/bouncycastle-cryptography
+  - ydk:library:deps/system-security-cryptography-pkcs
+acceptance_criteria:
+  - LICENSE exists at the repo root
+  - THIRD-PARTY-NOTICES.md names all eight packages above with their versions and licenses
+  - Adding a package without a notices entry fails CI

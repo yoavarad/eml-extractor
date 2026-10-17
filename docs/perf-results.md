@@ -36,6 +36,8 @@ files_per_sec_total ≈ extract_per_sec_single_thread × cores_used × 0.7
 
 The `0.7` is a contention fudge (GC + allocator) — re-measure under parallel load before buying hardware.
 
+> Superseded by ADR-015 (2026-10-17): the 0.7 factor is withdrawn. Sizing uses the measured DOP sweep, scaling efficiency, and memory figures defined in `ydk:nfr:performance/throughput-dop-sweep` and `ydk:nfr:performance/memory-footprint`. This report stays as the single-thread history.
+
 **Worked examples on this M1 Pro (10 cores, 0.7 factor):**
 
 | Mix | 1-thread extract/s | Rough 10-core capacity |

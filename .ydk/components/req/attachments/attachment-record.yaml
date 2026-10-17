@@ -2,24 +2,27 @@ $schema: ydk:schema:req
 id: ydk:req:attachments/attachment-record
 description: >-
   Original spec "Nested files": for every attachment return name, size, full path if present, and the binary.
-  Implementation additionally reports Content-ID and disposition.
+  Implementation additionally reports Content-ID and disposition; target adds the sender's original path and
+  Content-Location (ADR-013). Field names per the shared team contract (ADR-012): FileName, SizeInBytes, FullPath,
+  BinaryData; renames are target, not implemented (Stage 02).
 type: business-rule
 priority: critical
 rule: >-
   Walk the MIME tree depth-first in document order. Every leaf part becomes one
   ydk:entity:extraction/ExtractedAttachment except: the selected main body part; and, inside the
   multipart/alternative that contains the selected body, non-attachment text/plain and text/html siblings.
-  message/rfc822 parts follow ydk:req:attachments/no-recursion; TNEF parts follow ydk:req:attachments/tnef-unwrap .
-  Name/FullPath/Size/Data/ContentId/Disposition are derived as specified on the entity manifest
-  (decoded bytes, basename vs raw path, fallback names).
+  message/rfc822 parts follow ydk:req:attachments/no-recursion ; TNEF parts follow ydk:req:attachments/tnef-unwrap .
+  FileName/SizeInBytes/BinaryData/ContentId/Disposition/OriginalPath/ContentLocation are derived as specified on the
+  entity manifest (decoded bytes, basename, fallback names). FullPath follows ydk:req:attachments/container-path .
 failure_behavior: A part whose decode throws is skipped with ydk:warning:extraction/part-decode-failed .
 related_components:
   - ydk:entity:extraction/ExtractedAttachment
   - ydk:contract:api/eml-extractor
+  - ydk:req:attachments/container-path
 acceptance_criteria:
-  - docx/xlsx/pptx/pdf/jpg/gif/zip stubs round-trip with exact name, decoded size, SHA-256, and null FullPath (AttachmentTests.OfficeAndBinaryAttachmentsRoundTrip)
+  - docx/xlsx/pptx/pdf/jpg/gif/zip stubs round-trip with exact name, decoded size, SHA-256, and (target) FullPath equal to the name (AttachmentTests.OfficeAndBinaryAttachmentsRoundTrip; today FullPath is null)
   - An attached PNG is an attachment, not the body (AttachedImageIsNotTreatedAsBody)
-  - Filename "../../etc/passwd.txt" yields Name "passwd.txt" and FullPath "../../etc/passwd.txt" (ExtractionTests.PathInFileNameIsPreservedSeparately)
+  - Filename "../../etc/passwd.txt" yields FileName "passwd.txt" and OriginalPath "../../etc/passwd.txt" (ExtractionTests.PathInFileNameIsPreservedSeparately; today the raw path is in FullPath)
   - smime.p7s in multipart/signed is collected (Pkcs7SignaturePartIsCollected)
   - Corrupt base64 does not throw (CorruptBase64DoesNotCrash)
-  - Golden attachment 293/293, office 165/165, image 172/172, path-in-filename 30/30
+  - Golden attachment 293/293, office 165/165, image 172/172, path-in-filename 30/30 (path-in-filename moves to original_path when goldens are regenerated)

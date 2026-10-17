@@ -18,10 +18,13 @@ rule: >-
   (6) at scan end: headerLines >= 2 AND classic >= 1 AND (a blank line ended the header block OR headerLines >= 3).
   "classic" counts header names (case-insensitive) in: from, date, received, mime-version, message-id, subject,
   return-path, to, delivered-to, cc, sender, reply-to, in-reply-to, references, content-type.
-failure_behavior: Returns false. Never throws.
+  The same decision is exposed as EmlDetectionResult.IsSupported by Detect (target, ADR-012, Stage 02), with MimeType
+  "message/rfc822" when true and "" when false.
+failure_behavior: Returns false (Detect - IsSupported false, MimeType ""). Never throws.
 related_components:
   - ydk:contract:api/eml-detector
   - ydk:req:detection/reject-non-email-magic
+  - ydk:entity:extraction/EmlDetectionResult
 acceptance_criteria:
   - A MimeKit-generated plain message is accepted (DetectorTests.AcceptsGeneratedEml)
   - The same message prefixed with a UTF-8 BOM is accepted (AcceptsUtf8Bom)

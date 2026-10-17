@@ -1,20 +1,29 @@
 $schema: ydk:schema:req
 id: ydk:req:metadata/xfields
 description: >-
-  Original spec: all metadata fields that start with "X_" are joined into one long string field "xfields".
-  Implementation also matches "X-", the usual RFC custom-header form.
+  Original spec: all metadata fields that start with "X_" (capital X then underscore) are joined into one long string
+  in the field "xfields". Rule per ADR-014 (supersedes the earlier X-/X_ case-insensitive rule). Target; not
+  implemented (Stage 02). Today the code matches X- or X_ case-insensitively and exposes the string as the separate
+  EmlExtractionResult.XFields property.
 type: business-rule
 priority: high
 rule: >-
-  A header is an X header when its field name has length >= 2, its first char is 'X' or 'x', and its second char is
-  '-' or '_'. EmlExtractionResult.XFields = all X header lines, each rendered "<original field name>: <decoded value>",
-  in header order, joined by \n (no trailing newline); "" when there are none. X headers are also present in Metadata
-  under their normalised keys. Non-X headers (e.g. DKIM-Signature) never appear in XFields.
-failure_behavior: XFields is "" when no X headers exist or on ydk:warning:extraction/parse-failed .
+  A header is an xfields header when its field name starts with exactly "X_" (U+0058 then U+005F), compared ordinally;
+  "x_foo", "X-Foo" and "x-foo" do not match. Metadata["xfields"] = all xfields header lines, each rendered
+  "<original field name>: <decoded, unfolded value>", in header order, one line per occurrence, joined by \n (U+000A),
+  no trailing newline; "" when there are none. The key is always present (ydk:req:metadata/canonical-keys). Headers
+  are also present in Metadata under their own canonical keys; X- headers appear only there. Non-matching headers
+  (e.g. DKIM-Signature, X-Mailer) never appear in xfields. There is no separate XFields property.
+failure_behavior: >-
+  xfields is "" when no header matches, on ydk:warning:extraction/parse-failed , and on
+  ydk:warning:extraction/input-too-large .
 related_components:
-  - ydk:entity:extraction/EmlExtractionResult
   - ydk:entity:extraction/Metadata
+  - ydk:entity:extraction/EmlExtractionResult
+  - ydk:req:metadata/canonical-keys
 acceptance_criteria:
-  - X-Mailer, X_Custom_Field and X-Spam-Score lines all appear in XFields as "Name: value" (ExtractionTests.ExtractsClassicHeadersAndUnicodeSubject)
+  - Headers X-Mailer, X_Custom_Field, x_lower and X-Spam-Score give xfields exactly "X_Custom_Field: <value>" (ydk:test:extraction/extraction.unit)
+  - Two X_Tag headers give two lines in header order joined by \n
+  - X-Mailer stays in Metadata under x-mailer
   - Golden seed E10-xfields asserts DKIM-Signature is not contained in xfields
-  - Golden x-headers slice passes 121/121
+  - Golden x-headers slice regenerated from the catalog under the new rule passes 100%

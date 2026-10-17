@@ -1,0 +1,23 @@
+$schema: ydk:schema:entity
+id: ydk:entity:extraction/EmlDetectionResult
+description: >-
+  Typed result of EmlDetector.Detect (ADR-012). Target; not implemented (Stage 02). Today detection returns only bool.
+  Public sealed record. Shared-contract counterpart of the OLE extractor's MimeDetectionResult (IsSupported, MimeType);
+  OLE's DetectedFormat enum is OLE-specific and not included.
+fields:
+  IsSupported:
+    type: boolean
+    required: true
+    nullable: false
+    constraints: Exactly the decision of ydk:req:detection/detect-eml ; equals IsEml(data) for the same bytes.
+    description: true when the bytes are an internet mail message that ydk:contract:api/eml-extractor accepts.
+  MimeType:
+    type: string
+    required: true
+    nullable: false
+    constraints: '"message/rfc822" when IsSupported is true; "" otherwise.'
+    description: Media type of the detected format.
+state_transitions: {}
+relationships: []
+indexes: []
+crud: []

@@ -1,19 +1,24 @@
 $schema: ydk:schema:req
 id: ydk:req:attachments/no-recursion
 description: >-
-  Original spec: "Do not extract further (no file-type detection, no nested content extraction)". ADR-008.
+  Original spec: "Do not extract further (no file-type detection, no nested content extraction)". ADR-008; nested
+  messages stay opaque is reaffirmed by ADR-013.
 type: constraint
 priority: critical
 rule: >-
-  A message/rfc822 part yields exactly one attachment whose Data is the embedded message re-serialised to bytes
+  A message/rfc822 part yields exactly one attachment whose BinaryData is the embedded message re-serialised to bytes
   (or the raw part if MimeKit holds no parsed message), named from its filename or "attached.eml"; its inner parts
-  are never added to Attachments. No attachment's bytes are inspected for type, and no Office/PDF/image/archive
-  content is parsed. Only the selected-body text is decoded to a string.
+  are never added to Attachments, so no FullPath ever contains a nested message segment within one Extract call
+  (ydk:req:attachments/container-path). No attachment's bytes are inspected for type, and no Office/PDF/image/archive
+  content is parsed. Only the selected-body text is decoded to a string. A caller that re-extracts a nested message
+  builds deeper paths as outer FullPath + "/" + inner FullPath.
 failure_behavior: Serialisation failure skips the part with ydk:warning:extraction/rfc822-extract-failed .
 related_components:
   - ydk:entity:extraction/ExtractedAttachment
   - ydk:contract:api/eml-extractor
+  - ydk:req:attachments/container-path
 acceptance_criteria:
   - Outer message with a forwarded.eml part yields one attachment "forwarded.eml" whose bytes contain the inner body, and no attachment named after inner parts (AttachmentTests.NestedEmlIsOpaqueBinaryAndNotRecursed; golden E06-nested)
-  - Real-world nested forwards stay opaque (InternalCorpusTests.NestedRfc822ForwardStaysOpaque, when sample present)
+  - Real-world nested forwards stay opaque (InternalCorpusTests.NestedRfc822ForwardStaysOpaque; skipped visibly when the sample is absent)
+  - An attached .eml and an attached Outlook .msg in corpus/realistic/ each stay one attachment (ydk:test:quality/realistic-samples.integration)
   - Golden nested-rfc822 45/45, no-recurse 41/41

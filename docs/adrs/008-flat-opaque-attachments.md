@@ -1,7 +1,7 @@
 # ADR-008: Flat, opaque attachments — no recursion, TNEF unwrapped
 
 ## Status
-Accepted (recorded retroactively, Stage 01 Rewrite)
+Accepted (recorded retroactively, Stage 01 Rewrite). Amended by ADR-013 (full path is the container path; raw path-bearing filenames move to `OriginalPath`) and ADR-012 (field names).
 
 ## Context
 The original requirement: for every attachment return name, size, full path if present, and the binary; "Do not extract further (no file-type detection, no nested content extraction)" (`docs/requirements.md`).
@@ -22,7 +22,7 @@ Recursing into nested messages, which the requirement explicitly excludes.
 Callers that need a nested message's inner content must call the extractor again on its `.eml` attachment (the golden harness does this via `reextract`).
 
 ## Open questions
-- The only explanation for unwrapping TNEF while not recursing into nested messages is the phrase "peels the Outlook wrapper" in `docs/requirements.md`.
+- Resolved by ADR-013: TNEF is a transport wrapper around the outer message's own attachments, while a nested message is a complete mail file the factory extracts on its own; nested messages stay opaque.
 
 ## Evidence
 `docs/requirements.md` ("Nested files"), `README.md`, `src/EmlExtraction/PartCollector.cs`, `tests/EmlExtraction.Tests/AttachmentTests.cs`, `InternalCorpusTests` TNEF cases.

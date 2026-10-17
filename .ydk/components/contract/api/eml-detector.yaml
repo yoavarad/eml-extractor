@@ -3,11 +3,27 @@ id: ydk:contract:api/eml-detector
 description: >-
   Public detection surface. Interface IEmlDetector, implementation EmlDetector
   (src/EmlExtraction/Models.cs, src/EmlExtraction/EmlDetector.cs). Stateless; constructed with new EmlDetector().
-  Pure byte sniff: never parses MIME, never throws for any input, ignores file extension.
+  Pure byte sniff: never parses MIME, never throws for any input, ignores file extension and file name.
+  Target (ADR-012, shared team contract; not implemented, Stage 02): Detect returns the typed
+  ydk:entity:extraction/EmlDetectionResult ; IsEml stays as the bool convenience the brief describes. Today only
+  IsEml exists.
 methods:
+  Detect:
+    description: >-
+      Target; not implemented (Stage 02). Same decision as IsEml, returned as a typed result.
+      Algorithm and thresholds are specified by ydk:req:detection/detect-eml and ydk:req:detection/reject-non-email-magic .
+    params:
+      data:
+        type: ReadOnlySpan<byte>
+        description: Raw file bytes. Any length, including empty.
+    returns:
+      type: EmlDetectionResult
+      description: ydk:entity:extraction/EmlDetectionResult ; never null. IsSupported true = pass to ydk:contract:api/eml-extractor .
+    raises: []
   IsEml:
     description: >-
       Return true when the buffer looks like an RFC 5322 message (optionally mbox-prefixed / BOM-prefixed).
+      Equals Detect(data).IsSupported once Detect exists.
       Algorithm and thresholds are specified by ydk:req:detection/detect-eml and ydk:req:detection/reject-non-email-magic .
     params:
       data:
@@ -15,5 +31,5 @@ methods:
         description: Raw file bytes. Any length, including empty.
     returns:
       type: bool
-      description: true = treat as EML and pass to ydk:contract:api/eml-extractor; false = not EML.
+      description: true = treat as EML and pass to ydk:contract:api/eml-extractor ; false = not EML.
     raises: []

@@ -1,0 +1,33 @@
+$schema: ydk:schema:nfr
+id: ydk:nfr:performance/throughput-dop-sweep
+description: >-
+  Load test per ADR-015, replacing the single-thread-only figures and the 0.7 contention guess. Target; not
+  implemented (Stage 02). Measures throughput T(n), P50/P95 latency, peak working set P(n), and scaling efficiency
+  E(n) = T(n) / (n x T(1)) for every degree of parallelism n = 1..Environment.ProcessorCount, under both Workstation
+  and Server GC, on the real public-mail corpus (gitignored corpus/internal/, no size cut-off) and on the synthetic set
+  (5 bench messages + 1,212 golden inputs). All numeric run parameters and thresholds here are provisional
+  (per project owner, 2026-10-18): placeholders until the first sweep; the load-test task sets them from measured data
+  plus headroom.
+category: performance
+tags: [throughput, scaling, baseline]
+target: >-
+  Every DOP from 1 to ProcessorCount measured in both GC modes and committed in docs/perf-baseline.json with the
+  hardware block; regression warning when T(1) or T(ProcessorCount) drops by more than the threshold versus the
+  comparable baseline (provisional threshold 20%; warn-only, never fails a build).
+measurement: >-
+  Inputs loaded into memory first. Per DOP (provisional): 2 s warm-up, then a window of at least 10 s and at least 3
+  full passes; n worker threads take the next message from a shared list. The harness sets ServerGarbageCollection
+  explicitly (false, then true) and records the mode; Workstation GC is the .NET default for console hosts. Hardware
+  block: CPU model from the OS (Windows registry ProcessorNameString, Linux /proc/cpuinfo model name, macOS
+  machdep.cpu.brand_string), physical and logical cores, total RAM, OS, runtime, target framework, GC mode, date,
+  commit. The run exits non-zero when the CPU model cannot be read ("Unknown processor" is never written).
+test_method: >-
+  Run the sweep from benches/EmlExtraction.Bench in Release with corpus/internal/ populated. Compare against
+  docs/perf-baseline.json only when CPU model, logical cores, runtime major.minor, and GC mode match; otherwise print
+  "baseline not comparable: <field>". Nightly CI runs the synthetic set against docs/perf-baseline-ci.json, warn-only.
+  Sizing for target rate R files/s: cores_needed = ceil(R / (T(1) x E(n))); servers_needed = ceil(R / T(n_best));
+  ram_per_server = P(n_best) + n_best x max_input_bytes x M (M from ydk:nfr:performance/memory-footprint ).
+monitoring: none (library; no runtime telemetry)
+applies_to:
+  - ydk:contract:api/eml-extractor
+  - ydk:contract:api/eml-detector

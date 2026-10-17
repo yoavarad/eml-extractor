@@ -1,25 +1,31 @@
 $schema: ydk:schema:req
 id: ydk:req:metadata/classic-fields
 description: >-
-  Original spec "Classic fields (To, From, etc.)". The classic envelope headers are exposed under fixed,
-  punctuation-free keys, and the four address keys are always present (ADR-005).
+  Original spec "Classic fields (To, From, etc.)". The classic envelope headers are exposed in parsed form, and the
+  four address keys are always present (ADR-005, amended by ADR-016). Target (not implemented, Stage 02): the overlay
+  writes into each header's own canonical key and the address keys are present even on parse_failed. Today the
+  overlay adds second punctuation-free keys (replyto, messageid, ...) and the map is empty on parse_failed.
 type: business-rule
 priority: critical
 rule: >-
-  Metadata contains the overlay keys listed in ydk:entity:extraction/Metadata with the formats given there.
-  from, to, cc, bcc are present in every successful extraction: parsed mailbox list if any, else the raw header
-  value, else "". Every other overlay key is set only when its value is non-blank, and when set it overwrites the
-  raw-header entry with the same key.
+  Metadata contains the overlay keys listed in ydk:entity:extraction/Metadata with the formats given there:
+  from, to, cc, bcc, reply-to, sender, date, message-id, in-reply-to, references. Each overlay value replaces the raw
+  value under the same canonical key; no other key is created. from, to, cc, bcc are present in every result:
+  parsed mailbox list if any, else the raw header value, else "". Every other overlay key exists only when its header
+  does.
 failure_behavior: >-
-  Not a failure path: absent headers yield "" for the four address keys and no key for the others.
-  On ydk:warning:extraction/parse-failed the whole map is empty.
+  Not a failure path: absent headers yield "" for the four address keys and no key for the others. On
+  ydk:warning:extraction/parse-failed and ydk:warning:extraction/input-too-large the four address keys are "".
 related_components:
   - ydk:entity:extraction/Metadata
   - ydk:contract:api/eml-extractor
+  - ydk:req:metadata/canonical-keys
 acceptance_criteria:
   - A message with only From/To yields cc == "" and bcc == "" (ExtractionTests.FromToCcBccAreAlwaysPresent)
   - Multiple addresses and Hebrew/Arabic display names survive in from/to/cc/bcc (ExtractsFromToCcBccIncludingMultiplesAndRtlNames)
   - A raw Bcc header in the file is extracted (RawBccHeaderIsExtracted)
   - Two Received headers are both present in received (DuplicateReceivedAreConcatenated)
   - SMTPUTF8 addresses with a Hebrew display name decode (Smtputf8Addresses)
-  - Golden rfc5322 slice passes 160/160
+  - Reply-To yields only the key reply-to; Message-ID yields only message-id, without angle brackets
+  - A buffer that fails to parse still has from, to, cc, bcc equal to ""
+  - Golden rfc5322 slice, regenerated for the new keys, passes 100%

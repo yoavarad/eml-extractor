@@ -1,0 +1,28 @@
+$schema: ydk:schema:req
+id: ydk:req:quality/net8-multi-targeting
+description: >-
+  The library and its tests target both net8.0 and net10.0 so a .NET 8 template can load the component (ADR-019,
+  per project owner 2026-10-18). Target; not implemented (Stage 02). Today every project targets net10.0 only
+  (Directory.Build.props). .NET 8 LTS support ends 2026-11-10; net8.0 is dropped once the team template is on net10.
+type: constraint
+priority: high
+rule: >-
+  src/EmlExtraction and tests/EmlExtraction.Tests set TargetFrameworks net8.0;net10.0. tools/GoldenKit and
+  benches/EmlExtraction.Bench stay net10.0 only (Directory.Build.props default). Public API, results, and warnings are
+  identical on both targets. CI builds and runs the tests on both targets and installs the .NET 8 runtime beside the
+  SDK pinned by global.json. The golden score gate (ADR-011) runs on net10.0 (net8.0 optional). Runtime packages
+  ydk:library:deps/mimekit , ydk:library:deps/system-security-cryptography-pkcs , and
+  ydk:library:deps/bouncycastle-cryptography must restore for both targets and pass the vulnerability audit on both;
+  the Pkcs pin gets a per-target condition if it does not. No .NET 9/10-only API is used without an
+  #if NET9_0_OR_GREATER branch.
+failure_behavior: A build, restore, audit, or test failure on either target fails CI.
+related_components:
+  - ydk:crosscut:core/library-surface
+  - ydk:library:deps/mimekit
+  - ydk:library:deps/system-security-cryptography-pkcs
+  - ydk:library:deps/bouncycastle-cryptography
+acceptance_criteria:
+  - dotnet build of the library produces net8.0 and net10.0 assemblies with TreatWarningsAsErrors
+  - dotnet test runs the unit and seed-golden tests on net8.0 and net10.0 in CI, both green
+  - The vulnerable-package audit passes for both targets
+  - GoldenKit score passes on net10.0

@@ -9,11 +9,30 @@ cases:
     given: Plain message per row - Hebrew, Arabic, Chinese, Japanese, Hindi, Thai, Russian, emoji (ZWJ family + emoji)
     when: Extract is called
     then: subject and MainContent equal the input strings exactly
+  - name: EmojiSequencesSurviveExactly
+    description: Target (ydk:req:content/unicode-fidelity; not implemented, Stage 02) - multi-code-point emoji and combining sequences
+    given: >-
+      One row per sequence and per encoding (raw UTF-8, RFC 2047 B, RFC 2047 Q, base64 body, quoted-printable body) -
+      ZWJ family U+1F468 U+200D U+1F469 U+200D U+1F467 U+200D U+1F466; skin tone U+1F44D U+1F3FD; flags U+1F1EE U+1F1F1
+      and U+1F1FA U+1F1F8; keycap U+0031 U+FE0F U+20E3; decomposed U+0065 U+0301; Hebrew niqqud U+05E9 U+05C1 U+05B8;
+      Devanagari conjunct U+0915 U+094D U+0937
+    when: Extract is called
+    then: subject, MainContent, and the from display name equal the authored string by ordinal comparison
+  - name: EncodedWordSplitInsideSequence
+    description: Target (Stage 02) - a ZWJ sequence split across two adjacent RFC 2047 encoded-words
+    given: Subject whose ZWJ family is cut between two encoded-words at a code-point boundary
+    when: Extract is called
+    then: subject equals the original sequence exactly
+  - name: FlagEmojiInAttachmentName
+    description: Target (Stage 02) - RFC 2231 filename with a flag emoji
+    given: Attachment filename parameter carrying U+1F1EE U+1F1F1 in RFC 2231 encoding
+    when: Extract is called
+    then: FileName equals the authored name exactly
   - name: PlainHebrewIsRtlAndEnglishIsLtr
     description: First-strong on plain text
     given: Hebrew subject/body, Arabic subject/body, English subject/body
     when: Extract is called on each
-    then: Hebrew and Arabic report rtl in properties and metadata keys; English reports ltr
+    then: Hebrew and Arabic report rtl in the properties (and, until Stage 02, the metadata keys); English reports ltr
   - name: HtmlDirAttributeWinsOverLetterScript
     description: HTML dir overrides letters
     given: HTML body with html/body dir=rtl, and a second with dir=ltr around Hebrew text; Hebrew subject

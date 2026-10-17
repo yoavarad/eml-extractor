@@ -14,7 +14,8 @@ Per project owner, 2026-10-17:
 - Known content failures map to their existing warnings: `parse_failed` (whole message, empty result), and `body_decode_failed`, `part_decode_failed`, `rfc822_extract_failed`, `tnef_extract_failed` (one part; extraction continues).
 - Any other, unexpected exception is caught and recorded as a new `internal_error` warning that names the stage and the exception type (`ydk:warning:extraction/internal-error`).
 - After parsing, each extraction stage is guarded separately: header/metadata mapping, body selection plus direction, and attachment collection. A stage that throws unexpectedly contributes its empty default and adds one `internal_error` warning; stages that succeeded keep their output.
-- A parse failure (MimeKit cannot parse the message at all) still returns an empty result with `parse_failed`.
+- Stage defaults (aligned with ADR-016): header/metadata stage -> `Metadata` holding exactly the fixed keys `from`, `to`, `cc`, `bcc`, `xfields`, each the empty string; body stage -> `MainContent` and `MainContentMimeType` null, both directions `ltr`; attachment stage -> no attachments.
+- A parse failure (MimeKit cannot parse the message at all) still returns an empty result with `parse_failed`; "empty" means the same defaults, so the five fixed metadata keys are present as empty strings (ADR-016).
 - Programmer misuse still throws: a null argument raises `ArgumentNullException`.
 - Tests and GoldenKit fail on any `internal_error` warning, so library bugs surface in CI instead of hiding.
 - Warnings are plain strings of the form `<code>: <detail>`.

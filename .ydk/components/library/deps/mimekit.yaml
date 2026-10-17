@@ -3,6 +3,9 @@ id: ydk:library:deps/mimekit
 description: >-
   RFC 822/2822/5322 and RFC 2045-2049 MIME parser that does all message parsing, header decoding (RFC 2047/2231/6532),
   charset conversion, transfer decoding, and TNEF unpacking for the extractor (ADR-002). The detector does not use it.
+  Runtime transitive dependencies: ydk:library:deps/bouncycastle-cryptography and the pinned
+  ydk:library:deps/system-security-cryptography-pkcs (license audit, ADR-017).
+  Ships net8.0 and net10.0 assets, so it serves both targets of ADR-019 (ydk:req:quality/net8-multi-targeting).
 package: MimeKit
 registry: nuget
 version: 4.18.0
@@ -17,6 +20,7 @@ features_used:
   - MimeMessage header list, From/To/Cc/Bcc/ReplyTo/Sender/Subject/Date/MessageId/InReplyTo/References
   - TextPart.Text, IsHtml, IsPlain, IsAttachment; MultipartAlternative; MultipartRelated.Root
   - MimePart.Content.DecodeTo, FileName, ContentId, ContentDisposition
+  - MimeEntity.ContentLocation (target, ADR-013, Stage 02)
   - MessagePart.Message.WriteTo for opaque nested messages
   - MimeKit.Tnef.TnefPart.ExtractAttachments
 configuration:
