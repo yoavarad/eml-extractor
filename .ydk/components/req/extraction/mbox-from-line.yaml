@@ -1,0 +1,20 @@
+$schema: ydk:schema:req
+id: ydk:req:extraction/mbox-from-line
+description: >-
+  Files that begin with an mbox "From " separator line (SpamAssassin corpus, mbox exports) are handled by both
+  detector and extractor (docs/edge-cases.md E11; commit 251657d).
+type: business-rule
+priority: high
+rule: >-
+  When the buffer, after an optional UTF-8 BOM, starts with the five bytes "From ", the extractor parses it with
+  MimeKit's mbox format and returns the first message only; the separator line never appears in Metadata.
+  Otherwise the buffer is parsed as a single message.
+failure_behavior: Parse failure records ydk:warning:extraction/parse-failed .
+related_components:
+  - ydk:contract:api/eml-extractor
+  - ydk:req:detection/detect-eml
+  - ydk:library:deps/mimekit
+acceptance_criteria:
+  - mbox-prefixed message yields its subject and body, no parse_failed warning, and no metadata value containing the separator date (ExtractionTests.MboxFromPrefixDoesNotPolluteHeaders)
+  - Detector accepts the same input (DetectorTests.AcceptsMboxFromLine)
+  - Golden mbox slice passes 1/1

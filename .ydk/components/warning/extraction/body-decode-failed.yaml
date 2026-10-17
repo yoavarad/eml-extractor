@@ -1,0 +1,14 @@
+$schema: ydk:schema:warning
+id: ydk:warning:extraction/body-decode-failed
+description: Reading the decoded text of the selected main body part threw (any exception type).
+code: body_decode_failed
+message_template: "body_decode_failed: ${ExceptionMessage}"
+triggers:
+  - Charset conversion or content decoding of the selected text part throws
+result_effect: >-
+  MainContent null and MainContentMimeType null; ContentDirection ltr. The selected part is still
+  excluded from Attachments. Metadata and attachments are otherwise extracted normally.
+related:
+  - ydk:contract:api/eml-extractor
+  - ydk:req:content/main-content-selection
+  - ydk:crosscut:core/warning-format

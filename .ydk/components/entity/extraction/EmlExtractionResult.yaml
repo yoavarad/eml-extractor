@@ -1,0 +1,72 @@
+$schema: ydk:schema:entity
+id: ydk:entity:extraction/EmlExtractionResult
+description: >-
+  Immutable record returned by every Extract call. Source: src/EmlExtraction/Models.cs
+  (public sealed record EmlExtractionResult). In-memory value object, not persisted.
+fields:
+  Metadata:
+    type: IReadOnlyDictionary<string, string>
+    required: true
+    nullable: false
+    description: >-
+      Header map; key set and value formats defined by ydk:entity:extraction/Metadata .
+      Empty dictionary when ydk:warning:extraction/parse-failed is recorded.
+  XFields:
+    type: string
+    required: true
+    nullable: false
+    default: ""
+    constraints: "Lines 'Field: value' joined by \\n, in header order; see ydk:req:metadata/xfields"
+    description: Concatenation of every X- / X_ header line.
+  MainContent:
+    type: string
+    required: true
+    nullable: true
+    constraints: >-
+      Decoded text of the selected body part with trailing CR/LF trimmed; HTML is kept as markup.
+      null when no selectable body part exists, when body decode fails, or on parse failure.
+    description: Main body selected per ydk:req:content/main-content-selection .
+  MainContentMimeType:
+    type: string
+    required: true
+    nullable: true
+    constraints: "MIME type of the selected part, e.g. text/html, text/plain, text/calendar; null when MainContent is null"
+    description: Media type of MainContent.
+  Attachments:
+    type: IReadOnlyList<ExtractedAttachment>
+    required: true
+    nullable: false
+    default: []
+    fk: ydk:entity:extraction/ExtractedAttachment
+    description: Flat list of collected parts in MIME tree order; see ydk:req:attachments/attachment-record .
+  Warnings:
+    type: IReadOnlyList<string>
+    required: true
+    nullable: false
+    default: []
+    constraints: "Each item formatted per ydk:crosscut:core/warning-format"
+    description: Non-fatal diagnostics recorded during extraction (ydk:req:extraction/no-throw-on-malformed).
+  SubjectDirection:
+    type: enum
+    values: [ltr, rtl]
+    required: false
+    default: ltr
+    description: Paragraph direction of the subject (init-only property); see ydk:req:content/text-direction .
+  ContentDirection:
+    type: enum
+    values: [ltr, rtl]
+    required: false
+    default: ltr
+    description: Paragraph direction of MainContent (init-only property); see ydk:req:content/text-direction .
+state_transitions: {}
+relationships:
+  - entity: ydk:entity:extraction/ExtractedAttachment
+    type: one-to-many
+    fk: Attachments
+    description: A result owns zero or more attachment records.
+  - entity: ydk:entity:extraction/Metadata
+    type: one-to-one
+    fk: Metadata
+    description: A result owns exactly one metadata map.
+indexes: []
+crud: []

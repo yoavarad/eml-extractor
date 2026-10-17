@@ -1,0 +1,17 @@
+$schema: ydk:schema:library
+id: ydk:library:deps/system-security-cryptography-pkcs
+description: >-
+  Transitive dependency of MimeKit, pinned directly to a patched version to clear advisory GHSA-846f-f764-76mx
+  (commit a381aa0; ADR-009). No library code calls it.
+package: System.Security.Cryptography.Pkcs
+registry: nuget
+version: 10.0.13
+referenced_by:
+  - src/EmlExtraction/EmlExtraction.csproj
+direct: false
+features_used:
+  - None directly; present only to override the transitive version resolved through ydk:library:deps/mimekit
+failure_modes:
+  - CI vulnerability audit (dotnet list package --vulnerable --include-transitive) fails the build on High/Critical findings
+used_by:
+  - ydk:library:deps/mimekit

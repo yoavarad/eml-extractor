@@ -1,0 +1,19 @@
+$schema: ydk:schema:warning
+id: ydk:warning:extraction/parse-failed
+description: >-
+  The whole-message parse, or the mapping that follows it, threw one of the caught exception types:
+  FormatException, MimeKit ParseException, IOException, InvalidOperationException, ArgumentException,
+  NotSupportedException, DecoderFallbackException. Other exception types are not caught and propagate to the caller.
+code: parse_failed
+message_template: "parse_failed: ${ExceptionTypeName}: ${ExceptionMessage}"
+triggers:
+  - MimeKit cannot parse the header block or MIME structure of the buffer
+  - A caught exception type is raised anywhere inside Extract(ReadOnlyMemory<byte>) after parsing (header mapping, body selection, attachment collection)
+result_effect: >-
+  Result with empty Metadata (no keys at all), XFields "", MainContent null, MainContentMimeType null,
+  no attachments, SubjectDirection and ContentDirection at their default ltr, and Warnings holding any
+  warnings recorded before the failure followed by this one.
+related:
+  - ydk:contract:api/eml-extractor
+  - ydk:entity:extraction/EmlExtractionResult
+  - ydk:crosscut:core/warning-format

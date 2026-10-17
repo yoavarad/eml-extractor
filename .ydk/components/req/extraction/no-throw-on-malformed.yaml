@@ -1,0 +1,21 @@
+$schema: ydk:schema:req
+id: ydk:req:extraction/no-throw-on-malformed
+description: >-
+  Implemented beyond the original spec: "Parse does not crash the process". Problems are reported as warnings on the
+  result (ADR-004).
+type: policy
+priority: critical
+rule: >-
+  Extract(ReadOnlyMemory<byte>) converts the exception types listed on ydk:warning:extraction/parse-failed into that
+  warning plus an empty result. Per-part failures are converted to ydk:warning:extraction/body-decode-failed,
+  ydk:warning:extraction/part-decode-failed, ydk:warning:extraction/rfc822-extract-failed or
+  ydk:warning:extraction/tnef-extract-failed and extraction continues. Warnings never abort extraction of other parts.
+  Exception types outside the parse-failed list are not caught at the top level.
+failure_behavior: See the five warning components; each defines the resulting partial result.
+related_components:
+  - ydk:contract:api/eml-extractor
+  - ydk:crosscut:core/warning-format
+acceptance_criteria:
+  - Corrupt base64 body extracts the subject without throwing (ExtractionTests.CorruptBase64DoesNotCrash; golden corrupt-transfer-encoding 10/10)
+  - Headers-only message records no parse_failed warning (HeadersOnlyDoesNotThrow)
+  - Public harvest of 12,853 detected messages records 0 throws, 0 parse_failed, 0 warnings (ydk:nfr:reliability/real-world-harvest-no-throw)

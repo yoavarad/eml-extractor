@@ -1,0 +1,51 @@
+name: library
+description: "An in-process third-party package dependency (NuGet, PyPI, npm) linked into the build, with version pin, license, and how the project uses it"
+version: 1
+fields:
+  id:
+    type: string
+    required: true
+    pattern: "^ydk:library:.+"
+    description: "Unique component identifier in ydk:library:namespace/name format"
+  description:
+    type: text
+    required: true
+    description: "What this library provides to the project"
+  package:
+    type: string
+    required: true
+    description: "Package identifier in its registry (e.g. NuGet package id)"
+  registry:
+    type: enum
+    values: [nuget, pypi, npm, other]
+    required: true
+    description: "Package registry the dependency is restored from"
+  version:
+    type: string
+    required: true
+    description: "Exact pinned version"
+  license:
+    type: string
+    description: "License identifier, when known"
+  referenced_by:
+    type: list
+    required: true
+    description: "Project files that declare the package reference"
+  direct:
+    type: boolean
+    required: true
+    description: "true when code calls it directly; false when pinned only to override a transitive version"
+  features_used:
+    type: list
+    required: true
+    description: "The specific APIs / capabilities of the library the project relies on"
+  configuration:
+    type: map
+    description: "Non-default options the project sets on the library, keyed by option name"
+  failure_modes:
+    type: list
+    description: "How library failures surface in this project (exception types, error components)"
+  used_by:
+    type: ref_list
+    required: true
+    description: "Components that depend on this library"

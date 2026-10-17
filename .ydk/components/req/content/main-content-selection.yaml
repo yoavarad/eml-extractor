@@ -1,0 +1,28 @@
+$schema: ydk:schema:req
+id: ydk:req:content/main-content-selection
+description: Original spec "Content - the main body of the email". Selection rule per ADR-003.
+type: business-rule
+priority: critical
+rule: >-
+  Walk the top-level body entity recursively:
+  a text part flagged as attachment is never selected;
+  a text/html or text/plain part is selected; a text/calendar part is selected;
+  multipart/alternative selects, among its children's selections, the last HTML one, else the last plain one,
+  else the first other one;
+  multipart/related selects from its root part, else the first child that yields a selection;
+  any other multipart selects the first child that yields a selection;
+  anything else (message/rfc822, non-text leaf) yields nothing.
+  MainContent = decoded text of the selection with trailing CR and LF characters trimmed; HTML stays as markup
+  (cid: references and dir attributes kept). MainContentMimeType = selection's MIME type.
+  If nothing is selected both are null.
+failure_behavior: Decode failure records ydk:warning:extraction/body-decode-failed and leaves both values null.
+related_components:
+  - ydk:entity:extraction/EmlExtractionResult
+  - ydk:contract:api/eml-extractor
+  - ydk:req:attachments/attachment-record
+acceptance_criteria:
+  - multipart/alternative with plain and HTML yields the HTML markup and text/html; the plain sibling is not an attachment (ExtractionTests.PrefersHtmlOverPlain; golden E03-html-alt)
+  - A message with only headers yields null/empty MainContent and no parse_failed warning (HeadersOnlyDoesNotThrow; golden E13-empty)
+  - A text/plain body next to an attached text/calendar with a filename keeps the plain body (AttachmentTests.CalendarWithFilenameIsAttachment)
+  - multipart/signed yields its text part as body (Pkcs7SignaturePartIsCollected)
+  - Golden html-body 137/137, plain-body 27/27, multipart-alternative 56/56

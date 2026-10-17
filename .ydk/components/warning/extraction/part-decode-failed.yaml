@@ -1,0 +1,12 @@
+$schema: ydk:schema:warning
+id: ydk:warning:extraction/part-decode-failed
+description: Decoding the content of one non-body MIME leaf part threw (any exception type).
+code: part_decode_failed
+message_template: "part_decode_failed: ${FileNameOrMimeType}: ${ExceptionMessage}"
+triggers:
+  - Content-transfer decoding of an attachment part throws
+result_effect: That part is omitted from Attachments; all other parts are still collected.
+related:
+  - ydk:contract:api/eml-extractor
+  - ydk:req:attachments/attachment-record
+  - ydk:crosscut:core/warning-format

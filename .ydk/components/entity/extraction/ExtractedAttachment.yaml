@@ -1,0 +1,54 @@
+$schema: ydk:schema:entity
+id: ydk:entity:extraction/ExtractedAttachment
+description: >-
+  One collected MIME part (attachment, inline image, nested message, TNEF-unpacked file, or
+  non-selected body-like part). Source: src/EmlExtraction/Models.cs (public sealed record
+  ExtractedAttachment), built by PartCollector. In-memory value object, not persisted.
+fields:
+  Name:
+    type: string
+    required: true
+    nullable: false
+    constraints: >-
+      Basename of the MIME filename (Content-Type name / Content-Disposition filename), trimmed of
+      whitespace and surrounding quotes; path separators / and \ removed by taking the last segment.
+      Fallbacks when no filename: "<content-id without angle brackets>.<media-subtype>" if a Content-ID exists,
+      else "part-<index>.<media-subtype>" (index = attachments collected so far, subtype "bin" if empty);
+      nested message/rfc822 without a name -> "attached.eml".
+    description: File name to present for this part.
+  Size:
+    type: long
+    required: true
+    nullable: false
+    constraints: "Equals Data.Length (decoded byte count, not encoded size)"
+    description: Decoded size in bytes.
+  FullPath:
+    type: string
+    required: true
+    nullable: true
+    constraints: "Raw (trimmed) filename only when it contains / or \\; otherwise null"
+    description: Original path-bearing filename, kept separately from Name (path traversal is preserved, not resolved).
+  Data:
+    type: byte[]
+    required: true
+    nullable: false
+    constraints: >-
+      Transfer-decoded bytes (base64 / quoted-printable undone). For message/rfc822 parts: the inner message
+      re-serialised by MimeKit (opaque .eml bytes, not recursed). Empty array when the part has no content.
+    description: Binary payload.
+  ContentId:
+    type: string
+    required: true
+    nullable: true
+    constraints: "MimeKit ContentId (angle brackets stripped by MimeKit); null when absent"
+    description: "Content-ID used by cid: references in HTML."
+  Disposition:
+    type: string
+    required: true
+    nullable: true
+    constraints: "Content-Disposition value as written (e.g. attachment, inline); null when the header is absent"
+    description: Disposition type of the part.
+state_transitions: {}
+relationships: []
+indexes: []
+crud: []

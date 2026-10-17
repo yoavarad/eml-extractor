@@ -1,0 +1,33 @@
+name: warning
+description: "A non-fatal, in-process diagnostic recorded on a result object instead of thrown (no HTTP transport)"
+version: 1
+fields:
+  id:
+    type: string
+    required: true
+    pattern: "^ydk:warning:.+"
+    description: "Unique component identifier in ydk:warning:namespace/name format"
+  description:
+    type: text
+    required: true
+    description: "When and why this warning is recorded"
+  code:
+    type: string
+    required: true
+    description: "Machine-readable prefix that starts the warning string (e.g. parse_failed)"
+  message_template:
+    type: string
+    required: true
+    description: "Exact warning string with ${variable} placeholders"
+  triggers:
+    type: list
+    required: true
+    description: "Conditions that record this warning"
+  result_effect:
+    type: text
+    required: true
+    description: "What the returned result contains when this warning is recorded"
+  related:
+    type: ref_list
+    required: true
+    description: "Components that record or carry this warning"

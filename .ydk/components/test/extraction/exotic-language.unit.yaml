@@ -1,0 +1,39 @@
+$schema: ydk:schema:test
+id: ydk:test:extraction/exotic-language.unit
+description: Unicode round-trip and direction tests, tests/EmlExtraction.Tests/ExoticLanguageTests.cs.
+level: unit
+target: ydk:contract:api/eml-extractor
+cases:
+  - name: SubjectAndBodySurviveRoundTrip
+    description: Exotic scripts and emoji survive encode/decode
+    given: Plain message per row - Hebrew, Arabic, Chinese, Japanese, Hindi, Thai, Russian, emoji (ZWJ family + emoji)
+    when: Extract is called
+    then: subject and MainContent equal the input strings exactly
+  - name: PlainHebrewIsRtlAndEnglishIsLtr
+    description: First-strong on plain text
+    given: Hebrew subject/body, Arabic subject/body, English subject/body
+    when: Extract is called on each
+    then: Hebrew and Arabic report rtl in properties and metadata keys; English reports ltr
+  - name: HtmlDirAttributeWinsOverLetterScript
+    description: HTML dir overrides letters
+    given: HTML body with html/body dir=rtl, and a second with dir=ltr around Hebrew text; Hebrew subject
+    when: Extract is called
+    then: Content direction follows dir (rtl, then ltr); subject stays rtl; dir attribute and Hebrew text kept in MainContent
+  - name: CssDirectionRtlIsDetected
+    description: CSS direction is honoured
+    given: HTML body with style="direction - rtl" around English text; subject "hi"
+    when: Extract is called
+    then: SubjectDirection ltr, ContentDirection rtl
+  - name: BidiMarksSurviveAndSetDirection
+    description: RLM/LRM decide direction and are not stripped
+    given: Subject RLM + "Invoice 12"; body LRM + Hebrew
+    when: Extract is called
+    then: Marks remain in subject/MainContent; subject rtl; content ltr
+  - name: FirstStrongLetterWinsInMixedSubject
+    description: First strong letter decides
+    given: Subject starting with a Hebrew word followed by "+ English", and subject "mix" followed by Hebrew and Chinese words
+    when: Extract is called
+    then: First is rtl, second is ltr; English bodies ltr
+stubs: []
+never_mock:
+  - EmlExtractor

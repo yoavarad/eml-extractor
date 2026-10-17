@@ -1,0 +1,46 @@
+$schema: ydk:schema:contract
+id: ydk:contract:api/eml-extractor
+description: >-
+  Public extraction surface. Interface IEmlExtractor (declares only the byte overload), implementation
+  EmlExtractor (src/EmlExtraction/EmlExtractor.cs), which also exposes a MimeMessage overload.
+  Stateless per call; the static constructor registers CodePagesEncodingProvider once and parser options are a
+  static, read-only clone (see ydk:library:deps/mimekit). Caller is expected to have checked the buffer with
+  ydk:contract:api/eml-detector first; the extractor does not re-run detection.
+methods:
+  Extract(ReadOnlyMemory<byte>):
+    description: >-
+      Parse an in-memory EML buffer and return metadata, main content, attachments, directions, and warnings.
+      If the buffer (after an optional UTF-8 BOM) starts with "From " it is parsed in mbox format (first message only);
+      otherwise as a single message. Parser/decoder exceptions of the caught types become
+      ydk:warning:extraction/parse-failed and an empty result; per-part failures become the other warnings below.
+    params:
+      eml:
+        type: ReadOnlyMemory<byte>
+        description: >-
+          Whole message bytes. Wrapped without copy when backed by a full array (offset 0, full length);
+          otherwise copied once.
+    returns:
+      type: EmlExtractionResult
+      description: ydk:entity:extraction/EmlExtractionResult; never null.
+    raises:
+      - ydk:warning:extraction/parse-failed
+      - ydk:warning:extraction/body-decode-failed
+      - ydk:warning:extraction/part-decode-failed
+      - ydk:warning:extraction/rfc822-extract-failed
+      - ydk:warning:extraction/tnef-extract-failed
+  Extract(MimeMessage):
+    description: >-
+      Same mapping as the byte overload for an already-parsed MimeKit message; no parsing step, so
+      parse-failed is never recorded. Not part of IEmlExtractor.
+    params:
+      message:
+        type: MimeKit.MimeMessage
+        description: Parsed message (non-null).
+    returns:
+      type: EmlExtractionResult
+      description: ydk:entity:extraction/EmlExtractionResult; never null.
+    raises:
+      - ydk:warning:extraction/body-decode-failed
+      - ydk:warning:extraction/part-decode-failed
+      - ydk:warning:extraction/rfc822-extract-failed
+      - ydk:warning:extraction/tnef-extract-failed

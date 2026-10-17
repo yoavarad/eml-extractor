@@ -1,0 +1,24 @@
+$schema: ydk:schema:crosscut
+id: ydk:crosscut:core/library-surface
+description: >-
+  System-wide statement of what this deliverable is and is not at runtime, so that the standard web-service concerns
+  are settled once instead of per feature.
+kind: deployment-surface
+specification: >-
+  In-process .NET 10 class library (src/EmlExtraction) consumed by project reference. Public surface is exactly
+  ydk:contract:api/eml-detector and ydk:contract:api/eml-extractor plus the result records
+  ydk:entity:extraction/EmlExtractionResult and ydk:entity:extraction/ExtractedAttachment .
+  Not present, by design of the original spec and README: HTTP routes, authentication/authorisation, frontend pages,
+  CORS, health checks, pagination, persistence, generated IDs, logging/tracing, configuration files, environment
+  variables. Input is a whole message held in memory; output holds all decoded bytes in memory; no streaming, no disk
+  or network I/O. Timestamps: the only one is the message Date, emitted in ISO 8601 round-trip ("o") form.
+  Both public classes keep no per-instance mutable state; parser options and the code-page provider registration are
+  static and set once.
+applies_to: Entire library (src/EmlExtraction). Tools (tools/GoldenKit) and benches are developer utilities, not shipped surface.
+implementation_notes:
+  - Do not add routes, auth, or UI components to the spec; they are OUT of scope (docs/specs/scope.md).
+  - Thread-safety is not documented in the repo; the absence of instance state is a code observation, not a guarantee.
+related:
+  - ydk:contract:api/eml-detector
+  - ydk:contract:api/eml-extractor
+  - ydk:crosscut:core/warning-format

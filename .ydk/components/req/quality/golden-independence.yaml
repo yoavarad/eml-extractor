@@ -1,0 +1,19 @@
+$schema: ydk:schema:req
+id: ydk:req:quality/golden-independence
+description: >-
+  Golden expected values are authored, never produced by the extractor (docs/golden.md; ADR-007).
+type: policy
+priority: critical
+rule: >-
+  tools/GoldenKit "gen" writes each bulk case's input.eml and expected.json from the same authored catalog spec
+  (corpus/golden/catalog.jsonl) and must not call EmlExtractor. Expected attachment payloads are checked by name,
+  decoded size, SHA-256, disposition, and full path. Not golden-checked: full Received traces, warning strings,
+  recursive Office content, latency.
+failure_behavior: >-
+  A generator change that reads extractor output to write expected values is a defect; reject it in review.
+related_components:
+  - ydk:nfr:reliability/golden-pass-rate
+  - ydk:test:quality/seed-golden.integration
+acceptance_criteria:
+  - tools/GoldenKit/Generator.cs contains no reference to EmlExtractor
+  - Seed cases under corpus/golden/seed/ and 1200 bulk cases under corpus/golden/bulk/ each have input.eml + expected.json

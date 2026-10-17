@@ -1,0 +1,24 @@
+$schema: ydk:schema:req
+id: ydk:req:detection/reject-non-email-magic
+description: >-
+  Implemented beyond the original spec ("Detector rejects non-email magics"): known binary and
+  structured-text formats are rejected before header sniffing, even if they contain header-like text.
+type: validation
+priority: high
+rule: >-
+  After BOM stripping, IsEml returns false when the buffer starts with any of:
+  OLE compound file D0 CF 11 E0 (Outlook .msg, legacy Office);
+  ASCII "%PDF";
+  PNG 89 50 4E 47;
+  JPEG FF D8 FF;
+  ZIP "PK" followed by a byte <= 0x08 (buffer length >= 4);
+  a first byte of '{' or '[' (JSON) or '<' (HTML/XML).
+failure_behavior: Returns false. Never throws.
+related_components:
+  - ydk:contract:api/eml-detector
+  - ydk:req:detection/detect-eml
+acceptance_criteria:
+  - OLE magic followed by 64 zero bytes is rejected (DetectorTests.RejectsOleMsgMagic; golden seed E19-ole is_eml false)
+  - '"%PDF-1.4 ... From: x" text is rejected despite containing a header-like token (RejectsPdfZipPngJpegJson)'
+  - ZIP local-header, minimal PNG, JPEG FFD8FFE0, and a JSON object with from/date keys are rejected (RejectsPdfZipPngJpegJson)
+  - Golden not-eml slice passes 21/21

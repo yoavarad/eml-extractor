@@ -1,0 +1,21 @@
+$schema: ydk:schema:nfr
+id: ydk:nfr:reliability/golden-pass-rate
+description: >-
+  Every authored golden case must pass. Last recorded score (docs/golden-score.txt): 1212/1212 cases and
+  11333/11333 checks (12 seed + 1200 bulk), 0 failures across 48 tags.
+category: reliability
+tags: [golden, correctness]
+target: 100
+unit: percent of golden cases passing
+measurement: >-
+  dotnet run --project tools/GoldenKit -c Release -- score. Scorer runs detect, metadata fields, xfields,
+  main_content, main_content_mime, attachment_count, and per-attachment presence/size/sha/disposition/path checks;
+  prints totals and per-tag pass rates; exits 1 when any case fails.
+test_method: >-
+  Seed set (12 cases) runs on every dotnet test, including CI. Bulk set (1200 cases) is run manually with the
+  score command and the report is committed to docs/golden-score.txt.
+monitoring: none (library; no runtime telemetry)
+applies_to:
+  - ydk:contract:api/eml-detector
+  - ydk:contract:api/eml-extractor
+  - ydk:req:quality/golden-independence

@@ -1,0 +1,12 @@
+$schema: ydk:schema:warning
+id: ydk:warning:extraction/rfc822-extract-failed
+description: Serialising a nested message/rfc822 part back to bytes threw (any exception type).
+code: rfc822_extract_failed
+message_template: "rfc822_extract_failed: ${ExceptionMessage}"
+triggers:
+  - MimeKit fails to write the embedded message (or the raw message part) to a stream
+result_effect: The nested message is omitted from Attachments; all other parts are still collected.
+related:
+  - ydk:contract:api/eml-extractor
+  - ydk:req:attachments/no-recursion
+  - ydk:crosscut:core/warning-format

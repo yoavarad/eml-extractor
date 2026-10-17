@@ -1,0 +1,20 @@
+$schema: ydk:schema:req
+id: ydk:req:metadata/xfields
+description: >-
+  Original spec: all metadata fields that start with "X_" are joined into one long string field "xfields".
+  Implementation also matches "X-", the usual RFC custom-header form.
+type: business-rule
+priority: high
+rule: >-
+  A header is an X header when its field name has length >= 2, its first char is 'X' or 'x', and its second char is
+  '-' or '_'. EmlExtractionResult.XFields = all X header lines, each rendered "<original field name>: <decoded value>",
+  in header order, joined by \n (no trailing newline); "" when there are none. X headers are also present in Metadata
+  under their normalised keys. Non-X headers (e.g. DKIM-Signature) never appear in XFields.
+failure_behavior: XFields is "" when no X headers exist or on ydk:warning:extraction/parse-failed .
+related_components:
+  - ydk:entity:extraction/EmlExtractionResult
+  - ydk:entity:extraction/Metadata
+acceptance_criteria:
+  - X-Mailer, X_Custom_Field and X-Spam-Score lines all appear in XFields as "Name: value" (ExtractionTests.ExtractsClassicHeadersAndUnicodeSubject)
+  - Golden seed E10-xfields asserts DKIM-Signature is not contained in xfields
+  - Golden x-headers slice passes 121/121

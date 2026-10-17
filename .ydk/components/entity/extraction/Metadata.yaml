@@ -1,0 +1,123 @@
+$schema: ydk:schema:entity
+id: ydk:entity:extraction/Metadata
+description: >-
+  The header map exposed as EmlExtractionResult.Metadata. Built by HeaderMapper.Map
+  (src/EmlExtraction/HeaderMapper.cs) plus the two direction keys added by EmlExtractor.
+  Keys are ordinal (case-sensitive) strings. Construction order: (1) every raw header copied
+  under its normalised key; (2) overlay keys below overwrite; (3) direction keys added last.
+  Exception: when ydk:warning:extraction/parse-failed is recorded the map is empty (no keys at all,
+  including the "required" ones below).
+fields:
+  "<normalised header name>":
+    type: string
+    required: false
+    nullable: false
+    constraints: >-
+      Key = header field name trimmed, lower-cased (invariant), '-' replaced by '_' (e.g. DKIM-Signature -> dkim_signature,
+      X-Mailer -> x_mailer). Value = MimeKit-decoded header value (RFC 2047 decoded, unfolded). Repeated headers with the
+      same key are joined with \n in order. Applies to every header, including X- / X_ headers.
+    description: Generic entry for every header present in the message (ydk:req:metadata/all-headers).
+  from:
+    type: string
+    required: true
+    nullable: false
+    default: ""
+    constraints: >-
+      Parsed mailbox list formatted "Name <addr>" (or "addr" when no display name), groups "Group: m1; m2;", joined "; ".
+      If MimeKit parsed no mailbox: raw header value kept. If header absent: "".
+    description: Always present (ydk:req:metadata/classic-fields).
+  to:
+    type: string
+    required: true
+    nullable: false
+    default: ""
+    constraints: Same formatting and fallback as from.
+    description: Always present.
+  cc:
+    type: string
+    required: true
+    nullable: false
+    default: ""
+    constraints: Same formatting and fallback as from.
+    description: Always present.
+  bcc:
+    type: string
+    required: true
+    nullable: false
+    default: ""
+    constraints: Same formatting and fallback as from.
+    description: Always present.
+  replyto:
+    type: string
+    required: false
+    constraints: Formatted like from; set only when the parsed list is non-empty.
+    description: Reply-To overlay key.
+  sender:
+    type: string
+    required: false
+    constraints: MimeKit Sender mailbox ToString(); set only when non-blank.
+    description: Sender overlay key.
+  subject:
+    type: string
+    required: false
+    constraints: Decoded subject; set only when non-blank (otherwise the raw "subject" key, if any, remains).
+    description: Subject overlay key.
+  date:
+    type: string
+    required: false
+    constraints: ISO 8601 round-trip format ("o") of the parsed Date; set only when the date parsed.
+    description: Date overlay key (overwrites the raw Date value).
+  messageid:
+    type: string
+    required: false
+    constraints: Message-ID without angle brackets (MimeKit MessageId); set only when non-blank.
+    description: Message-ID overlay key.
+  inreplyto:
+    type: string
+    required: false
+    constraints: MimeKit InReplyTo; set only when non-blank.
+    description: In-Reply-To overlay key.
+  references:
+    type: string
+    required: false
+    constraints: Message-IDs joined by a single space; set only when at least one.
+    description: References overlay key.
+  mimeversion:
+    type: string
+    required: false
+    constraints: Raw MIME-Version header value; set only when non-blank.
+    description: MIME-Version overlay key.
+  contenttype:
+    type: string
+    required: false
+    constraints: MIME type of the top-level body entity (e.g. multipart/mixed); set only when non-blank.
+    description: Top-level content type overlay key.
+  returnpath:
+    type: string
+    required: false
+    constraints: First Return-Path header value; set only when non-blank.
+    description: Return-Path overlay key.
+  deliveredto:
+    type: string
+    required: false
+    constraints: First Delivered-To header value; set only when non-blank.
+    description: Delivered-To overlay key.
+  received:
+    type: string
+    required: false
+    constraints: All Received header values joined by \n in header order; set only when at least one.
+    description: Received trace overlay key.
+  subject_direction:
+    type: enum
+    values: [ltr, rtl]
+    required: true
+    description: Same value as EmlExtractionResult.SubjectDirection (ydk:req:content/text-direction).
+  content_direction:
+    type: enum
+    values: [ltr, rtl]
+    required: true
+    description: Same value as EmlExtractionResult.ContentDirection (ydk:req:content/text-direction).
+state_transitions: {}
+relationships: []
+indexes: []
+crud: []

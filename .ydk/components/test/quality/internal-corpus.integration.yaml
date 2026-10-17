@@ -1,0 +1,53 @@
+$schema: ydk:schema:test
+id: ydk:test:quality/internal-corpus.integration
+description: >-
+  Targeted asserts over real public mail, tests/EmlExtraction.Tests/InternalCorpusTests.cs (17 facts). Samples live
+  under the gitignored corpus/internal/; each test returns early (passes vacuously) when its file is missing, so CI
+  does not exercise them. Complements ydk:nfr:reliability/real-world-harvest-no-throw .
+level: integration
+target: ydk:contract:api/eml-extractor
+cases:
+  - name: ZimbraOutlookTnefUnpacksGifAttachments
+    description: TNEF unwrapped
+    given: corpus/internal/tnef/zimbra-tnef.msg
+    when: Extract is called
+    then: No warnings; no winmail.dat attachment; a non-empty "upload" file exists
+  - name: ExchangeMegaHeadersLandInXFields
+    description: Large Exchange header block
+    given: corpus/internal/exchange/leeholmes-o365-megaheaders.eml
+    when: Extract is called
+    then: At least 50 metadata keys; X-MS-Exchange-Organization-Network-Message-Id and X-Microsoft-Antispam-Message-Info lines in XFields
+  - name: OutlookShapedCidPasteIsExtracted
+    description: Chatwoot Outlook CID fixture
+    given: corpus/internal/cid/chatwoot-outlook-cid.eml
+    when: Extract is called
+    then: text/html body containing cid:image001.jpg@test; attachment with that ContentId and size > 0
+  - name: LegacyCharsetsDecode
+    description: ShiftJisBodyDecodes, Iso2022JpSubjectAndBodyDecode, Gb2312BodyDecodesWithoutThrowing
+    given: corpus/internal/gaps/ Shift_JIS, ISO-2022-JP, GB2312 samples
+    when: Extract is called
+    then: Subject/body decode without throwing
+  - name: DsnAndSmime
+    description: DsnReportKeepsHumanBodyAndDeliveryStatusPart, SmimeSignedYieldsBodyAndJpegAttachment
+    given: gaps/dsn-report.eml, gaps/smime-signed.eml
+    when: Extract is called
+    then: Human-readable body selected; delivery-status part / JPEG attachment collected
+  - name: RealOfficeAndTnef
+    description: PoiTnefUnpacksRealOleDocAndPdf, PoiTnefUnpacksRealPdfAndPng, SwiftMailerHasRealOfficeAndOpaqueNestedEml, ProtonForwardHasDocxXlsxPdfMagic
+    given: spec/tnef/*, spec/php-mails/issue274.eml, spec/office/proton-forwarding-docx.eml
+    when: Extract is called
+    then: Real OLE .doc / PDF / PNG / OOXML payloads present with expected magic; nested message kept opaque
+  - name: HebrewFromRealClients
+    description: GmailHebrewIso88598SubjectDecodes, BellcoreHebrewIso88598BodyDecodes
+    given: spec/php-mails/issue149, spec/unicode/jwz-hebrew-01.eml
+    when: Extract is called
+    then: ISO-8859-8 Hebrew subject/body decoded
+  - name: NestedAndCidReal
+    description: NestedRfc822ForwardStaysOpaque, OutlookPasteImage001At01DIsInlinePng, HashCidPngPasteKeepsCidInHtml
+    given: spec/php-mails/issue158a, spec/cid/outlook-paste-image001-01D.eml, spec/php-mails/m0129
+    when: Extract is called
+    then: "Nested mail opaque; inline PNG with Content-ID matching the HTML cid; cid: references left in HTML"
+stubs: []
+never_mock:
+  - EmlExtractor
+  - Real sample files (never synthesised; tests skip when absent)

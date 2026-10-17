@@ -1,0 +1,41 @@
+$schema: ydk:schema:test
+id: ydk:test:attachments/attachment.unit
+description: Attachment collection tests, tests/EmlExtraction.Tests/AttachmentTests.cs.
+level: unit
+target: ydk:contract:api/eml-extractor
+cases:
+  - name: OfficeAndBinaryAttachmentsRoundTrip
+    description: Typed stubs round-trip byte-exact
+    given: One attachment per row - report.docx, sheet.xlsx, deck.pptx, file.pdf, photo.jpg, anim.gif, archive.zip with matching media types and fake payloads
+    when: Extract is called
+    then: Exactly one attachment with the same name, size, SHA-256, and null FullPath
+  - name: NestedEmlIsOpaqueBinaryAndNotRecursed
+    description: message/rfc822 is one blob
+    given: Outer message "outer" with an attached forwarded.eml whose body is "inner body"
+    when: Extract is called
+    then: MainContent "outer"; single attachment forwarded.eml containing the inner body; no attachment named after inner parts
+  - name: CopyPasteCidImageIsExtracted
+    description: Inline CID image becomes an attachment
+    given: multipart/related HTML referencing cid:paste@local plus a PNG with that Content-ID
+    when: Extract is called
+    then: MainContent keeps cid:paste@local; one attachment with exact PNG bytes, name containing "paste", Disposition inline
+  - name: AttachedImageIsNotTreatedAsBody
+    description: Images never become the body
+    given: Alternative text/HTML body plus pic.png attachment
+    when: Extract is called
+    then: MainContent contains "see attach"; single attachment pic.png with exact bytes
+  - name: CalendarWithFilenameIsAttachment
+    description: A named text/calendar part is an attachment, not the body
+    given: Plain body "see invite" plus meet.ics attachment
+    when: Extract is called
+    then: MainContent "see invite"; attachments include meet.ics
+  - name: Pkcs7SignaturePartIsCollected
+    description: S/MIME signature kept as file
+    given: multipart/signed with text "signed-body" and application/pkcs7-signature smime.p7s
+    when: Extract is called
+    then: MainContent "signed-body"; attachments include smime.p7s
+stubs:
+  - Attachment payloads are tiny typed stubs (SampleFactory.FakeOffice, MinimalPng), not real Office files
+never_mock:
+  - EmlExtractor
+  - MimeKit

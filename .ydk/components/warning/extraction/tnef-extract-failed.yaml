@@ -1,0 +1,17 @@
+$schema: ydk:schema:warning
+id: ydk:warning:extraction/tnef-extract-failed
+description: >-
+  Unpacking an Outlook TNEF part (winmail.dat / application/ms-tnef) into its contained files threw
+  (any exception type).
+code: tnef_extract_failed
+message_template: "tnef_extract_failed: ${ExceptionMessage}"
+triggers:
+  - MimeKit TnefPart.ExtractAttachments throws on a corrupt or unsupported TNEF stream
+result_effect: >-
+  The raw TNEF part itself is added to Attachments as one opaque file (decoded bytes, its own name).
+  If decoding that raw part also fails, part_decode_failed is recorded as well. Files already unpacked
+  before the failure remain in Attachments.
+related:
+  - ydk:contract:api/eml-extractor
+  - ydk:req:attachments/tnef-unwrap
+  - ydk:crosscut:core/warning-format
