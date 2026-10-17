@@ -21,7 +21,7 @@ public sealed class ExtractionTests
 
             body
             """;
-        var result = _extractor.Extract(Encoding.ASCII.GetBytes(raw.Replace("\n", "\r\n")));
+        var result = _extractor.Extract(Encoding.ASCII.GetBytes(raw.ReplaceLineEndings("\r\n")));
         Assert.Equal("alice@example.com", result.Metadata["from"].Trim());
         Assert.Contains("bob@example.com", result.Metadata["to"]);
         Assert.Equal("", result.Metadata["cc"]);
@@ -71,7 +71,7 @@ public sealed class ExtractionTests
 
             body
             """;
-        var result = _extractor.Extract(Encoding.UTF8.GetBytes(raw.Replace("\n", "\r\n")));
+        var result = _extractor.Extract(Encoding.UTF8.GetBytes(raw.ReplaceLineEndings("\r\n")));
         Assert.Contains("alice@example.com", result.Metadata["from"]);
         Assert.Contains("bob@example.com", result.Metadata["to"]);
         Assert.Contains("carol@example.com", result.Metadata["cc"]);
@@ -169,7 +169,7 @@ public sealed class ExtractionTests
 
             body
             """;
-        var result = _extractor.Extract(Encoding.ASCII.GetBytes(raw.Replace("\n", "\r\n")));
+        var result = _extractor.Extract(Encoding.ASCII.GetBytes(raw.ReplaceLineEndings("\r\n")));
         Assert.Contains("hello", result.Metadata["subject"]);
         Assert.Contains("world", result.Metadata["subject"]);
     }
@@ -193,7 +193,7 @@ public sealed class ExtractionTests
 
             {b64}
             """;
-        var result = _extractor.Extract(Encoding.ASCII.GetBytes(raw.Replace("\n", "\r\n")));
+        var result = _extractor.Extract(Encoding.ASCII.GetBytes(raw.ReplaceLineEndings("\r\n")));
         Assert.Equal(hebrew, result.Metadata["subject"]);
         Assert.Equal(hebrew, result.MainContent);
     }
@@ -238,7 +238,7 @@ public sealed class ExtractionTests
 
             %%%%not-base64%%%%
             """;
-        var result = _extractor.Extract(Encoding.ASCII.GetBytes(raw.Replace("\n", "\r\n")));
+        var result = _extractor.Extract(Encoding.ASCII.GetBytes(raw.ReplaceLineEndings("\r\n")));
         Assert.Equal("corrupt", result.Metadata["subject"]);
     }
 
