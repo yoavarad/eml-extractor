@@ -6,13 +6,19 @@ description: >-
   Stateless per call; the static constructor registers CodePagesEncodingProvider once and parser options are a
   static, read-only clone (see ydk:library:deps/mimekit). Caller is expected to have checked the buffer with
   ydk:contract:api/eml-detector first; the extractor does not re-run detection.
+  Throw contract (ADR-004, per project owner 2026-10-17): content-driven failures never throw from either overload.
+  Known content failures map to their existing warnings; any other exception is caught and recorded as
+  ydk:warning:extraction/internal-error ; only programmer misuse (null argument) throws ArgumentNullException.
+  Current code (gap, Stage 02 work): the byte overload catches only the seven exception types listed on
+  ydk:warning:extraction/parse-failed and lets others propagate; the MimeMessage overload has no try/catch.
 methods:
   Extract(ReadOnlyMemory<byte>):
     description: >-
       Parse an in-memory EML buffer and return metadata, main content, attachments, directions, and warnings.
       If the buffer (after an optional UTF-8 BOM) starts with "From " it is parsed in mbox format (first message only);
-      otherwise as a single message. Parser/decoder exceptions of the caught types become
-      ydk:warning:extraction/parse-failed and an empty result; per-part failures become the other warnings below.
+      otherwise as a single message. Parser/decoder exceptions of the known types become
+      ydk:warning:extraction/parse-failed and an empty result; per-part failures become the other warnings below;
+      any other exception becomes ydk:warning:extraction/internal-error (target; see description).
     params:
       eml:
         type: ReadOnlyMemory<byte>
@@ -28,10 +34,13 @@ methods:
       - ydk:warning:extraction/part-decode-failed
       - ydk:warning:extraction/rfc822-extract-failed
       - ydk:warning:extraction/tnef-extract-failed
+      - ydk:warning:extraction/internal-error
   Extract(MimeMessage):
     description: >-
       Same mapping as the byte overload for an already-parsed MimeKit message; no parsing step, so
-      parse-failed is never recorded. Not part of IEmlExtractor.
+      parse-failed is never recorded. Not part of IEmlExtractor. Target: same no-throw behaviour as the byte
+      overload (unexpected exceptions become ydk:warning:extraction/internal-error ); a null message throws
+      ArgumentNullException. Today this overload has no top-level try/catch.
     params:
       message:
         type: MimeKit.MimeMessage
@@ -44,3 +53,4 @@ methods:
       - ydk:warning:extraction/part-decode-failed
       - ydk:warning:extraction/rfc822-extract-failed
       - ydk:warning:extraction/tnef-extract-failed
+      - ydk:warning:extraction/internal-error

@@ -47,7 +47,9 @@ Direction is reported, never applied. The text keeps its bidi marks, and the HTM
 
 ## Failure handling
 
-Extraction does not throw on the malformed input it knows how to handle ([ydk:req:extraction/no-throw-on-malformed], ADR-004). A whole-message parse failure returns an empty result with [ydk:warning:extraction/parse-failed]. Any other failure affects one part only and is recorded as a warning while the rest of the message is still extracted. The warning format is defined once in [cross-cutting.md](cross-cutting.md).
+Content never makes extraction throw ([ydk:req:extraction/no-throw-on-malformed], ADR-004). Per the project owner (2026-10-17), the downstream indexer and language-model pipeline extracts messages in batches, and one bad message must not abort the batch. Both ways of calling the extractor behave the same. A whole-message parse failure returns an empty result with [ydk:warning:extraction/parse-failed]. A failure in one part affects that part only and is recorded as a warning while the rest of the message is still extracted. Any other, unexpected failure is caught too and recorded as [ydk:warning:extraction/internal-error], naming the kind of failure. That warning means a library bug, so the tests and the golden scorer fail whenever it appears, and bugs surface in CI instead of hiding. Only programmer misuse, such as passing no message at all, still throws.
+
+The code does not do this yet: today it catches a fixed list of failure kinds when parsing bytes, lets any other kind escape, and catches nothing at the top level when given an already-parsed message. Closing that gap is Stage 02 work. The warning format is defined once in [cross-cutting.md](cross-cutting.md).
 
 ## Evidence
 

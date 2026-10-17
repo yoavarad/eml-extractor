@@ -1,0 +1,20 @@
+$schema: ydk:schema:warning
+id: ydk:warning:extraction/internal-error
+description: >-
+  TARGET BEHAVIOUR (ADR-004, per project owner 2026-10-17; implementation pending as Stage 02 work - today the code
+  does not record this warning). Recorded when an exception that is not one of the known content failures is raised
+  inside either Extract overload. It signals a library bug, not bad input: tests and GoldenKit fail on any
+  internal_error warning. ArgumentNullException for a null argument is programmer misuse and is still thrown.
+code: internal_error
+message_template: "internal_error: ${ExceptionTypeName}: ${ExceptionMessage}"
+triggers:
+  - Any exception other than the known content failures (parse_failed, body_decode_failed, part_decode_failed, rfc822_extract_failed, tnef_extract_failed) raised inside Extract(ReadOnlyMemory<byte>) or Extract(MimeMessage)
+result_effect: >-
+  Same shape as ydk:warning:extraction/parse-failed : empty Metadata, XFields "", MainContent null,
+  MainContentMimeType null, no attachments, directions ltr, and Warnings holding any warnings recorded before the
+  failure followed by this one.
+related:
+  - ydk:contract:api/eml-extractor
+  - ydk:entity:extraction/EmlExtractionResult
+  - ydk:crosscut:core/warning-format
+  - ydk:req:extraction/no-throw-on-malformed

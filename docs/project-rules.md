@@ -10,7 +10,7 @@ We are building an in-process C# / .NET 10 class library that decides whether a 
 
 - Stack is fixed (ADR-001): .NET SDK pinned by `global.json`; build with `TreatWarningsAsErrors=true`; `dotnet format --verify-no-changes` must pass; tests use xUnit.
 - Public surface is only `EmlDetector.IsEml`, `EmlExtractor.Extract` (byte and `MimeMessage` overloads), and the result records in `Models.cs`. Keep helpers `internal`.
-- Extraction never throws for handled failures. Record a warning `"<code>: <detail>"` instead (ADR-004, `ydk:crosscut:core/warning-format`). New warning kinds need a `ydk:warning:*` manifest.
+- Extraction never throws on content, from either `Extract` overload. Known content failures record their warning `"<code>: <detail>"`; any other exception records `internal_error` with the exception type. Only a null argument throws `ArgumentNullException` (ADR-004, `ydk:crosscut:core/warning-format`). Tests and GoldenKit must fail on any `internal_error` warning. New warning kinds need a `ydk:warning:*` manifest.
 - Metadata keys: header name lower-cased with `-` replaced by `_`. Classic overlay keys have no punctuation (`replyto`, `messageid`). `from`/`to`/`cc`/`bcc` are always present (ADR-005).
 - Attachments are flat and opaque. Never recurse into `message/rfc822` and never sniff file types. TNEF is the only wrapper that gets unpacked (ADR-008).
 - Golden `expected.json` values are authored from the catalog. `tools/GoldenKit gen` must never call `EmlExtractor` (ADR-007).
@@ -25,7 +25,7 @@ We are building an in-process C# / .NET 10 class library that decides whether a 
 - MimeKit TNEF and legacy charsets (GB2312, Shift_JIS, Windows-125x) need `Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)`. The extractor's static constructor does this; test code that decodes on its own (e.g. `GoldenTests.Cases`) must register it as well.
 - mbox-prefixed files (`From ` first line) must be parsed with `MimeParser(..., MimeFormat.Mbox)`. Before this, mbox `From_` lines "were breaking SpamAssassin" (commit 251657d).
 - The detector sniffs only the first 16 KB. Header blocks larger than that have no real-world sample yet (edge case E27).
-- The top-level `Extract` catch filters by exception type. An exception type outside that list propagates despite the "does not throw" wording in the README.
+- Not yet aligned with ADR-004: the byte `Extract` catch filters by seven exception types, so any other type propagates, and the `MimeMessage` overload has no try/catch. Fixing this is Stage 02 work.
 - `ydk` (Python) on Windows reads manifests and narratives with the cp1252 codepage. Non-Latin characters (Hebrew, CJK) in `.ydk/components/**` or `docs/specs/**` crash `ydk component validate` with `UnicodeDecodeError`. Keep those files ASCII, or set `PYTHONUTF8=1`. (Observed with ydk 1.6.0 on Windows.)
 - The YDK cross-ref linker treats a `.` directly after a `ydk:type:ns/name` ID in a manifest as part of the ID. Put a space before sentence-ending punctuation. (Observed with ydk 1.6.0 on Windows.)
 - `tools/GoldenKit` locates the repo root via `EmlExtraction.slnx`; its other marker, `docs/golden-1200-plan.md`, no longer exists (renamed to `docs/golden.md`).

@@ -3,7 +3,8 @@ id: ydk:warning:extraction/parse-failed
 description: >-
   The whole-message parse, or the mapping that follows it, threw one of the caught exception types:
   FormatException, MimeKit ParseException, IOException, InvalidOperationException, ArgumentException,
-  NotSupportedException, DecoderFallbackException. Other exception types are not caught and propagate to the caller.
+  NotSupportedException, DecoderFallbackException. Today other exception types are not caught and propagate to the caller;
+  the target is ydk:warning:extraction/internal-error for them (ADR-004, Stage 02 work).
 code: parse_failed
 message_template: "parse_failed: ${ExceptionTypeName}: ${ExceptionMessage}"
 triggers:

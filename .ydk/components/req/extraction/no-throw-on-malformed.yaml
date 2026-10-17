@@ -10,11 +10,15 @@ rule: >-
   warning plus an empty result. Per-part failures are converted to ydk:warning:extraction/body-decode-failed,
   ydk:warning:extraction/part-decode-failed, ydk:warning:extraction/rfc822-extract-failed or
   ydk:warning:extraction/tnef-extract-failed and extraction continues. Warnings never abort extraction of other parts.
-  Exception types outside the parse-failed list are not caught at the top level.
-failure_behavior: See the five warning components; each defines the resulting partial result.
+  Target (ADR-004, per project owner 2026-10-17): both Extract overloads behave the same; any other exception is
+  caught and recorded as ydk:warning:extraction/internal-error ; only a null argument throws ArgumentNullException.
+  Tests and GoldenKit fail on any internal_error warning. Current code (Stage 02 gap): exception types outside the
+  parse-failed list propagate from the byte overload, and the MimeMessage overload catches nothing at the top level.
+failure_behavior: See the six warning components; each defines the resulting partial result.
 related_components:
   - ydk:contract:api/eml-extractor
   - ydk:crosscut:core/warning-format
+  - ydk:warning:extraction/internal-error
 acceptance_criteria:
   - Corrupt base64 body extracts the subject without throwing (ExtractionTests.CorruptBase64DoesNotCrash; golden corrupt-transfer-encoding 10/10)
   - Headers-only message records no parse_failed warning (HeadersOnlyDoesNotThrow)
