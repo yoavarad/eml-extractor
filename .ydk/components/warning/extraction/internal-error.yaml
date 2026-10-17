@@ -3,16 +3,21 @@ id: ydk:warning:extraction/internal-error
 description: >-
   TARGET BEHAVIOUR (ADR-004, per project owner 2026-10-17; implementation pending as Stage 02 work - today the code
   does not record this warning). Recorded when an exception that is not one of the known content failures is raised
-  inside either Extract overload. It signals a library bug, not bad input: tests and GoldenKit fail on any
+  inside either Extract overload, after the message was parsed. Each extraction stage (metadata = header mapping and
+  xfields, body = body selection plus direction, attachments = attachment collection) is guarded separately, so one
+  warning names one failed stage. It signals a library bug, not bad input: tests and GoldenKit fail on any
   internal_error warning. ArgumentNullException for a null argument is programmer misuse and is still thrown.
 code: internal_error
-message_template: "internal_error: ${ExceptionTypeName}: ${ExceptionMessage}"
+message_template: "internal_error: ${Stage}: ${ExceptionTypeName}: ${ExceptionMessage}"
 triggers:
   - Any exception other than the known content failures (parse_failed, body_decode_failed, part_decode_failed, rfc822_extract_failed, tnef_extract_failed) raised inside Extract(ReadOnlyMemory<byte>) or Extract(MimeMessage)
 result_effect: >-
-  Same shape as ydk:warning:extraction/parse-failed : empty Metadata, XFields "", MainContent null,
-  MainContentMimeType null, no attachments, directions ltr, and Warnings holding any warnings recorded before the
-  failure followed by this one.
+  Partial result, per stage (per project owner 2026-10-17). The failed stage contributes its empty default and every
+  stage that succeeded keeps its output. Defaults: metadata stage -> Metadata with no header keys and XFields "";
+  body stage -> MainContent null, MainContentMimeType null, SubjectDirection and ContentDirection ltr; attachments
+  stage -> no attachments. One internal_error warning is added per failed stage, after any warnings recorded before
+  the failure. A whole-message parse failure is not this warning: it stays ydk:warning:extraction/parse-failed with an
+  empty result.
 related:
   - ydk:contract:api/eml-extractor
   - ydk:entity:extraction/EmlExtractionResult

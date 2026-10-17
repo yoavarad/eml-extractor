@@ -17,7 +17,7 @@ There is one diagnostic channel: the ordered warnings list on [ydk:entity:extrac
 - [ydk:warning:extraction/part-decode-failed] - one attachment could not be decoded and is skipped.
 - [ydk:warning:extraction/rfc822-extract-failed] - one nested message could not be serialised and is skipped.
 - [ydk:warning:extraction/tnef-extract-failed] - an Outlook wrapper could not be unpacked and is kept whole.
-- [ydk:warning:extraction/internal-error] - an unexpected failure, which means a library bug; the result is empty. Not recorded by the code yet (Stage 02).
+- [ydk:warning:extraction/internal-error] - an unexpected failure in one extraction stage, which means a library bug; that stage comes back empty and the others keep their output. Not recorded by the code yet (Stage 02).
 
 A caller tells warnings apart by their leading code, never by the free text after it. The policy that turns failures into warnings is [ydk:req:extraction/no-throw-on-malformed] (ADR-004).
 

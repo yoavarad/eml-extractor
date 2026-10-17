@@ -7,8 +7,10 @@ description: >-
   static, read-only clone (see ydk:library:deps/mimekit). Caller is expected to have checked the buffer with
   ydk:contract:api/eml-detector first; the extractor does not re-run detection.
   Throw contract (ADR-004, per project owner 2026-10-17): content-driven failures never throw from either overload.
-  Known content failures map to their existing warnings; any other exception is caught and recorded as
-  ydk:warning:extraction/internal-error ; only programmer misuse (null argument) throws ArgumentNullException.
+  Known content failures map to their existing warnings. After parsing, each stage (metadata, body plus direction,
+  attachments) is guarded separately: a stage that throws unexpectedly contributes its empty default and records one
+  ydk:warning:extraction/internal-error naming the stage, while the other stages keep their output. A parse failure
+  stays an empty result with parse_failed. Only programmer misuse (null argument) throws ArgumentNullException.
   Current code (gap, Stage 02 work): the byte overload catches only the seven exception types listed on
   ydk:warning:extraction/parse-failed and lets others propagate; the MimeMessage overload has no try/catch.
 methods:
