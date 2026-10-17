@@ -13,14 +13,18 @@ rule: >-
   First-strong: scan code points in order; U+200F, U+202B, U+202E, U+2067 -> rtl; U+200E, U+202A, U+202D, U+2066 -> ltr;
   U+202C, U+2068, U+2069 skipped; code point in U+0590-U+08FF, U+FB1D-U+FDFF, U+FE70-U+FEFF, U+10800-U+10FFF,
   U+1E800-U+1EFFF -> rtl; any other letter (Lu, Ll, Lt, Lm, Lo, Nl) -> ltr; no strong character -> ltr.
-  The value is written both to the result property and to the metadata key (subject_direction / content_direction).
+  The value is written to the result property (SubjectDirection / ContentDirection). Target (ADR-016; not
+  implemented, Stage 02): the property is the only place; today the value is also written to the metadata keys
+  subject_direction / content_direction, which are removed.
   Content and subject text are not modified (bidi marks and dir markup kept).
 failure_behavior: Not a failure path; defaults to ltr.
 related_components:
   - ydk:entity:extraction/EmlExtractionResult
   - ydk:entity:extraction/Metadata
+  - ydk:req:content/unicode-fidelity
 acceptance_criteria:
-  - Plain Hebrew and Arabic subject/body -> rtl in both properties and metadata keys; English -> ltr (ExoticLanguageTests.PlainHebrewIsRtlAndEnglishIsLtr)
+  - Plain Hebrew and Arabic subject/body -> rtl in both properties (and, until Stage 02, the metadata keys); English -> ltr (ExoticLanguageTests.PlainHebrewIsRtlAndEnglishIsLtr)
+  - Target - Metadata has no subject_direction or content_direction key (ydk:req:metadata/canonical-keys)
   - HTML dir="ltr" wrapper around Hebrew text -> content ltr while Hebrew subject stays rtl; dir="rtl" kept in MainContent (HtmlDirAttributeWinsOverLetterScript)
   - CSS direction:rtl is detected (CssDirectionRtlIsDetected)
   - Leading RLM/LRM marks set direction and survive in the text (BidiMarksSurviveAndSetDirection)

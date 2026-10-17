@@ -1,0 +1,39 @@
+$schema: ydk:schema:req
+id: ydk:req:attachments/container-path
+description: >-
+  Brief "full path if it exists" read as the subfile's position inside the message (ADR-013). Target; not implemented
+  (Stage 02). Today FullPath is the raw filename only when it contains / or \ and is otherwise null.
+type: business-rule
+priority: high
+rule: >-
+  For every ydk:entity:extraction/ExtractedAttachment , FullPath is non-null and equals the segments of the file
+  containers the part was reached through, followed by the part's FileName, joined by "/".
+  Container segments: a TNEF wrapper (ydk:req:attachments/tnef-unwrap) contributes its FileName (usually winmail.dat);
+  a nested message would contribute its FileName, but nested messages are not entered (ydk:req:attachments/no-recursion),
+  so within one Extract call the only possible container is a TNEF wrapper. MIME multipart nodes contribute nothing.
+  The path is relative to the message passed in and never includes EmlExtractionRequest.FileName.
+  Segment names: FileName as produced by the naming rule on the entity (basename after splitting on / and \, trimmed);
+  an empty, "." or ".." basename counts as nameless and takes the fallback name; "/" and "\" inside a fallback name are
+  replaced by "_".
+  Uniqueness: FullPath values are unique within one result under ordinal case-insensitive comparison. On collision the
+  last segment gets "~<n>" inserted before its extension (the text from the last "." that is not the first character),
+  or appended when there is none, with n the smallest free integer from 2. FileName is never changed by de-duplication.
+  Additional info: OriginalPath = raw trimmed sender filename when it contains / or \, else null; ContentLocation =
+  decoded, trimmed Content-Location header of the part, else null. Neither is used to build FullPath.
+  Caller composition for re-extracted nested messages: inner path = outer FullPath + "/" + inner FullPath.
+failure_behavior: >-
+  Not a failure path. A part skipped by ydk:warning:extraction/part-decode-failed has no FullPath and does not
+  reserve one.
+related_components:
+  - ydk:entity:extraction/ExtractedAttachment
+  - ydk:req:attachments/attachment-record
+  - ydk:req:attachments/tnef-unwrap
+  - ydk:req:attachments/no-recursion
+acceptance_criteria:
+  - A top-level report.docx has FileName "report.docx" and FullPath "report.docx"
+  - A file budget.xlsx unpacked from winmail.dat has FullPath "winmail.dat/budget.xlsx"
+  - A forwarded fwd.eml has FullPath "fwd.eml"; re-extracting it and prefixing gives "fwd.eml/report.docx" for its report.docx
+  - Two top-level parts both named image001.png get FullPath "image001.png" and "image001~2.png"; both keep FileName "image001.png"
+  - Filename "../../etc/passwd.txt" gives FileName "passwd.txt", FullPath "passwd.txt", OriginalPath "../../etc/passwd.txt"
+  - A part with Content-Location "http://example.com/a.png" reports it in ContentLocation and not in FullPath
+  - A nameless image/png part whose Content-ID is "a/b@x" gets FileName and FullPath "a_b@x.png"

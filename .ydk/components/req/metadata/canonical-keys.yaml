@@ -1,0 +1,28 @@
+$schema: ydk:schema:req
+id: ydk:req:metadata/canonical-keys
+description: >-
+  Metadata cleanup (ADR-016): one canonical key per header, computed values separated from header keys, fixed keys
+  present in every result. Target; not implemented (Stage 02). Today raw keys fold "-" to "_", the classic overlay adds
+  second punctuation-free keys (replyto beside reply_to), X-Foo and X_Foo collide on x_foo, direction keys sit in the
+  map, and the map is empty on parse_failed.
+type: business-rule
+priority: critical
+rule: >-
+  Key = header field name trimmed and lower-cased (invariant culture); no other character is changed ("-" and "_" are
+  kept). Each header has exactly one key; repeated headers sharing a key are joined with \n in header order. The classic
+  overlay (ydk:req:metadata/classic-fields) writes into the header's own key and creates no other key. The only computed
+  key is "xfields" (ydk:req:metadata/xfields); a header named xfields in any case is stored under "header:xfields"
+  (":" cannot occur in an RFC 5322 field name). Direction values are not in Metadata
+  (ydk:req:content/text-direction). Keys "from", "to", "cc", "bcc", "xfields" are present in every result, including
+  results carrying ydk:warning:extraction/parse-failed or ydk:warning:extraction/input-too-large , with "" when unknown.
+failure_behavior: Not a failure path. On parse_failed and input_too_large Metadata holds exactly the five fixed keys with "".
+related_components:
+  - ydk:entity:extraction/Metadata
+  - ydk:req:metadata/all-headers
+  - ydk:req:metadata/classic-fields
+acceptance_criteria:
+  - Headers X-Foo "a" and X_Foo "b" give metadata x-foo "a" and x_foo "b" (no merge)
+  - Reply-To and Message-ID give only keys reply-to and message-id (no replyto, reply_to, messageid, message_id)
+  - No key subject_direction or content_direction exists in Metadata
+  - A buffer that fails to parse gives Metadata with exactly from, to, cc, bcc, xfields, all ""
+  - A header "XFields - z" (name XFields, value z) gives Metadata["header:xfields"] "z" while Metadata["xfields"] keeps the concatenation

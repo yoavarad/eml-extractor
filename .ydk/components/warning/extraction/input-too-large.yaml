@@ -1,0 +1,16 @@
+$schema: ydk:schema:warning
+id: ydk:warning:extraction/input-too-large
+description: >-
+  The input is longer than the extractor's maxInputBytes limit (ydk:req:extraction/max-input-size). Target; not
+  implemented (Stage 02).
+code: input_too_large
+message_template: "input_too_large: ${InputBytes} > ${MaxInputBytes}"
+triggers:
+  - EmlExtractionRequest.FileBytes.Length is greater than maxInputBytes
+result_effect: >-
+  Nothing is parsed. Metadata holds only from, to, cc, bcc, xfields, each ""; MainContent null; MainContentMimeType
+  null; no attachments; SubjectDirection and ContentDirection ltr; Warnings holds only this warning.
+related:
+  - ydk:contract:api/eml-extractor
+  - ydk:crosscut:core/warning-format
+  - ydk:req:extraction/max-input-size

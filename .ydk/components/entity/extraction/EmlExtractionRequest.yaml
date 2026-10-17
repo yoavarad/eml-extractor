@@ -1,0 +1,29 @@
+$schema: ydk:schema:entity
+id: ydk:entity:extraction/EmlExtractionRequest
+description: >-
+  Input record of ydk:contract:api/eml-extractor (ADR-012). Target; not implemented (Stage 02). Today Extract takes
+  ReadOnlyMemory<byte> directly. Public sealed record with init-only properties. In-memory value object, not persisted.
+  Shared-contract counterpart of the OLE extractor's ExtractionRequest (FileBytes + FileName). Further optional
+  sources (stream, file path) may be added later as new optional members; none exists now.
+fields:
+  FileBytes:
+    type: ReadOnlyMemory<byte>
+    required: true
+    nullable: false
+    default: empty
+    constraints: >-
+      Whole message bytes. A byte[] converts implicitly. Wrapped without copy when backed by a full array
+      (offset 0, full length); otherwise copied once. Length above the extractor's limit gives
+      ydk:warning:extraction/input-too-large (ydk:req:extraction/max-input-size). Empty gives parse_failed.
+    description: The message to extract.
+  FileName:
+    type: string
+    required: false
+    nullable: true
+    default: null
+    constraints: Traceability only. Never read by detection or extraction logic and never changes the result; not used as a FullPath prefix.
+    description: Caller's name for the file (for logs in the caller's pipeline).
+state_transitions: {}
+relationships: []
+indexes: []
+crud: []

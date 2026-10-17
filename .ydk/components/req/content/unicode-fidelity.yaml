@@ -1,0 +1,30 @@
+$schema: ydk:schema:req
+id: ydk:req:content/unicode-fidelity
+description: >-
+  Brief correctness A: emoji and exotic languages survive extraction exactly. Scripts are covered today; the emoji
+  sequence cases below (skin tone, flags, keycap, combining marks, split encoded-words) are target; not implemented
+  (Stage 02). Today only one ZWJ family row exists in ExoticLanguageTests.
+type: business-rule
+priority: critical
+rule: >-
+  For subject, MainContent, display names in from/to/cc/bcc, and attachment FileName, the extracted string equals the
+  authored string by ordinal comparison (no normalisation, no stripping), whether the source used raw UTF-8 (RFC 6532),
+  RFC 2047 encoded-words (B and Q), RFC 2231 parameters, base64, or quoted-printable bodies. Covered sequences:
+  ZWJ sequences (U+1F468 U+200D U+1F469 U+200D U+1F467 U+200D U+1F466); skin-tone modifiers (U+1F44D U+1F3FD);
+  regional-indicator flags (U+1F1EE U+1F1F1, U+1F1FA U+1F1F8); keycap with variation selector (U+0031 U+FE0F U+20E3);
+  combining marks (U+0065 U+0301 decomposed; Hebrew with niqqud U+05E9 U+05C1 U+05B8; Devanagari U+0915 U+094D U+0937);
+  a ZWJ sequence split across two adjacent encoded-words; scripts Hebrew, Arabic, Chinese, Japanese, Hindi, Thai,
+  Russian.
+failure_behavior: >-
+  Not a failure path; a mismatch is a defect. Undecodable body bytes follow
+  ydk:warning:extraction/body-decode-failed .
+related_components:
+  - ydk:entity:extraction/EmlExtractionResult
+  - ydk:entity:extraction/Metadata
+  - ydk:req:content/text-direction
+  - ydk:test:extraction/exotic-language.unit
+acceptance_criteria:
+  - Every listed sequence round-trips with exact ordinal equality in subject and body, in UTF-8, base64, and quoted-printable (ydk:test:extraction/exotic-language.unit)
+  - A ZWJ family split across two RFC 2047 encoded-words decodes to the original sequence
+  - An attachment FileName with a flag emoji in an RFC 2231 parameter equals the authored name
+  - Expected values are the authored strings, never extractor output (ydk:req:quality/golden-independence)

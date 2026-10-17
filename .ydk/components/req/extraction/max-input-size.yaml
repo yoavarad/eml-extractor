@@ -1,0 +1,25 @@
+$schema: ydk:schema:req
+id: ydk:req:extraction/max-input-size
+description: >-
+  Input-size guard. Target; not implemented (Stage 02). Today nothing caps input size and all attachments are decoded
+  into memory, so one oversized message can exhaust the host's RAM. Streaming stays DEFERRED (docs/specs/scope.md)
+  unless ydk:nfr:performance/memory-footprint shows the in-memory model cannot meet its ceiling.
+type: constraint
+priority: high
+rule: >-
+  EmlExtractor has one optional constructor parameter maxInputBytes (long, default 157286400 = 150 MiB, the largest
+  message size Exchange Online accepts; must be > 0, otherwise ArgumentOutOfRangeException at construction).
+  When EmlExtractionRequest.FileBytes.Length > maxInputBytes, Extract does not parse: it returns a result with
+  ydk:warning:extraction/input-too-large , Metadata holding only the fixed keys with "" (ydk:req:metadata/canonical-keys),
+  MainContent null, no attachments, directions ltr. A length equal to the limit is parsed. The detector is not limited:
+  it reads at most 16 KB.
+failure_behavior: Records ydk:warning:extraction/input-too-large ; never throws.
+related_components:
+  - ydk:contract:api/eml-extractor
+  - ydk:entity:extraction/EmlExtractionRequest
+  - ydk:nfr:performance/memory-footprint
+acceptance_criteria:
+  - With maxInputBytes 1024, a 1025-byte message gives exactly one warning starting with "input_too_large" and no attachments
+  - With maxInputBytes 1024, a 1024-byte message is extracted normally
+  - new EmlExtractor(0) throws ArgumentOutOfRangeException
+  - Default construction accepts a 150 MiB input and rejects 150 MiB + 1 byte

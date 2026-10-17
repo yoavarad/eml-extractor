@@ -8,7 +8,9 @@ cases:
     description: Typed stubs round-trip byte-exact
     given: One attachment per row - report.docx, sheet.xlsx, deck.pptx, file.pdf, photo.jpg, anim.gif, archive.zip with matching media types and fake payloads
     when: Extract is called
-    then: Exactly one attachment with the same name, size, SHA-256, and null FullPath
+    then: >-
+      Exactly one attachment with the same name, size, SHA-256, and null FullPath. Target (ADR-012, ADR-013; Stage 02) -
+      same FileName, SizeInBytes, SHA-256 of BinaryData, and FullPath equal to FileName
   - name: NestedEmlIsOpaqueBinaryAndNotRecursed
     description: message/rfc822 is one blob
     given: Outer message "outer" with an attached forwarded.eml whose body is "inner body"

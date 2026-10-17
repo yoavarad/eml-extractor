@@ -1,7 +1,7 @@
 # ADR-006: Report subject and content text direction as ltr/rtl
 
 ## Status
-Accepted (recorded retroactively, Stage 01 Rewrite)
+Accepted (recorded retroactively, Stage 01 Rewrite). Amended by ADR-016: direction values are reported only on the result properties, no longer as metadata keys (target, Stage 02).
 
 ## Context
 The library must support Hebrew and Arabic (Correctness A in `docs/requirements.md`). Commit `c3b39bb` adds direction so callers can rely on "subject/content direction from HTML dir or first-strong Unicode".

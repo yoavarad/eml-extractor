@@ -3,28 +3,33 @@ id: ydk:entity:extraction/EmlExtractionResult
 description: >-
   Immutable record returned by every Extract call. Source: src/EmlExtraction/Models.cs
   (public sealed record EmlExtractionResult). In-memory value object, not persisted.
+  Target change (ADR-014; not implemented, Stage 02): the XFields property is removed and its value lives only in
+  Metadata["xfields"].
 fields:
   Metadata:
     type: IReadOnlyDictionary<string, string>
     required: true
     nullable: false
     description: >-
-      Header map; key set and value formats defined by ydk:entity:extraction/Metadata .
-      Empty dictionary when ydk:warning:extraction/parse-failed is recorded.
+      Header map; key set and value formats defined by ydk:entity:extraction/Metadata . Target: always holds
+      from, to, cc, bcc, xfields, also on ydk:warning:extraction/parse-failed and
+      ydk:warning:extraction/input-too-large (ydk:req:metadata/canonical-keys). Today it is empty on parse_failed.
   XFields:
     type: string
     required: true
     nullable: false
     default: ""
-    constraints: "Lines 'Field: value' joined by \\n, in header order; see ydk:req:metadata/xfields"
-    description: Concatenation of every X- / X_ header line.
+    constraints: >-
+      Current code only; removed by ADR-014 (Stage 02). Lines 'Field: value' joined by \n, in header order,
+      for X- and X_ headers; target value and rule are Metadata["xfields"] per ydk:req:metadata/xfields .
+    description: Concatenation of every X- / X_ header line (current behaviour).
   MainContent:
     type: string
     required: true
     nullable: true
     constraints: >-
       Decoded text of the selected body part with trailing CR/LF trimmed; HTML is kept as markup.
-      null when no selectable body part exists, when body decode fails, or on parse failure.
+      null when no selectable body part exists, when body decode fails, on parse failure, or on input_too_large.
     description: Main body selected per ydk:req:content/main-content-selection .
   MainContentMimeType:
     type: string
@@ -51,13 +56,17 @@ fields:
     values: [ltr, rtl]
     required: false
     default: ltr
-    description: Paragraph direction of the subject (init-only property); see ydk:req:content/text-direction .
+    description: >-
+      Paragraph direction of the subject (init-only property); see ydk:req:content/text-direction . Target: the only
+      place this value is reported (no metadata key, ADR-016).
   ContentDirection:
     type: enum
     values: [ltr, rtl]
     required: false
     default: ltr
-    description: Paragraph direction of MainContent (init-only property); see ydk:req:content/text-direction .
+    description: >-
+      Paragraph direction of MainContent (init-only property); see ydk:req:content/text-direction . Target: the only
+      place this value is reported (no metadata key, ADR-016).
 state_transitions: {}
 relationships:
   - entity: ydk:entity:extraction/ExtractedAttachment

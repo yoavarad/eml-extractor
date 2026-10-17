@@ -6,18 +6,24 @@ description: >-
 kind: deployment-surface
 specification: >-
   In-process .NET 10 class library (src/EmlExtraction) consumed by project reference. Public surface is exactly
-  ydk:contract:api/eml-detector and ydk:contract:api/eml-extractor plus the result records
-  ydk:entity:extraction/EmlExtractionResult and ydk:entity:extraction/ExtractedAttachment .
+  ydk:contract:api/eml-detector and ydk:contract:api/eml-extractor plus the records
+  ydk:entity:extraction/EmlExtractionResult and ydk:entity:extraction/ExtractedAttachment , and, as target
+  (ADR-012, not implemented, Stage 02), ydk:entity:extraction/EmlExtractionRequest and
+  ydk:entity:extraction/EmlDetectionResult . No MimeKit type appears in the target public surface.
   Not present, by design of the original spec and README: HTTP routes, authentication/authorisation, frontend pages,
   CORS, health checks, pagination, persistence, generated IDs, logging/tracing, configuration files, environment
-  variables. Input is a whole message held in memory; output holds all decoded bytes in memory; no streaming, no disk
-  or network I/O. Timestamps: the only one is the message Date, emitted in ISO 8601 round-trip ("o") form.
-  Both public classes keep no per-instance mutable state; parser options and the code-page provider registration are
-  static and set once.
+  variables. Input is a whole message held in memory, capped by maxInputBytes (target, ydk:req:extraction/max-input-size);
+  output holds all decoded bytes in memory; no streaming, no disk or network I/O. Timestamps: the only one is the
+  message Date, emitted in ISO 8601 round-trip ("o") form.
+  Both public classes keep no per-instance mutable state (the target extractor holds only its read-only
+  maxInputBytes); parser options and the code-page provider registration are static and set once.
+  Integration into the team's extraction template and factory is done by the team and is not specified here
+  (docs/team-questions.md).
 applies_to: Entire library (src/EmlExtraction). Tools (tools/GoldenKit) and benches are developer utilities, not shipped surface.
 implementation_notes:
   - Do not add routes, auth, or UI components to the spec; they are OUT of scope (docs/specs/scope.md).
   - Thread-safety is not documented in the repo; the absence of instance state is a code observation, not a guarantee.
+  - The surface change of ADR-012 is breaking; it is made while there are no consumers.
 related:
   - ydk:contract:api/eml-detector
   - ydk:contract:api/eml-extractor

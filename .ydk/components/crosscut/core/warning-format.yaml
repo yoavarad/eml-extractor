@@ -8,7 +8,7 @@ kind: error-format
 specification: >-
   EmlExtractionResult.Warnings is an ordered list of strings, in the order problems were met during extraction.
   Each string is "<code>: <detail>" where <code> is one of parse_failed, body_decode_failed, part_decode_failed,
-  rfc822_extract_failed, tnef_extract_failed, internal_error (lower snake_case, no spaces) and <detail> is the template defined on the
+  rfc822_extract_failed, tnef_extract_failed, internal_error, input_too_large (target, Stage 02) (lower snake_case, no spaces) and <detail> is the template defined on the
   matching warning component (typically the .NET exception message, prefixed for parse_failed by the exception type
   name and for part_decode_failed by the part's filename or MIME type). Consumers identify a warning by its prefix
   (string StartsWith "<code>"), never by the free-text detail. An empty list means a clean extraction.
@@ -23,4 +23,5 @@ related:
   - ydk:warning:extraction/rfc822-extract-failed
   - ydk:warning:extraction/tnef-extract-failed
   - ydk:warning:extraction/internal-error
+  - ydk:warning:extraction/input-too-large
   - ydk:entity:extraction/EmlExtractionResult

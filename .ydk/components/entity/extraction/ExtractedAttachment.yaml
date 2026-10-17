@@ -4,37 +4,46 @@ description: >-
   One collected MIME part (attachment, inline image, nested message, TNEF-unpacked file, or
   non-selected body-like part). Source: src/EmlExtraction/Models.cs (public sealed record
   ExtractedAttachment), built by PartCollector. In-memory value object, not persisted.
+  Target field names and meanings follow the shared team contract (ADR-012) and the container-path rule (ADR-013);
+  not implemented (Stage 02). Today the fields are Name, Size, FullPath (raw path-bearing filename or null), Data,
+  ContentId, Disposition. Shared fields: FileName, SizeInBytes, FullPath, BinaryData. EML-only fields: ContentId,
+  Disposition, OriginalPath, ContentLocation.
 fields:
-  Name:
+  FileName:
     type: string
     required: true
     nullable: false
     constraints: >-
       Basename of the MIME filename (Content-Type name / Content-Disposition filename), trimmed of
       whitespace and surrounding quotes; path separators / and \ removed by taking the last segment.
-      Fallbacks when no filename: "<content-id without angle brackets>.<media-subtype>" if a Content-ID exists,
-      else "part-<index>.<media-subtype>" (index = attachments collected so far, subtype "bin" if empty);
-      nested message/rfc822 without a name -> "attached.eml".
+      Empty, "." or ".." after that counts as nameless. Fallbacks when nameless: "<content-id without angle
+      brackets>.<media-subtype>" if a Content-ID exists, else "part-<index>.<media-subtype>" (index = attachments
+      collected so far, subtype "bin" if empty); nested message/rfc822 without a name -> "attached.eml".
+      "/" and "\" inside a fallback name are replaced by "_". Today this field is named Name.
     description: File name to present for this part.
-  Size:
+  SizeInBytes:
     type: long
     required: true
     nullable: false
-    constraints: "Equals Data.Length (decoded byte count, not encoded size)"
+    constraints: "Equals BinaryData.Length (decoded byte count, not encoded size). Today this field is named Size."
     description: Decoded size in bytes.
   FullPath:
     type: string
     required: true
-    nullable: true
-    constraints: "Raw (trimmed) filename only when it contains / or \\; otherwise null"
-    description: Original path-bearing filename, kept separately from Name (path traversal is preserved, not resolved).
-  Data:
+    nullable: false
+    constraints: >-
+      Container path per ydk:req:attachments/container-path : container segments (TNEF wrapper name) then FileName,
+      joined by "/"; equals FileName for parts outside any container; unique within the result (case-insensitive,
+      "~<n>" suffix on collision). Today: the raw trimmed filename only when it contains / or \, otherwise null.
+    description: Position of the subfile inside the message (brief "full path").
+  BinaryData:
     type: byte[]
     required: true
     nullable: false
     constraints: >-
       Transfer-decoded bytes (base64 / quoted-printable undone). For message/rfc822 parts: the inner message
       re-serialised by MimeKit (opaque .eml bytes, not recursed). Empty array when the part has no content.
+      Today this field is named Data.
     description: Binary payload.
   ContentId:
     type: string
@@ -48,6 +57,22 @@ fields:
     nullable: true
     constraints: "Content-Disposition value as written (e.g. attachment, inline); null when the header is absent"
     description: Disposition type of the part.
+  OriginalPath:
+    type: string
+    required: true
+    nullable: true
+    constraints: >-
+      Raw trimmed sender filename when it contains / or \, otherwise null. Not resolved or sanitised; never used to
+      build FullPath. Target (ADR-013); today this value is reported as FullPath.
+    description: Path-bearing filename as the sender wrote it (kept, not trusted).
+  ContentLocation:
+    type: string
+    required: true
+    nullable: true
+    constraints: >-
+      Decoded, trimmed Content-Location header value of the part; null when absent. Not used to build FullPath.
+      Target (ADR-013); today Content-Location is ignored.
+    description: Location the sender declared for this part (often a URL).
 state_transitions: {}
 relationships: []
 indexes: []

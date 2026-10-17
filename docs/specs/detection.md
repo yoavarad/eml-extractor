@@ -15,6 +15,10 @@ The detector works only on the leading bytes of the buffer and never throws.
 5. **mbox separator.** Files exported from mbox archives, such as the SpamAssassin corpus, begin with a "From " separator line. That line is skipped, and the header check runs on the lines after it. The extractor honours the same convention ([ydk:req:extraction/mbox-from-line]).
 6. **Header block shape.** The leading lines must look like a mail header block: a few well-formed header lines, at least one of them a well-known envelope header. The block may end at the blank line that separates headers from body or at the first line that is not a header; either way is accepted. A block that does neither before the sniff window runs out must be slightly longer to count. The exact thresholds and the list of envelope headers are in [ydk:req:detection/detect-eml].
 
+## What it returns
+
+The brief asks for a yes/no answer, and that call stays. Per the shared team contract (ADR-012), the detector also offers a typed answer, [ydk:entity:extraction/EmlDetectionResult]: the same yes/no plus the media type of the detected format, so the team's template can route the OLE and EML extractors the same way. Both calls give the same decision for the same bytes. The typed answer is target behaviour; it lands in Stage 02.
+
 ## What it does not do
 
 It does not validate MIME structure, decode anything, or guarantee that extraction will succeed. A positive answer means "worth extracting". The extractor can still record [ydk:warning:extraction/parse-failed] for a buffer the detector accepted.

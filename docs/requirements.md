@@ -57,8 +57,9 @@ Legend: **Done** · **Partial** (category covered, not production samples) · **
 
 **Requirement:** All metadata fields that start with `X_` (uppercase X then underscore) are joined into one long string in field `xfields`.
 
-- **Done** (also `X-`, the usual RFC custom-header form)
+- **Done (current code)** (also `X-`, the usual RFC custom-header form)
 - `IsXHeader` matches `X-` or `X_`; lines joined with `\n` into `EmlExtractionResult.XFields`
+- **Superseded by ADR-014 (target; not implemented, Stage 02):** only names starting with exactly `X_` (case-sensitive) count; the string lives in `Metadata["xfields"]`; `X-` headers stay in the general metadata only. See `ydk:req:metadata/xfields` and `docs/research/brief-gap-analysis.md`.
 - File: `src/EmlExtraction/HeaderMapper.cs`
 - Tests: `ExtractionTests.ExtractsClassicHeadersAndUnicodeSubject`, golden `corpus/golden/seed/E10-xfields/`
 

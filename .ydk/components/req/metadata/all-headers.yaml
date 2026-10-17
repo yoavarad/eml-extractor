@@ -1,18 +1,25 @@
 $schema: ydk:schema:req
 id: ydk:req:metadata/all-headers
-description: Original spec "As many headers as possible" - every header, not only the classic set.
+description: >-
+  Original spec "As many headers as possible" - every header, not only the classic set. Keying per ADR-016
+  (ydk:req:metadata/canonical-keys); the key change is target, not implemented (Stage 02). Today the key folds "-"
+  to "_", so X-Foo and X_Foo collide on x_foo and their values merge.
 type: business-rule
 priority: high
 rule: >-
   For every header in the top-level message header block, Metadata holds an entry whose key is the field name
-  trimmed, lower-cased (invariant culture) and with '-' replaced by '_', and whose value is the decoded, unfolded
-  header value. Repeated headers sharing a key are concatenated with \n in order. Headers of nested parts are not
-  included.
-failure_behavior: Not a failure path. On ydk:warning:extraction/parse-failed the map is empty.
+  trimmed and lower-cased (invariant culture), with "-" and "_" kept, and whose value is the decoded, unfolded header
+  value. Repeated headers sharing a key are concatenated with \n in order. Distinct field names that differ only by
+  "-" versus "_" keep separate keys. Headers of nested parts are not included.
+failure_behavior: >-
+  Not a failure path. On ydk:warning:extraction/parse-failed the map holds only the fixed keys
+  (ydk:req:metadata/canonical-keys).
 related_components:
   - ydk:entity:extraction/Metadata
   - ydk:contract:api/eml-extractor
+  - ydk:req:metadata/canonical-keys
 acceptance_criteria:
-  - A DKIM-Signature header appears under dkim_signature (ExtractionTests.ExtractsClassicHeadersAndUnicodeSubject; golden seed E10-xfields)
+  - A DKIM-Signature header appears under dkim-signature (ExtractionTests.ExtractsClassicHeadersAndUnicodeSubject; golden seed E10-xfields)
+  - X-Foo and X_Foo keep separate keys x-foo and x_foo
   - A folded Subject is unfolded into one value containing both halves (FoldedSubjectIsJoined)
-  - An Exchange O365 header dump yields at least 50 metadata keys (InternalCorpusTests.ExchangeMegaHeadersLandInXFields, when sample present)
+  - An Exchange O365 header dump yields at least 50 metadata keys (InternalCorpusTests.ExchangeMegaHeadersLandInXFields, renamed ExchangeMegaHeadersLandInMetadata in Stage 02; skipped visibly when the sample is absent)

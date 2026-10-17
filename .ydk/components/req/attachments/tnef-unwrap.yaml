@@ -2,19 +2,23 @@ $schema: ydk:schema:req
 id: ydk:req:attachments/tnef-unwrap
 description: >-
   Outlook winmail.dat (TNEF) is unpacked to flat attachments - peeling the Outlook wrapper, not parsing Office content
-  (docs/requirements.md note; ADR-008).
+  (docs/requirements.md note; ADR-008, ADR-013).
 type: business-rule
 priority: medium
 rule: >-
   A part MimeKit recognises as TNEF is replaced by the files returned from TnefPart.ExtractAttachments, each walked with
   the same rules as top-level parts; the TNEF container itself is not reported. Requires CodePagesEncodingProvider
-  (registered by the extractor's static constructor).
+  (registered by the extractor's static constructor). Target (ADR-013; not implemented, Stage 02): each unpacked file's
+  FullPath is the wrapper's FileName + "/" + the file's FileName (ydk:req:attachments/container-path).
 failure_behavior: >-
-  Unpack failure records ydk:warning:extraction/tnef-extract-failed and reports the raw TNEF part as one attachment.
+  Unpack failure records ydk:warning:extraction/tnef-extract-failed and reports the raw TNEF part as one attachment
+  whose FullPath is its own FileName.
 related_components:
   - ydk:entity:extraction/ExtractedAttachment
   - ydk:library:deps/mimekit
+  - ydk:req:attachments/container-path
 acceptance_criteria:
-  - Zimbra Outlook 11 tnef.msg yields no attachment named winmail.dat and a non-empty "upload" file, with no warnings (InternalCorpusTests.ZimbraOutlookTnefUnpacksGifAttachments, when sample present)
-  - Apache POI quick-winmail.dat yields an OLE .doc and a PDF (PoiTnefUnpacksRealOleDocAndPdf, when sample present)
-  - Public harvest: 82 TNEF-header mails, 0 left as opaque winmail.dat (docs/edge-cases.md E17)
+  - Zimbra Outlook 11 tnef.msg yields no attachment named winmail.dat and a non-empty "upload" file, with no warnings (InternalCorpusTests.ZimbraOutlookTnefUnpacksGifAttachments; skipped visibly when the sample is absent)
+  - Apache POI quick-winmail.dat yields an OLE .doc and a PDF (PoiTnefUnpacksRealOleDocAndPdf; skipped visibly when the sample is absent)
+  - The committed TNEF sample yields an Office file whose FullPath starts with "winmail.dat/" (ydk:test:quality/realistic-samples.integration)
+  - Public harvest - 82 TNEF-header mails, 0 left as opaque winmail.dat (docs/edge-cases.md E17)

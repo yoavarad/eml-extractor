@@ -1,12 +1,16 @@
 $schema: ydk:schema:contract
 id: ydk:contract:api/eml-extractor
 description: >-
-  Public extraction surface. Interface IEmlExtractor (declares only the byte overload), implementation
-  EmlExtractor (src/EmlExtraction/EmlExtractor.cs), which also exposes a MimeMessage overload.
+  Public extraction surface. Interface IEmlExtractor, implementation EmlExtractor (src/EmlExtraction/EmlExtractor.cs).
   Stateless per call; the static constructor registers CodePagesEncodingProvider once and parser options are a
   static, read-only clone (see ydk:library:deps/mimekit). Caller is expected to have checked the buffer with
   ydk:contract:api/eml-detector first; the extractor does not re-run detection.
-  Throw contract (ADR-004, per project owner 2026-10-17): content-driven failures never throw from either overload.
+  Target surface (ADR-012, shared team contract; not implemented, Stage 02): the only public method is
+  Extract(EmlExtractionRequest); the constructor takes an optional maxInputBytes (ydk:req:extraction/max-input-size);
+  Extract(MimeMessage) becomes internal (tests and tools reach it through InternalsVisibleTo) so MimeKit types leave the
+  public API; Extract(ReadOnlyMemory<byte>) is removed. Today IEmlExtractor declares Extract(ReadOnlyMemory<byte>) and
+  EmlExtractor also exposes a public Extract(MimeMessage).
+  Throw contract (ADR-004, per project owner 2026-10-17; kept by ADR-012): content-driven failures never throw.
   Known content failures map to their existing warnings. After parsing, each stage (metadata, body plus direction,
   attachments) is guarded separately: a stage that throws unexpectedly contributes its empty default and records one
   ydk:warning:extraction/internal-error naming the stage, while the other stages keep their output. A parse failure
@@ -14,22 +18,42 @@ description: >-
   Current code (gap, Stage 02 work): the byte overload catches only the seven exception types listed on
   ydk:warning:extraction/parse-failed and lets others propagate; the MimeMessage overload has no try/catch.
 methods:
+  Extract(EmlExtractionRequest):
+    description: >-
+      Target; not implemented (Stage 02). Parse request.FileBytes and return metadata, main content, attachments,
+      directions, and warnings. When FileBytes is longer than maxInputBytes nothing is parsed and
+      ydk:warning:extraction/input-too-large is recorded. If the buffer (after an optional UTF-8 BOM) starts with
+      "From " it is parsed in mbox format (first message only); otherwise as a single message. Parser/decoder
+      exceptions of the known types become ydk:warning:extraction/parse-failed ; per-part failures become the other
+      warnings below; any other exception becomes ydk:warning:extraction/internal-error . request.FileName never
+      affects the result. A null request throws ArgumentNullException.
+    params:
+      request:
+        type: EmlExtractionRequest
+        description: ydk:entity:extraction/EmlExtractionRequest (non-null).
+    returns:
+      type: EmlExtractionResult
+      description: ydk:entity:extraction/EmlExtractionResult ; never null.
+    raises:
+      - ydk:warning:extraction/input-too-large
+      - ydk:warning:extraction/parse-failed
+      - ydk:warning:extraction/body-decode-failed
+      - ydk:warning:extraction/part-decode-failed
+      - ydk:warning:extraction/rfc822-extract-failed
+      - ydk:warning:extraction/tnef-extract-failed
+      - ydk:warning:extraction/internal-error
   Extract(ReadOnlyMemory<byte>):
     description: >-
-      Parse an in-memory EML buffer and return metadata, main content, attachments, directions, and warnings.
-      If the buffer (after an optional UTF-8 BOM) starts with "From " it is parsed in mbox format (first message only);
-      otherwise as a single message. Parser/decoder exceptions of the known types become
-      ydk:warning:extraction/parse-failed and an empty result; per-part failures become the other warnings below;
-      any other exception becomes ydk:warning:extraction/internal-error (target; see description).
+      Current public method; removed from the public surface by ADR-012 (Stage 02). Same behaviour as
+      Extract(EmlExtractionRequest) without the input-size guard. Wrapped without copy when backed by a full array
+      (offset 0, full length); otherwise copied once.
     params:
       eml:
         type: ReadOnlyMemory<byte>
-        description: >-
-          Whole message bytes. Wrapped without copy when backed by a full array (offset 0, full length);
-          otherwise copied once.
+        description: Whole message bytes.
     returns:
       type: EmlExtractionResult
-      description: ydk:entity:extraction/EmlExtractionResult; never null.
+      description: ydk:entity:extraction/EmlExtractionResult ; never null.
     raises:
       - ydk:warning:extraction/parse-failed
       - ydk:warning:extraction/body-decode-failed
@@ -39,17 +63,17 @@ methods:
       - ydk:warning:extraction/internal-error
   Extract(MimeMessage):
     description: >-
-      Same mapping as the byte overload for an already-parsed MimeKit message; no parsing step, so
-      parse-failed is never recorded. Not part of IEmlExtractor. Target: same no-throw behaviour as the byte
-      overload (unexpected exceptions become ydk:warning:extraction/internal-error ); a null message throws
-      ArgumentNullException. Today this overload has no top-level try/catch.
+      Same mapping as the byte path for an already-parsed MimeKit message; no parsing step, so parse-failed is never
+      recorded. Target: internal, not public (ADR-012); same no-throw behaviour as the request method (unexpected
+      exceptions become ydk:warning:extraction/internal-error ); a null message throws ArgumentNullException.
+      Today it is public and has no top-level try/catch.
     params:
       message:
         type: MimeKit.MimeMessage
         description: Parsed message (non-null).
     returns:
       type: EmlExtractionResult
-      description: ydk:entity:extraction/EmlExtractionResult; never null.
+      description: ydk:entity:extraction/EmlExtractionResult ; never null.
     raises:
       - ydk:warning:extraction/body-decode-failed
       - ydk:warning:extraction/part-decode-failed

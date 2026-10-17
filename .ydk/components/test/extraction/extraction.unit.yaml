@@ -26,7 +26,10 @@ cases:
     description: Classic keys, every-header copy, xfields, and a unicode subject
     given: Message with mixed-script subject, DKIM-Signature, X-Mailer, X_Custom_Field, X-Spam-Score, plain body "hello"
     when: Extract is called
-    then: subject exact, messageid and dkim_signature keys present, three X lines in XFields, MainContent "hello", type text/plain, no attachments
+    then: >-
+      subject exact, messageid and dkim_signature keys present, three X lines in XFields, MainContent "hello", type
+      text/plain, no attachments. Target (ADR-014, ADR-016; Stage 02) - message-id and dkim-signature keys present,
+      Metadata["xfields"] is exactly the X_Custom_Field line, x-mailer and x-spam-score keys hold their values
   - name: PrefersHtmlOverPlain
     description: HTML wins in multipart/alternative
     given: multipart/alternative with "plain version" and "<p>html version</p>"
@@ -71,7 +74,9 @@ cases:
     description: Path-bearing filenames split into name and full path
     given: Attachment named "../../etc/passwd.txt"
     when: Extract is called
-    then: Name "passwd.txt", FullPath "../../etc/passwd.txt", Data equals payload
+    then: >-
+      Name "passwd.txt", FullPath "../../etc/passwd.txt", Data equals payload. Target (ADR-012, ADR-013; Stage 02) -
+      FileName "passwd.txt", FullPath "passwd.txt", OriginalPath "../../etc/passwd.txt", BinaryData equals payload
 stubs: []
 never_mock:
   - EmlExtractor
