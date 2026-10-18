@@ -107,7 +107,7 @@ stories:
       - ydk:crosscut:core/library-surface
     acceptance:
       - "Detect(bytes).IsSupported == IsEml(bytes) for every detector unit case and every golden detection case; MimeType is message/rfc822 when supported, else empty string"
-      - "Extract(new EmlExtractionRequest(bytes, name)) and Extract(bytes) return identical results and warnings for every seed and bulk golden case"
+      - "Extract(new EmlExtractionRequest { FileBytes = bytes, FileName = name }) and Extract(bytes) return identical results and warnings for every seed and bulk golden case"
       - "FileName on the request never changes the result"
       - "Extract(null request) throws ArgumentNullException"
       - "Public API (reflection test) exposes no MimeKit type; Extract(MimeMessage) is internal"
@@ -178,7 +178,6 @@ stories:
       - docs/adrs/004-warnings-not-exceptions.md
     component_refs:
       - ydk:req:extraction/no-throw-on-malformed
-      - ydk:warning:extraction/internal-error
       - ydk:crosscut:core/warning-format
     acceptance:
       - "An injected exception in any one stage gives one 'internal_error: <stage>: <ExceptionType>: ...' warning, that stage's default, and the other stages' output"
@@ -197,7 +196,6 @@ stories:
       - cross-cutting.md
     component_refs:
       - ydk:req:extraction/max-input-size
-      - ydk:warning:extraction/input-too-large
     acceptance:
       - "maxInputBytes 1024: 1025-byte input gives exactly one input_too_large warning, fixed keys only, no attachments; 1024-byte input is extracted normally"
       - "new EmlExtractor(0) throws ArgumentOutOfRangeException"
@@ -611,7 +609,6 @@ tasks:
     story: S-no-throw
     component_refs:
       - ydk:req:extraction/no-throw-on-malformed
-      - ydk:warning:extraction/internal-error
       - ydk:crosscut:core/warning-format
       - ydk:contract:api/eml-extractor
       - ydk:req:content/main-content-selection
@@ -656,7 +653,6 @@ tasks:
     story: S-size-guard
     component_refs:
       - ydk:req:extraction/max-input-size
-      - ydk:warning:extraction/input-too-large
       - ydk:crosscut:core/warning-format
       - ydk:contract:api/eml-extractor
     spec_refs:

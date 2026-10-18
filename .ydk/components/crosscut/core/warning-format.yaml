@@ -1,7 +1,7 @@
 $schema: ydk:schema:crosscut
 id: ydk:crosscut:core/warning-format
 description: >-
-  The single diagnostic format for content problems. This library has no HTTP error responses. Target (ADR-023, per
+  The single diagnostic format for content problems. This library has no HTTP error responses. (ADR-023, per
   project owner 2026-10-18; supersedes the ADR-004 "never throws" rule): malformed-but-readable content is a warning
   string on the result; misuse (ArgumentException family), input over maxInputBytes
   (ydk:entity:extraction/EmlInputTooLargeException) and library bugs (ydk:entity:extraction/EmlExtractionException)

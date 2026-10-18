@@ -8,13 +8,12 @@ description: >-
   (the ReadOnlySpan<byte> overloads have no argument that can be null or invalid, so none applies today); a library
   bug throws ydk:entity:extraction/EmlExtractionException with stage detect (implemented, #106). A detect-stage
   throw records no telemetry: the eml_extraction.stage tag set (ADR-021) has only the four extract stages.
-  Target (ADR-012, shared team contract; not implemented, Stage 02): Detect returns the typed
-  ydk:entity:extraction/EmlDetectionResult ; IsEml stays as the bool convenience the brief describes. Today only
-  IsEml exists.
+  Detect (ADR-012, shared team contract) returns the typed
+  ydk:entity:extraction/EmlDetectionResult ; IsEml stays as the bool convenience the brief describes.
 methods:
   Detect:
     description: >-
-      Target; not implemented (Stage 02). Same decision as IsEml, returned as a typed result.
+      Same decision as IsEml, returned as a typed result.
       Algorithm and thresholds are specified by ydk:req:detection/detect-eml and ydk:req:detection/reject-non-email-magic .
     params:
       data:

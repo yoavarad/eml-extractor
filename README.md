@@ -57,6 +57,49 @@ No further extraction: no file-type detection, no parsing inside Office/PDF/imag
 
 ---
 
+## Errors
+
+Malformed mail content never throws: it is recorded as a warning on `result.Warnings` and you get the partial result (ADR-023). Everything else throws.
+
+| Case | Exception | Properties |
+| --- | --- | --- |
+| Null `request` | `ArgumentNullException` | `ParamName` |
+| `maxInputBytes <= 0` (constructor) | `ArgumentOutOfRangeException` | `ParamName`, `ActualValue` |
+| Input longer than `maxInputBytes` (default 500 MiB; an input of exactly the limit is parsed) | `EmlInputTooLargeException` (derives from `ArgumentException`) | `InputLength`, `MaxInputBytes`, `ParamName` (`request`) |
+| Unexpected exception in a stage (a library bug) | `EmlExtractionException` | `Stage` (`detect`, `parse`, `metadata`, `body` or `attachments`), `InnerException` (the original, with its stack trace) |
+
+- Checks for the first three rows run before any parsing. Messages name the parameter and the size or limit; they never quote message content.
+- `EmlExtractionException.Message` names the stage and the inner exception's type only; read the details from `InnerException`.
+- `OutOfMemoryException` and exceptions thrown by your own `MeterListener` callbacks are not wrapped.
+- `EmlDetector.Detect` / `IsEml` return "not supported" / `false` for input that is not a message. That is a result, not an error. They throw only `EmlExtractionException` (stage `detect`) on a library bug.
+- These content warnings stay warnings (`"<code>: <detail>"`): `parse_failed`, `body_decode_failed`, `part_decode_failed`, `rfc822_extract_failed`, `tnef_extract_failed`. An empty `Warnings` list on a returned result means nothing was degraded.
+
+Batch callers catch per item, so one bad file does not lose the batch:
+
+```csharp
+var extractor = new EmlExtractor();
+foreach (var (name, bytes) in files)
+{
+    try
+    {
+        var result = extractor.Extract(new EmlExtractionRequest { FileBytes = bytes, FileName = name });
+        Index(name, result); // result.Warnings lists any degraded content
+    }
+    catch (EmlInputTooLargeException ex)
+    {
+        Skip(name, $"{ex.InputLength} bytes exceeds the {ex.MaxInputBytes} byte limit");
+    }
+    catch (EmlExtractionException ex)
+    {
+        ReportBug(name, ex.Stage, ex.InnerException); // library bug: keep the inner exception for the report
+    }
+}
+```
+
+Catch `EmlInputTooLargeException` before any `ArgumentException` handler, since it derives from it.
+
+---
+
 ## Telemetry
 
 The library publishes runtime metrics through the BCL `System.Diagnostics.Metrics` API (ADR-021). It takes no OpenTelemetry, logging or EventSource dependency; nothing is emitted unless a listener subscribes. Meter name: `EmlExtraction` (version = the library's informational version).

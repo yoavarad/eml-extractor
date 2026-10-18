@@ -17,7 +17,7 @@ The detector works only on the leading bytes of the buffer. A buffer that is not
 
 ## What it returns
 
-The brief asks for a yes/no answer, and that call stays. Per the shared team contract (ADR-012), the detector also offers a typed answer, [ydk:entity:extraction/EmlDetectionResult]: the same yes/no plus the media type of the detected format, so the team's template can route the OLE and EML extractors the same way. Both calls give the same decision for the same bytes. The typed answer is target behaviour; it lands in Stage 02.
+The brief asks for a yes/no answer, and that call stays. Per the shared team contract (ADR-012), the detector also offers a typed answer, [ydk:entity:extraction/EmlDetectionResult]: the same yes/no plus the media type of the detected format, so the team's template can route the OLE and EML extractors the same way. Both calls give the same decision for the same bytes.
 
 ## What it does not do
 

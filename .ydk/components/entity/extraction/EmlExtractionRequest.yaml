@@ -1,8 +1,8 @@
 $schema: ydk:schema:entity
 id: ydk:entity:extraction/EmlExtractionRequest
 description: >-
-  Input record of ydk:contract:api/eml-extractor (ADR-012). Target; not implemented (Stage 02). Today Extract takes
-  ReadOnlyMemory<byte> directly. Public sealed record with init-only properties. In-memory value object, not persisted.
+  Input record of ydk:contract:api/eml-extractor (ADR-012). Extract(ReadOnlyMemory<byte>) stays as a thin wrapper that
+  builds a request. Public sealed record with init-only properties. In-memory value object, not persisted.
   Shared-contract counterpart of the OLE extractor's ExtractionRequest (FileBytes + FileName). Further optional
   sources (stream, file path) may be added later as new optional members; none exists now.
 fields:

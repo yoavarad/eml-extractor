@@ -4,7 +4,7 @@ The extractor, [ydk:contract:api/eml-extractor], turns one request into one [ydk
 
 ## The request
 
-Per the shared team contract (ADR-012), the caller passes a request, [ydk:entity:extraction/EmlExtractionRequest], holding the message bytes and, optionally, the caller's name for the file. The name is for the caller's own tracing; it never changes the result. A request leaves room to add other input sources later without breaking callers. Per the project owner (2026-10-18), the call that takes plain bytes stays as a convenience: it only wraps the bytes in a request and forwards, so both calls give the same result. There is no batch call; the factory runs messages in parallel itself. The parsed-message entry point that exposed parser-library types becomes internal. This is target behaviour: today the public methods take raw bytes or an already-parsed message object, and the change lands in Stage 02. It is a breaking change, made now while the library has no consumers.
+Per the shared team contract (ADR-012), the caller passes a request, [ydk:entity:extraction/EmlExtractionRequest], holding the message bytes and, optionally, the caller's name for the file. The name is for the caller's own tracing; it never changes the result. A request leaves room to add other input sources later without breaking callers. Per the project owner (2026-10-18), the call that takes plain bytes stays as a convenience: it only wraps the bytes in a request and forwards, so both calls give the same result. There is no batch call; the factory runs messages in parallel itself. The parsed-message entry point that exposed parser-library types is internal. This is a breaking change, made now while the library has no consumers.
 
 ## Input size
 

@@ -8,16 +8,16 @@ specification: >-
   In-process .NET 10 class library (src/EmlExtraction) consumed by project reference. Target (ADR-019; not implemented,
   Stage 02): multi-targets net8.0 and net10.0 with identical behaviour (ydk:req:quality/net8-multi-targeting). Public surface is exactly
   ydk:contract:api/eml-detector and ydk:contract:api/eml-extractor plus the records
-  ydk:entity:extraction/EmlExtractionResult and ydk:entity:extraction/ExtractedAttachment , and, as target
-  (ADR-012, not implemented, Stage 02), ydk:entity:extraction/EmlExtractionRequest and
-  ydk:entity:extraction/EmlDetectionResult . No MimeKit type appears in the target public surface.
+  ydk:entity:extraction/EmlExtractionResult and ydk:entity:extraction/ExtractedAttachment , and
+  (ADR-012) ydk:entity:extraction/EmlExtractionRequest and
+  ydk:entity:extraction/EmlDetectionResult . No MimeKit type appears in the public surface. Errors: misuse and oversized input throw argument exceptions (EmlInputTooLargeException), library bugs throw EmlExtractionException (ADR-023).
   Not present, by design of the original spec and README: HTTP routes, authentication/authorisation, frontend pages,
   CORS, health checks, pagination, persistence, generated IDs, logging, configuration files, environment
   variables. ADR-021: BCL metrics (implemented, #71) and activities (target, #72) under the name EmlExtraction, with
-  no telemetry package dependency (ydk:crosscut:core/observability). Input is a whole message held in memory, capped by maxInputBytes (target, ydk:req:extraction/max-input-size);
+  no telemetry package dependency (ydk:crosscut:core/observability). Input is a whole message held in memory, capped by maxInputBytes (ydk:req:extraction/max-input-size);
   output holds all decoded bytes in memory; no streaming, no disk or network I/O. Timestamps: the only one is the
   message Date, emitted in ISO 8601 round-trip ("o") form.
-  Both public classes keep no per-instance mutable state (the target extractor holds only its read-only
+  Both public classes keep no per-instance mutable state (the extractor holds only its read-only
   maxInputBytes); parser options and the code-page provider registration are static and set once.
   Integration into the team's extraction template and factory is done by the team and is not specified here
   (docs/team-questions.md).

@@ -5,14 +5,13 @@ description: >-
   Stateless per call; the static constructor registers CodePagesEncodingProvider once and parser options are a
   static, read-only clone (see ydk:library:deps/mimekit). Caller is expected to have checked the buffer with
   ydk:contract:api/eml-detector first; the extractor does not re-run detection.
-  Target surface (ADR-012, shared team contract; not implemented, Stage 02): Extract(EmlExtractionRequest) is the
+  Surface (ADR-012, shared team contract): Extract(EmlExtractionRequest) is the
   primary public method; Extract(ReadOnlyMemory<byte>) stays public as a thin wrapper that builds a request and
   forwards (per project owner 2026-10-18); the constructor takes an optional maxInputBytes
-  (ydk:req:extraction/max-input-size); Extract(MimeMessage) becomes internal (tests and tools reach it through
-  InternalsVisibleTo) so MimeKit types leave the public API. No batch method: the factory owns parallelism. Today IEmlExtractor declares Extract(ReadOnlyMemory<byte>) and
-  EmlExtractor also exposes a public Extract(MimeMessage).
-  Throw contract (ADR-023, per project owner 2026-10-18; supersedes ADR-004 in part and amends ADR-012; target,
-  Stage 02): malformed-but-readable content never throws; it maps to the content warnings below with a partial
+  (ydk:req:extraction/max-input-size); Extract(MimeMessage) is internal (tests and tools reach it through
+  InternalsVisibleTo) so MimeKit types leave the public API. No batch method: the factory owns parallelism.
+  Throw contract (ADR-023, per project owner 2026-10-18; supersedes ADR-004 in part and amends ADR-012):
+  malformed-but-readable content never throws; it maps to the content warnings below with a partial
   result, and a parse failure stays an empty result with parse_failed (the five fixed metadata keys present as "").
   Everything else throws: a null argument -> ArgumentNullException; an invalid option (maxInputBytes <= 0) ->
   ArgumentOutOfRangeException at construction; input longer than maxInputBytes ->
@@ -24,7 +23,7 @@ description: >-
 methods:
   Extract(EmlExtractionRequest):
     description: >-
-      Target; not implemented (Stage 02). Parse request.FileBytes and return metadata, main content, attachments,
+      Parse request.FileBytes and return metadata, main content, attachments,
       directions, and warnings. When FileBytes is longer than maxInputBytes nothing is parsed and
       ydk:entity:extraction/EmlInputTooLargeException is thrown (ADR-023). If the buffer (after an optional UTF-8 BOM) starts with
       "From " it is parsed in mbox format (first message only); otherwise as a single message. Parser/decoder
@@ -48,7 +47,7 @@ methods:
       - ydk:warning:extraction/tnef-extract-failed
   Extract(ReadOnlyMemory<byte>):
     description: >-
-      Convenience overload, kept public (ADR-012, per project owner 2026-10-18). Target (Stage 02): a thin wrapper
+      Convenience overload, kept public (ADR-012, per project owner 2026-10-18): a thin wrapper
       equal to Extract(new EmlExtractionRequest { FileBytes = eml }), so results, warnings, and the input-size guard
       are identical; no logic of its own. ReadOnlyMemory<byte> cannot be null, so only the size limit and library bugs throw. Wrapped
       without copy when backed by a full array (offset 0, full length); otherwise copied once.

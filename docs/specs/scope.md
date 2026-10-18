@@ -9,7 +9,7 @@ The original specification is translated in [docs/requirements.md](../requiremen
 - Accepting files that start with an mbox separator line or a UTF-8 byte-order mark: [ydk:req:extraction/mbox-from-line].
 - The shared team contract for the public surface (target, ADR-012): a request record, [ydk:entity:extraction/EmlExtractionRequest], shared sub-file field names, and no parser-library types in the public API.
 - Supporting both .NET 8 and .NET 10 hosts with identical behaviour, with tests run on both in CI (target, ADR-019): [ydk:req:quality/net8-multi-targeting]. The developer tools stay on .NET 10 only.
-- Refusing inputs over a host-set size limit with a warning (target): [ydk:req:extraction/max-input-size].
+- Refusing inputs over a host-set size limit by throwing (ADR-023): [ydk:req:extraction/max-input-size].
 - Extracting every top-level header under one canonical key each, the classic envelope headers in parsed form (with the four address keys always present), and the brief's custom-header field: [ydk:req:metadata/all-headers], [ydk:req:metadata/canonical-keys], [ydk:req:metadata/classic-fields], [ydk:req:metadata/xfields]. The canonical keys and the literal custom-header rule are target (ADR-014, ADR-016).
 - Selecting one main body, with HTML preferred, and reporting its media type: [ydk:req:content/main-content-selection].
 - Returning text exactly as written, including emoji sequences and combining marks: [ydk:req:content/unicode-fidelity].
