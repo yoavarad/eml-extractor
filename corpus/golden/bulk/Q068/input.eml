@@ -3,26 +3,26 @@ Date: Tue, 15 Sep 2026 07:00:00 +0000
 Subject: combo 68 中文
 Message-Id: <Q068@golden.example>
 To: Bob <bob@example.com>
-X-Mailer: Combo-68
+X_Mailer: Combo-68
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-RkZXxbid1JCMAgl/1i8mlg=="
+Content-Type: multipart/mixed; boundary="=-HOsPkGzCsOEbMFVIpQgQrA=="
 
---=-RkZXxbid1JCMAgl/1i8mlg==
-Content-Type: multipart/alternative; boundary="=-2o8CpIC27REsxkGyoqTDnA=="
+--=-HOsPkGzCsOEbMFVIpQgQrA==
+Content-Type: multipart/alternative; boundary="=-3XjCvhuTPnZKe5Nfu5kvVA=="
 
---=-2o8CpIC27REsxkGyoqTDnA==
+--=-3XjCvhuTPnZKe5Nfu5kvVA==
 Content-Type: text/plain; charset=utf-8
 
 plain-68
---=-2o8CpIC27REsxkGyoqTDnA==
-Content-Type: multipart/related; boundary="=-1YiHHDoYDh4HFJBLMYjq2w==";
+--=-3XjCvhuTPnZKe5Nfu5kvVA==
+Content-Type: multipart/related; boundary="=-00ezFE9SNV+Jo0gRhqaoTg==";
 	type="text/html"
 
---=-1YiHHDoYDh4HFJBLMYjq2w==
+--=-00ezFE9SNV+Jo0gRhqaoTg==
 Content-Type: text/html; charset=utf-8
 
 <p>שלום 68 😀</p><img src="cid:c68@x" />
---=-1YiHHDoYDh4HFJBLMYjq2w==
+--=-00ezFE9SNV+Jo0gRhqaoTg==
 Content-Type: image/png; name=p.png
 Content-Transfer-Encoding: base64
 Content-Disposition: inline; filename=p.png
@@ -32,11 +32,11 @@ Content-Id: <c68@x>
 iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
 IQAAAABJRU5ErkJggg==
 
---=-1YiHHDoYDh4HFJBLMYjq2w==--
+--=-00ezFE9SNV+Jo0gRhqaoTg==--
 
---=-2o8CpIC27REsxkGyoqTDnA==--
+--=-3XjCvhuTPnZKe5Nfu5kvVA==--
 
---=-RkZXxbid1JCMAgl/1i8mlg==
+--=-HOsPkGzCsOEbMFVIpQgQrA==
 Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document;
 	name=r.docx
 Content-Transfer-Encoding: base64
@@ -44,4 +44,4 @@ Content-Disposition: attachment; filename=r.docx
 
 UEsDBGRvY3g6UTA2OA==
 
---=-RkZXxbid1JCMAgl/1i8mlg==--
+--=-HOsPkGzCsOEbMFVIpQgQrA==--

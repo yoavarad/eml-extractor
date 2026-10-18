@@ -99,9 +99,9 @@ public sealed class ExtractionTests
         Assert.Equal("שלום 😀 中文 हिंदी", result.Metadata["subject"]);
         Assert.True(result.Metadata.ContainsKey("message-id"));
         Assert.True(result.Metadata.ContainsKey("dkim-signature"));
-        Assert.Contains("X-Mailer: SandboxMail", result.XFields);
-        Assert.Contains("X_Custom_Field: team-value", result.XFields);
-        Assert.Contains("X-Spam-Score: 1.2", result.XFields);
+        Assert.Equal("X_Custom_Field: team-value", result.Metadata["xfields"]);
+        Assert.Equal("SandboxMail", result.Metadata["x-mailer"]);
+        Assert.Equal("1.2", result.Metadata["x-spam-score"]);
         Assert.Equal("hello", result.MainContent);
         Assert.Equal("text/plain", result.MainContentMimeType);
         Assert.Empty(result.Attachments);
@@ -238,6 +238,29 @@ public sealed class ExtractionTests
         Assert.True(result.Metadata.ContainsKey("content-type"));
         foreach (var gone in new[] { "messageid", "replyto", "dkim_signature", "contenttype", "subject_direction", "content_direction", "mimeversion", "returnpath", "deliveredto", "inreplyto", "reply_to", "message_id" })
             Assert.False(result.Metadata.ContainsKey(gone), gone);
+    }
+
+    [Fact]
+    public void XFieldsJoinsOnlyLiteralXUnderscoreHeadersInOrder()
+    {
+        var message = SampleFactory.Plain("x", "b");
+        message.Headers.Add("X_A", "1");
+        message.Headers.Add("X-B", "2");
+        message.Headers.Add("x_c", "3");
+        message.Headers.Add("X_A", "4");
+        var result = _extractor.Extract(SampleFactory.ToBytes(message));
+        Assert.Equal("X_A: 1\nX_A: 4", result.Metadata["xfields"]);
+        Assert.Equal("2", result.Metadata["x-b"]);
+        Assert.Equal("3", result.Metadata["x_c"]);
+    }
+
+    [Fact]
+    public void XFieldsEmptyWhenOnlyXDashHeaders()
+    {
+        var message = SampleFactory.Plain("x", "b");
+        message.Headers.Add("X-Mailer", "m");
+        var result = _extractor.Extract(SampleFactory.ToBytes(message));
+        Assert.Equal("", result.Metadata["xfields"]);
     }
 
     [Fact]

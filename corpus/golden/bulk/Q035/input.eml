@@ -3,26 +3,26 @@ Date: Tue, 15 Sep 2026 07:00:00 +0000
 Subject: combo 35 中文
 Message-Id: <Q035@golden.example>
 To: Bob <bob@example.com>
-X-Mailer: Combo-35
+X_Mailer: Combo-35
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-1/fTXh0xFY2hW6yBN5+tBQ=="
+Content-Type: multipart/mixed; boundary="=-NiSQm57xcI1RQQoBm4ZqNQ=="
 
---=-1/fTXh0xFY2hW6yBN5+tBQ==
-Content-Type: multipart/alternative; boundary="=-q4OMH3BZpZnin2/KlZu/hQ=="
+--=-NiSQm57xcI1RQQoBm4ZqNQ==
+Content-Type: multipart/alternative; boundary="=-2RvbYgmluy0UrvxKTdV07A=="
 
---=-q4OMH3BZpZnin2/KlZu/hQ==
+--=-2RvbYgmluy0UrvxKTdV07A==
 Content-Type: text/plain; charset=utf-8
 
 plain-35
---=-q4OMH3BZpZnin2/KlZu/hQ==
-Content-Type: multipart/related; boundary="=-0ziahef/miCoMSCtaswOWQ==";
+--=-2RvbYgmluy0UrvxKTdV07A==
+Content-Type: multipart/related; boundary="=-zJG/Ld0vh2ZVRl6Y+xxP6A==";
 	type="text/html"
 
---=-0ziahef/miCoMSCtaswOWQ==
+--=-zJG/Ld0vh2ZVRl6Y+xxP6A==
 Content-Type: text/html; charset=utf-8
 
 <p>שלום 35 😀</p><img src="cid:c35@x" />
---=-0ziahef/miCoMSCtaswOWQ==
+--=-zJG/Ld0vh2ZVRl6Y+xxP6A==
 Content-Type: image/png; name=p.png
 Content-Transfer-Encoding: base64
 Content-Disposition: inline; filename=p.png
@@ -32,11 +32,11 @@ Content-Id: <c35@x>
 iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
 IQAAAABJRU5ErkJggg==
 
---=-0ziahef/miCoMSCtaswOWQ==--
+--=-zJG/Ld0vh2ZVRl6Y+xxP6A==--
 
---=-q4OMH3BZpZnin2/KlZu/hQ==--
+--=-2RvbYgmluy0UrvxKTdV07A==--
 
---=-1/fTXh0xFY2hW6yBN5+tBQ==
+--=-NiSQm57xcI1RQQoBm4ZqNQ==
 Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document;
 	name=r.docx
 Content-Transfer-Encoding: base64
@@ -44,4 +44,4 @@ Content-Disposition: attachment; filename=r.docx
 
 UEsDBGRvY3g6UTAzNQ==
 
---=-1/fTXh0xFY2hW6yBN5+tBQ==--
+--=-NiSQm57xcI1RQQoBm4ZqNQ==--

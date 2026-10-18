@@ -44,7 +44,6 @@ public sealed class EmlExtractor : IEmlExtractor
             warnings.Add($"parse_failed: {ex.GetType().Name}: {ex.Message}");
             return new EmlExtractionResult(
                 HeaderMapper.EmptyMetadata(),
-                string.Empty,
                 null,
                 null,
                 [],
@@ -59,7 +58,7 @@ public sealed class EmlExtractor : IEmlExtractor
 
     internal static EmlExtractionResult Extract(MimeMessage message, List<string> warnings)
     {
-        var metadata = HeaderMapper.Map(message, out var xfields);
+        var metadata = HeaderMapper.Map(message);
         var body = BodySelector.Select(message.Body);
 
         string? content = null;
@@ -82,7 +81,7 @@ public sealed class EmlExtractor : IEmlExtractor
                    && contentType.Contains("html", StringComparison.OrdinalIgnoreCase);
         var subjectDir = TextDirection.Detect(metadata.GetValueOrDefault("subject"), html: false);
         var contentDir = TextDirection.Detect(content, html);
-        return new EmlExtractionResult(metadata, xfields, content, contentType, attachments, warnings)
+        return new EmlExtractionResult(metadata, content, contentType, attachments, warnings)
         {
             SubjectDirection = subjectDir,
             ContentDirection = contentDir

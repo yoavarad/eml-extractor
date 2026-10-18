@@ -33,7 +33,7 @@ Does not throw on malformed MIME; problems go into `result.Warnings`.
 - Classic fields: `from`, `to`, `cc`, `bcc` (always present; empty string if the header is missing), plus `replyto`, `sender`, `subject`, `date`, `messageid`, and the rest of the usual envelope headers
 - `subject_direction` and `content_direction`: `ltr` or `rtl` (HTML `dir` / CSS `direction`, otherwise Unicode first-strong letter)
 - Every other header as well (keys lowercased, `-` → `_`)
-- Headers that start with `X_` **or** `X-` (the usual custom-header form) are concatenated into one string: `result.XFields`  
+- Headers that start with the literal `X_` (capital X, underscore) are concatenated into `Metadata["xfields"]` (`""` when none); `X-` headers stay under their own metadata keys  
   (`Name: value` per line)
 
 #### Content

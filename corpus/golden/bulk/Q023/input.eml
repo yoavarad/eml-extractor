@@ -3,26 +3,26 @@ Date: Tue, 15 Sep 2026 07:00:00 +0000
 Subject: combo 23 中文
 Message-Id: <Q023@golden.example>
 To: Bob <bob@example.com>
-X-Mailer: Combo-23
+X_Mailer: Combo-23
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-6muVTMVUiLe+1XNz02bxGQ=="
+Content-Type: multipart/mixed; boundary="=-Tn6JrOfhH43qS1Q7XymVkg=="
 
---=-6muVTMVUiLe+1XNz02bxGQ==
-Content-Type: multipart/alternative; boundary="=-pVkLse4YMiXngK/DFuNttw=="
+--=-Tn6JrOfhH43qS1Q7XymVkg==
+Content-Type: multipart/alternative; boundary="=-KEHjfvLvG3wz7vbCwAT1/A=="
 
---=-pVkLse4YMiXngK/DFuNttw==
+--=-KEHjfvLvG3wz7vbCwAT1/A==
 Content-Type: text/plain; charset=utf-8
 
 plain-23
---=-pVkLse4YMiXngK/DFuNttw==
-Content-Type: multipart/related; boundary="=-tW/qNp06sXKHUT5ijAYskQ==";
+--=-KEHjfvLvG3wz7vbCwAT1/A==
+Content-Type: multipart/related; boundary="=-mXhwWIds/gG2OYeEUkL67A==";
 	type="text/html"
 
---=-tW/qNp06sXKHUT5ijAYskQ==
+--=-mXhwWIds/gG2OYeEUkL67A==
 Content-Type: text/html; charset=utf-8
 
 <p>שלום 23 😀</p><img src="cid:c23@x" />
---=-tW/qNp06sXKHUT5ijAYskQ==
+--=-mXhwWIds/gG2OYeEUkL67A==
 Content-Type: image/png; name=p.png
 Content-Transfer-Encoding: base64
 Content-Disposition: inline; filename=p.png
@@ -32,11 +32,11 @@ Content-Id: <c23@x>
 iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
 IQAAAABJRU5ErkJggg==
 
---=-tW/qNp06sXKHUT5ijAYskQ==--
+--=-mXhwWIds/gG2OYeEUkL67A==--
 
---=-pVkLse4YMiXngK/DFuNttw==--
+--=-KEHjfvLvG3wz7vbCwAT1/A==--
 
---=-6muVTMVUiLe+1XNz02bxGQ==
+--=-Tn6JrOfhH43qS1Q7XymVkg==
 Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document;
 	name=r.docx
 Content-Transfer-Encoding: base64
@@ -44,4 +44,4 @@ Content-Disposition: attachment; filename=r.docx
 
 UEsDBGRvY3g6UTAyMw==
 
---=-6muVTMVUiLe+1XNz02bxGQ==--
+--=-Tn6JrOfhH43qS1Q7XymVkg==--

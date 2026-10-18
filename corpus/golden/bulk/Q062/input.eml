@@ -3,26 +3,26 @@ Date: Tue, 15 Sep 2026 07:00:00 +0000
 Subject: combo 62 中文
 Message-Id: <Q062@golden.example>
 To: Bob <bob@example.com>
-X-Mailer: Combo-62
+X_Mailer: Combo-62
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-e3ZqippLnkm+nfZ83F1TOg=="
+Content-Type: multipart/mixed; boundary="=-w3L3LqHrbStVpw4s14X5lQ=="
 
---=-e3ZqippLnkm+nfZ83F1TOg==
-Content-Type: multipart/alternative; boundary="=-lbxvqFCn2ikkgIhKa7GPfQ=="
+--=-w3L3LqHrbStVpw4s14X5lQ==
+Content-Type: multipart/alternative; boundary="=-jJdLYV4yC+i1gIsbRghW2Q=="
 
---=-lbxvqFCn2ikkgIhKa7GPfQ==
+--=-jJdLYV4yC+i1gIsbRghW2Q==
 Content-Type: text/plain; charset=utf-8
 
 plain-62
---=-lbxvqFCn2ikkgIhKa7GPfQ==
-Content-Type: multipart/related; boundary="=-dpWKX5RPQxJYBFX3fFxnYw==";
+--=-jJdLYV4yC+i1gIsbRghW2Q==
+Content-Type: multipart/related; boundary="=-SHm8hC55dbCSp2ReBy5i3Q==";
 	type="text/html"
 
---=-dpWKX5RPQxJYBFX3fFxnYw==
+--=-SHm8hC55dbCSp2ReBy5i3Q==
 Content-Type: text/html; charset=utf-8
 
 <p>שלום 62 😀</p><img src="cid:c62@x" />
---=-dpWKX5RPQxJYBFX3fFxnYw==
+--=-SHm8hC55dbCSp2ReBy5i3Q==
 Content-Type: image/png; name=p.png
 Content-Transfer-Encoding: base64
 Content-Disposition: inline; filename=p.png
@@ -32,11 +32,11 @@ Content-Id: <c62@x>
 iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
 IQAAAABJRU5ErkJggg==
 
---=-dpWKX5RPQxJYBFX3fFxnYw==--
+--=-SHm8hC55dbCSp2ReBy5i3Q==--
 
---=-lbxvqFCn2ikkgIhKa7GPfQ==--
+--=-jJdLYV4yC+i1gIsbRghW2Q==--
 
---=-e3ZqippLnkm+nfZ83F1TOg==
+--=-w3L3LqHrbStVpw4s14X5lQ==
 Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document;
 	name=r.docx
 Content-Transfer-Encoding: base64
@@ -44,4 +44,4 @@ Content-Disposition: attachment; filename=r.docx
 
 UEsDBGRvY3g6UTA2Mg==
 
---=-e3ZqippLnkm+nfZ83F1TOg==--
+--=-w3L3LqHrbStVpw4s14X5lQ==--

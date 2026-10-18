@@ -3,26 +3,26 @@ Date: Tue, 15 Sep 2026 07:00:00 +0000
 Subject: combo 19 中文
 Message-Id: <Q019@golden.example>
 To: Bob <bob@example.com>
-X-Mailer: Combo-19
+X_Mailer: Combo-19
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-F9XrsfgbeEfT1J1VhhUHgg=="
+Content-Type: multipart/mixed; boundary="=-WBJM5tp8Le7E34P9/pI6rg=="
 
---=-F9XrsfgbeEfT1J1VhhUHgg==
-Content-Type: multipart/alternative; boundary="=-RvTGNRCuCtRrBxmyRnn2KQ=="
+--=-WBJM5tp8Le7E34P9/pI6rg==
+Content-Type: multipart/alternative; boundary="=-QhsjvxtKAgyEfgsKsy9z5A=="
 
---=-RvTGNRCuCtRrBxmyRnn2KQ==
+--=-QhsjvxtKAgyEfgsKsy9z5A==
 Content-Type: text/plain; charset=utf-8
 
 plain-19
---=-RvTGNRCuCtRrBxmyRnn2KQ==
-Content-Type: multipart/related; boundary="=-bFvNndQQ6pwZm9zG1NviDw==";
+--=-QhsjvxtKAgyEfgsKsy9z5A==
+Content-Type: multipart/related; boundary="=-5Gmf24Hmk6DSkWcEIa46cg==";
 	type="text/html"
 
---=-bFvNndQQ6pwZm9zG1NviDw==
+--=-5Gmf24Hmk6DSkWcEIa46cg==
 Content-Type: text/html; charset=utf-8
 
 <p>שלום 19 😀</p><img src="cid:c19@x" />
---=-bFvNndQQ6pwZm9zG1NviDw==
+--=-5Gmf24Hmk6DSkWcEIa46cg==
 Content-Type: image/png; name=p.png
 Content-Transfer-Encoding: base64
 Content-Disposition: inline; filename=p.png
@@ -32,11 +32,11 @@ Content-Id: <c19@x>
 iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
 IQAAAABJRU5ErkJggg==
 
---=-bFvNndQQ6pwZm9zG1NviDw==--
+--=-5Gmf24Hmk6DSkWcEIa46cg==--
 
---=-RvTGNRCuCtRrBxmyRnn2KQ==--
+--=-QhsjvxtKAgyEfgsKsy9z5A==--
 
---=-F9XrsfgbeEfT1J1VhhUHgg==
+--=-WBJM5tp8Le7E34P9/pI6rg==
 Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document;
 	name=r.docx
 Content-Transfer-Encoding: base64
@@ -44,4 +44,4 @@ Content-Disposition: attachment; filename=r.docx
 
 UEsDBGRvY3g6UTAxOQ==
 
---=-F9XrsfgbeEfT1J1VhhUHgg==--
+--=-WBJM5tp8Le7E34P9/pI6rg==--

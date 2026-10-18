@@ -273,7 +273,7 @@ internal static class Probe
             stats.MaxHeadersLabel = label;
         }
 
-        var xCount = string.IsNullOrEmpty(result.XFields) ? 0 : result.XFields.Split('\n').Length;
+        var xCount = string.IsNullOrEmpty(result.Metadata["xfields"]) ? 0 : result.Metadata["xfields"].Split('\n').Length;
         stats.XFields += xCount;
         if (xCount > stats.MaxXFields)
         {
@@ -336,7 +336,7 @@ internal static class Probe
             stats.ExchangeHeaders++;
         if (result.Metadata.TryGetValue("content-type", out var ct) && ct.Contains("tnef", StringComparison.OrdinalIgnoreCase))
             stats.TnefContentType++;
-        if (result.XFields.Contains("winmail", StringComparison.OrdinalIgnoreCase)
+        if (result.Metadata["xfields"].Contains("winmail", StringComparison.OrdinalIgnoreCase)
             || result.Metadata.TryGetValue("x-ms-tnef-correlator", out _))
             stats.TnefHeaders++;
 
