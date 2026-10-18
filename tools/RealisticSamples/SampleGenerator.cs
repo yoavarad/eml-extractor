@@ -13,6 +13,26 @@ public static class SampleGenerator
     const string Generator = "tools/RealisticSamples";
     const string License = "generated: repo license";
 
+    const string PoiCommit = "62322b97f3f1bca39cdcd0b7705973833c74ad25";
+    const string PoiLicenseUrl = "https://github.com/apache/poi/blob/" + PoiCommit + "/legal/LICENSE";
+
+    /// <summary>Public files committed verbatim under corpus/realistic/sources; pinned hashes are of the published bytes.</summary>
+    static readonly (string Eml, string Subject, string Dir, string Name, string Sha, string Type, string Sub)[] PublicSources =
+    [
+        ("attached-doc", "Legacy document", "document", "Bug60942b.doc", "183379e7c855aeed2c496f1170e4e2bec16bfde9fddc49ae0fa14f765947430f", "application", "msword"),
+        ("attached-xls", "Legacy sheet", "spreadsheet", "63819.xls", "0defe1c277ac1107498f2326c4376d47effa0051c1e20e5f2cb30caa89c822f3", "application", "vnd.ms-excel"),
+        ("attached-msg", "Outlook item", "hsmf", "blank.msg", "b9e5b5d8fac07e7be9604a3f9b039b9f824978d8b59cdeb2768d5182a03825c0", "application", "vnd.ms-outlook"),
+    ];
+
+    static string SourcesDir()
+    {
+        var d = new DirectoryInfo(AppContext.BaseDirectory);
+        while (d is not null && !File.Exists(Path.Combine(d.FullName, "EmlExtraction.slnx"))) d = d.Parent;
+        d ??= new DirectoryInfo(Directory.GetCurrentDirectory());
+        while (d is not null && !File.Exists(Path.Combine(d.FullName, "EmlExtraction.slnx"))) d = d.Parent;
+        return Path.Combine(d?.FullName ?? throw new InvalidOperationException("repo root not found"), "corpus", "realistic", "sources");
+    }
+
     public static string Sha(byte[] b) => Convert.ToHexString(SHA256.HashData(b)).ToLowerInvariant();
 
     static ExpectedFile Exp(string name, byte[] data, string? path = null) => new(name, data.Length, Sha(data), path ?? name);
@@ -66,6 +86,7 @@ public static class SampleGenerator
         var gmailPng = Binaries.Png(150);
 
         var samples = new List<(string File, byte[] Bytes, object Expected)>();
+        var sourceInfo = new Dictionary<string, object>();
 
         void Attached(string file, string subject, string att, string t, string st, byte[] data)
         {
@@ -79,6 +100,22 @@ public static class SampleGenerator
         Attached("attached-pptx", "Slides", "deck.pptx", "application", "vnd.openxmlformats-officedocument.presentationml.presentation", pptx);
         Attached("attached-pdf", "Invoice", "invoice.pdf", "application", "pdf", pdf);
         Attached("attached-image", "Photo", "photo.png", "image", "png", png);
+
+        foreach (var (eml, subject, dir, name, sha, t, st) in PublicSources)
+        {
+            var data = File.ReadAllBytes(Path.Combine(SourcesDir(), name));
+            if (Sha(data) != sha) throw new InvalidOperationException($"{name} does not match its published SHA-256");
+            Attached(eml, subject, name, t, st, data);
+            sourceInfo[eml + ".eml"] = new
+            {
+                url = $"https://github.com/apache/poi/blob/{PoiCommit}/test-data/{dir}/{name}",
+                commit = PoiCommit,
+                license = "Apache-2.0",
+                licenseUrl = PoiLicenseUrl,
+                file = "sources/" + name,
+                sha256 = sha,
+            };
+        }
 
         // Nested message: returned as a single attachment, never recursed (ADR-013).
         var inner = Msg("Inner note", "inner-note");
@@ -110,7 +147,10 @@ public static class SampleGenerator
         foreach (var (file, bytes, expected) in samples.OrderBy(s => s.File, StringComparer.Ordinal))
         {
             File.WriteAllBytes(Path.Combine(outDir, file), bytes);
-            entries.Add(new { file, generator = Generator, license = License, sha256 = Sha(bytes), expected });
+            if (sourceInfo.TryGetValue(file, out var src))
+                entries.Add(new { file, generator = Generator, license = "Apache-2.0", sha256 = Sha(bytes), source = src, expected });
+            else
+                entries.Add(new { file, generator = Generator, license = License, sha256 = Sha(bytes), expected });
         }
         var json = JsonSerializer.Serialize(new { samples = entries }, new JsonSerializerOptions
         {

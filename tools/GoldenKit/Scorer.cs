@@ -93,6 +93,8 @@ internal static class Scorer
 
     private static void ScoreResult(CaseScore s, EmlExtractionResult result, GoldenExpect expect, EmlExtractor extractor, int depth)
     {
+        var internalError = result.Warnings.FirstOrDefault(w => w.StartsWith("internal_error", StringComparison.Ordinal));
+        Check(s, "no_internal_error", internalError is null, internalError);
         foreach (var (key, field) in expect.Metadata)
         {
             result.Metadata.TryGetValue(key, out var actual);

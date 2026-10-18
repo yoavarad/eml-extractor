@@ -11,6 +11,15 @@ public sealed class EmlExtractor : IEmlExtractor
 
     private static readonly ParserOptions Options = CreateOptions();
 
+    private static readonly AsyncLocal<Action<string>?> Fault = new();
+
+    /// <summary>Test seam (ADR-004): invoked with the stage name (parse, metadata, body, attachments) inside that stage's guard, so a test can inject a throw.</summary>
+    internal static Action<string>? StageFault
+    {
+        get => Fault.Value;
+        set => Fault.Value = value;
+    }
+
     /// <inheritdoc/>
     public EmlExtractionResult Extract(ReadOnlyMemory<byte> eml)
         => Extract(new EmlExtractionRequest { FileBytes = eml });
@@ -21,10 +30,11 @@ public sealed class EmlExtractor : IEmlExtractor
         ArgumentNullException.ThrowIfNull(request);
         var eml = request.FileBytes;
         var warnings = new List<string>();
+        MimeMessage message;
         try
         {
+            StageFault?.Invoke("parse");
             using var stream = Open(eml);
-            MimeMessage message;
             if (StartsWithMboxFrom(eml.Span))
             {
                 var parser = new MimeParser(Options, stream, MimeFormat.Mbox);
@@ -34,59 +44,105 @@ public sealed class EmlExtractor : IEmlExtractor
             {
                 message = MimeMessage.Load(Options, stream);
             }
-
-            return Extract(message, warnings);
         }
         catch (Exception ex) when (ex is FormatException or ParseException or IOException
                                        or InvalidOperationException or ArgumentException
                                        or NotSupportedException or DecoderFallbackException)
         {
             warnings.Add($"parse_failed: {ex.GetType().Name}: {ex.Message}");
-            return new EmlExtractionResult(
-                HeaderMapper.EmptyMetadata(),
-                null,
-                null,
-                [],
-                warnings);
+            return Empty(warnings);
         }
+        catch (Exception ex)
+        {
+            warnings.Add(InternalError("parse", ex));
+            return Empty(warnings);
+        }
+
+        return Extract(message, warnings);
     }
 
     /// <summary>Extracts from an already parsed <see cref="MimeMessage"/>.</summary>
     /// <param name="message">Parsed message.</param>
     internal EmlExtractionResult Extract(MimeMessage message)
-        => Extract(message, []);
+    {
+        ArgumentNullException.ThrowIfNull(message);
+        return Extract(message, []);
+    }
 
     internal static EmlExtractionResult Extract(MimeMessage message, List<string> warnings)
     {
-        var metadata = HeaderMapper.Map(message);
-        var body = BodySelector.Select(message.Body);
-
-        string? content = null;
-        string? contentType = null;
-        if (body is not null)
+        IReadOnlyDictionary<string, string> metadata;
+        try
         {
-            try
-            {
-                content = body.Text.TrimEnd('\r', '\n');
-                contentType = body.ContentType.MimeType;
-            }
-            catch (Exception ex)
-            {
-                warnings.Add($"body_decode_failed: {ex.Message}");
-            }
+            StageFault?.Invoke("metadata");
+            metadata = HeaderMapper.Map(message);
+        }
+        catch (Exception ex)
+        {
+            metadata = HeaderMapper.EmptyMetadata();
+            warnings.Add(InternalError("metadata", ex));
         }
 
-        var attachments = PartCollector.Collect(message.Body, body, warnings);
-        var html = contentType is not null
-                   && contentType.Contains("html", StringComparison.OrdinalIgnoreCase);
-        var subjectDir = TextDirection.Detect(metadata.GetValueOrDefault("subject"), html: false);
-        var contentDir = TextDirection.Detect(content, html);
+        TextPart? body = null;
+        string? content = null;
+        string? contentType = null;
+        var subjectDir = "ltr";
+        var contentDir = "ltr";
+        try
+        {
+            body = BodySelector.Select(message.Body);
+            StageFault?.Invoke("body");
+            if (body is not null)
+            {
+                try
+                {
+                    content = body.Text.TrimEnd('\r', '\n');
+                    contentType = body.ContentType.MimeType;
+                }
+                catch (Exception ex)
+                {
+                    warnings.Add($"body_decode_failed: {ex.Message}");
+                }
+            }
+
+            var html = contentType is not null
+                       && contentType.Contains("html", StringComparison.OrdinalIgnoreCase);
+            subjectDir = TextDirection.Detect(metadata.GetValueOrDefault("subject"), html: false);
+            contentDir = TextDirection.Detect(content, html);
+        }
+        catch (Exception ex)
+        {
+            content = null;
+            contentType = null;
+            subjectDir = "ltr";
+            contentDir = "ltr";
+            warnings.Add(InternalError("body", ex));
+        }
+
+        IReadOnlyList<ExtractedAttachment> attachments;
+        try
+        {
+            StageFault?.Invoke("attachments");
+            attachments = PartCollector.Collect(message.Body, body, warnings);
+        }
+        catch (Exception ex)
+        {
+            attachments = [];
+            warnings.Add(InternalError("attachments", ex));
+        }
+
         return new EmlExtractionResult(metadata, content, contentType, attachments, warnings)
         {
             SubjectDirection = subjectDir,
             ContentDirection = contentDir
         };
     }
+
+    private static string InternalError(string stage, Exception ex)
+        => $"internal_error: {stage}: {ex.GetType().Name}: {ex.Message}";
+
+    private static EmlExtractionResult Empty(List<string> warnings)
+        => new(HeaderMapper.EmptyMetadata(), null, null, [], warnings);
 
     private static ParserOptions CreateOptions()
     {
