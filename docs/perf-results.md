@@ -184,3 +184,38 @@ Re-run values (not committed as JSON; extract, synthetic set; 6 re-run sweep fil
 The committed baseline alone has A 23.3-24.5 (workstation) and 23.7-24.1 (server); the A ceiling of 32 is 30% above that and 22% above the re-run max. M and the 730 MB peak come from the #49 large-file pass (PR #93, `sweep-results/large-*.md` of that run, not committed; rerun with `-- large`). The ceilings are per extraction: at DOP n on near-limit inputs expect up to n times that growth, so use the sizing formula above (`ram_per_server`), not the ceiling alone. A <= 32 is set on a tiny-message mix and would not catch a regression on large messages; the large-file pass (M) covers those.
 
 Streaming stays DEFERRED (`docs/specs/scope.md`): measured M (max 4.2) is below the ceiling (6). Owner-set: the 500 MiB default. Still to confirm: the A and M ceilings above.
+
+## Telemetry overhead (#73)
+
+Command: `dotnet run -c Release --project benches/EmlExtraction.Bench -f net10.0 -- overhead --filter '*'` (BenchmarkDotNet 0.15.8 runs both the net8.0 and net10.0 jobs from the one command, `MemoryDiagnoser`, default `SimpleJob` auto-tuned iterations; ADR-021). Run twice (2026-10-18), synthetic bench messages only (no `corpus/internal`). Machine: Intel Core Ultra 7 155H, 1 CPU, 22 logical / 16 physical cores, Windows 11 25H2, .NET SDK 10.0.401, runtimes .NET 10.0.12 and .NET 8.0.30, X64 RyuJIT x86-64-v3, Release. A laptop with other processes running, so run-to-run noise is large: the same configuration moved by up to about 16 points between the two runs (small-20kb Activity net10.0 +8.6% then -7.3%). Overhead % = (mean with listener - mean no listener) / mean no listener, per run; shown as run 1 / run 2.
+
+Extract time overhead, listener vs none:
+
+| Case | TFM | MeterListener (all instruments) | ActivityListener (AllData, with stage children) |
+| --- | --- | ---: | ---: |
+| tiny (221 B) | net10.0 | -5.1% / -6.9% | +7.8% / +0.8% |
+| tiny (221 B) | net8.0 | -1.2% / +0.5% | +9.2% / +9.7% |
+| small-20kb | net10.0 | -5.5% / -4.0% | +8.6% / -7.3% |
+| small-20kb | net8.0 | -2.7% / -0.2% | +0.4% / +3.5% |
+| attach-1mb | net10.0 | -16.0% / -2.2% | -9.0% / -5.3% |
+| attach-1mb | net8.0 | -10.8% / -4.4% | -10.0% / -2.3% |
+| Detect tiny | net10.0 | -2.2% / -10.0% | -4.7% / -7.5% |
+| Detect tiny | net8.0 | -3.4% / -7.1% | -1.7% / -8.9% |
+
+Negative values are noise (a listener cannot make the call faster). Allocation per op (MemoryDiagnoser, identical in both runs):
+
+| Case | TFM | None | MeterListener | ActivityListener |
+| --- | --- | ---: | ---: | ---: |
+| Extract tiny | net10.0 | 23.74 KB | +0.00 KB | +2.24 KB (+9.4%) |
+| Extract tiny | net8.0 | 23.83 KB | +0.01 KB | +2.25 KB |
+| Extract small-20kb | net10.0 / net8.0 | 258.17 / 258.32 KB | +0.00 / +0.01 KB | +2.24 KB |
+| Extract attach-1mb | net10.0 / net8.0 | 5375.16 / 5375.28 KB | -0.07 / -0.05 KB (noise) | +2.2 KB |
+| Detect tiny | both | 1.94 KB | +0.00 KB | +0.00 KB |
+
+Reading:
+- MeterListener on every instrument: no measurable added time or allocation (all deltas inside the noise band, mean about -5%; the instruments record into pre-sized storage and the callbacks here are empty). Budget 5% on tiny holds.
+- ActivityListener sampling AllData with the four stage children: +2.2 KB per Extract (one parent plus four child activities and tags) and +0.8 to +9.7% on the tiny message (tiny net8.0 +9.2% / +9.7% in both runs, the only case near the limit), within noise for the larger cases. Under the ADR-021 limit of 10%, so the stage children are kept; headroom is thin on tiny/net8.0.
+- Zero listener: `TelemetryNoListenerAllocationTests` asserts 0 allocated bytes across 1000 iterations of every Extract and Detect telemetry hook (a normal unit test, runs in milliseconds in CI). On net8.0 it only runs when no earlier test in the process attached a `MeterListener`: the net8.0 BCL leaves `Instrument.Enabled` true after a listener is disposed (verified with a stand-alone probe; fixed in later runtimes) and the hooks then allocate about 240 B per Extract. So in the full net8.0 suite it skips and runs when filtered alone; net10.0 always runs it. The BDN `None` runs are unaffected (one process per benchmark, no listener ever attached). `Detect` itself allocates 1.94 KB/op without any telemetry (header sniffing), unchanged by listeners. No uninstrumented build exists to A/B the no-listener time against, so "time within noise" rests on the hooks being `Enabled` / null checks plus the 0-byte result, not a measured delta.
+- Not done: the #48 sweep T(1) with and without a listener. The sweep has no listener switch and its T(1) varies 24-80% between short windows (above), which hides a difference of this size; the per-call BDN numbers above are the evidence.
+
+Proposed budget (**provisional, for owner confirmation**; set in `ydk:nfr:observability/metrics-overhead` and ADR-021): no listener 0 added bytes per call (tested); MeterListener <= 5% on tiny (measured <= +0.5%, noise +-7%); ActivityListener with stage children <= 10% on tiny (measured +0.8 to +9.7%, headroom only about 0.3 points on net8.0, so a noisier run could cross 10%; owner to confirm the limit or the child spans), +2.3 KB per Extract.

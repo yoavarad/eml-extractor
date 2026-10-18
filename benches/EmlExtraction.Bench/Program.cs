@@ -16,6 +16,12 @@ if (args.Length > 0 && args[0] == "profile-trace")
 if (args.Length > 0 && args[0] == "sweep-child")
     return SweepCommand.Child(args[1..]);
 
+if (args.Length > 0 && args[0] == "overhead")
+{
+    BenchmarkRunner.Run<OverheadBenchmarks>(null, args[1..]);
+    return 0;
+}
+
 if (args.Contains("--bdn"))
 {
     BenchmarkRunner.Run<EmlBenchmarks>();

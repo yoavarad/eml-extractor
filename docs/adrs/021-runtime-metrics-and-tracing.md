@@ -1,7 +1,7 @@
 # ADR-021: Runtime metrics and tracing with BCL Meter and ActivitySource
 
 ## Status
-Accepted (per project owner, 2026-10-18). Implemented (metrics #71, activities #72). The overhead budget is provisional until measured. Instrument names may be renamed once if the team answers `docs/team-questions.md` question 6 before the first release that ships them. Amended by ADR-023 (2026-10-18): `internal_errors` and `input_too_large` count thrown exceptions, and those two codes leave the warning-code tag set.
+Accepted (per project owner, 2026-10-18). Implemented (metrics #71, activities #72). The overhead budget is set from the #73 measurement (`docs/perf-results.md`), pending owner confirmation. Instrument names may be renamed once if the team answers `docs/team-questions.md` question 6 before the first release that ships them. Amended by ADR-023 (2026-10-18): `internal_errors` and `input_too_large` count thrown exceptions, and those two codes leave the warning-code tag set.
 
 ## Context
 Today the warnings list on the result is the only diagnostic channel; the library writes no logs, traces, or metrics (`ydk:crosscut:core/warning-format`). The factory sees each result, but it cannot see, without wrapping every call itself, how long extraction takes per message size, how often each warning kind fires across a fleet, how often the size guard refuses input, or which stage hit an `internal_error`. The owner decided (2026-10-18) to add runtime metrics in the library, next to dev-time profiling (ADR-020).
@@ -61,11 +61,12 @@ No histogram bucket advice is set: the API for it is not in the net8.0 BCL. Cons
 - Exception messages are never recorded (MimeKit messages can quote input).
 - Every tag value comes from a closed set fixed in code or is a number. A test asserts this on every instrument and activity (`ydk:test:observability/telemetry.unit`).
 
-### Overhead budget (provisional)
-`ydk:nfr:observability/metrics-overhead`. Placeholders until measured:
-- No listener: added time per Extract within the run-to-run noise of the tiny-message benchmark and at most 1%, and zero added allocated bytes per call.
-- MeterListener on every instrument (and ActivityListener sampling all, measured separately): at most 5% added time on the tiny message.
-- Verified by a BenchmarkDotNet comparison of no listener versus listener attached, on both target frameworks. The measuring task replaces the placeholders with measured values plus headroom.
+### Overhead budget
+`ydk:nfr:observability/metrics-overhead`. Set from the #73 BenchmarkDotNet run (`docs/perf-results.md`, both TFMs, two runs); pending owner confirmation:
+- No listener: zero added allocated bytes per call (asserted on the telemetry hooks by a unit test). Time is not A/B measured (no uninstrumented build); the hooks are `Enabled`/null checks.
+- MeterListener on every instrument: at most 5% added time on the tiny message. Measured: inside noise (-6.9% to +0.5%), no added bytes.
+- ActivityListener sampling all, with stage children: at most 10% on the tiny message, else the children are dropped. Measured +0.8% to +9.7% and +2.2 KB per Extract, so the children stay; headroom is only about 0.3 points on net8.0, so a noisier run could cross 10% (owner to confirm).
+- Verified by a BenchmarkDotNet comparison of no listener versus listener attached, on both target frameworks (`-- overhead`).
 
 ## Alternatives
 - `EventSource` / EventCounters. Rejected: the older mechanism; `Meter` is what OpenTelemetry .NET and `dotnet-counters` consume natively, and it supports histograms and tags.
@@ -76,6 +77,7 @@ No histogram bucket advice is set: the API for it is not in the net8.0 BCL. Cons
 
 ## Consequences
 - `ydk:crosscut:core/library-surface` and `ydk:crosscut:core/warning-format` change from "no logging, tracing, or metrics" to "warnings plus BCL metrics and activities (target)". Cross-cutting rules: `ydk:crosscut:core/observability`.
+- On net8.0 a host that attaches and later disposes a `MeterListener` leaves the instruments `Enabled` for the rest of the process (BCL behavior, fixed in later runtimes), costing about 240 B per Extract after that (#73 measurement). Hosts that never attach a listener are unaffected.
 - Telemetry tests share one static meter across the test process: they filter by meter name and run in one non-parallel test collection, so measurements from other tests do not leak in.
 - The README documents the meter and source names and how to subscribe with OpenTelemetry.
 - Open question for the team: `docs/team-questions.md` question 6 (factory naming conventions, existing meter).
