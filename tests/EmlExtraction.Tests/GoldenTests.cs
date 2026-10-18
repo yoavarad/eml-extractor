@@ -36,6 +36,7 @@ public sealed class GoldenTests
         var label = spec.Id;
 
         Assert.True(spec.IsEml == _detector.IsEml(bytes), $"{label} detector");
+        Assert.Equal(_detector.IsEml(bytes), _detector.Detect(bytes).IsSupported);
         if (!spec.IsEml)
             return;
 
