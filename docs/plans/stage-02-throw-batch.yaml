@@ -7,14 +7,14 @@
 # batch opens a new epic.
 #
 # Existing issues referenced in depends_on (create-batch passes known issue numbers through unchanged):
-#   #34 T-fullpath (in review; edits PartCollector, where the per-part content catch sites live)
-#   #47 T-readme (open; README rewrite for the Stage 02 API)
-#   #49 T-load-largefile (in review; its +1 byte check expects the input_too_large warning)
-#   #68 T-profile-harness (in review; uses the internal stage entry points behind the #37 guards)
-#   #71 T-runtime-metrics (in review; outcome tags and counters reference internal_error / input_too_large)
-#   #72 T-runtime-tracing (open, not started; stage activity status Error "on internal_error")
-# Each code task below waits for the in-review PR whose code it overlaps, then adapts that code, so no open PR has to
-# be reworked. #72 is "related": when it starts after T-throw-bugs it implements the ADR-023 wording directly.
+#   #34 T-fullpath (merged; edits PartCollector, where the per-part content catch sites live)
+#   #49 T-load-largefile (open, PR #93; its +1 byte check expects the input_too_large warning)
+#   #68 T-profile-harness (merged; uses the internal stage entry points behind the #37 guards)
+#   #71 T-runtime-metrics (merged; outcome tags and counters reference internal_error / input_too_large)
+# Each code task below adapts the code of the work it depends on. No "related" links are used: `ydk task start`
+# treats every dependency, "related" included, as blocking.
+# After create-batch: the coordinator edits the existing issues so that #72 (T-runtime-tracing, stage activity
+# status Error) depends on T-throw-bugs and #47 (T-readme) depends on T-throw-docs. Those links are not in this file.
 #
 # Planning conventions (those at the top of stage-02-batch.yaml all apply):
 # - TDD: failing test first, then code. Every code task ends with dotnet build -warnaserror, dotnet format
@@ -22,8 +22,8 @@
 #   on a golden input.
 # - Exception messages name the parameter and the bad value or limit and never quote message content. Tests assert
 #   exception type and data (ParamName, InputLength, MaxInputBytes, Stage, InnerException), not full message text.
-# - Proposed names (EmlExtractionException, EmlInputTooLargeException) and "wrap, do not propagate" are owner decisions
-#   pending confirmation on the ADR-023 PR; if the owner changes them, edit this file before creating issues.
+# - Names (EmlExtractionException, EmlInputTooLargeException), base types and "wrap, do not propagate" were approved
+#   by the owner on 2026-10-18 (PR #98).
 
 epics:
   - id: E-error-model
@@ -165,7 +165,7 @@ tasks:
       exceptions propagate unchanged. Keep the StageFault test seam; rewrite StageGuardTests to assert the throw
       (Stage, InnerException identity) for every stage and both internal and public paths. Telemetry (#71):
       internal_errors +1 (stage, error.type = inner type) and outcome internal_error recorded on the throw; stage
-      activity status Error where #72 has landed. Profile harness (#68): stage entry points keep working. GoldenKit:
+      activity status Error is left to #72, which is made to depend on this task after creation. Profile harness (#68): stage entry points keep working. GoldenKit:
       replace the per-result no_internal_error check with "extraction does not throw" (a throw fails the case and the
       run exits non-zero); probe counts any exception as a throw. Delete
       .ydk/components/warning/extraction/internal-error.yaml and remove its references so validation passes.
@@ -187,7 +187,6 @@ tasks:
       - "34:blocks"
       - "68:blocks"
       - "71:blocks"
-      - "72:related"
 
   - id: T-throw-docs
     title: "README and XML docs for the ADR-023 error model; drop the 'today' gap notes from specs and manifests"
@@ -208,7 +207,7 @@ tasks:
       oversized input and a library bug are reported as warnings" sentence. Check every public member's XML docs for
       complete <exception> tags. In docs/specs, docs/project-rules.md and the ADR-023 manifests, drop the "today /
       current code / Stage 02 gap" sentences that T-throw-size and T-throw-bugs made obsolete, and set ADR-023 status
-      to implemented. Coordinate with #47 (README for the Stage 02 API) if it is open: rebase, do not overwrite.
+      to implemented. #47 (README for the Stage 02 API) is made to depend on this task after creation.
     acceptance:
       - "README Errors section lists every exception type, its properties, and the content warnings, matching ADR-023"
       - "Every public method and constructor documents the exceptions it throws"
@@ -219,4 +218,3 @@ tasks:
     depends_on:
       - "T-throw-size:blocks"
       - "T-throw-bugs:blocks"
-      - "47:related"

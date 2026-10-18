@@ -31,11 +31,12 @@ Per project owner, 2026-10-18: throw relevant, informative errors when the call 
 - Misuse and limit checks run before any parsing.
 
 ### New exception types
+Owner-approved 2026-10-18: names, base types, `sealed`, and properties as below.
 - `EmlInputTooLargeException : ArgumentException` (sealed). Properties `long InputLength` and `long MaxInputBytes`. `ParamName` is `request` (or `eml` for the bytes overload). Message: `Input is <InputLength> bytes, which exceeds maxInputBytes <MaxInputBytes>.` A length equal to the limit is parsed. Deriving from `ArgumentException` lets callers that already catch argument errors handle it, and it is the caller's input that is wrong. Manifest: `ydk:entity:extraction/EmlInputTooLargeException`.
 - `EmlExtractionException : Exception` (sealed). Property `string Stage`, one of `request`, `detect`, `parse`, `metadata`, `body`, `attachments` (the ADR-020 stage names; ADR-021 keeps the last four for its `eml_extraction.stage` tag). `InnerException` is the original exception. Message: `EML extraction failed in stage '<Stage>': <InnerTypeFullName>.` The inner exception's message is not copied into the outer message (MimeKit messages can quote input); it stays on `InnerException`. Manifest: `ydk:entity:extraction/EmlExtractionException`.
 
 ### Wrap or propagate unexpected exceptions
-Recommendation: wrap, in `EmlExtractionException`, and never wrap the cases in the table marked "no".
+Owner-approved 2026-10-18: wrap, in `EmlExtractionException`, and never wrap the cases in the table marked "no".
 - The stage name is the most useful fact for a bug report, and only the library knows it.
 - One type tells the caller "library bug" apart from misuse (`ArgumentException` family) without a list of BCL and MimeKit types.
 - Nothing is lost: the original exception, type and stack trace are on `InnerException`.
@@ -61,7 +62,7 @@ Recommendation: wrap, in `EmlExtractionException`, and never wrap the cases in t
 
 ## Alternatives
 - Keep ADR-004 (never throw, `internal_error` warning). Rejected by the owner: it hides bugs and oversized inputs behind warning strings.
-- Let unexpected exceptions propagate unwrapped. Simpler and keeps the original type at the top. Not recommended: the caller loses the stage name and needs its own list of "bug" types to tell bugs from misuse. Remains acceptable if the owner prefers fewer types.
+- Let unexpected exceptions propagate unwrapped. Simpler and keeps the original type at the top. Rejected (owner, 2026-10-18): the caller loses the stage name and needs its own list of "bug" types to tell bugs from misuse.
 - Return a failure result with an `Error` slot (OLE's batch shape). Rejected: ADR-012 has no batch API, and a result that may be an error is the same problem as a warning code.
 - `EmlInputTooLargeException : InvalidOperationException` or `: EmlExtractionException`. Not chosen: the input is the caller's argument, so `ArgumentException` is the closest BCL meaning, and mixing it with the bug type would blur the two.
 - Strict mode flag (throw only when asked). Rejected: two behaviours to test and document for no current consumer.
