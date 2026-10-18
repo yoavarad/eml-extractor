@@ -729,6 +729,7 @@ internal static class Catalog
             var builder = new BodyBuilder { HtmlBody = $"<img src=\"cid:a{i}@x\" /><img src=\"cid:b{i}@x\" />" };
             var a = builder.LinkedResources.Add("a.png", img1, new ContentType("image", "png"));
             a.ContentId = $"a{i}@x";
+            a.ContentLocation = new Uri($"images/a{i}.png", UriKind.Relative);
             a.ContentDisposition = new ContentDisposition(ContentDisposition.Inline) { FileName = "a.png" };
             var bName = i % 2 == 0 ? "b.jpg" : "b.gif";
             var b = builder.LinkedResources.Add(bName, img2, new ContentType("image", i % 2 == 0 ? "jpeg" : "gif"));
@@ -744,7 +745,7 @@ internal static class Catalog
                 AttachmentCount = 2,
                 Attachments =
                 [
-                    new GoldenAttachment { Name = "a.png", Sha256 = MimeBuild.Sha(img1), Disposition = "inline" },
+                    new GoldenAttachment { Name = "a.png", Sha256 = MimeBuild.Sha(img1), Disposition = "inline", ContentLocation = $"images/a{i}.png" },
                     new GoldenAttachment { Name = bName, Sha256 = MimeBuild.Sha(img2), Disposition = "inline" }
                 ]
             }));

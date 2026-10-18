@@ -41,7 +41,7 @@
         "size": 8,
         "sha256": "46b67b7daef67fb6aaf9b39af732ca827be7f5f7c66f61306ec278040ba6be22",
         "disposition": "attachment",
-        "full_path": "docs/legacy.doc"
+        "original_path": "docs/legacy.doc"
       }
     ]
   }

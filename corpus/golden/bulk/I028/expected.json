@@ -40,7 +40,7 @@
         "size": 21,
         "sha256": "6539f2574fe471e2336f40e6c5807462cc7e21293a1b11e07ae5863aaf62b9eb",
         "disposition": "attachment",
-        "full_path": "photos/pic.webp"
+        "original_path": "photos/pic.webp"
       }
     ]
   }

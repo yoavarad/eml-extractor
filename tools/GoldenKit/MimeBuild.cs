@@ -100,7 +100,7 @@ internal static class MimeBuild
                 Size = part.Payload.Length,
                 Sha256 = Sha(part.Payload),
                 Disposition = part.Disposition,
-                FullPath = part.Path
+                OriginalPath = part.Path
             });
         }
 
@@ -146,7 +146,7 @@ internal static class MimeBuild
                 new GoldenAttachment
                 {
                     Name = Path.GetFileName(fileName.Replace('\\', '/')),
-                    FullPath = fileName.Contains('/') || fileName.Contains('\\') ? fileName : null,
+                    OriginalPath = fileName.Contains('/') || fileName.Contains('\\') ? fileName : null,
                     Reextract = new GoldenExpect
                     {
                         Metadata = Meta(innerSubject),

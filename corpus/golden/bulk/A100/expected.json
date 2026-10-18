@@ -41,7 +41,7 @@
         "size": 17,
         "sha256": "4d7f7ed238887b11d3d5987499f7198addb7917f688cda2d4ab91cc5a5c48ca0",
         "disposition": "attachment",
-        "full_path": "docs/file.pdf"
+        "original_path": "docs/file.pdf"
       }
     ]
   }

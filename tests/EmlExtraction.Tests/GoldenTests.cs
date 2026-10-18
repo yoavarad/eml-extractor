@@ -63,24 +63,26 @@ public sealed class GoldenTests
         {
             var match = result.Attachments.First(a => Matches(a, wanted));
             if (wanted.Size is long size)
-                Assert.Equal(size, match.Size);
+                Assert.Equal(size, match.SizeInBytes);
             if (wanted.Sha256 is string sha)
-                Assert.Equal(sha, Convert.ToHexString(SHA256.HashData(match.Data)), StringComparer.OrdinalIgnoreCase);
+                Assert.Equal(sha, Convert.ToHexString(SHA256.HashData(match.BinaryData)), StringComparer.OrdinalIgnoreCase);
             if (wanted.Disposition is string disp)
                 Assert.Equal(disp, match.Disposition);
-            if (wanted.FullPath is string path)
-                Assert.Equal(path, match.FullPath);
+            if (wanted.OriginalPath is string path)
+                Assert.Equal(path, match.OriginalPath);
+            if (wanted.ContentLocation is string loc)
+                Assert.Equal(loc, match.ContentLocation);
             if (wanted.Reextract is not null)
-                Check(_extractor.Extract(match.Data), wanted.Reextract, $"{label}/{match.Name}", depth + 1);
+                Check(_extractor.Extract(match.BinaryData), wanted.Reextract, $"{label}/{match.FileName}", depth + 1);
         }
     }
 
     private static bool Matches(ExtractedAttachment actual, GoldenAttachment wanted)
     {
         if (wanted.Name is not null)
-            return actual.Name.Equals(wanted.Name, StringComparison.OrdinalIgnoreCase);
+            return actual.FileName.Equals(wanted.Name, StringComparison.OrdinalIgnoreCase);
         return wanted.NameContains is not null
-               && actual.Name.Contains(wanted.NameContains, StringComparison.OrdinalIgnoreCase);
+               && actual.FileName.Contains(wanted.NameContains, StringComparison.OrdinalIgnoreCase);
     }
 
     private static void CheckField(string label, string? actual, GoldenField field)

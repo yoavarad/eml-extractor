@@ -41,7 +41,7 @@
         "size": 13,
         "sha256": "7eeb47260ce531456b45d4790703cfeab10782bb0a8f911252d0291679c893bc",
         "disposition": "attachment",
-        "full_path": "docs/deck.pptx"
+        "original_path": "docs/deck.pptx"
       }
     ]
   }
