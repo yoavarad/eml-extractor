@@ -26,7 +26,7 @@ Input: a buffer already identified as EML. Output: metadata, main content, neste
 EmlExtractionResult result = new EmlExtractor().Extract(bytes);
 ```
 
-Does not throw on malformed MIME content (bad charset, undecodable part, broken structure); those problems go into `result.Warnings` with whatever could be extracted. Planned (ADR-023, Stage 02): misuse throws `ArgumentException` types, input over `maxInputBytes` throws `EmlInputTooLargeException`, and a library bug throws `EmlExtractionException` naming the failed stage. Today an oversized input and a library bug are reported as `input_too_large` / `internal_error` warnings.
+Does not throw on malformed MIME content (bad charset, undecodable part, broken structure); those problems go into `result.Warnings` with whatever could be extracted. Input over `maxInputBytes` throws `EmlInputTooLargeException` (`InputLength`, `MaxInputBytes`) before parsing. Planned (ADR-023, Stage 02): misuse throws `ArgumentException` types and a library bug throws `EmlExtractionException` naming the failed stage. Today a library bug is reported as an `internal_error` warning.
 
 #### Metadata
 
@@ -73,7 +73,7 @@ The library publishes runtime metrics through the BCL `System.Diagnostics.Metric
 
 Tag values (closed sets):
 - `eml_extraction.outcome`: `clean`, `warnings`, `parse_failed` (nothing parsed: parse failure or an `internal_error` in the parse stage), `input_too_large`
-- `eml_extraction.warning.code`: `parse_failed`, `body_decode_failed`, `part_decode_failed`, `rfc822_extract_failed`, `tnef_extract_failed`, `internal_error`, `input_too_large`
+- `eml_extraction.warning.code`: `parse_failed`, `body_decode_failed`, `part_decode_failed`, `rfc822_extract_failed`, `tnef_extract_failed`, `internal_error`
 - `eml_extraction.detect.result`: `supported`, `not_supported`
 - `eml_extraction.stage`: `parse`, `metadata`, `body`, `attachments`
 - `error.type`: the .NET exception type's full name
@@ -156,6 +156,8 @@ Measured on Apple M1 Pro, 1 thread, Release, in-memory `byte[]` (no disk). Use t
 | Mail + 1 MB attachment | ~259 |
 
 Multi-core capacity is measured, not estimated: `dotnet run -c Release --project benches/EmlExtraction.Bench -- sweep` runs the DOP sweep (ADR-015). Attachment-heavy mail is RAM-bound. Full table and sweep options: [docs/perf-results.md](docs/perf-results.md).
+
+Corpus-level profiling (ADR-020): `scripts/profile-corpus.sh` or `scripts/profile-corpus.ps1 [--corpus <path>]` runs the sweep and large-file pass on net8.0 and net10.0 under `dotnet-trace`, `dotnet-counters` and `dotnet-gcdump` (local tools, `dotnet tool restore`) and writes the nettrace, counters CSV, gcdump and `manifest.json` (GC counts, pause time, hardware) to the gitignored `artifacts/perf/<stamp>/`. Open a nettrace with `dotnet-trace convert --format speedscope` or PerfView. A missing corpus path prints `SKIPPED` and profiles the synthetic set only.
 
 ### 2. Correctness A — emoji and exotic languages
 

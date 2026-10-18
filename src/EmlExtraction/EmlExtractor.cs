@@ -27,7 +27,7 @@ public sealed class EmlExtractor : IEmlExtractor
     private readonly long _maxInputBytes;
 
     /// <summary>Creates an extractor.</summary>
-    /// <param name="maxInputBytes">Largest input, in bytes, that is parsed; larger inputs yield an <c>input_too_large</c> warning.</param>
+    /// <param name="maxInputBytes">Largest input, in bytes, that is parsed; larger inputs make <c>Extract</c> throw.</param>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxInputBytes"/> is not positive.</exception>
     public EmlExtractor(long maxInputBytes = DefaultMaxInputBytes)
     {
@@ -36,23 +36,26 @@ public sealed class EmlExtractor : IEmlExtractor
     }
 
     /// <inheritdoc/>
+    /// <exception cref="EmlInputTooLargeException"><paramref name="eml"/> is longer than the configured <c>maxInputBytes</c>.</exception>
     public EmlExtractionResult Extract(ReadOnlyMemory<byte> eml)
         => Extract(new EmlExtractionRequest { FileBytes = eml });
 
     /// <inheritdoc/>
+    /// <exception cref="ArgumentNullException"><paramref name="request"/> is null.</exception>
+    /// <exception cref="EmlInputTooLargeException"><see cref="EmlExtractionRequest.FileBytes"/> is longer than the configured <c>maxInputBytes</c>.</exception>
     public EmlExtractionResult Extract(EmlExtractionRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
         var start = Stopwatch.GetTimestamp();
         var eml = request.FileBytes;
         EmlExtractionTelemetry.RecordInputSize(eml.Length);
-        var warnings = new List<string>();
         if (eml.Length > _maxInputBytes)
         {
-            warnings.Add($"input_too_large: {eml.Length} > {_maxInputBytes}");
-            EmlExtractionTelemetry.RecordInputTooLarge();
-            return Recorded(start, EmlExtractionTelemetry.OutcomeInputTooLarge, Empty(warnings));
+            EmlExtractionTelemetry.RecordInputTooLarge(start);
+            throw new EmlInputTooLargeException(eml.Length, _maxInputBytes, nameof(request));
         }
+
+        var warnings = new List<string>();
 
         MimeMessage message;
         try

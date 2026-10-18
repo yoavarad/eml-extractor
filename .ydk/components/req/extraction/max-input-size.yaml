@@ -17,7 +17,7 @@ rule: >-
   always set its own limit. When EmlExtractionRequest.FileBytes.Length > maxInputBytes,
   Extract does not parse and throws ydk:entity:extraction/EmlInputTooLargeException (ADR-023, per project owner
   2026-10-18), carrying InputLength and MaxInputBytes; no result is returned. A length equal to the limit is parsed.
-  Superseded behaviour (#38, current code until Stage 02): an empty result with ydk:warning:extraction/input-too-large . The bytes convenience overload applies the same limit. The detector is not limited:
+  The bytes convenience overload applies the same limit. The detector is not limited:
   it reads at most 16 KB.
 failure_behavior: Throws ydk:entity:extraction/EmlInputTooLargeException (no result, no warning); maxInputBytes <= 0 throws ArgumentOutOfRangeException at construction.
 related_components:

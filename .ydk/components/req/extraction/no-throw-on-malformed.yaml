@@ -17,7 +17,7 @@ rule: >-
   ydk:entity:extraction/EmlExtractionException naming the stage, with the original as InnerException; a null argument
   throws ArgumentNullException; input over maxInputBytes throws ydk:entity:extraction/EmlInputTooLargeException
   (ydk:req:extraction/max-input-size). Tests and GoldenKit fail when extraction throws on a golden or realistic input.
-  Current code (Stage 02 gap): bugs and oversized input are still recorded as internal_error / input_too_large
+  Current code (Stage 02 gap): bugs are still recorded as internal_error
   warnings, and the per-part catch sites catch every exception type.
 failure_behavior: See the five content warning components; each defines the resulting partial result.
 related_components:

@@ -13,19 +13,29 @@ public sealed class MaxInputBytesTests
     }
 
     [Fact]
-    public void OverLimitReturnsOnlyInputTooLargeWarning()
+    public void OverLimitThrowsEmlInputTooLargeException()
     {
-        var result = new EmlExtractor(1024).Extract(Message(1025));
+        var ex = Assert.Throws<EmlInputTooLargeException>(
+            () => new EmlExtractor(1024).Extract(new EmlExtractionRequest { FileBytes = Message(1025) }));
 
-        Assert.Equal("input_too_large: 1025 > 1024", Assert.Single(result.Warnings));
-        Assert.Equal(["bcc", "cc", "from", "to", "xfields"], result.Metadata.Keys.Order(StringComparer.Ordinal));
-        Assert.All(result.Metadata.Values, v => Assert.Equal("", v));
-        Assert.Equal("", result.Metadata["xfields"]);
-        Assert.Null(result.MainContent);
-        Assert.Null(result.MainContentMimeType);
-        Assert.Empty(result.Attachments);
-        Assert.Equal("ltr", result.SubjectDirection);
-        Assert.Equal("ltr", result.ContentDirection);
+        AssertTooLarge(ex);
+    }
+
+    [Fact]
+    public void BytesOverloadThrowsSameException()
+    {
+        var ex = Assert.Throws<EmlInputTooLargeException>(() => new EmlExtractor(1024).Extract(Message(1025)));
+
+        AssertTooLarge(ex);
+    }
+
+    private static void AssertTooLarge(EmlInputTooLargeException ex)
+    {
+        Assert.Equal(1025, ex.InputLength);
+        Assert.Equal(1024, ex.MaxInputBytes);
+        Assert.Equal("request", ex.ParamName);
+        Assert.Contains("1025", ex.Message);
+        Assert.Contains("1024", ex.Message);
     }
 
     [Fact]
@@ -54,10 +64,9 @@ public sealed class MaxInputBytesTests
         var extractor = new EmlExtractor();
         var bytes = Message(checked((int)EmlExtractor.DefaultMaxInputBytes + 1));
 
-        var over = extractor.Extract(bytes);
-        Assert.StartsWith("input_too_large", Assert.Single(over.Warnings));
+        Assert.Throws<EmlInputTooLargeException>(() => extractor.Extract(bytes));
 
         var at = extractor.Extract(bytes.AsMemory(0, (int)EmlExtractor.DefaultMaxInputBytes));
-        Assert.DoesNotContain(at.Warnings, w => w.StartsWith("input_too_large"));
+        Assert.Empty(at.Warnings);
     }
 }

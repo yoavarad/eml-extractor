@@ -39,7 +39,7 @@ internal static class HeaderMapper
         return metadata;
     }
 
-    /// <summary>Fixed always-present keys with empty values (parse_failed, input_too_large, ...).</summary>
+    /// <summary>Fixed always-present keys with empty values (parse_failed, ...).</summary>
     internal static Dictionary<string, string> EmptyMetadata() => new(StringComparer.Ordinal)
     {
         ["from"] = "",
