@@ -27,22 +27,24 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
+          # SDK pinned by global.json, plus .NET 8 (SDK, includes the runtime) for the net8.0 target; global.json still selects the SDK (ADR-019).
           global-json-file: global.json
+          dotnet-version: 8.0.x
       - name: Restore
         run: dotnet restore $SOLUTION
       - name: Build
         run: dotnet build $SOLUTION -c Release --no-restore -p:TreatWarningsAsErrors=true
       - name: Format
         run: dotnet format $SOLUTION --verify-no-changes --no-restore
-      - name: Test
-        run: dotnet test $SOLUTION -c Release --no-build --logger "trx;LogFileName=results.trx" --results-directory TestResults
+      - name: Test (net8.0 + net10.0)
+        run: dotnet test $SOLUTION -c Release --no-build --logger "trx;LogFilePrefix=results" --results-directory TestResults
       - name: Upload test results
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: TestResults
-      - name: GoldenKit score (1212/1212 gate)
+      - name: GoldenKit score (1212/1212 gate, net10.0)
         run: dotnet run --project tools/GoldenKit -c Release --no-build -- score
       - name: Upload golden score report
         if: failure()
@@ -52,7 +54,7 @@ jobs:
           path: |
             docs/golden-score.txt
             docs/golden-score.json
-      - name: Vulnerability audit
+      - name: Vulnerability audit (all target frameworks)
         run: |
           output=$(dotnet list $SOLUTION package --vulnerable --include-transitive 2>&1)
           echo "$output"

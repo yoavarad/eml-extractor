@@ -4,7 +4,7 @@ namespace EmlExtraction.Tests;
 
 public sealed class ExoticLanguageTests
 {
-    private readonly EmlExtractor _extractor = new();
+    private readonly IEmlExtractor _extractor = new CheckedExtractor();
 
     [Theory]
     [InlineData("עברית", "שלום עולם")]

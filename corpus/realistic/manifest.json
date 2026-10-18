@@ -1,6 +1,30 @@
 {
   "samples": [
     {
+      "file": "attached-doc.eml",
+      "generator": "tools/RealisticSamples",
+      "license": "Apache-2.0",
+      "sha256": "cdcd2c92ba6d056150a22cfece00449450d751c6d3cd9ec40ac2fa069d465b28",
+      "source": {
+        "url": "https://github.com/apache/poi/blob/62322b97f3f1bca39cdcd0b7705973833c74ad25/test-data/document/Bug60942b.doc",
+        "commit": "62322b97f3f1bca39cdcd0b7705973833c74ad25",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://github.com/apache/poi/blob/62322b97f3f1bca39cdcd0b7705973833c74ad25/legal/LICENSE",
+        "file": "sources/Bug60942b.doc",
+        "sha256": "183379e7c855aeed2c496f1170e4e2bec16bfde9fddc49ae0fa14f765947430f"
+      },
+      "expected": {
+        "attachments": [
+          {
+            "fileName": "Bug60942b.doc",
+            "sizeInBytes": 6144,
+            "sha256": "183379e7c855aeed2c496f1170e4e2bec16bfde9fddc49ae0fa14f765947430f",
+            "fullPath": "Bug60942b.doc"
+          }
+        ]
+      }
+    },
+    {
       "file": "attached-docx.eml",
       "generator": "tools/RealisticSamples",
       "license": "generated: repo license",
@@ -49,6 +73,30 @@
       }
     },
     {
+      "file": "attached-msg.eml",
+      "generator": "tools/RealisticSamples",
+      "license": "Apache-2.0",
+      "sha256": "c0f7a1996585b795ea03b96d65a4923584f8f158b375feca3f03f83798ff54ef",
+      "source": {
+        "url": "https://github.com/apache/poi/blob/62322b97f3f1bca39cdcd0b7705973833c74ad25/test-data/hsmf/blank.msg",
+        "commit": "62322b97f3f1bca39cdcd0b7705973833c74ad25",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://github.com/apache/poi/blob/62322b97f3f1bca39cdcd0b7705973833c74ad25/legal/LICENSE",
+        "file": "sources/blank.msg",
+        "sha256": "b9e5b5d8fac07e7be9604a3f9b039b9f824978d8b59cdeb2768d5182a03825c0"
+      },
+      "expected": {
+        "attachments": [
+          {
+            "fileName": "blank.msg",
+            "sizeInBytes": 6656,
+            "sha256": "b9e5b5d8fac07e7be9604a3f9b039b9f824978d8b59cdeb2768d5182a03825c0",
+            "fullPath": "blank.msg"
+          }
+        ]
+      }
+    },
+    {
       "file": "attached-pdf.eml",
       "generator": "tools/RealisticSamples",
       "license": "generated: repo license",
@@ -76,6 +124,30 @@
             "sizeInBytes": 1140,
             "sha256": "5ee46b5b1e53973e66714831757d29f14453bfbe5e21ba081d0dd8688a7e2137",
             "fullPath": "deck.pptx"
+          }
+        ]
+      }
+    },
+    {
+      "file": "attached-xls.eml",
+      "generator": "tools/RealisticSamples",
+      "license": "Apache-2.0",
+      "sha256": "f1afe038071c1a81519b4d2f2d271ced6408e3524cdf964f30a35573d1d3b683",
+      "source": {
+        "url": "https://github.com/apache/poi/blob/62322b97f3f1bca39cdcd0b7705973833c74ad25/test-data/spreadsheet/63819.xls",
+        "commit": "62322b97f3f1bca39cdcd0b7705973833c74ad25",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://github.com/apache/poi/blob/62322b97f3f1bca39cdcd0b7705973833c74ad25/legal/LICENSE",
+        "file": "sources/63819.xls",
+        "sha256": "0defe1c277ac1107498f2326c4376d47effa0051c1e20e5f2cb30caa89c822f3"
+      },
+      "expected": {
+        "attachments": [
+          {
+            "fileName": "63819.xls",
+            "sizeInBytes": 6144,
+            "sha256": "0defe1c277ac1107498f2326c4376d47effa0051c1e20e5f2cb30caa89c822f3",
+            "fullPath": "63819.xls"
           }
         ]
       }

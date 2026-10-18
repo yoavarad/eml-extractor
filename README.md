@@ -1,6 +1,6 @@
 # EML extraction
 
-C# / .NET 10 library for RFC 822/2822/5322 mail and RFC 2045–2049 MIME. Parser: [MimeKit](https://github.com/jstedfast/MimeKit) 4.18.0 (MIT).
+C# library for .NET 8 and .NET 10 (`net8.0`, `net10.0`) for RFC 822/2822/5322 mail and RFC 2045–2049 MIME. Parser: [MimeKit](https://github.com/jstedfast/MimeKit) 4.18.0 (MIT).
 
 Repo: https://github.com/yoavarad/eml-extractor
 
@@ -59,7 +59,7 @@ No further extraction: no file-type detection, no parsing inside Office/PDF/imag
 
 ## Setup and run
 
-Requires the .NET 10 SDK (`global.json` pins `10.0.401`). If `dotnet` is missing:
+Requires the .NET 10 SDK (`global.json` pins `10.0.401`); the `net8.0` tests also need the .NET 8 runtime. If `dotnet` is missing:
 
 ```bash
 curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --channel 10.0 --install-dir "$HOME/.dotnet"

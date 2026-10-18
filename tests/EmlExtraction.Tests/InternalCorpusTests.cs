@@ -2,7 +2,7 @@ namespace EmlExtraction.Tests;
 
 public sealed class InternalCorpusTests
 {
-    private readonly EmlExtractor _extractor = new();
+    private readonly IEmlExtractor _extractor = new CheckedExtractor();
 
     [SkippableFact]
     public void ZimbraOutlookTnefUnpacksGifAttachments()

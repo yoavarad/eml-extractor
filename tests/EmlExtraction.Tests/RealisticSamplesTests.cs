@@ -56,9 +56,20 @@ public class RealisticSamplesTests
                 Assert.True(s.TryGetProperty(k, out _), $"missing {k}");
             var path = Path.Combine(Committed, s.GetProperty("file").GetString()!);
             Assert.Equal(s.GetProperty("sha256").GetString(), SampleGenerator.Sha(File.ReadAllBytes(path)));
+            if (s.TryGetProperty("source", out var src))
+            {
+                foreach (var k in new[] { "url", "commit", "license", "licenseUrl", "file", "sha256" })
+                    Assert.False(string.IsNullOrWhiteSpace(src.GetProperty(k).GetString()), $"source.{k} empty");
+                Assert.Contains(src.GetProperty("commit").GetString()!, src.GetProperty("url").GetString());
+                Assert.Contains(src.GetProperty("license").GetString()!, new[] { "Apache-2.0", "MIT", "BSD-3-Clause", "CC0-1.0", "CC-BY-4.0" });
+                var raw = File.ReadAllBytes(Path.Combine(Committed, src.GetProperty("file").GetString()!));
+                Assert.Equal(src.GetProperty("sha256").GetString(), SampleGenerator.Sha(raw));
+                var att = s.GetProperty("expected").GetProperty("attachments")[0];
+                Assert.Equal(src.GetProperty("sha256").GetString(), att.GetProperty("sha256").GetString());
+            }
         }
         var files = samples.Select(s => s.GetProperty("file").GetString()!).ToHashSet();
-        foreach (var f in new[] { "attached-docx", "attached-xlsx", "attached-pptx", "attached-pdf", "attached-eml", "tnef-docx", "attached-image", "outlook-paste", "gmail-paste" })
+        foreach (var f in new[] { "attached-docx", "attached-xlsx", "attached-pptx", "attached-pdf", "attached-eml", "tnef-docx", "attached-image", "outlook-paste", "gmail-paste", "attached-doc", "attached-xls", "attached-msg" })
             Assert.Contains(f + ".eml", files);
     }
 

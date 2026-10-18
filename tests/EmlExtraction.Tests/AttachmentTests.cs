@@ -5,7 +5,7 @@ namespace EmlExtraction.Tests;
 
 public sealed class AttachmentTests
 {
-    private readonly EmlExtractor _extractor = new();
+    private readonly IEmlExtractor _extractor = new CheckedExtractor();
 
     [Theory]
     [InlineData("report.docx", "application", "vnd.openxmlformats-officedocument.wordprocessingml.document")]
