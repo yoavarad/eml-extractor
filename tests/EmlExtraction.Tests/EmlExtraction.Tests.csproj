@@ -28,5 +28,6 @@
     <Compile Include="..\..\benches\EmlExtraction.Bench\Sweep\SweepMath.cs" Link="Sweep\SweepMath.cs" />
     <Compile Include="..\..\benches\EmlExtraction.Bench\Sweep\CpuInfoParser.cs" Link="Sweep\CpuInfoParser.cs" />
     <Compile Include="..\..\benches\EmlExtraction.Bench\Sweep\MboxSplitter.cs" Link="Sweep\MboxSplitter.cs" />
+    <Compile Include="..\..\benches\EmlExtraction.Bench\Sweep\LargeFileMath.cs" Link="Sweep\LargeFileMath.cs" />
   </ItemGroup>
 </Project>
