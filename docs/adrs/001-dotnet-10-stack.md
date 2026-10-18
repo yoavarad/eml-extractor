@@ -14,7 +14,7 @@ The original (Hebrew) specification, as translated in `docs/requirements.md`, st
 - CI gates (`.github/workflows/ci.yml`): `dotnet build -p:TreatWarningsAsErrors=true`, `dotnet format --verify-no-changes`, `dotnet test`, and a vulnerable-package audit that fails on High/Critical.
 
 ## Alternatives
-Not recorded in the repo. The original specification set the stack. The brief also asks for an assessment of improving C# libraries versus another language if a large capability gap exists; it will be written as `docs/research/csharp-capability-assessment.md` (Stage 02 task, `ydk:req:research/capability-assessment`) and linked here.
+The original specification set the stack, so alternatives were not weighed at the time. The brief asks for an assessment of improving C# libraries versus another language if a large capability gap exists. [`docs/research/csharp-capability-assessment.md`](../research/csharp-capability-assessment.md) compares MimeKit on .NET 10 with Python (`email`), Java (Jakarta Mail, Apache POI HMEF) and Go (`net/mail`, `enmime`) per capability, and concludes "no big gap - stay on C#".
 
 ## Consequences
 - Consumers must target .NET 10 or later.
