@@ -4,13 +4,13 @@
       "file": "attached-docx.eml",
       "generator": "tools/RealisticSamples",
       "license": "generated: repo license",
-      "sha256": "8967b7c06257717223f7da162711c0412eae911290b2f050364b67ac199cd9bb",
+      "sha256": "7b8b404128af45c98b731455a97f83840f9598f494a0148f01314029e338bf89",
       "expected": {
         "attachments": [
           {
             "fileName": "report.docx",
             "sizeInBytes": 1218,
-            "sha256": "68980825b9dcb0edcdce792f55ad7fe9787b9b377981faa672d1b997835042af",
+            "sha256": "8e23e81b6d460495a3baa3b4310b99b0560f272b351a3b45e44c82ae28b04a51",
             "fullPath": "report.docx"
           }
         ]
@@ -68,13 +68,13 @@
       "file": "attached-pptx.eml",
       "generator": "tools/RealisticSamples",
       "license": "generated: repo license",
-      "sha256": "3f270e632e9f214d13629b9fda319f69fe3dab34b281edcb7a5b122f5dd39576",
+      "sha256": "d90058552212891c1546b89bd3cd50361bafdc85d7649a0b71f9dac7097fb33f",
       "expected": {
         "attachments": [
           {
             "fileName": "deck.pptx",
             "sizeInBytes": 1140,
-            "sha256": "4b1920408c7e797d33da2392c92be68e968e58bc30f84773078d0bfed4d1813b",
+            "sha256": "5ee46b5b1e53973e66714831757d29f14453bfbe5e21ba081d0dd8688a7e2137",
             "fullPath": "deck.pptx"
           }
         ]
@@ -84,13 +84,13 @@
       "file": "attached-xlsx.eml",
       "generator": "tools/RealisticSamples",
       "license": "generated: repo license",
-      "sha256": "70aaed51b2ec594817fd7044e73ca51d2b0c5b3286664f508de1e7825ce47ee3",
+      "sha256": "2016c993db1b4eb58c8af036b300c27240bb291c142c12eb0aded39203b37a74",
       "expected": {
         "attachments": [
           {
             "fileName": "data.xlsx",
             "sizeInBytes": 2182,
-            "sha256": "1730c7cfd222300ba0b3872d4229a75bd9e4c3b2e52a8f3a95a83654e483a21e",
+            "sha256": "d76e94b00435f37507c3d1b58ae36d503789fd4b065086de7869a549416d1115",
             "fullPath": "data.xlsx"
           }
         ]
@@ -138,13 +138,13 @@
       "file": "tnef-docx.eml",
       "generator": "tools/RealisticSamples",
       "license": "generated: repo license",
-      "sha256": "2e39c431d838f556ca3e3f26445502aecaa78af7d362e662efc37fc4bcf48f6b",
+      "sha256": "f748aae7fd8455673e237108012ad530f5653ef700aed5bb6c975a99af739d2f",
       "expected": {
         "attachments": [
           {
             "fileName": "report.docx",
             "sizeInBytes": 1218,
-            "sha256": "68980825b9dcb0edcdce792f55ad7fe9787b9b377981faa672d1b997835042af",
+            "sha256": "8e23e81b6d460495a3baa3b4310b99b0560f272b351a3b45e44c82ae28b04a51",
             "fullPath": "winmail.dat/report.docx"
           }
         ]

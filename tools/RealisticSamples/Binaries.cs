@@ -11,7 +11,6 @@ namespace RealisticSamples;
 /// <summary>Deterministic synthetic attachment payloads (no real data).</summary>
 internal static class Binaries
 {
-    static readonly DateTimeOffset FixedTime = new(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
     public static byte[] Docx()
     {
@@ -134,7 +133,7 @@ internal static class Binaries
         return ~c;
     }
 
-    /// <summary>Re-zip with sorted entries, fixed timestamp and sequential relationship ids so bytes are reproducible.</summary>
+    /// <summary>Re-zip (stored) with sorted entries, fixed timestamp and sequential relationship ids so bytes are reproducible.</summary>
     static byte[] Normalize(byte[] zip)
     {
         using var src = new ZipArchive(new MemoryStream(zip), ZipArchiveMode.Read);
@@ -147,17 +146,47 @@ internal static class Binaries
         foreach (var (name, data) in entries.Where(e => e.FullName.EndsWith(".rels", StringComparison.Ordinal)))
             foreach (System.Text.RegularExpressions.Match m in rx.Matches(Encoding.UTF8.GetString(data)))
                 map.TryAdd(m.Value, "rId" + (map.Count + 1));
-        using var outMs = new MemoryStream();
-        using (var dst = new ZipArchive(outMs, ZipArchiveMode.Create, true))
-            foreach (var (name, data0) in entries)
-            {
-                var data = data0;
-                if (name.EndsWith(".xml", StringComparison.Ordinal) || name.EndsWith(".rels", StringComparison.Ordinal))
-                    data = Encoding.UTF8.GetBytes(rx.Replace(Encoding.UTF8.GetString(data), m => map.GetValueOrDefault(m.Value, m.Value)));
-                var ne = dst.CreateEntry(name, CompressionLevel.NoCompression);
-                ne.LastWriteTime = FixedTime;
-                using var o = ne.Open(); o.Write(data);
-            }
-        return outMs.ToArray();
+        return WriteStoredZip(entries.Select(e =>
+        {
+            var data = e.Data;
+            if (e.FullName.EndsWith(".xml", StringComparison.Ordinal) || e.FullName.EndsWith(".rels", StringComparison.Ordinal))
+                data = Encoding.UTF8.GetBytes(rx.Replace(Encoding.UTF8.GetString(data), m => map.GetValueOrDefault(m.Value, m.Value)));
+            return (e.FullName, data);
+        }).ToList());
+    }
+
+    /// <summary>
+    /// Minimal stored (uncompressed) zip writer. System.IO.Compression stamps platform-specific
+    /// header fields (version-made-by, unix attributes), so it cannot be byte-identical across OSes.
+    /// </summary>
+    static byte[] WriteStoredZip(List<(string Name, byte[] Data)> files)
+    {
+        const ushort dosTime = 0, dosDate = (2020 - 1980) << 9 | 1 << 5 | 1; // 2020-01-01 00:00:00
+        using var ms = new MemoryStream();
+        using var w = new BinaryWriter(ms);
+        var offsets = new List<uint>();
+        foreach (var (name, data) in files)
+        {
+            offsets.Add((uint)ms.Position);
+            var n = Encoding.UTF8.GetBytes(name);
+            w.Write(0x04034B50u); w.Write((ushort)20); w.Write((ushort)0x0800); w.Write((ushort)0);
+            w.Write(dosTime); w.Write(dosDate); w.Write(Crc32(data)); w.Write((uint)data.Length); w.Write((uint)data.Length);
+            w.Write((ushort)n.Length); w.Write((ushort)0); w.Write(n); w.Write(data);
+        }
+        var cdStart = (uint)ms.Position;
+        for (var i = 0; i < files.Count; i++)
+        {
+            var (name, data) = files[i];
+            var n = Encoding.UTF8.GetBytes(name);
+            w.Write(0x02014B50u); w.Write((ushort)20); w.Write((ushort)20); w.Write((ushort)0x0800); w.Write((ushort)0);
+            w.Write(dosTime); w.Write(dosDate); w.Write(Crc32(data)); w.Write((uint)data.Length); w.Write((uint)data.Length);
+            w.Write((ushort)n.Length); w.Write((ushort)0); w.Write((ushort)0); w.Write((ushort)0); w.Write((ushort)0);
+            w.Write(0u); w.Write(offsets[i]); w.Write(n);
+        }
+        var cdSize = (uint)ms.Position - cdStart;
+        w.Write(0x06054B50u); w.Write((ushort)0); w.Write((ushort)0);
+        w.Write((ushort)files.Count); w.Write((ushort)files.Count); w.Write(cdSize); w.Write(cdStart); w.Write((ushort)0);
+        w.Flush();
+        return ms.ToArray();
     }
 }

@@ -16,16 +16,6 @@ public class RealisticSamplesTests
     }
 
     static string Committed => Path.Combine(RepoRoot(), "corpus", "realistic");
-    static string Dump(string path)
-    {
-        var msg = MimeKit.MimeMessage.Load(path);
-        var p = msg.BodyParts.OfType<MimeKit.MimePart>().First(x => x.FileName == "report.docx");
-        using var ms = new MemoryStream(); p.Content!.DecodeTo(ms); ms.Position = 0; /* temporary diagnostic */
-        using var z = new System.IO.Compression.ZipArchive(ms);
-        var sb = new System.Text.StringBuilder();
-        foreach (var e in z.Entries) { using var r = new StreamReader(e.Open()); sb.Append("\n##").Append(e.FullName).Append(' ').Append(e.LastWriteTime).Append('\n').Append(r.ReadToEnd()); }
-        return sb.ToString();
-    }
 
     static string Gen()
     {
@@ -48,7 +38,7 @@ public class RealisticSamplesTests
             {
                 var bytes = File.ReadAllBytes(Path.Combine(a, n!));
                 Assert.True(bytes.AsSpan().SequenceEqual(File.ReadAllBytes(Path.Combine(b, n!))), $"{n} differs between runs");
-                Assert.True(bytes.AsSpan().SequenceEqual(File.ReadAllBytes(Path.Combine(Committed, n!))), $"{n} differs from committed; GEN:{Dump(Path.Combine(a, n!))} COMMITTED:{Dump(Path.Combine(Committed, n!))}");
+                Assert.True(bytes.AsSpan().SequenceEqual(File.ReadAllBytes(Path.Combine(Committed, n!))), $"{n} differs from committed; re-run tools/RealisticSamples");
             }
         }
         finally { Directory.Delete(a, true); Directory.Delete(b, true); }
@@ -87,6 +77,7 @@ public class RealisticSamplesTests
                     var data = Find(msg, name, a.GetProperty("fullPath").GetString()!);
                     Assert.Equal(a.GetProperty("sizeInBytes").GetInt64(), data.Length);
                     Assert.Equal(a.GetProperty("sha256").GetString(), SampleGenerator.Sha(data));
+                    if (name.EndsWith(".docx") || name.EndsWith(".xlsx") || name.EndsWith(".pptx")) AssertValidZip(data);
                 }
             if (exp.TryGetProperty("inlineImages", out var imgs))
                 foreach (var i in imgs.EnumerateArray())
@@ -97,6 +88,13 @@ public class RealisticSamplesTests
                     Assert.Contains("cid:" + part.ContentId, msg.HtmlBody);
                 }
         }
+    }
+
+    static void AssertValidZip(byte[] data)
+    {
+        using var z = new System.IO.Compression.ZipArchive(new MemoryStream(data));
+        Assert.Contains(z.Entries, e => e.FullName == "[Content_Types].xml");
+        foreach (var e in z.Entries) { using var s = e.Open(); s.CopyTo(Stream.Null); }
     }
 
     static byte[] Bytes(MimePart p)
