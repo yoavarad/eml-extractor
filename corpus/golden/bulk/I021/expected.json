@@ -40,7 +40,7 @@
         "size": 14,
         "sha256": "6c05bf0fd3d1dfd825525f53c98d11d9e2d0a79bf59cda4310e9007764c08f55",
         "disposition": "attachment",
-        "full_path": "photos/pic.gif"
+        "original_path": "photos/pic.gif"
       }
     ]
   }

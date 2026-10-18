@@ -4,24 +4,24 @@ Subject: two-cid-12
 Message-Id: <O2392-012@golden.example>
 To: Bob <bob@example.com>
 MIME-Version: 1.0
-Content-Type: multipart/related; boundary="=-HBlLy3oRl4tV5czWwD4+5A==";
+Content-Type: multipart/related; boundary="=-Am5lG40HuQyR3++BMVKCog==";
 	type="text/html"
 
---=-HBlLy3oRl4tV5czWwD4+5A==
+--=-Am5lG40HuQyR3++BMVKCog==
 Content-Type: text/html; charset=utf-8
 
 <img src="cid:a12@x" /><img src="cid:b12@x" />
---=-HBlLy3oRl4tV5czWwD4+5A==
+--=-Am5lG40HuQyR3++BMVKCog==
 Content-Type: image/png; name=a.png
 Content-Transfer-Encoding: base64
 Content-Disposition: inline; filename=a.png
-Content-Location: a.png
+Content-Location: images/a12.png
 Content-Id: <a12@x>
 
 iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
 IQAAAABJRU5ErkJggg==
 
---=-HBlLy3oRl4tV5czWwD4+5A==
+--=-Am5lG40HuQyR3++BMVKCog==
 Content-Type: image/jpeg; name=b.jpg
 Content-Transfer-Encoding: base64
 Content-Disposition: inline; filename=b.jpg
@@ -30,4 +30,4 @@ Content-Id: <b12@x>
 
 /9j/4GpwZzpvMjM5MmItMTI=
 
---=-HBlLy3oRl4tV5czWwD4+5A==--
+--=-Am5lG40HuQyR3++BMVKCog==--

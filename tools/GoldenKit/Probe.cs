@@ -275,7 +275,7 @@ internal static class Probe
             stats.MaxHeadersLabel = label;
         }
 
-        var xCount = string.IsNullOrEmpty(result.XFields) ? 0 : result.XFields.Split('\n').Length;
+        var xCount = string.IsNullOrEmpty(result.Metadata["xfields"]) ? 0 : result.Metadata["xfields"].Split('\n').Length;
         stats.XFields += xCount;
         if (xCount > stats.MaxXFields)
         {
@@ -301,14 +301,14 @@ internal static class Probe
         var hasTnefLeftover = false;
         foreach (var a in result.Attachments)
         {
-            stats.AttachBytes += a.Size;
-            if (a.Size > stats.MaxAttach)
+            stats.AttachBytes += a.SizeInBytes;
+            if (a.SizeInBytes > stats.MaxAttach)
             {
-                stats.MaxAttach = a.Size;
-                stats.MaxAttachLabel = $"{label} {a.Name}";
+                stats.MaxAttach = a.SizeInBytes;
+                stats.MaxAttachLabel = $"{label} {a.FileName}";
             }
 
-            var ext = Path.GetExtension(a.Name).ToLowerInvariant();
+            var ext = Path.GetExtension(a.FileName).ToLowerInvariant();
             if (string.IsNullOrEmpty(ext))
                 ext = "(none)";
             stats.Bump("att_ext:" + ext);
@@ -319,13 +319,13 @@ internal static class Probe
                 stats.CidParts++;
             }
 
-            if (a.Name.Equals("winmail.dat", StringComparison.OrdinalIgnoreCase)
-                || a.Name.EndsWith(".tnef", StringComparison.OrdinalIgnoreCase))
+            if (a.FileName.Equals("winmail.dat", StringComparison.OrdinalIgnoreCase)
+                || a.FileName.EndsWith(".tnef", StringComparison.OrdinalIgnoreCase))
                 hasTnefLeftover = true;
 
             if (LooksOffice(ext))
                 stats.Office++;
-            if (ext is ".eml" || (a.Name.Contains("rfc822", StringComparison.OrdinalIgnoreCase)))
+            if (ext is ".eml" || (a.FileName.Contains("rfc822", StringComparison.OrdinalIgnoreCase)))
                 stats.NestedMail++;
         }
 
@@ -338,7 +338,7 @@ internal static class Probe
             stats.ExchangeHeaders++;
         if (result.Metadata.TryGetValue("content-type", out var ct) && ct.Contains("tnef", StringComparison.OrdinalIgnoreCase))
             stats.TnefContentType++;
-        if (result.XFields.Contains("winmail", StringComparison.OrdinalIgnoreCase)
+        if (result.Metadata["xfields"].Contains("winmail", StringComparison.OrdinalIgnoreCase)
             || result.Metadata.TryGetValue("x-ms-tnef-correlator", out _))
             stats.TnefHeaders++;
 

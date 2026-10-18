@@ -99,9 +99,9 @@ public sealed class ExtractionTests
         Assert.Equal("שלום 😀 中文 हिंदी", result.Metadata["subject"]);
         Assert.True(result.Metadata.ContainsKey("message-id"));
         Assert.True(result.Metadata.ContainsKey("dkim-signature"));
-        Assert.Contains("X-Mailer: SandboxMail", result.XFields);
-        Assert.Contains("X_Custom_Field: team-value", result.XFields);
-        Assert.Contains("X-Spam-Score: 1.2", result.XFields);
+        Assert.Equal("X_Custom_Field: team-value", result.Metadata["xfields"]);
+        Assert.Equal("SandboxMail", result.Metadata["x-mailer"]);
+        Assert.Equal("1.2", result.Metadata["x-spam-score"]);
         Assert.Equal("hello", result.MainContent);
         Assert.Equal("text/plain", result.MainContentMimeType);
         Assert.Empty(result.Attachments);
@@ -120,7 +120,7 @@ public sealed class ExtractionTests
         var result = _extractor.Extract(SampleFactory.ToBytes(message));
         Assert.Equal("<p>html version</p>", result.MainContent);
         Assert.Equal("text/html", result.MainContentMimeType);
-        Assert.DoesNotContain(result.Attachments, a => Encoding.UTF8.GetString(a.Data).Contains("plain version"));
+        Assert.DoesNotContain(result.Attachments, a => Encoding.UTF8.GetString(a.BinaryData).Contains("plain version"));
     }
 
     [Fact]
@@ -241,6 +241,29 @@ public sealed class ExtractionTests
     }
 
     [Fact]
+    public void XFieldsJoinsOnlyLiteralXUnderscoreHeadersInOrder()
+    {
+        var message = SampleFactory.Plain("x", "b");
+        message.Headers.Add("X_A", "1");
+        message.Headers.Add("X-B", "2");
+        message.Headers.Add("x_c", "3");
+        message.Headers.Add("X_A", "4");
+        var result = _extractor.Extract(SampleFactory.ToBytes(message));
+        Assert.Equal("X_A: 1\nX_A: 4", result.Metadata["xfields"]);
+        Assert.Equal("2", result.Metadata["x-b"]);
+        Assert.Equal("3", result.Metadata["x_c"]);
+    }
+
+    [Fact]
+    public void XFieldsEmptyWhenOnlyXDashHeaders()
+    {
+        var message = SampleFactory.Plain("x", "b");
+        message.Headers.Add("X-Mailer", "m");
+        var result = _extractor.Extract(SampleFactory.ToBytes(message));
+        Assert.Equal("", result.Metadata["xfields"]);
+    }
+
+    [Fact]
     public void HeaderNamedXFieldsIsStoredUnderReservedPrefix()
     {
         var message = SampleFactory.Plain("x", "b");
@@ -300,9 +323,26 @@ public sealed class ExtractionTests
         message.Body = builder.ToMessageBody();
         var result = _extractor.Extract(SampleFactory.ToBytes(message));
         var att = Assert.Single(result.Attachments);
-        Assert.Equal("passwd.txt", att.Name);
+        Assert.Equal("passwd.txt", att.FileName);
+        Assert.Equal("../../etc/passwd.txt", att.OriginalPath);
         Assert.Equal("../../etc/passwd.txt", att.FullPath);
-        Assert.Equal(payload, att.Data);
+        Assert.Equal(payload, att.BinaryData);
+    }
+
+    [Fact]
+    public void ContentLocationIsReportedWhenPresentElseNull()
+    {
+        var builder = new BodyBuilder { TextBody = "x" };
+        var withLoc = (MimePart)builder.Attachments.Add("logo.png", new byte[] { 1, 2, 3 }, new ContentType("image", "png"));
+        withLoc.ContentLocation = new Uri("images/logo.png", UriKind.Relative);
+        builder.Attachments.Add("plain.txt", new byte[] { 4 }, new ContentType("text", "plain"));
+        var message = SampleFactory.Plain("loc", "unused");
+        message.Body = builder.ToMessageBody();
+        var result = _extractor.Extract(SampleFactory.ToBytes(message));
+        Assert.Equal("images/logo.png", Assert.Single(result.Attachments, a => a.FileName == "logo.png").ContentLocation);
+        var plain = Assert.Single(result.Attachments, a => a.FileName == "plain.txt");
+        Assert.Null(plain.ContentLocation);
+        Assert.Null(plain.OriginalPath);
     }
 
     [Fact]

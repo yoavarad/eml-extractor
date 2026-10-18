@@ -22,7 +22,7 @@ The original specification is translated in [docs/requirements.md](../requiremen
 - A load test across every degree of parallelism with measured memory, a sizing formula, and a committed baseline with a warn-only regression rule (target, ADR-015): [ydk:nfr:performance/throughput-dop-sweep], [ydk:nfr:performance/memory-footprint].
 - Dev-time profiling per extraction stage with a committed hotspot report, then optimization only from that data, each change proven by its own before-and-after measurement (target, ADR-020, ADR-022): [ydk:req:quality/profiling-report], [ydk:req:quality/optimization-evidence].
 - Runtime metrics and tracing through the facilities built into .NET, with no telemetry package dependency, no message content in any label, and a measured cost budget (target, ADR-021): [ydk:crosscut:core/observability], [ydk:req:observability/runtime-telemetry], [ydk:nfr:observability/metrics-overhead].
-- A license file and third-party notices with a dependency license audit (target, ADR-017; MIT proposed, owner confirmation pending): [ydk:req:quality/license-notices].
+- A license file and third-party notices with a dependency license audit (ADR-017; MIT, accepted by the owner 2026-10-18): [ydk:req:quality/license-notices].
 - A written capability assessment of C# versus other languages for this job, as a Stage 02 research document: [ydk:req:research/capability-assessment].
 - Hand-off documents for the team: [docs/research/brief-gap-analysis.md](../research/brief-gap-analysis.md) and [docs/team-questions.md](../team-questions.md).
 

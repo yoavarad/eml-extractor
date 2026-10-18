@@ -3,26 +3,26 @@ Date: Tue, 15 Sep 2026 07:00:00 +0000
 Subject: combo 8 中文
 Message-Id: <Q008@golden.example>
 To: Bob <bob@example.com>
-X-Mailer: Combo-8
+X_Mailer: Combo-8
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-KK/en6ttDV/eVss3X2SSAg=="
+Content-Type: multipart/mixed; boundary="=-45Fn7bHrFe+Z3W0mt0ARHg=="
 
---=-KK/en6ttDV/eVss3X2SSAg==
-Content-Type: multipart/alternative; boundary="=-YJau23pR18eKFgAY1nQw/A=="
+--=-45Fn7bHrFe+Z3W0mt0ARHg==
+Content-Type: multipart/alternative; boundary="=-DX10xuQPfF0evXdA/VHxaw=="
 
---=-YJau23pR18eKFgAY1nQw/A==
+--=-DX10xuQPfF0evXdA/VHxaw==
 Content-Type: text/plain; charset=utf-8
 
 plain-8
---=-YJau23pR18eKFgAY1nQw/A==
-Content-Type: multipart/related; boundary="=-KZWCV9nTx+adI7Zi9Z2GQg==";
+--=-DX10xuQPfF0evXdA/VHxaw==
+Content-Type: multipart/related; boundary="=-tFnTcsCdcujBPYBYDAMfRA==";
 	type="text/html"
 
---=-KZWCV9nTx+adI7Zi9Z2GQg==
+--=-tFnTcsCdcujBPYBYDAMfRA==
 Content-Type: text/html; charset=utf-8
 
 <p>שלום 8 😀</p><img src="cid:c8@x" />
---=-KZWCV9nTx+adI7Zi9Z2GQg==
+--=-tFnTcsCdcujBPYBYDAMfRA==
 Content-Type: image/png; name=p.png
 Content-Transfer-Encoding: base64
 Content-Disposition: inline; filename=p.png
@@ -32,11 +32,11 @@ Content-Id: <c8@x>
 iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
 IQAAAABJRU5ErkJggg==
 
---=-KZWCV9nTx+adI7Zi9Z2GQg==--
+--=-tFnTcsCdcujBPYBYDAMfRA==--
 
---=-YJau23pR18eKFgAY1nQw/A==--
+--=-DX10xuQPfF0evXdA/VHxaw==--
 
---=-KK/en6ttDV/eVss3X2SSAg==
+--=-45Fn7bHrFe+Z3W0mt0ARHg==
 Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document;
 	name=r.docx
 Content-Transfer-Encoding: base64
@@ -44,4 +44,4 @@ Content-Disposition: attachment; filename=r.docx
 
 UEsDBGRvY3g6UTAwOA==
 
---=-KK/en6ttDV/eVss3X2SSAg==--
+--=-45Fn7bHrFe+Z3W0mt0ARHg==--

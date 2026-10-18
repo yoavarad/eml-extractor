@@ -38,7 +38,7 @@ How these are measured is in [quality.md](quality.md) and [testing.md](testing.m
 
 The only runtime library the code calls is the mail parser, [ydk:library:deps/mimekit]. Its parser options and the code-page encoding registration are fixed once for the whole process. The parser brings a cryptography package with it, [ydk:library:deps/bouncycastle-cryptography], which the library ships but never calls. A third package, [ydk:library:deps/system-security-cryptography-pkcs], is referenced only to pin a patched transitive version (ADR-009). None is a network service.
 
-The brief requires everything to be open source. The repo has no license yet. The proposal is MIT, with a notices file that lists every dependency and every committed sample with its license ([ydk:req:quality/license-notices], ADR-017). All runtime dependencies are MIT-licensed. The owner's confirmation of the license is pending.
+The brief requires everything to be open source. The repo is MIT-licensed (owner decision 2026-10-18, `LICENSE`), with a notices file that lists every dependency and every committed sample with its license ([ydk:req:quality/license-notices], ADR-017). All runtime dependencies are MIT-licensed.
 
 ## Language choice
 

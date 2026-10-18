@@ -40,7 +40,7 @@
         "size": 12,
         "sha256": "b2cb9359f0cd4fa822462dfab9e8520d50843e40432dc5c8915189d79a0a4f96",
         "disposition": "attachment",
-        "full_path": "photos/pic.tif"
+        "original_path": "photos/pic.tif"
       }
     ]
   }

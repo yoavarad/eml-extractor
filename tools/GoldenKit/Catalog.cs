@@ -130,8 +130,8 @@ internal static class Catalog
             var expect = PlainExpect($"x-{i}", "x");
             expect.XFields = new GoldenField
             {
-                Contains = [$"X-Mailer: Mailer-{i}", $"X_Custom_Field: team-{i}", "X-Spam-Score:"],
-                NotContains = i % 2 == 0 ? ["DKIM-Signature"] : []
+                Contains = [$"X_Custom_Field: team-{i}"],
+                NotContains = ["X-Mailer", "X-Spam-Score", "DKIM-Signature"]
             };
             if (i % 2 == 0)
                 expect.Metadata["dkim-signature"] = MimeBuild.Contains("v=1");
@@ -660,14 +660,14 @@ internal static class Catalog
             var office = MimeBuild.Stub("docx", $"Q{i:D3}");
             builder.Attachments.Add("r.docx", office, new ContentType("application", "vnd.openxmlformats-officedocument.wordprocessingml.document"));
             var m = MimeBuild.BaseMessage($"Q{i:D3}", $"combo {i} 中文");
-            m.Headers.Add("X-Mailer", $"Combo-{i}");
+            m.Headers.Add("X_Mailer", $"Combo-{i}");
             m.Body = builder.ToMessageBody();
             list.Add(MimeBuild.FromMessage($"Q{i:D3}", ["unicode", "emoji", "cid", "office", "x-headers", "html-body"], m, new GoldenExpect
             {
                 Metadata = MimeBuild.Meta($"combo {i} 中文"),
                 MainContent = MimeBuild.Contains($"cid:c{i}@x"),
                 MainContentMimeType = "text/html",
-                XFields = MimeBuild.Contains($"X-Mailer: Combo-{i}"),
+                XFields = MimeBuild.Contains($"X_Mailer: Combo-{i}"),
                 AttachmentCount = 2,
                 Attachments =
                 [
@@ -724,6 +724,7 @@ internal static class Catalog
             var builder = new BodyBuilder { HtmlBody = $"<img src=\"cid:a{i}@x\" /><img src=\"cid:b{i}@x\" />" };
             var a = builder.LinkedResources.Add("a.png", img1, new ContentType("image", "png"));
             a.ContentId = $"a{i}@x";
+            a.ContentLocation = new Uri($"images/a{i}.png", UriKind.Relative);
             a.ContentDisposition = new ContentDisposition(ContentDisposition.Inline) { FileName = "a.png" };
             var bName = i % 2 == 0 ? "b.jpg" : "b.gif";
             var b = builder.LinkedResources.Add(bName, img2, new ContentType("image", i % 2 == 0 ? "jpeg" : "gif"));
@@ -739,7 +740,7 @@ internal static class Catalog
                 AttachmentCount = 2,
                 Attachments =
                 [
-                    new GoldenAttachment { Name = "a.png", Sha256 = MimeBuild.Sha(img1), Disposition = "inline" },
+                    new GoldenAttachment { Name = "a.png", Sha256 = MimeBuild.Sha(img1), Disposition = "inline", ContentLocation = $"images/a{i}.png" },
                     new GoldenAttachment { Name = bName, Sha256 = MimeBuild.Sha(img2), Disposition = "inline" }
                 ]
             }));

@@ -34,11 +34,11 @@
     },
     "x_fields": {
       "contains": [
-        "X-Mailer: Mailer-24",
-        "X_Custom_Field: team-24",
-        "X-Spam-Score:"
+        "X_Custom_Field: team-24"
       ],
       "not_contains": [
+        "X-Mailer",
+        "X-Spam-Score",
         "DKIM-Signature"
       ]
     },

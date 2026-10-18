@@ -3,26 +3,26 @@ Date: Tue, 15 Sep 2026 07:00:00 +0000
 Subject: combo 18 中文
 Message-Id: <Q018@golden.example>
 To: Bob <bob@example.com>
-X-Mailer: Combo-18
+X_Mailer: Combo-18
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-9fLqyKEeLO1+aJEQmxhvDQ=="
+Content-Type: multipart/mixed; boundary="=-od1JkqhfsWffsRjgj0+8RA=="
 
---=-9fLqyKEeLO1+aJEQmxhvDQ==
-Content-Type: multipart/alternative; boundary="=-oYdU6U7Cv4Dk4NyGo4EvfQ=="
+--=-od1JkqhfsWffsRjgj0+8RA==
+Content-Type: multipart/alternative; boundary="=-Ztyd/f5DAZkWqDmn4LxjIw=="
 
---=-oYdU6U7Cv4Dk4NyGo4EvfQ==
+--=-Ztyd/f5DAZkWqDmn4LxjIw==
 Content-Type: text/plain; charset=utf-8
 
 plain-18
---=-oYdU6U7Cv4Dk4NyGo4EvfQ==
-Content-Type: multipart/related; boundary="=-IeG3kk+Pnr4741ybtgY1bQ==";
+--=-Ztyd/f5DAZkWqDmn4LxjIw==
+Content-Type: multipart/related; boundary="=-YPZ3UY3vOEtvqCDhH1pXtQ==";
 	type="text/html"
 
---=-IeG3kk+Pnr4741ybtgY1bQ==
+--=-YPZ3UY3vOEtvqCDhH1pXtQ==
 Content-Type: text/html; charset=utf-8
 
 <p>שלום 18 😀</p><img src="cid:c18@x" />
---=-IeG3kk+Pnr4741ybtgY1bQ==
+--=-YPZ3UY3vOEtvqCDhH1pXtQ==
 Content-Type: image/png; name=p.png
 Content-Transfer-Encoding: base64
 Content-Disposition: inline; filename=p.png
@@ -32,11 +32,11 @@ Content-Id: <c18@x>
 iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
 IQAAAABJRU5ErkJggg==
 
---=-IeG3kk+Pnr4741ybtgY1bQ==--
+--=-YPZ3UY3vOEtvqCDhH1pXtQ==--
 
---=-oYdU6U7Cv4Dk4NyGo4EvfQ==--
+--=-Ztyd/f5DAZkWqDmn4LxjIw==--
 
---=-9fLqyKEeLO1+aJEQmxhvDQ==
+--=-od1JkqhfsWffsRjgj0+8RA==
 Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document;
 	name=r.docx
 Content-Transfer-Encoding: base64
@@ -44,4 +44,4 @@ Content-Disposition: attachment; filename=r.docx
 
 UEsDBGRvY3g6UTAxOA==
 
---=-9fLqyKEeLO1+aJEQmxhvDQ==--
+--=-od1JkqhfsWffsRjgj0+8RA==--

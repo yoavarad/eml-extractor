@@ -3,26 +3,26 @@ Date: Tue, 15 Sep 2026 07:00:00 +0000
 Subject: combo 49 中文
 Message-Id: <Q049@golden.example>
 To: Bob <bob@example.com>
-X-Mailer: Combo-49
+X_Mailer: Combo-49
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-oGYFnKSuRLwLdonSDBNnxg=="
+Content-Type: multipart/mixed; boundary="=-A1D6zrpU4/W+t2QQoWMBEg=="
 
---=-oGYFnKSuRLwLdonSDBNnxg==
-Content-Type: multipart/alternative; boundary="=-EtB9MbfmHtmd6bz7p/cBtA=="
+--=-A1D6zrpU4/W+t2QQoWMBEg==
+Content-Type: multipart/alternative; boundary="=-IFwx7OV4zA8gCTGDpS8gqw=="
 
---=-EtB9MbfmHtmd6bz7p/cBtA==
+--=-IFwx7OV4zA8gCTGDpS8gqw==
 Content-Type: text/plain; charset=utf-8
 
 plain-49
---=-EtB9MbfmHtmd6bz7p/cBtA==
-Content-Type: multipart/related; boundary="=-B6mwKbwFhOHH5fQEn367cw==";
+--=-IFwx7OV4zA8gCTGDpS8gqw==
+Content-Type: multipart/related; boundary="=-NJysHoy/LHoTPbpZZxAq5g==";
 	type="text/html"
 
---=-B6mwKbwFhOHH5fQEn367cw==
+--=-NJysHoy/LHoTPbpZZxAq5g==
 Content-Type: text/html; charset=utf-8
 
 <p>שלום 49 😀</p><img src="cid:c49@x" />
---=-B6mwKbwFhOHH5fQEn367cw==
+--=-NJysHoy/LHoTPbpZZxAq5g==
 Content-Type: image/png; name=p.png
 Content-Transfer-Encoding: base64
 Content-Disposition: inline; filename=p.png
@@ -32,11 +32,11 @@ Content-Id: <c49@x>
 iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
 IQAAAABJRU5ErkJggg==
 
---=-B6mwKbwFhOHH5fQEn367cw==--
+--=-NJysHoy/LHoTPbpZZxAq5g==--
 
---=-EtB9MbfmHtmd6bz7p/cBtA==--
+--=-IFwx7OV4zA8gCTGDpS8gqw==--
 
---=-oGYFnKSuRLwLdonSDBNnxg==
+--=-A1D6zrpU4/W+t2QQoWMBEg==
 Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document;
 	name=r.docx
 Content-Transfer-Encoding: base64
@@ -44,4 +44,4 @@ Content-Disposition: attachment; filename=r.docx
 
 UEsDBGRvY3g6UTA0OQ==
 
---=-oGYFnKSuRLwLdonSDBNnxg==--
+--=-A1D6zrpU4/W+t2QQoWMBEg==--

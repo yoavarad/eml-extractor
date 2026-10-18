@@ -39,7 +39,7 @@
         "size": 8,
         "sha256": "6d2ea2114f6984df297c2de01769e34f55bbc21a88ba5b256f835b818491610a",
         "disposition": "attachment",
-        "full_path": "C:\\Temp\\file-35.txt"
+        "original_path": "C:\\Temp\\file-35.txt"
       }
     ]
   }

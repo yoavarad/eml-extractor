@@ -25,7 +25,7 @@ internal static class Inspect
 
             var result = extractor.Extract(File.ReadAllBytes(path));
             Console.WriteLine($"== {Path.GetRelativePath(repo, path)} ==");
-            Console.WriteLine($"  warnings={result.Warnings.Count} mime={result.MainContentMimeType} body_len={result.MainContent?.Length ?? 0} attachments={result.Attachments.Count} headers={result.Metadata.Count} xfields={result.XFields.Split('\n', StringSplitOptions.RemoveEmptyEntries).Length}");
+            Console.WriteLine($"  warnings={result.Warnings.Count} mime={result.MainContentMimeType} body_len={result.MainContent?.Length ?? 0} attachments={result.Attachments.Count} headers={result.Metadata.Count} xfields={result.Metadata["xfields"].Split('\n', StringSplitOptions.RemoveEmptyEntries).Length}");
             if (!string.IsNullOrWhiteSpace(result.Metadata.GetValueOrDefault("subject")))
                 Console.WriteLine($"  subject={result.Metadata["subject"]}");
             if (!string.IsNullOrWhiteSpace(result.MainContent))
@@ -41,8 +41,8 @@ internal static class Inspect
 
             foreach (var a in result.Attachments)
             {
-                var magic = a.Data.Length >= 4 ? Convert.ToHexString(a.Data.AsSpan(0, Math.Min(8, a.Data.Length))) : "";
-                Console.WriteLine($"  attach name={a.Name} size={a.Size} cid={a.ContentId} disp={a.Disposition} path={a.FullPath} magic={magic}");
+                var magic = a.BinaryData.Length >= 4 ? Convert.ToHexString(a.BinaryData.AsSpan(0, Math.Min(8, a.BinaryData.Length))) : "";
+                Console.WriteLine($"  attach name={a.FileName} size={a.SizeInBytes} cid={a.ContentId} disp={a.Disposition} path={a.OriginalPath} loc={a.ContentLocation} magic={magic}");
             }
         }
 

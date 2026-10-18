@@ -28,11 +28,13 @@
     },
     "x_fields": {
       "contains": [
-        "X-Mailer: Mailer-21",
-        "X_Custom_Field: team-21",
-        "X-Spam-Score:"
+        "X_Custom_Field: team-21"
       ],
-      "not_contains": []
+      "not_contains": [
+        "X-Mailer",
+        "X-Spam-Score",
+        "DKIM-Signature"
+      ]
     },
     "main_content": {
       "eq": "x",

@@ -21,10 +21,12 @@ public sealed class AttachmentTests
         var bytes = SampleFactory.WithAttachment(name, payload, type, sub);
         var result = _extractor.Extract(bytes);
         var att = Assert.Single(result.Attachments);
-        Assert.Equal(name, att.Name);
-        Assert.Equal(payload.Length, att.Size);
-        Assert.Equal(SampleFactory.Sha256(payload), SampleFactory.Sha256(att.Data));
+        Assert.Equal(name, att.FileName);
+        Assert.Equal(payload.Length, att.SizeInBytes);
+        Assert.Equal(SampleFactory.Sha256(payload), SampleFactory.Sha256(att.BinaryData));
         Assert.Null(att.FullPath);
+        Assert.Null(att.OriginalPath);
+        Assert.Null(att.ContentLocation);
     }
 
     [Fact]
@@ -34,10 +36,10 @@ public sealed class AttachmentTests
         var result = _extractor.Extract(bytes);
         Assert.Equal("outer", result.MainContent);
         var att = Assert.Single(result.Attachments);
-        Assert.Equal("forwarded.eml", att.Name);
-        Assert.True(_extractor.Extract(att.Data).MainContent == "inner body"
-                    || Encoding.UTF8.GetString(att.Data).Contains("inner body"));
-        Assert.DoesNotContain(result.Attachments, a => a.Name.Contains("inner"));
+        Assert.Equal("forwarded.eml", att.FileName);
+        Assert.True(_extractor.Extract(att.BinaryData).MainContent == "inner body"
+                    || Encoding.UTF8.GetString(att.BinaryData).Contains("inner body"));
+        Assert.DoesNotContain(result.Attachments, a => a.FileName.Contains("inner"));
     }
 
     [Fact]
@@ -48,8 +50,8 @@ public sealed class AttachmentTests
         var result = _extractor.Extract(bytes);
         Assert.Contains("cid:paste@local", result.MainContent!);
         var img = Assert.Single(result.Attachments);
-        Assert.Equal(png, img.Data);
-        Assert.Contains("paste", img.Name, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(png, img.BinaryData);
+        Assert.Contains("paste", img.FileName, StringComparison.OrdinalIgnoreCase);
         Assert.Equal("inline", img.Disposition);
     }
 
@@ -61,8 +63,8 @@ public sealed class AttachmentTests
         var result = _extractor.Extract(bytes);
         Assert.Contains("see attach", result.MainContent!);
         var att = Assert.Single(result.Attachments);
-        Assert.Equal("pic.png", att.Name);
-        Assert.Equal(png, att.Data);
+        Assert.Equal("pic.png", att.FileName);
+        Assert.Equal(png, att.BinaryData);
     }
 
     [Fact]
@@ -82,7 +84,7 @@ public sealed class AttachmentTests
         message.Body = builder.ToMessageBody();
         var result = _extractor.Extract(SampleFactory.ToBytes(message));
         Assert.Equal("see invite", result.MainContent);
-        Assert.Contains(result.Attachments, a => a.Name == "meet.ics");
+        Assert.Contains(result.Attachments, a => a.FileName == "meet.ics");
     }
 
     [Fact]
@@ -101,6 +103,6 @@ public sealed class AttachmentTests
         message.Body = mixed;
         var result = _extractor.Extract(SampleFactory.ToBytes(message));
         Assert.Equal("signed-body", result.MainContent);
-        Assert.Contains(result.Attachments, a => a.Name == "smime.p7s");
+        Assert.Contains(result.Attachments, a => a.FileName == "smime.p7s");
     }
 }

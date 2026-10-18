@@ -3,26 +3,26 @@ Date: Tue, 15 Sep 2026 07:00:00 +0000
 Subject: combo 31 中文
 Message-Id: <Q031@golden.example>
 To: Bob <bob@example.com>
-X-Mailer: Combo-31
+X_Mailer: Combo-31
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-hJhVIQKCPUL9EHAh2ccO8w=="
+Content-Type: multipart/mixed; boundary="=-cEZTg2nwINTm0+/8P/1PNQ=="
 
---=-hJhVIQKCPUL9EHAh2ccO8w==
-Content-Type: multipart/alternative; boundary="=-PtwGIwNCLQbgzl4mNHgDiQ=="
+--=-cEZTg2nwINTm0+/8P/1PNQ==
+Content-Type: multipart/alternative; boundary="=-hKQ0u7p1TXon0SpGWbWKoA=="
 
---=-PtwGIwNCLQbgzl4mNHgDiQ==
+--=-hKQ0u7p1TXon0SpGWbWKoA==
 Content-Type: text/plain; charset=utf-8
 
 plain-31
---=-PtwGIwNCLQbgzl4mNHgDiQ==
-Content-Type: multipart/related; boundary="=-hIq0qpZlVLzWNsS4jLGSRw==";
+--=-hKQ0u7p1TXon0SpGWbWKoA==
+Content-Type: multipart/related; boundary="=-DRNnUYkRhBPMvjVU2Hxrrw==";
 	type="text/html"
 
---=-hIq0qpZlVLzWNsS4jLGSRw==
+--=-DRNnUYkRhBPMvjVU2Hxrrw==
 Content-Type: text/html; charset=utf-8
 
 <p>שלום 31 😀</p><img src="cid:c31@x" />
---=-hIq0qpZlVLzWNsS4jLGSRw==
+--=-DRNnUYkRhBPMvjVU2Hxrrw==
 Content-Type: image/png; name=p.png
 Content-Transfer-Encoding: base64
 Content-Disposition: inline; filename=p.png
@@ -32,11 +32,11 @@ Content-Id: <c31@x>
 iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
 IQAAAABJRU5ErkJggg==
 
---=-hIq0qpZlVLzWNsS4jLGSRw==--
+--=-DRNnUYkRhBPMvjVU2Hxrrw==--
 
---=-PtwGIwNCLQbgzl4mNHgDiQ==--
+--=-hKQ0u7p1TXon0SpGWbWKoA==--
 
---=-hJhVIQKCPUL9EHAh2ccO8w==
+--=-cEZTg2nwINTm0+/8P/1PNQ==
 Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document;
 	name=r.docx
 Content-Transfer-Encoding: base64
@@ -44,4 +44,4 @@ Content-Disposition: attachment; filename=r.docx
 
 UEsDBGRvY3g6UTAzMQ==
 
---=-hJhVIQKCPUL9EHAh2ccO8w==--
+--=-cEZTg2nwINTm0+/8P/1PNQ==--

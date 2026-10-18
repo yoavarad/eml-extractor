@@ -32,7 +32,7 @@
     },
     "x_fields": {
       "contains": [
-        "X-Mailer: Combo-60"
+        "X_Mailer: Combo-60"
       ],
       "not_contains": []
     },

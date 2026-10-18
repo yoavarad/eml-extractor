@@ -3,26 +3,26 @@ Date: Tue, 15 Sep 2026 07:00:00 +0000
 Subject: combo 28 中文
 Message-Id: <Q028@golden.example>
 To: Bob <bob@example.com>
-X-Mailer: Combo-28
+X_Mailer: Combo-28
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-HJYWclVnSyrEWBFC67c9ug=="
+Content-Type: multipart/mixed; boundary="=-eT0GejA0xI+3bn2cW79WEA=="
 
---=-HJYWclVnSyrEWBFC67c9ug==
-Content-Type: multipart/alternative; boundary="=-SGBLFQfUiRG7S/g4DCp5zw=="
+--=-eT0GejA0xI+3bn2cW79WEA==
+Content-Type: multipart/alternative; boundary="=-ZjGFYXU6+0ugYB8ZAHknyA=="
 
---=-SGBLFQfUiRG7S/g4DCp5zw==
+--=-ZjGFYXU6+0ugYB8ZAHknyA==
 Content-Type: text/plain; charset=utf-8
 
 plain-28
---=-SGBLFQfUiRG7S/g4DCp5zw==
-Content-Type: multipart/related; boundary="=-a2OZVSeW7h5sSTBvuQdw6A==";
+--=-ZjGFYXU6+0ugYB8ZAHknyA==
+Content-Type: multipart/related; boundary="=-xXsOQqimgJDHEKi5FYmUwg==";
 	type="text/html"
 
---=-a2OZVSeW7h5sSTBvuQdw6A==
+--=-xXsOQqimgJDHEKi5FYmUwg==
 Content-Type: text/html; charset=utf-8
 
 <p>שלום 28 😀</p><img src="cid:c28@x" />
---=-a2OZVSeW7h5sSTBvuQdw6A==
+--=-xXsOQqimgJDHEKi5FYmUwg==
 Content-Type: image/png; name=p.png
 Content-Transfer-Encoding: base64
 Content-Disposition: inline; filename=p.png
@@ -32,11 +32,11 @@ Content-Id: <c28@x>
 iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
 IQAAAABJRU5ErkJggg==
 
---=-a2OZVSeW7h5sSTBvuQdw6A==--
+--=-xXsOQqimgJDHEKi5FYmUwg==--
 
---=-SGBLFQfUiRG7S/g4DCp5zw==--
+--=-ZjGFYXU6+0ugYB8ZAHknyA==--
 
---=-HJYWclVnSyrEWBFC67c9ug==
+--=-eT0GejA0xI+3bn2cW79WEA==
 Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document;
 	name=r.docx
 Content-Transfer-Encoding: base64
@@ -44,4 +44,4 @@ Content-Disposition: attachment; filename=r.docx
 
 UEsDBGRvY3g6UTAyOA==
 
---=-HJYWclVnSyrEWBFC67c9ug==--
+--=-eT0GejA0xI+3bn2cW79WEA==--

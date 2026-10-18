@@ -3,26 +3,26 @@ Date: Tue, 15 Sep 2026 07:00:00 +0000
 Subject: combo 43 中文
 Message-Id: <Q043@golden.example>
 To: Bob <bob@example.com>
-X-Mailer: Combo-43
+X_Mailer: Combo-43
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-+biXlChRaXKG7u6o5vdvsQ=="
+Content-Type: multipart/mixed; boundary="=-s7Aho7Qb3df2r2L7UKWqYQ=="
 
---=-+biXlChRaXKG7u6o5vdvsQ==
-Content-Type: multipart/alternative; boundary="=-SPeYwiZDtOSzigdKwmS5zA=="
+--=-s7Aho7Qb3df2r2L7UKWqYQ==
+Content-Type: multipart/alternative; boundary="=-fn8dl6xOgEhhnomvoIU4WQ=="
 
---=-SPeYwiZDtOSzigdKwmS5zA==
+--=-fn8dl6xOgEhhnomvoIU4WQ==
 Content-Type: text/plain; charset=utf-8
 
 plain-43
---=-SPeYwiZDtOSzigdKwmS5zA==
-Content-Type: multipart/related; boundary="=-9AFqUl/HudYu92F1fxqnIQ==";
+--=-fn8dl6xOgEhhnomvoIU4WQ==
+Content-Type: multipart/related; boundary="=-PRtLtYIbXGE0Gwxt4nI7DA==";
 	type="text/html"
 
---=-9AFqUl/HudYu92F1fxqnIQ==
+--=-PRtLtYIbXGE0Gwxt4nI7DA==
 Content-Type: text/html; charset=utf-8
 
 <p>שלום 43 😀</p><img src="cid:c43@x" />
---=-9AFqUl/HudYu92F1fxqnIQ==
+--=-PRtLtYIbXGE0Gwxt4nI7DA==
 Content-Type: image/png; name=p.png
 Content-Transfer-Encoding: base64
 Content-Disposition: inline; filename=p.png
@@ -32,11 +32,11 @@ Content-Id: <c43@x>
 iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
 IQAAAABJRU5ErkJggg==
 
---=-9AFqUl/HudYu92F1fxqnIQ==--
+--=-PRtLtYIbXGE0Gwxt4nI7DA==--
 
---=-SPeYwiZDtOSzigdKwmS5zA==--
+--=-fn8dl6xOgEhhnomvoIU4WQ==--
 
---=-+biXlChRaXKG7u6o5vdvsQ==
+--=-s7Aho7Qb3df2r2L7UKWqYQ==
 Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document;
 	name=r.docx
 Content-Transfer-Encoding: base64
@@ -44,4 +44,4 @@ Content-Disposition: attachment; filename=r.docx
 
 UEsDBGRvY3g6UTA0Mw==
 
---=-+biXlChRaXKG7u6o5vdvsQ==--
+--=-s7Aho7Qb3df2r2L7UKWqYQ==--
