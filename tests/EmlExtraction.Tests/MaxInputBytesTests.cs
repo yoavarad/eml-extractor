@@ -20,7 +20,7 @@ public sealed class MaxInputBytesTests
         Assert.Equal("input_too_large: 1025 > 1024", Assert.Single(result.Warnings));
         Assert.Equal(["bcc", "cc", "from", "to", "xfields"], result.Metadata.Keys.Order(StringComparer.Ordinal));
         Assert.All(result.Metadata.Values, v => Assert.Equal("", v));
-        Assert.Equal("", result.XFields);
+        Assert.Equal("", result.Metadata["xfields"]);
         Assert.Null(result.MainContent);
         Assert.Null(result.MainContentMimeType);
         Assert.Empty(result.Attachments);
