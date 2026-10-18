@@ -4,7 +4,7 @@ using MimeKit;
 
 namespace EmlExtraction;
 
-/// <summary>MimeKit-based <see cref="IEmlExtractor"/>. Does not throw on malformed input.</summary>
+/// <summary>MimeKit-based <see cref="IEmlExtractor"/>.</summary>
 public sealed class EmlExtractor : IEmlExtractor
 {
     static EmlExtractor() => Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
