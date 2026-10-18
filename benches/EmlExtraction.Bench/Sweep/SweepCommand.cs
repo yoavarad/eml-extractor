@@ -140,8 +140,9 @@ internal static class SweepCommand
         for (var n = lo; n <= p.MaxDop; n++)
         {
             var point = SweepRunner.Run(inputs, n, action, p);
-            var t1 = points.Count == 0 ? point.FilesPerSec : points[0].FilesPerSec;
-            point = point with { Efficiency = SweepMath.Efficiency(point.FilesPerSec, n, t1) };
+            // No DOP 1 point in this run (--dop N, N>1): E(n) has no baseline, so it is null, not a bogus 1/N.
+            double? t1 = lo > 1 ? null : points.Count == 0 ? point.FilesPerSec : points[0].FilesPerSec;
+            point = point with { Efficiency = SweepMath.EfficiencyOrNull(point.FilesPerSec, n, t1) };
             points.Add(point);
             Console.WriteLine(SweepReport.Row(point));
         }

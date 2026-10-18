@@ -190,7 +190,7 @@ internal static class LargeFileCommand
         var best = set.Extract[n - 1];
         var t1 = set.Extract[0].FilesPerSec;
         sb.AppendLine(string.Create(CultureInfo.InvariantCulture,
-            $"From `{Path.GetFileName(sweepPath)}` (set {set.Name}, Workstation GC, extract): T(1) = {t1:F1} files/s, n_best = {n}, T(n_best) = {best.FilesPerSec:F1} files/s, E(n_best) = {best.Efficiency:F3}, P(n_best) = {Mb(best.PeakWorkingSetBytes):F1} MB."));
+            $"From `{Path.GetFileName(sweepPath)}` (set {set.Name}, Workstation GC, extract): T(1) = {t1:F1} files/s, n_best = {n}, T(n_best) = {best.FilesPerSec:F1} files/s, E(n_best) = {SweepReport.Eff(best.Efficiency)}, P(n_best) = {Mb(best.PeakWorkingSetBytes):F1} MB."));
         if (m is not null)
         {
             var ram = LargeFileMath.RamPerServer(best.PeakWorkingSetBytes, n, max, m.Value);
@@ -199,7 +199,7 @@ internal static class LargeFileCommand
         }
 
         sb.AppendLine(string.Create(CultureInfo.InvariantCulture,
-            $"Per 1 file/s of target: cores_needed = ceil(1 / ({t1:F1} x {best.Efficiency:F3})), servers_needed = ceil(1 / {best.FilesPerSec:F1}); multiply R in."));
+            $"Per 1 file/s of target: cores_needed = ceil(1 / ({t1:F1} x {SweepReport.Eff(best.Efficiency)})), servers_needed = ceil(1 / {best.FilesPerSec:F1}); multiply R in."));
         return sb.ToString();
     }
 
