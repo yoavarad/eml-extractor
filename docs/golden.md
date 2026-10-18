@@ -73,7 +73,7 @@ Payloads are **tiny typed stubs** (correct magic / PK header / `%PDF`), not real
 
 - Full `Received` traces
 - Warning strings
-- Real TNEF/winmail.dat (no public safe sample here — still in `docs/edge-cases.md` as internal)
+- Real-world TNEF/winmail.dat is covered by the public harvest (see README: Apache POI HMEF samples), not the committed goldens; ADR-018 adds a committed TNEF sample under `corpus/realistic/`
 - Recursive Office content
 - Latency
 

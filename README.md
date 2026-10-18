@@ -16,7 +16,7 @@ Input: bytes. Output: whether the buffer is an EML (RFC 5322) message.
 bool ok = new EmlDetector().IsEml(bytes);
 ```
 
-Sniffs headers (and mbox `From `). Ignores file extension. Rejects OLE `.msg`, PDF, ZIP, PNG, JPEG, JSON.
+Sniffs headers (and mbox `From `). Ignores file extension. Rejects OLE `.msg`, PDF, ZIP, PNG, JPEG, and markup/JSON (a first byte of `{`, `[` or `<`).
 
 ### 2. Extract
 
@@ -121,7 +121,7 @@ Measured on Apple M1 Pro, 1 thread, Release, in-memory `byte[]` (no disk). Use t
 | ~20 KB HTML | ~16,900 |
 | Mail + 1 MB attachment | ~259 |
 
-Rough multi-core: `files/sec ≈ extract/s × cores × 0.7`. Attachment-heavy mail is RAM-bound. Full table and formula: [docs/perf-results.md](docs/perf-results.md).
+Multi-core capacity is measured, not estimated: `dotnet run -c Release --project benches/EmlExtraction.Bench -- sweep` runs the DOP sweep (ADR-015). Attachment-heavy mail is RAM-bound. Full table and sweep options: [docs/perf-results.md](docs/perf-results.md).
 
 ### 2. Correctness A — emoji and exotic languages
 

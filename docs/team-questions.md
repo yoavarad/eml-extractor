@@ -66,3 +66,13 @@ The brief says headers starting with `X_` (capital X, underscore) go into `xfiel
 - Should lower-case `x_` count?
 
 Default: literal, case-sensitive `X_`.
+
+## 6. Telemetry naming conventions (ADR-021)
+
+Per the owner (2026-10-18), the library will emit runtime metrics and traces through the .NET built-in `Meter` and `ActivitySource`, both named `EmlExtraction`, with instruments such as `eml_extraction.extract.duration` and `eml_extraction.extract.warnings` (full list: `ydk:req:observability/runtime-telemetry`). The host wires OpenTelemetry; the library has no telemetry package dependency.
+
+- Does the factory or the extraction template already have telemetry naming conventions (meter names, instrument prefix, tag keys)?
+- Is there an existing shared meter or activity source the extractors should report under, or a required set of instruments per extractor?
+- Should the OLE extractor emit the same instrument set under its own name, so dashboards can compare extractors?
+
+Default: the names in ADR-021. They may be renamed once, before the first release that ships them, if the team answers; after that a rename is a breaking change.

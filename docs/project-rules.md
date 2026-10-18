@@ -18,7 +18,7 @@ We are building an in-process C# / .NET 10 class library that decides whether a 
 `, stored as `Metadata["xfields"]`.
 - Attachments are flat and opaque. Never recurse into `message/rfc822` and never sniff file types. TNEF is the only wrapper that gets unpacked (ADR-008, ADR-013). `FullPath` is the container path (`winmail.dat/budget.xlsx`), unique per result (ADR-013).
 - Golden `expected.json` values are authored from the catalog. `tools/GoldenKit gen` must never call `EmlExtractor` (ADR-007).
-- Real-world samples go under gitignored `corpus/internal/`. Never commit them (licences and PII vary). Tests that use them must report Skipped (with the missing path) when the file is absent, never Passed (ADR-018; today they still pass vacuously, Stage 02).
+- Real-world samples go under gitignored `corpus/internal/`. Never commit them (licences and PII vary). Tests that use them must report Skipped (with the missing path) when the file is absent, never Passed (ADR-018).
 - Committed samples (`corpus/realistic/`, ADR-018) need a provenance + license entry; expected values come from generator inputs or published contents, never from extractor output or prose.
 - Load-test reports must name the CPU model; never write "Unknown processor". Refresh the perf baseline in the same commit as a runtime, MimeKit, or machine change (ADR-015).
 - After any change to extraction behaviour or a MimeKit upgrade: run `GoldenKit score` and `GoldenKit probe`, and commit the refreshed `docs/golden-score.txt`.
@@ -34,4 +34,4 @@ We are building an in-process C# / .NET 10 class library that decides whether a 
 - Not yet aligned with ADR-004: the byte `Extract` catch filters by seven exception types, so any other type propagates, and the `MimeMessage` overload has no try/catch. Fixing this is Stage 02 work.
 - `ydk` (Python) on Windows reads manifests and narratives with the cp1252 codepage. Non-Latin characters (Hebrew, CJK) in `.ydk/components/**` or `docs/specs/**` crash `ydk component validate` with `UnicodeDecodeError`. Keep those files ASCII, or set `PYTHONUTF8=1`. (Observed with ydk 1.6.0 on Windows.)
 - The YDK cross-ref linker treats a `.` directly after a `ydk:type:ns/name` ID in a manifest as part of the ID. Put a space before sentence-ending punctuation. (Observed with ydk 1.6.0 on Windows.)
-- `tools/GoldenKit` locates the repo root via `EmlExtraction.slnx`; its other marker, `docs/golden-1200-plan.md`, no longer exists (renamed to `docs/golden.md`).
+- `tools/GoldenKit` locates the repo root via `EmlExtraction.slnx`.

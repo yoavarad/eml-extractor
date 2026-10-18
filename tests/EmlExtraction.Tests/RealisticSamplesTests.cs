@@ -92,6 +92,7 @@ public class RealisticSamplesTests
     static byte[] Bytes(MimePart p)
     {
         using var ms = new MemoryStream();
+        ArgumentNullException.ThrowIfNull(p.Content);
         p.Content.DecodeTo(ms);
         return ms.ToArray();
     }
@@ -109,6 +110,7 @@ public class RealisticSamplesTests
             if (p is MessagePart mp && mp.ContentDisposition?.FileName == name)
             {
                 using var ms = new MemoryStream();
+                ArgumentNullException.ThrowIfNull(mp.Message);
                 mp.Message.WriteTo(ms);
                 return ms.ToArray();
             }

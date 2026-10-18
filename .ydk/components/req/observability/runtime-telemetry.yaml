@@ -1,0 +1,46 @@
+$schema: ydk:schema:req
+id: ydk:req:observability/runtime-telemetry
+description: >-
+  The runtime telemetry contract: the meter, its instruments, and the activities the library emits (ADR-021, per
+  project owner 2026-10-18). Target; not implemented (Stage 02). Names may be renamed once if team question 6
+  (docs/team-questions.md) is answered before the first release that ships them.
+type: constraint
+priority: medium
+rule: >-
+  Meter "EmlExtraction" (version = assembly informational version) exposes exactly these instruments:
+  (1) eml_extraction.extract.duration, Histogram<double>, unit s, tag eml_extraction.outcome in
+  {clean, warnings, parse_failed, input_too_large}, one record per Extract call (wall time of the whole call);
+  (2) eml_extraction.extract.input.size, Histogram<long>, unit By, no tags, one record per Extract call;
+  (3) eml_extraction.extract.attachments, Histogram<int>, unit {attachment}, no tags, one record per Extract call that
+  parsed;
+  (4) eml_extraction.extract.warnings, Counter<long>, unit {warning}, tag eml_extraction.warning.code in the warning
+  codes of ydk:crosscut:core/warning-format , +1 per warning added to a result;
+  (5) eml_extraction.detect.calls, Counter<long>, unit {call}, tag eml_extraction.detect.result in
+  {supported, not_supported}, +1 per Detect or IsEml call;
+  (6) eml_extraction.extract.internal_errors, Counter<long>, unit {error}, tags eml_extraction.stage in
+  {parse, metadata, body, attachments} and error.type (exception type full name), +1 per stage recording
+  ydk:warning:extraction/internal-error ;
+  (7) eml_extraction.extract.input_too_large, Counter<long>, unit {request}, no tags, +1 per call refused with
+  ydk:warning:extraction/input-too-large .
+  ActivitySource "EmlExtraction" starts one Internal activity eml_extraction.extract per Extract call with tags
+  eml_extraction.input.size, eml_extraction.attachments.count, eml_extraction.warnings.count, eml_extraction.outcome;
+  and, when the parent is sampled, child activities eml_extraction.parse, eml_extraction.metadata, eml_extraction.body,
+  eml_extraction.attachments. A stage that records internal_error sets its activity status to Error with error.type.
+  No activity for Detect. All tag rules of ydk:crosscut:core/observability apply. Identical on net8.0 and net10.0.
+failure_behavior: >-
+  Not a runtime failure. A missing or renamed instrument, an unlisted tag key, an open-ended tag value, or any message
+  content in telemetry fails ydk:test:observability/telemetry.unit and CI.
+related_components:
+  - ydk:crosscut:core/observability
+  - ydk:contract:api/eml-extractor
+  - ydk:contract:api/eml-detector
+  - ydk:crosscut:core/warning-format
+  - ydk:warning:extraction/internal-error
+  - ydk:warning:extraction/input-too-large
+  - ydk:nfr:observability/metrics-overhead
+acceptance_criteria:
+  - A MeterListener on meter EmlExtraction sees exactly the seven instruments with the listed names, kinds, and units
+  - Each instrument records the listed values for a clean message, a message with part_decode_failed, an input over the limit, and an injected internal_error
+  - An ActivityListener sees eml_extraction.extract with the four tags and, when sampled, the four stage children
+  - No tag value or activity field contains any subject, address, header value, file name, content ID, or the request FileName from a PII probe message
+  - Tests pass on net8.0 and net10.0; the library references no OpenTelemetry, logging, or EventSource package

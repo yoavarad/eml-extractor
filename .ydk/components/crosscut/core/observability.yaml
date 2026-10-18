@@ -1,0 +1,31 @@
+$schema: ydk:schema:crosscut
+id: ydk:crosscut:core/observability
+description: >-
+  Library-wide rules for runtime telemetry (ADR-021). Target; not implemented (Stage 02). Today the warnings list is
+  the only diagnostic channel and nothing is emitted.
+kind: observability
+specification: >-
+  Mechanism: BCL only. One static readonly System.Diagnostics.Metrics.Meter and one static readonly
+  System.Diagnostics.ActivitySource, both named "EmlExtraction" with the assembly informational version, held by one
+  internal class. No OpenTelemetry, ILogger, or EventSource dependency in the library; the host subscribes by name.
+  Instrument and activity names follow OpenTelemetry semantic-convention style (lower-case dot namespaces, snake_case
+  words, UCUM units, no .total suffix, error.type for exception types). The instrument list is
+  ydk:req:observability/runtime-telemetry ; names, units, tag keys, and tag values are public contract (rename or
+  removal is breaking and needs an ADR plus a major version; additions are minor).
+  PII rule (hard): no tag, activity name, event, baggage, or status description carries message content or anything
+  derived from it (subject, body, header values, addresses, display names, message IDs, attachment file names, content
+  IDs, paths, content types, warning detail text), the request FileName, or exception messages. Every tag value is a
+  number or a member of a closed set fixed in code.
+  Overhead: negligible with no listener, within ydk:nfr:observability/metrics-overhead .
+  Thread-safety: Meter, instruments, and ActivitySource are thread-safe; the public classes keep no per-instance
+  mutable state.
+applies_to: Entire library (src/EmlExtraction), both public classes. Tools and benches may read the meter but are not shipped surface.
+implementation_notes:
+  - Use ActivitySource.StartActivity and check for null; never build tag values unless the activity or instrument is enabled.
+  - Telemetry tests filter by meter name and run in one non-parallel test collection (one static meter per process).
+  - Profiling (ADR-020) is dev-time only and adds nothing to the shipped library.
+related:
+  - ydk:req:observability/runtime-telemetry
+  - ydk:nfr:observability/metrics-overhead
+  - ydk:crosscut:core/warning-format
+  - ydk:crosscut:core/library-surface

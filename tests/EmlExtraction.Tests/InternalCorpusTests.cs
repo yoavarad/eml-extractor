@@ -4,11 +4,10 @@ public sealed class InternalCorpusTests
 {
     private readonly EmlExtractor _extractor = new();
 
-    [Fact]
+    [SkippableFact]
     public void ZimbraOutlookTnefUnpacksGifAttachments()
     {
-        if (!TryLoad(["tnef", "zimbra-tnef.msg"], out var bytes))
-            return;
+        var bytes = Load(["tnef", "zimbra-tnef.msg"]);
 
         var result = _extractor.Extract(bytes);
         Assert.Empty(result.Warnings);
@@ -16,11 +15,10 @@ public sealed class InternalCorpusTests
         Assert.Contains(result.Attachments, a => a.Name.Contains("upload", StringComparison.OrdinalIgnoreCase) && a.Size > 0);
     }
 
-    [Fact]
+    [SkippableFact]
     public void ExchangeMegaHeadersLandInXFields()
     {
-        if (!TryLoad(["exchange", "leeholmes-o365-megaheaders.eml"], out var bytes))
-            return;
+        var bytes = Load(["exchange", "leeholmes-o365-megaheaders.eml"]);
 
         var result = _extractor.Extract(bytes);
         Assert.True(result.Metadata.Count >= 50, $"headers={result.Metadata.Count}");
@@ -28,11 +26,10 @@ public sealed class InternalCorpusTests
         Assert.Contains("X-Microsoft-Antispam-Message-Info:", result.XFields, StringComparison.OrdinalIgnoreCase);
     }
 
-    [Fact]
+    [SkippableFact]
     public void OutlookShapedCidPasteIsExtracted()
     {
-        if (!TryLoad(["cid", "chatwoot-outlook-cid.eml"], out var bytes))
-            return;
+        var bytes = Load(["cid", "chatwoot-outlook-cid.eml"]);
 
         var result = _extractor.Extract(bytes);
         Assert.Equal("text/html", result.MainContentMimeType);
@@ -40,22 +37,20 @@ public sealed class InternalCorpusTests
         Assert.Contains(result.Attachments, a => a.ContentId == "image001.jpg@test" && a.Size > 0);
     }
 
-    [Fact]
+    [SkippableFact]
     public void ShiftJisBodyDecodes()
     {
-        if (!TryLoad(["gaps", "shift-jis.eml"], out var bytes))
-            return;
+        var bytes = Load(["gaps", "shift-jis.eml"]);
 
         var result = _extractor.Extract(bytes);
         Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed") || w.StartsWith("body_decode_failed"));
         Assert.Contains("あいうえお", result.MainContent);
     }
 
-    [Fact]
+    [SkippableFact]
     public void Iso2022JpSubjectAndBodyDecode()
     {
-        if (!TryLoad(["gaps", "iso2022jp.eml"], out var bytes))
-            return;
+        var bytes = Load(["gaps", "iso2022jp.eml"]);
 
         var result = _extractor.Extract(bytes);
         Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed"));
@@ -64,11 +59,10 @@ public sealed class InternalCorpusTests
         Assert.Contains("テスト", result.MainContent);
     }
 
-    [Fact]
+    [SkippableFact]
     public void Gb2312BodyDecodesWithoutThrowing()
     {
-        if (!TryLoad(["gaps", "gb2312.eml"], out var bytes))
-            return;
+        var bytes = Load(["gaps", "gb2312.eml"]);
 
         var result = _extractor.Extract(bytes);
         Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed"));
@@ -76,11 +70,10 @@ public sealed class InternalCorpusTests
         Assert.DoesNotContain('\uFFFD', result.MainContent);
     }
 
-    [Fact]
+    [SkippableFact]
     public void DsnReportKeepsHumanBodyAndDeliveryStatusPart()
     {
-        if (!TryLoad(["gaps", "dsn-report.eml"], out var bytes))
-            return;
+        var bytes = Load(["gaps", "dsn-report.eml"]);
 
         var result = _extractor.Extract(bytes);
         Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed"));
@@ -90,11 +83,10 @@ public sealed class InternalCorpusTests
             || a.Name.EndsWith(".delivery-status", StringComparison.OrdinalIgnoreCase));
     }
 
-    [Fact]
+    [SkippableFact]
     public void SmimeSignedYieldsBodyAndJpegAttachment()
     {
-        if (!TryLoad(["gaps", "smime-signed.eml"], out var bytes))
-            return;
+        var bytes = Load(["gaps", "smime-signed.eml"]);
 
         var result = _extractor.Extract(bytes);
         Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed"));
@@ -105,11 +97,10 @@ public sealed class InternalCorpusTests
             || a.Name.Contains("pkcs7-signature", StringComparison.OrdinalIgnoreCase));
     }
 
-    [Fact]
+    [SkippableFact]
     public void PoiTnefUnpacksRealOleDocAndPdf()
     {
-        if (!TryLoad(["spec", "tnef", "wrap-poi-quick-winmail.eml"], out var bytes))
-            return;
+        var bytes = Load(["spec", "tnef", "wrap-poi-quick-winmail.eml"]);
 
         var result = _extractor.Extract(bytes);
         Assert.Empty(result.Warnings);
@@ -122,11 +113,10 @@ public sealed class InternalCorpusTests
         Assert.True(pdf.Size > 10_000);
     }
 
-    [Fact]
+    [SkippableFact]
     public void PoiTnefUnpacksRealPdfAndPng()
     {
-        if (!TryLoad(["spec", "tnef", "wrap-poi-bug52400-with-attachments.eml"], out var bytes))
-            return;
+        var bytes = Load(["spec", "tnef", "wrap-poi-bug52400-with-attachments.eml"]);
 
         var result = _extractor.Extract(bytes);
         Assert.Empty(result.Warnings);
@@ -138,11 +128,10 @@ public sealed class InternalCorpusTests
         Assert.True(png.Size > 100_000);
     }
 
-    [Fact]
+    [SkippableFact]
     public void SwiftMailerHasRealOfficeAndOpaqueNestedEml()
     {
-        if (!TryLoad(["spec", "php-mails", "issue274.eml"], out var bytes))
-            return;
+        var bytes = Load(["spec", "php-mails", "issue274.eml"]);
 
         var result = _extractor.Extract(bytes);
         Assert.Empty(result.Warnings);
@@ -159,11 +148,10 @@ public sealed class InternalCorpusTests
         Assert.Equal(5, result.Attachments.Count);
     }
 
-    [Fact]
+    [SkippableFact]
     public void ProtonForwardHasDocxXlsxPdfMagic()
     {
-        if (!TryLoad(["spec", "office", "proton-forwarding-docx.eml"], out var bytes))
-            return;
+        var bytes = Load(["spec", "office", "proton-forwarding-docx.eml"]);
 
         var result = _extractor.Extract(bytes);
         Assert.Empty(result.Warnings);
@@ -172,11 +160,10 @@ public sealed class InternalCorpusTests
         Assert.Contains(result.Attachments, a => a.Name.Equals("test.pdf", StringComparison.OrdinalIgnoreCase) && HasMagic(a.Data, "%PDF-"u8));
     }
 
-    [Fact]
+    [SkippableFact]
     public void GmailHebrewIso88598SubjectDecodes()
     {
-        if (!TryLoad(["spec", "php-mails", "issue149"], out var bytes))
-            return;
+        var bytes = Load(["spec", "php-mails", "issue149"]);
 
         var result = _extractor.Extract(bytes);
         Assert.Empty(result.Warnings);
@@ -185,11 +172,10 @@ public sealed class InternalCorpusTests
         Assert.Contains("Invoice", subject);
     }
 
-    [Fact]
+    [SkippableFact]
     public void BellcoreHebrewIso88598BodyDecodes()
     {
-        if (!TryLoad(["spec", "unicode", "jwz-hebrew-01.eml"], out var bytes))
-            return;
+        var bytes = Load(["spec", "unicode", "jwz-hebrew-01.eml"]);
 
         var result = _extractor.Extract(bytes);
         Assert.Empty(result.Warnings);
@@ -197,11 +183,10 @@ public sealed class InternalCorpusTests
         Assert.Contains("תירבע", result.MainContent);
     }
 
-    [Fact]
+    [SkippableFact]
     public void NestedRfc822ForwardStaysOpaque()
     {
-        if (!TryLoad(["spec", "php-mails", "issue158a"], out var bytes))
-            return;
+        var bytes = Load(["spec", "php-mails", "issue158a"]);
 
         var result = _extractor.Extract(bytes);
         Assert.Empty(result.Warnings);
@@ -211,11 +196,10 @@ public sealed class InternalCorpusTests
         Assert.StartsWith("Return-Path:", System.Text.Encoding.ASCII.GetString(nested.Data.AsSpan(0, Math.Min(12, nested.Data.Length))));
     }
 
-    [Fact]
+    [SkippableFact]
     public void OutlookPasteImage001At01DIsInlinePng()
     {
-        if (!TryLoad(["spec", "cid", "outlook-paste-image001-01D.eml"], out var bytes))
-            return;
+        var bytes = Load(["spec", "cid", "outlook-paste-image001-01D.eml"]);
 
         var result = _extractor.Extract(bytes);
         Assert.Empty(result.Warnings);
@@ -232,11 +216,10 @@ public sealed class InternalCorpusTests
             && string.IsNullOrEmpty(a.ContentId));
     }
 
-    [Fact]
+    [SkippableFact]
     public void HashCidPngPasteKeepsCidInHtml()
     {
-        if (!TryLoad(["spec", "php-mails", "m0129"], out var bytes))
-            return;
+        var bytes = Load(["spec", "php-mails", "m0129"]);
 
         var result = _extractor.Extract(bytes);
         Assert.Empty(result.Warnings);
@@ -247,17 +230,11 @@ public sealed class InternalCorpusTests
         Assert.True(img.Size > 1_000);
     }
 
-    private static bool TryLoad(string[] parts, out byte[] bytes)
+    private static byte[] Load(string[] parts)
     {
         var path = FindInternal(parts);
-        if (path is null)
-        {
-            bytes = [];
-            return false;
-        }
-
-        bytes = File.ReadAllBytes(path);
-        return true;
+        Skip.If(path is null, $"corpus/internal sample missing: {Path.Combine(parts)}");
+        return File.ReadAllBytes(path!);
     }
 
     private static string? FindInternal(params string[] parts)

@@ -7,6 +7,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="MimeKit" />
     <PackageReference Include="xunit" />
+    <PackageReference Include="Xunit.SkippableFact" />
     <PackageReference Include="xunit.runner.visualstudio" />
   </ItemGroup>
   <ItemGroup>
@@ -20,5 +21,11 @@
     <!-- Single golden schema, shared with GoldenKit. -->
     <Compile Include="..\..\tools\GoldenKit\Schema\*.cs" Link="GoldenSchema\%(Filename)%(Extension)" />
     <Using Include="GoldenKit.Schema" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Pure parts of the bench DOP sweep (ADR-015), unit-tested without referencing the bench exe. -->
+    <Compile Include="..\..\benches\EmlExtraction.Bench\Sweep\SweepMath.cs" Link="Sweep\SweepMath.cs" />
+    <Compile Include="..\..\benches\EmlExtraction.Bench\Sweep\CpuInfoParser.cs" Link="Sweep\CpuInfoParser.cs" />
+    <Compile Include="..\..\benches\EmlExtraction.Bench\Sweep\MboxSplitter.cs" Link="Sweep\MboxSplitter.cs" />
   </ItemGroup>
 </Project>
