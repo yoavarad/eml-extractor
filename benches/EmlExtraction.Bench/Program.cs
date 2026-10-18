@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Running;
 using EmlExtraction.Bench;
 
 if (args.Contains("--bdn"))
