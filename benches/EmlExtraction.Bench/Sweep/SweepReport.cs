@@ -35,7 +35,7 @@ internal sealed record SweepPoint(
     double P95Ms,
     long PeakWorkingSetBytes,
     double AllocBytesPerInputByte,
-    double Efficiency,
+    double? Efficiency,
     long Messages,
     double ElapsedSec,
     double Passes);
@@ -103,7 +103,10 @@ internal sealed record SweepReport(int SchemaVersion, HardwareBlock Hardware, Sw
 
     public static string Row(SweepPoint p) => string.Create(
         CultureInfo.InvariantCulture,
-        $"{p.Dop,4} {p.FilesPerSec,12:F1} {p.P50Ms,9:F3} {p.P95Ms,9:F3} {p.PeakWorkingSetBytes / (1024.0 * 1024),9:F1} {p.AllocBytesPerInputByte,8:F2} {p.Efficiency,6:F3}");
+        $"{p.Dop,4} {p.FilesPerSec,12:F1} {p.P50Ms,9:F3} {p.P95Ms,9:F3} {p.PeakWorkingSetBytes / (1024.0 * 1024),9:F1} {p.AllocBytesPerInputByte,8:F2} {Eff(p.Efficiency),6}");
+
+    /// <summary>E(n) text; "n/a" when the run has no DOP 1 baseline.</summary>
+    public static string Eff(double? e) => e is null ? "n/a" : e.Value.ToString("F3", CultureInfo.InvariantCulture);
 
     private static void AppendTable(StringBuilder md, string title, IReadOnlyList<SweepPoint> points)
     {
@@ -116,7 +119,7 @@ internal sealed record SweepReport(int SchemaVersion, HardwareBlock Hardware, Sw
         {
             md.AppendLine(string.Create(
                 CultureInfo.InvariantCulture,
-                $"| {p.Dop} | {p.FilesPerSec:F1} | {p.P50Ms:F3} | {p.P95Ms:F3} | {p.PeakWorkingSetBytes / (1024.0 * 1024):F1} | {p.AllocBytesPerInputByte:F2} | {p.Efficiency:F3} |"));
+                $"| {p.Dop} | {p.FilesPerSec:F1} | {p.P50Ms:F3} | {p.P95Ms:F3} | {p.PeakWorkingSetBytes / (1024.0 * 1024):F1} | {p.AllocBytesPerInputByte:F2} | {Eff(p.Efficiency)} |"));
         }
     }
 }

@@ -18,6 +18,13 @@ public sealed class SweepPureTests
     public void EfficiencyRejectsZeroDop() =>
         Assert.Throws<ArgumentOutOfRangeException>(() => SweepMath.Efficiency(1, 0, 1));
 
+    [Fact]
+    public void EfficiencyIsNullWithoutDop1Baseline()
+    {
+        Assert.Null(SweepMath.EfficiencyOrNull(400, 8, null));
+        Assert.Equal(0.5, SweepMath.EfficiencyOrNull(400, 8, 100)!.Value, 9);
+    }
+
     [Theory]
     [InlineData(50, 5.0)]
     [InlineData(95, 10.0)]

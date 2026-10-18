@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Runtime;
 using System.Text;
 using System.Text.Json;
+using EmlExtraction.Bench.Profile;
 
 namespace EmlExtraction.Bench.Sweep;
 
@@ -13,7 +14,7 @@ namespace EmlExtraction.Bench.Sweep;
 internal static class LargeFileCommand
 {
     private const string Usage =
-        "Usage: large [--max-input-bytes N] [--sample-ms N] [--sweep <sweep.json>] [--out <dir>]";
+        "Usage: large [--max-input-bytes N] [--sample-ms N] [--sweep <sweep.json>] [--out <dir>] [--handshake]";
 
     private const string Rerun = """
         ## How the team reruns this
@@ -30,6 +31,7 @@ internal static class LargeFileCommand
 
     public static int Run(string[] args)
     {
+        var trace = TraceSupport.From(ref args);
         var repoRoot = RepoRoot.Find();
         long max = EmlExtractor.DefaultMaxInputBytes;
         var sampleMs = 50;
@@ -56,9 +58,12 @@ internal static class LargeFileCommand
         var extractor = new EmlExtractor(max);
         extractor.Extract(LargeFileMath.BuildMessage(Math.Min(65_536, max))); // JIT warm-up so it does not inflate the first M
         var passes = new List<Pass>();
+        trace.Wait("start");
+        trace.ResetGcBaseline();
         foreach (var percent in new[] { 25, 50, 100 })
-            passes.Add(Measure($"{percent}%", max * percent / 100, extractor, sampleMs, expectAttachment: true));
-        passes.Add(Measure("limit+1", max + 1, extractor, sampleMs, expectAttachment: false));
+            passes.Add(Measure($"{percent}%", max * percent / 100, extractor, sampleMs, expectAttachment: true, percent == 100 ? trace : null));
+        passes.Add(Measure("limit+1", max + 1, extractor, sampleMs, expectAttachment: false, null));
+        trace.PrintGcStats();
 
         var sb = new StringBuilder();
         sb.AppendLine("# Large-file pass");
@@ -90,7 +95,7 @@ internal static class LargeFileCommand
         return okPasses.Count == 3 && passes[^1].Ok ? 0 : 1;
     }
 
-    private static Pass Measure(string label, long size, EmlExtractor extractor, int sampleMs, bool expectAttachment)
+    private static Pass Measure(string label, long size, EmlExtractor extractor, int sampleMs, bool expectAttachment, TraceSupport? peakHook)
     {
         GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, blocking: true, compacting: true);
         GC.WaitForPendingFinalizers();
@@ -122,6 +127,7 @@ internal static class LargeFileCommand
         sampler.Join();
         self.Refresh();
         peak = Math.Max(Interlocked.Read(ref peak), self.WorkingSet64);
+        peakHook?.Wait("peak"); // input and result still live: the parent takes the gcdump here
 
         bool ok;
         string note;
@@ -184,7 +190,7 @@ internal static class LargeFileCommand
         var best = set.Extract[n - 1];
         var t1 = set.Extract[0].FilesPerSec;
         sb.AppendLine(string.Create(CultureInfo.InvariantCulture,
-            $"From `{Path.GetFileName(sweepPath)}` (set {set.Name}, Workstation GC, extract): T(1) = {t1:F1} files/s, n_best = {n}, T(n_best) = {best.FilesPerSec:F1} files/s, E(n_best) = {best.Efficiency:F3}, P(n_best) = {Mb(best.PeakWorkingSetBytes):F1} MB."));
+            $"From `{Path.GetFileName(sweepPath)}` (set {set.Name}, Workstation GC, extract): T(1) = {t1:F1} files/s, n_best = {n}, T(n_best) = {best.FilesPerSec:F1} files/s, E(n_best) = {SweepReport.Eff(best.Efficiency)}, P(n_best) = {Mb(best.PeakWorkingSetBytes):F1} MB."));
         if (m is not null)
         {
             var ram = LargeFileMath.RamPerServer(best.PeakWorkingSetBytes, n, max, m.Value);
@@ -193,7 +199,7 @@ internal static class LargeFileCommand
         }
 
         sb.AppendLine(string.Create(CultureInfo.InvariantCulture,
-            $"Per 1 file/s of target: cores_needed = ceil(1 / ({t1:F1} x {best.Efficiency:F3})), servers_needed = ceil(1 / {best.FilesPerSec:F1}); multiply R in."));
+            $"Per 1 file/s of target: cores_needed = ceil(1 / ({t1:F1} x {SweepReport.Eff(best.Efficiency)})), servers_needed = ceil(1 / {best.FilesPerSec:F1}); multiply R in."));
         return sb.ToString();
     }
 

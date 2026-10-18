@@ -157,6 +157,8 @@ Measured on Apple M1 Pro, 1 thread, Release, in-memory `byte[]` (no disk). Use t
 
 Multi-core capacity is measured, not estimated: `dotnet run -c Release --project benches/EmlExtraction.Bench -- sweep` runs the DOP sweep (ADR-015). Attachment-heavy mail is RAM-bound. Full table and sweep options: [docs/perf-results.md](docs/perf-results.md).
 
+Corpus-level profiling (ADR-020): `scripts/profile-corpus.sh` or `scripts/profile-corpus.ps1 [--corpus <path>]` runs the sweep and large-file pass on net8.0 and net10.0 under `dotnet-trace`, `dotnet-counters` and `dotnet-gcdump` (local tools, `dotnet tool restore`) and writes the nettrace, counters CSV, gcdump and `manifest.json` (GC counts, pause time, hardware) to the gitignored `artifacts/perf/<stamp>/`. Open a nettrace with `dotnet-trace convert --format speedscope` or PerfView. A missing corpus path prints `SKIPPED` and profiles the synthetic set only.
+
 ### 2. Correctness A — emoji and exotic languages
 
 Subject and body round-trip for Hebrew, Arabic, Chinese, Japanese, Hindi, Thai, Russian, emoji, mixed scripts, RFC 2047 encoded-words, Windows-1255 / other legacy charsets, SMTPUTF8 addresses.

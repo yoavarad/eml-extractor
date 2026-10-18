@@ -11,6 +11,10 @@ internal static class SweepMath
         return throughputAtOne <= 0 ? 0 : throughput / (dop * throughputAtOne);
     }
 
+    /// <summary>E(n), or null when there is no DOP 1 measurement to compare against.</summary>
+    public static double? EfficiencyOrNull(double throughput, int dop, double? throughputAtOne) =>
+        throughputAtOne is null ? null : Efficiency(throughput, dop, throughputAtOne.Value);
+
     /// <summary>Nearest-rank percentile of an ascending-sorted sample; <paramref name="percent"/> in (0, 100].</summary>
     public static double Percentile(IReadOnlyList<double> sorted, double percent)
     {
