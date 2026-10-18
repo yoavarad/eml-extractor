@@ -57,6 +57,40 @@ No further extraction: no file-type detection, no parsing inside Office/PDF/imag
 
 ---
 
+## Telemetry
+
+The library publishes runtime metrics through the BCL `System.Diagnostics.Metrics` API (ADR-021). It takes no OpenTelemetry, logging or EventSource dependency; nothing is emitted unless a listener subscribes. Meter name: `EmlExtraction` (version = the library's informational version).
+
+| Instrument | Kind | Unit | Tags |
+| --- | --- | --- | --- |
+| `eml_extraction.extract.duration` | Histogram<double> | `s` | `eml_extraction.outcome` |
+| `eml_extraction.extract.input.size` | Histogram<long> | `By` | - |
+| `eml_extraction.extract.attachments` | Histogram<int> | `{attachment}` | - |
+| `eml_extraction.extract.warnings` | Counter<long> | `{warning}` | `eml_extraction.warning.code` |
+| `eml_extraction.detect.calls` | Counter<long> | `{call}` | `eml_extraction.detect.result` |
+| `eml_extraction.extract.internal_errors` | Counter<long> | `{error}` | `eml_extraction.stage`, `error.type` |
+| `eml_extraction.extract.input_too_large` | Counter<long> | `{request}` | - |
+
+Tag values (closed sets):
+- `eml_extraction.outcome`: `clean`, `warnings`, `parse_failed` (nothing parsed: parse failure or an `internal_error` in the parse stage), `input_too_large`
+- `eml_extraction.warning.code`: `parse_failed`, `body_decode_failed`, `part_decode_failed`, `rfc822_extract_failed`, `tnef_extract_failed`, `internal_error`, `input_too_large`
+- `eml_extraction.detect.result`: `supported`, `not_supported`
+- `eml_extraction.stage`: `parse`, `metadata`, `body`, `attachments`
+- `error.type`: the .NET exception type's full name
+
+PII: no tag carries message content or anything derived from it (subject, body, headers, addresses, file names, content IDs), the request `FileName`, or exception messages. A unit test enforces this.
+
+Subscribe with OpenTelemetry:
+
+```csharp
+using var meterProvider = Sdk.CreateMeterProviderBuilder()
+    .AddMeter("EmlExtraction")
+    .AddOtlpExporter()
+    .Build();
+```
+
+Or watch live: `dotnet-counters monitor --counters EmlExtraction -p <pid>`.
+
 ## Setup and run
 
 Requires the .NET 10 SDK (`global.json` pins `10.0.401`); the `net8.0` tests also need the .NET 8 runtime. If `dotnet` is missing:

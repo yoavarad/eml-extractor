@@ -19,11 +19,18 @@ public sealed class EmlDetector : IEmlDetector
     private static readonly EmlDetectionResult Unsupported = new(false, "");
 
     /// <inheritdoc/>
-    public bool IsEml(ReadOnlySpan<byte> data) => Detect(data).IsSupported;
+    public bool IsEml(ReadOnlySpan<byte> data) => Counted(data);
 
     /// <summary>Detects whether <paramref name="data"/> is a mail message. Never throws.</summary>
     public EmlDetectionResult Detect(ReadOnlySpan<byte> data)
-        => Sniff(data) ? Supported : Unsupported;
+        => Counted(data) ? Supported : Unsupported;
+
+    private static bool Counted(ReadOnlySpan<byte> data)
+    {
+        var supported = Sniff(data);
+        EmlExtractionTelemetry.RecordDetect(supported);
+        return supported;
+    }
 
     private static bool Sniff(ReadOnlySpan<byte> data)
     {
