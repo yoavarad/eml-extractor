@@ -16,7 +16,7 @@ Input: bytes. Output: whether the buffer is an EML (RFC 5322) message.
 bool ok = new EmlDetector().IsEml(bytes);
 ```
 
-Sniffs headers (and mbox `From `). Ignores file extension. Rejects OLE `.msg`, PDF, ZIP, PNG, JPEG, JSON.
+Sniffs headers (and mbox `From `). Ignores file extension. Rejects OLE `.msg`, PDF, ZIP, PNG, JPEG, and markup/JSON (a first byte of `{`, `[` or `<`).
 
 ### 2. Extract
 

@@ -34,4 +34,4 @@ We are building an in-process C# / .NET 10 class library that decides whether a 
 - Not yet aligned with ADR-004: the byte `Extract` catch filters by seven exception types, so any other type propagates, and the `MimeMessage` overload has no try/catch. Fixing this is Stage 02 work.
 - `ydk` (Python) on Windows reads manifests and narratives with the cp1252 codepage. Non-Latin characters (Hebrew, CJK) in `.ydk/components/**` or `docs/specs/**` crash `ydk component validate` with `UnicodeDecodeError`. Keep those files ASCII, or set `PYTHONUTF8=1`. (Observed with ydk 1.6.0 on Windows.)
 - The YDK cross-ref linker treats a `.` directly after a `ydk:type:ns/name` ID in a manifest as part of the ID. Put a space before sentence-ending punctuation. (Observed with ydk 1.6.0 on Windows.)
-- `tools/GoldenKit` locates the repo root via `EmlExtraction.slnx`; its other marker, `docs/golden-1200-plan.md`, no longer exists (renamed to `docs/golden.md`).
+- `tools/GoldenKit` locates the repo root via `EmlExtraction.slnx`.

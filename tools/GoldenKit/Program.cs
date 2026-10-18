@@ -23,8 +23,7 @@ static string? FindRepo(string start)
     var dir = new DirectoryInfo(start);
     while (dir is not null)
     {
-        if (File.Exists(Path.Combine(dir.FullName, "docs", "golden-1200-plan.md"))
-            || File.Exists(Path.Combine(dir.FullName, "EmlExtraction.slnx")))
+        if (File.Exists(Path.Combine(dir.FullName, "EmlExtraction.slnx")))
             return dir.FullName;
         dir = dir.Parent;
     }
