@@ -42,6 +42,16 @@ jobs:
         with:
           name: test-results
           path: TestResults
+      - name: GoldenKit score (1212/1212 gate)
+        run: dotnet run --project tools/GoldenKit -c Release --no-build -- score
+      - name: Upload golden score report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-score
+          path: |
+            docs/golden-score.txt
+            docs/golden-score.json
       - name: Vulnerability audit
         run: |
           output=$(dotnet list $SOLUTION package --vulnerable --include-transitive 2>&1)
