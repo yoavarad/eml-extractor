@@ -1,0 +1,29 @@
+$schema: ydk:schema:nfr
+id: ydk:nfr:observability/metrics-overhead
+description: >-
+  Cost of the runtime telemetry of ydk:req:observability/runtime-telemetry (ADR-021). Target; not implemented
+  (Stage 02). Every number here is provisional (per project owner, 2026-10-18): a placeholder until the overhead
+  benchmark runs; the measuring task replaces each with the measured value plus stated headroom and records the source
+  run.
+category: observability
+tags: [overhead, telemetry, provisional]
+target: >-
+  Provisional. No listener: added time per Extract on the tiny message within run-to-run noise and <= 1%, and 0 added
+  allocated bytes per Extract and per Detect. MeterListener subscribed to every instrument: <= 5% added time per
+  Extract on the tiny message. ActivityListener sampling all (with stage children): reported separately; if it exceeds
+  10% the stage children are dropped (ADR-021).
+measurement: >-
+  BenchmarkDotNet with MemoryDiagnoser in benches/EmlExtraction.Bench, Release, net8.0 and net10.0: Extract on the
+  tiny, 20 KB HTML, and 1 MB attachment bench messages and Detect on the tiny message, in three configurations - no
+  listener, MeterListener enabled on all EmlExtraction instruments, ActivityListener sampling AllData. Overhead =
+  (mean with listener - mean without) / mean without; allocation delta from MemoryDiagnoser. Hardware block as
+  ADR-015.
+test_method: >-
+  dotnet run -c Release --project benches/EmlExtraction.Bench -- overhead (both TFMs); results and verdict against the
+  budget recorded in docs/perf-results.md. Re-run whenever an instrument or activity is added.
+monitoring: none (the library emits the metrics; overhead is a dev-time measurement)
+applies_to:
+  - ydk:req:observability/runtime-telemetry
+  - ydk:crosscut:core/observability
+  - ydk:contract:api/eml-extractor
+  - ydk:contract:api/eml-detector

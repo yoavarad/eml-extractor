@@ -1,0 +1,28 @@
+$schema: ydk:schema:req
+id: ydk:req:quality/optimization-evidence
+description: >-
+  Every performance optimization is data-driven and individually proven (ADR-022, per project owner 2026-10-18).
+  Target; not implemented (Stage 02). No numeric target exists yet; the triage task sets provisional targets from
+  the first profile report relative to the ADR-015 baseline.
+type: policy
+priority: medium
+rule: >-
+  An optimization is its own task that names a hotspot row of the latest ydk:req:quality/profiling-report report, a
+  hypothesis (cause, change, expected gain in a named metric), and a target relative to docs/perf-baseline.json. Its
+  PR shows before/after on the same machine, TFMs, and GC mode: the per-stage benchmark of the stage plus the sweep
+  T(1), T(ProcessorCount), A, and P(ProcessorCount). It merges only if the named metric improves beyond the measured
+  run-to-run spread, no other ADR-015 metric regresses past the warn threshold, the golden score stays 1212/1212, all
+  tests pass on net8.0 and net10.0, the telemetry overhead budget still holds, and the public API is unchanged (any
+  API change needs its own ADR). Streaming stays DEFERRED unless the measured memory ceiling is exceeded. After the
+  optimizations, a closing re-profile refreshes the baseline and records the delta per optimization.
+failure_behavior: Not a runtime rule. A PR without the before/after evidence or with a regression past the threshold is not merged.
+related_components:
+  - ydk:req:quality/profiling-report
+  - ydk:nfr:performance/throughput-dop-sweep
+  - ydk:nfr:performance/memory-footprint
+  - ydk:nfr:reliability/golden-pass-rate
+  - ydk:nfr:observability/metrics-overhead
+acceptance_criteria:
+  - Each optimization task cites a hotspot row and states hypothesis, metric, and expected gain
+  - Each optimization PR contains before/after numbers from the same machine and both TFMs
+  - The closing report lists every optimization with its measured delta against the pre-optimization baseline

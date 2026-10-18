@@ -15,7 +15,7 @@ specification: >-
 applies_to: ydk:contract:api/eml-extractor (both Extract overloads). The detector has no diagnostics.
 implementation_notes:
   - Warning strings are not golden-checked (docs/golden.md "What we will not gold"); tests assert only on prefixes.
-  - No logging, tracing, or metrics are emitted; warnings are the only diagnostic channel.
+  - No logging, tracing, or metrics are emitted today; warnings are the only diagnostic channel. Target (ADR-021, Stage 02): each warning also increments a counter tagged by its code, never by its detail (ydk:crosscut:core/observability).
 related:
   - ydk:warning:extraction/parse-failed
   - ydk:warning:extraction/body-decode-failed
@@ -25,3 +25,4 @@ related:
   - ydk:warning:extraction/internal-error
   - ydk:warning:extraction/input-too-large
   - ydk:entity:extraction/EmlExtractionResult
+  - ydk:crosscut:core/observability

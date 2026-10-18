@@ -1,0 +1,61 @@
+$schema: ydk:schema:test
+id: ydk:test:observability/telemetry.unit
+description: >-
+  Unit tests for the runtime telemetry contract (ydk:req:observability/runtime-telemetry , ADR-021). Target; not
+  implemented (Stage 02). Uses the real MeterListener and ActivityListener from the BCL; runs on net8.0 and net10.0
+  in one non-parallel collection, filtering by meter and source name "EmlExtraction".
+level: unit
+target: ydk:req:observability/runtime-telemetry
+cases:
+  - name: MeterExposesExactInstrumentSet
+    description: Names, kinds, units are the contract
+    given: A MeterListener that records every published instrument of meter EmlExtraction
+    when: Extract and Detect are each called once
+    then: Exactly the seven listed instruments are published with the listed kinds and units, and the meter version equals the assembly informational version
+  - name: CleanMessageRecordsDurationSizeAttachments
+    description: One record per call
+    given: A message with two attachments and no problems
+    when: Extract is called
+    then: duration has one positive value tagged outcome=clean; input.size equals the input length; attachments records 2; warnings counter unchanged
+  - name: WarningsCountedByCode
+    description: Counter tag is the warning code
+    given: A message with one undecodable attachment part
+    when: Extract is called
+    then: extract.warnings gets +1 tagged warning.code=part_decode_failed and duration is tagged outcome=warnings
+  - name: InputTooLargeCounted
+    description: Size guard signal
+    given: An extractor with a small maxInputBytes and a longer input
+    when: Extract is called
+    then: input_too_large gets +1, warnings gets +1 tagged input_too_large, duration tagged outcome=input_too_large, no attachments record
+  - name: InternalErrorCountedByStage
+    description: Library-bug signal carries the stage
+    given: A test hook that throws an unexpected exception inside the attachments stage
+    when: Extract is called
+    then: internal_errors gets +1 tagged stage=attachments and error.type with the exception type name; the stage activity has status Error
+  - name: DetectCountedByResult
+    description: Detection counter
+    given: One mail buffer and one PDF buffer
+    when: Detect is called on each and IsEml on the mail buffer
+    then: detect.calls is supported=2 and not_supported=1
+  - name: ExtractActivityAndStageChildren
+    description: Tracing shape
+    given: An ActivityListener sampling AllData on source EmlExtraction
+    when: Extract is called
+    then: One eml_extraction.extract activity with input.size, attachments.count, warnings.count, outcome tags, and children parse, metadata, body, attachments; no activity for Detect
+  - name: NoPiiInTelemetry
+    description: Hard PII guard
+    given: A probe message with a unique marker string in subject, body, every address, a custom header, an attachment file name, content ID and Content-Location, passed with request FileName containing the marker
+    when: Extract and Detect run with both listeners attached
+    then: No recorded tag value, activity name, display name, status description, event, or baggage contains the marker; every tag key is in the allowed list and every string tag value is in its closed set
+  - name: NoListenerNoActivity
+    description: Zero-listener path
+    given: No listener attached to source EmlExtraction
+    when: Extract is called
+    then: Activity.Current stays null inside the call and the result equals the result with listeners attached
+stubs:
+  - A test-only fault hook (internal, via InternalsVisibleTo) to inject an exception into one stage
+never_mock:
+  - EmlExtractor
+  - EmlDetector
+  - MimeKit
+  - MeterListener and ActivityListener (real BCL listeners)
