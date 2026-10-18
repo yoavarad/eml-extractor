@@ -50,12 +50,7 @@ Default: net8.0 + net10.0 until the template moves.
 
 ## 4. License
 
-This repo has no license yet. Proposal: MIT, with `THIRD-PARTY-NOTICES.md` (ADR-017). All runtime dependencies (MimeKit, BouncyCastle.Cryptography, System.Security.Cryptography.Pkcs) are MIT; test dependencies are MIT or Apache-2.0.
-
-- Project owner: confirm MIT, and the copyright holder line.
-- Team: is there a required license for template components (for example Apache-2.0 for its patent grant)?
-
-Default: no `LICENSE` file is added until the owner confirms.
+**Closed.** Owner decision 2026-10-18: MIT, "Copyright (c) 2026 Yoav Arad" (ADR-017, `LICENSE`, `THIRD-PARTY-NOTICES.md`). All runtime dependencies (MimeKit, BouncyCastle.Cryptography, System.Security.Cryptography.Pkcs) are MIT; test dependencies are MIT, Apache-2.0 or MS-PL.
 
 ## 5. `X_` headers in internal mail
 

@@ -1,10 +1,10 @@
 # ADR-017: MIT license with a third-party notices file
 
 ## Status
-Proposed. Owner confirmation of the license choice pending (`docs/team-questions.md`). Implementation pending, tracked as Stage 02 work.
+Accepted (owner, 2026-10-18): MIT, copyright line "Copyright (c) 2026 Yoav Arad". `LICENSE`, `THIRD-PARTY-NOTICES.md` and the CI audit (`tools/license-audit.py`) are implemented.
 
 ## Context
-The brief requires everything to be open source. The repo has no `LICENSE` file, so legally it is "all rights reserved". No dependency license audit exists, and one runtime dependency, `BouncyCastle.Cryptography` (pulled in by MimeKit), is not documented anywhere.
+The brief requires everything to be open source. At proposal time the repo had no `LICENSE` file, so legally it is "all rights reserved". No dependency license audit exists, and one runtime dependency, `BouncyCastle.Cryptography` (pulled in by MimeKit), is not documented anywhere.
 
 Audit of the packages restored today (versions from the project files and `project.assets.json`):
 
@@ -20,9 +20,9 @@ Audit of the packages restored today (versions from the project files and `proje
 | BenchmarkDotNet | 0.15.8 | bench | MIT |
 
 ## Decision
-- License the repo under MIT (proposal; owner confirmation pending).
+- License the repo under MIT (accepted by the owner, 2026-10-18).
 - Add `LICENSE` (MIT text) and `THIRD-PARTY-NOTICES.md` at the repo root. The notices file lists every shipped runtime dependency with version, license, and copyright line, and separately lists test and bench dependencies and the source and license of every committed sample file (ADR-018).
-- CI checks that every package in the restore graph appears in `THIRD-PARTY-NOTICES.md`.
+- CI (`tools/license-audit.py`) checks that every package in the restore graph appears in `THIRD-PARTY-NOTICES.md` and that its license is MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause or MS-PL. MS-PL is allowed because the test-only `Xunit.SkippableFact` (and its dependency `Validation`) use it.
 - Corpus samples under the gitignored `corpus/internal/` are never redistributed; their sources are listed in `docs/edge-cases.md`.
 
 ## Alternatives
