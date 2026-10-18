@@ -36,5 +36,9 @@ One name per concept. Use the canonical term in specs, code comments, and review
 | Internal corpus | The gitignored folder of public real-world samples | private corpus, test data |
 | Realistic sample set | The committed, licensed set of real or tool-generated samples run in CI ([ydk:req:quality/realistic-attachment-samples]) | fixtures (for these), real corpus |
 | Load test | The sweep over every degree of parallelism that measures throughput and memory ([ydk:nfr:performance/throughput-dop-sweep]) | bench (for the sweep), stress test |
+| Hotspot | A stage or code path that the profiling report ranks among the largest shares of processor time or allocated memory ([ydk:req:quality/profiling-report], ADR-020) | bottleneck (unless measured), slow part |
+| Profiling report | The committed per-stage report with the ranked hotspot table ([ydk:req:quality/profiling-report]) | perf notes, profile dump |
+| Meter | The library's one named source of runtime measurements, which the host subscribes to ([ydk:crosscut:core/observability], ADR-021) | metrics logger, stats collector |
+| Telemetry contract | The fixed list of measurement and trace names, units, and labels the library emits ([ydk:req:observability/runtime-telemetry]) | metrics schema, counters list |
 | Scaling efficiency | Measured throughput at n threads divided by n times the one-thread throughput (ADR-015) | contention factor, fudge factor |
 | Typed stub | A tiny attachment payload with the right leading bytes but no real content | fake file, dummy |

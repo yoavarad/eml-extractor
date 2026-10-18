@@ -20,12 +20,15 @@ The original specification is translated in [docs/requirements.md](../requiremen
 - A CI gate on the full golden score (1,200 bulk plus 12 seed cases), failing below the 1212 of 1212 baseline: [ydk:nfr:reliability/golden-pass-rate] (ADR-011). Accepted but not implemented yet; CI runs only the seed cases today.
 - A committed, licensed realistic sample set run in CI, and visible skips for absent samples (target, ADR-018): [ydk:req:quality/realistic-attachment-samples].
 - A load test across every degree of parallelism with measured memory, a sizing formula, and a committed baseline with a warn-only regression rule (target, ADR-015): [ydk:nfr:performance/throughput-dop-sweep], [ydk:nfr:performance/memory-footprint].
+- Dev-time profiling per extraction stage with a committed hotspot report, then optimization only from that data, each change proven by its own before-and-after measurement (target, ADR-020, ADR-022): [ydk:req:quality/profiling-report], [ydk:req:quality/optimization-evidence].
+- Runtime metrics and tracing through the facilities built into .NET, with no telemetry package dependency, no message content in any label, and a measured cost budget (target, ADR-021): [ydk:crosscut:core/observability], [ydk:req:observability/runtime-telemetry], [ydk:nfr:observability/metrics-overhead].
 - A license file and third-party notices with a dependency license audit (target, ADR-017; MIT proposed, owner confirmation pending): [ydk:req:quality/license-notices].
 - A written capability assessment of C# versus other languages for this job, as a Stage 02 research document: [ydk:req:research/capability-assessment].
 - Hand-off documents for the team: [docs/research/brief-gap-analysis.md](../research/brief-gap-analysis.md) and [docs/team-questions.md](../team-questions.md).
 
 ## OUT of scope
 
+- Shipping a telemetry exporter or pipeline, or choosing the host's monitoring backend. The host wires that up ([ydk:crosscut:core/observability]).
 - Any HTTP API, authentication, authorisation, user interface, persistence, or background service. The deliverable is an in-process class library only: [ydk:crosscut:core/library-surface].
 - Wiring into the downstream processing pipeline (the "factory" or template in the original spec). The team does this; this repo only proposes the shared contract.
 - Deciding the error model for the OLE extractor, or changing the OLE repo. Divergences are listed for the team.
