@@ -34,16 +34,7 @@ public sealed class EmlExtractor : IEmlExtractor
         try
         {
             StageFault?.Invoke("parse");
-            using var stream = Open(eml);
-            if (StartsWithMboxFrom(eml.Span))
-            {
-                var parser = new MimeParser(Options, stream, MimeFormat.Mbox);
-                message = parser.ParseMessage();
-            }
-            else
-            {
-                message = MimeMessage.Load(Options, stream);
-            }
+            message = Parse(eml);
         }
         catch (Exception ex) when (ex is FormatException or ParseException or IOException
                                        or InvalidOperationException or ArgumentException
@@ -67,6 +58,19 @@ public sealed class EmlExtractor : IEmlExtractor
     {
         ArgumentNullException.ThrowIfNull(message);
         return Extract(message, []);
+    }
+
+    /// <summary>Parse stage body (ADR-004), without its guard; the profiling harness (ADR-020) calls it directly.</summary>
+    internal static MimeMessage Parse(ReadOnlyMemory<byte> eml)
+    {
+        using var stream = Open(eml);
+        if (StartsWithMboxFrom(eml.Span))
+        {
+            var parser = new MimeParser(Options, stream, MimeFormat.Mbox);
+            return parser.ParseMessage();
+        }
+
+        return MimeMessage.Load(Options, stream);
     }
 
     internal static EmlExtractionResult Extract(MimeMessage message, List<string> warnings)

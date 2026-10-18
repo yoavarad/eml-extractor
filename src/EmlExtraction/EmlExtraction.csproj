@@ -22,6 +22,8 @@
     <InternalsVisibleTo Include="GoldenKit" />
     <!-- Tests drive Extract(MimeMessage) and the StageFault seam (ADR-004). -->
     <InternalsVisibleTo Include="EmlExtraction.Tests" />
+    <!-- Per-stage profiling benchmarks call the stage entry points (ADR-020). -->
+    <InternalsVisibleTo Include="EmlExtraction.Bench" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />

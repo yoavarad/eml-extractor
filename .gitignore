@@ -14,3 +14,4 @@ docs/golden-score.json
 .ydk/worktrees/
 .ydk/tdd-state.json
 sweep-results/
+artifacts/perf/
