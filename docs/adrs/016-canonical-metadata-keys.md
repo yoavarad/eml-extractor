@@ -1,7 +1,7 @@
 # ADR-016: One canonical metadata key per header
 
 ## Status
-Accepted (per project owner, 2026-10-17). Implementation pending, tracked as Stage 02 work. Amends ADR-005 and ADR-006. Amended by ADR-023 (2026-10-18): oversized input throws, so there is no `input_too_large` result.
+Accepted (per project owner, 2026-10-17). Implemented. Amends ADR-005 and ADR-006. Amended by ADR-023 (2026-10-18): oversized input throws, so there is no `input_too_large` result.
 
 ## Context
 The metadata map has three problems:

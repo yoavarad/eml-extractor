@@ -1,27 +1,27 @@
 # Scope
 
-The original specification is translated in [docs/requirements.md](../requirements.md). This page fixes the boundary so nobody builds past it. Items marked "target" are decided but not yet in code; they are Stage 02 work.
+The original specification is translated in [docs/requirements.md](../requirements.md). This page fixes the boundary so nobody builds past it. Items marked "target" are decided but not yet in code; they are Stage 02 work. The public API, metadata, telemetry, exceptions and multi-targeting items below are implemented.
 
 ## IN scope
 
-- Detecting whether a byte buffer is a mail message from its content alone, ignoring the file name, as a yes/no and (target) as a typed answer: [ydk:contract:api/eml-detector], [ydk:req:detection/detect-eml], [ydk:entity:extraction/EmlDetectionResult].
+- Detecting whether a byte buffer is a mail message from its content alone, ignoring the file name, as a yes/no and as a typed answer: [ydk:contract:api/eml-detector], [ydk:req:detection/detect-eml], [ydk:entity:extraction/EmlDetectionResult].
 - Rejecting common non-mail formats by their leading bytes. The original spec did not ask for this; it was implemented anyway: [ydk:req:detection/reject-non-email-magic].
 - Accepting files that start with an mbox separator line or a UTF-8 byte-order mark: [ydk:req:extraction/mbox-from-line].
-- The shared team contract for the public surface (target, ADR-012): a request record, [ydk:entity:extraction/EmlExtractionRequest], shared sub-file field names, and no parser-library types in the public API.
-- Supporting both .NET 8 and .NET 10 hosts with identical behaviour, with tests run on both in CI (target, ADR-019): [ydk:req:quality/net8-multi-targeting]. The developer tools stay on .NET 10 only.
+- The shared team contract for the public surface (ADR-012): a request record, [ydk:entity:extraction/EmlExtractionRequest], shared sub-file field names, and no parser-library types in the public API.
+- Supporting both .NET 8 and .NET 10 hosts with identical behaviour, with tests run on both in CI (ADR-019): [ydk:req:quality/net8-multi-targeting]. The developer tools stay on .NET 10 only.
 - Refusing inputs over a host-set size limit by throwing (ADR-023): [ydk:req:extraction/max-input-size].
 - Extracting every top-level header under one canonical key each, the classic envelope headers in parsed form (with the four address keys always present), and the brief's custom-header field: [ydk:req:metadata/all-headers], [ydk:req:metadata/canonical-keys], [ydk:req:metadata/classic-fields], [ydk:req:metadata/xfields]. The canonical keys and the literal custom-header rule are target (ADR-014, ADR-016).
 - Selecting one main body, with HTML preferred, and reporting its media type: [ydk:req:content/main-content-selection].
 - Returning text exactly as written, including emoji sequences and combining marks: [ydk:req:content/unicode-fidelity].
 - Reporting left-to-right or right-to-left direction for subject and body: [ydk:req:content/text-direction].
-- Returning every other MIME part as a flat attachment record with decoded bytes and its position in the message: [ydk:req:attachments/attachment-record], [ydk:req:attachments/container-path] (target, ADR-013), including pasted inline images [ydk:req:attachments/inline-cid-images] and the files inside Outlook TNEF wrappers [ydk:req:attachments/tnef-unwrap].
-- Never crashing the caller on malformed but readable MIME content, and reporting those problems as warnings: [ydk:req:extraction/no-throw-on-malformed]. The original spec did not ask for this; it was implemented anyway. Misuse, oversized input, and library bugs throw informative exceptions (ADR-023, target).
+- Returning every other MIME part as a flat attachment record with decoded bytes and its position in the message: [ydk:req:attachments/attachment-record], [ydk:req:attachments/container-path] (ADR-013), including pasted inline images [ydk:req:attachments/inline-cid-images] and the files inside Outlook TNEF wrappers [ydk:req:attachments/tnef-unwrap].
+- Never crashing the caller on malformed but readable MIME content, and reporting those problems as warnings: [ydk:req:extraction/no-throw-on-malformed]. The original spec did not ask for this; it was implemented anyway. Misuse, oversized input, and library bugs throw informative exceptions (ADR-023).
 - The authored golden set, the public-mail harvest tool, and the load test as developer tooling: [quality.md](quality.md).
 - A CI gate on the full golden score (1,200 bulk plus 12 seed cases), failing below the 1212 of 1212 baseline: [ydk:nfr:reliability/golden-pass-rate] (ADR-011). Accepted but not implemented yet; CI runs only the seed cases today.
 - A committed, licensed realistic sample set run in CI, and visible skips for absent samples (target, ADR-018): [ydk:req:quality/realistic-attachment-samples].
 - A load test across every degree of parallelism with measured memory, a sizing formula, and a committed baseline with a warn-only regression rule (target, ADR-015): [ydk:nfr:performance/throughput-dop-sweep], [ydk:nfr:performance/memory-footprint].
 - Dev-time profiling per extraction stage with a committed hotspot report, then optimization only from that data, each change proven by its own before-and-after measurement (target, ADR-020, ADR-022): [ydk:req:quality/profiling-report], [ydk:req:quality/optimization-evidence].
-- Runtime metrics and tracing through the facilities built into .NET, with no telemetry package dependency, no message content in any label, and a measured cost budget (target, ADR-021): [ydk:crosscut:core/observability], [ydk:req:observability/runtime-telemetry], [ydk:nfr:observability/metrics-overhead].
+- Runtime metrics and tracing through the facilities built into .NET, with no telemetry package dependency, no message content in any label, and a measured cost budget (ADR-021; metrics and activities implemented): [ydk:crosscut:core/observability], [ydk:req:observability/runtime-telemetry], [ydk:nfr:observability/metrics-overhead].
 - A license file and third-party notices with a dependency license audit (ADR-017; MIT, accepted by the owner 2026-10-18): [ydk:req:quality/license-notices].
 - A written capability assessment of C# versus other languages for this job, as a Stage 02 research document: [ydk:req:research/capability-assessment].
 - Hand-off documents for the team: [docs/research/brief-gap-analysis.md](../research/brief-gap-analysis.md) and [docs/team-questions.md](../team-questions.md).

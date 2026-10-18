@@ -1,7 +1,7 @@
 # ADR-012: Shared team extractor contract (request, detection result, subfile names)
 
 ## Status
-Accepted for EML; proposed to team (per project owner, 2026-10-17; bytes overload and batch API settled by the owner on 2026-10-18). Implementation pending, tracked as Stage 02 work. Amended by ADR-023 (2026-10-18): the error model is now exceptions for misuse, limits and bugs, warnings for content.
+Accepted for EML; proposed to team (per project owner, 2026-10-17; bytes overload and batch API settled by the owner on 2026-10-18). Implemented. Amended by ADR-023 (2026-10-18): the error model is now exceptions for misuse, limits and bugs, warnings for content.
 
 ## Context
 The team brief gives two functions per extractor: a detection function (bytes in, "is this the format?") and an extraction function (metadata, main content, sub-files with name, size, full path if it exists, and the binary). The extracted component goes into the team's extraction template, and the team wires it into the factory.
@@ -17,7 +17,7 @@ Two extractors were built against the same brief: this repo (EML) and `yoavarad/
 A template that hosts both extractors needs one shape. There are no consumers of the EML API yet, so a breaking change costs nothing now and more later.
 
 ## Decision
-Per project owner, 2026-10-17. EML adopts the following now (target; not implemented, Stage 02) and proposes it to the team as the shared contract.
+Per project owner, 2026-10-17. EML adopts the following now (implemented in Stage 02) and proposes it to the team as the shared contract.
 
 ### Requests
 - Extraction input is a request record, `EmlExtractionRequest`:
@@ -71,7 +71,7 @@ The record and list names are not part of this decision. EML keeps `ExtractedAtt
 - No batch API: callers, in practice the factory, run their own parallel loop over `Extract`.
 - Breaking change to every public type: `EmlDetector`, `EmlExtractor`, `ExtractedAttachment`, and new `EmlExtractionRequest` / `EmlDetectionResult`. Acceptable now because there are no consumers.
 - Golden `expected.json` files, GoldenKit, the bench, and the unit tests are updated in Stage 02 to the new names.
-- `README.md` describes today's API until the Stage 02 change lands.
+- `README.md` describes the Stage 02 API and carries a "Migrating from the pre-0.1 API" table.
 - Manifests: `ydk:contract:api/eml-detector`, `ydk:contract:api/eml-extractor`, `ydk:entity:extraction/EmlExtractionRequest`, `ydk:entity:extraction/EmlDetectionResult`, `ydk:entity:extraction/ExtractedAttachment`, `ydk:crosscut:core/library-surface`.
 
 ## Evidence

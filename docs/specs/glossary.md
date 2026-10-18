@@ -8,8 +8,8 @@ One name per concept. Use the canonical term in specs, code comments, and review
 | EML | The on-disk or in-memory byte form of a message | .eml file (when talking about content rather than a file name) |
 | Detector | The sniffing entry point, [ydk:contract:api/eml-detector] | validator, classifier |
 | Extractor | The parsing entry point, [ydk:contract:api/eml-extractor] | parser (that word means MimeKit), reader |
-| Extraction request | The input record holding the message bytes and an optional caller file name, [ydk:entity:extraction/EmlExtractionRequest] (target, ADR-012) | input, call args |
-| Detection result | The typed answer of the detector: yes/no plus media type, [ydk:entity:extraction/EmlDetectionResult] (target, ADR-012) | detection response, sniff result |
+| Extraction request | The input record holding the message bytes and an optional caller file name, [ydk:entity:extraction/EmlExtractionRequest] (ADR-012) | input, call args |
+| Detection result | The typed answer of the detector: yes/no plus media type, [ydk:entity:extraction/EmlDetectionResult] (ADR-012) | detection response, sniff result |
 | Extraction result | The record returned by the extractor, [ydk:entity:extraction/EmlExtractionResult] | output, response |
 | Metadata | The header map on the extraction result, [ydk:entity:extraction/Metadata] | headers dict, properties |
 | Canonical key | The one metadata key of a header: its name in lower case, nothing else changed ([ydk:req:metadata/canonical-keys]) | normalised name, snake key |

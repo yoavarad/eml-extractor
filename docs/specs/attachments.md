@@ -4,7 +4,7 @@
 
 Every part of the message that is not the chosen body comes back as one [ydk:entity:extraction/ExtractedAttachment]. The one exception is the other renderings of the chosen body (see Naming rules below), which are dropped rather than returned. The original specification asks for four things per sub-file: its name, its size, its full path if it exists, and its bytes. Each record holds those four, plus the part's content identifier and disposition so callers can match inline images to the HTML ([ydk:req:attachments/attachment-record]).
 
-The four brief fields carry the names of the shared team contract proposed in ADR-012, so the OLE extractor and this one describe a sub-file the same way. The renaming is target behaviour; the code still uses its older names until Stage 02.
+The four brief fields carry the names of the shared team contract proposed in ADR-012, so the OLE extractor and this one describe a sub-file the same way. The renaming is implemented; the README migration table maps the older names.
 
 The list is flat and follows document order. No record nests inside another.
 

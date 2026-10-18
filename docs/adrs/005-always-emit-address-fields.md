@@ -1,7 +1,7 @@
 # ADR-005: Always emit from, to, cc, and bcc metadata keys
 
 ## Status
-Accepted (recorded retroactively, Stage 01 Rewrite). Amended by ADR-016: the four keys are also present on `parse_failed` and `input_too_large` results (target, Stage 02). Amended by ADR-023 (2026-10-18): oversized input throws, so there is no `input_too_large` result.
+Accepted (recorded retroactively, Stage 01 Rewrite). Amended by ADR-016: the four keys are also present on `parse_failed` and `input_too_large` results (implemented). Amended by ADR-023 (2026-10-18): oversized input throws, so there is no `input_too_large` result.
 
 ## Context
 Commit `c3b39bb` ("Report RTL/LTR direction and always emit from, to, cc, and bcc.") states: "Callers can rely on those four address keys (empty when missing)". The code comment in `HeaderMapper.EnsureAddress` says: "Always emit the key so callers can read from/to/cc/bcc without a lookup miss."
