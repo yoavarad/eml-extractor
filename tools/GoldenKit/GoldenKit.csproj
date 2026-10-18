@@ -2,9 +2,10 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>GoldenKit</RootNamespace>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\EmlExtraction\EmlExtraction.csproj" />
-    <PackageReference Include="MimeKit" Version="4.18.0" />
+    <PackageReference Include="MimeKit" />
   </ItemGroup>
 </Project>
