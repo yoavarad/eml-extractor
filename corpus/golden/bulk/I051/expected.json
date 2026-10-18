@@ -39,7 +39,8 @@
         "name": "pic.ico",
         "size": 12,
         "sha256": "6ce87c427680a10f022a9b05ed3884004e4c8206c65ca3a39697f02f54716ef8",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "pic.ico"
       }
     ]
   }

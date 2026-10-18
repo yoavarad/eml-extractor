@@ -37,6 +37,7 @@
     "attachments": [
       {
         "name": "5.eml",
+        "full_path": "5.eml",
         "original_path": "fwd/5.eml",
         "reextract": {
           "metadata": {

@@ -189,13 +189,29 @@ internal static class MimeBuild
     {
         expect.Metadata.TryAdd("from", new GoldenField { Contains = ["alice@example.com"] });
         expect.Metadata.TryAdd("to", new GoldenField { Contains = ["bob@example.com"] });
-        return new CaseDef { Id = id, Tags = tags, Eml = ToBytes(message), IsEml = true, Expect = expect };
+        return new CaseDef { Id = id, Tags = tags, Eml = ToBytes(message), IsEml = true, Expect = WithFullPaths(expect) };
     }
 
     public static CaseDef RawEml(string id, string[] tags, string rfc822, GoldenExpect expect)
     {
         var bytes = Encoding.UTF8.GetBytes(rfc822.Replace("\n", "\r\n"));
-        return new CaseDef { Id = id, Tags = tags, Eml = bytes, IsEml = true, Expect = expect };
+        return new CaseDef { Id = id, Tags = tags, Eml = bytes, IsEml = true, Expect = WithFullPaths(expect) };
+    }
+
+    /// <summary>ADR-013: catalog parts are all top-level (no TNEF wrapper), so FullPath equals the name when it is unique in a fully listed result.</summary>
+    private static GoldenExpect WithFullPaths(GoldenExpect expect)
+    {
+        foreach (var a in expect.Attachments)
+        {
+            if (a.Name is not null
+                && expect.AttachmentCount == expect.Attachments.Count
+                && expect.Attachments.Count(b => string.Equals(b.Name, a.Name, StringComparison.OrdinalIgnoreCase)) == 1)
+                a.FullPath ??= a.Name;
+            if (a.Reextract is not null)
+                WithFullPaths(a.Reextract);
+        }
+
+        return expect;
     }
 
     public static CaseDef RawBytes(string id, string[] tags, byte[] data, bool isEml, GoldenExpect? expect = null)

@@ -39,7 +39,8 @@
         "name": "show.odp",
         "size": 12,
         "sha256": "9bf1cb072616e884bce58a29fe19c4e0fb4b3a393a7cd44d08fef16d1c72dc15",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "show.odp"
       }
     ]
   }

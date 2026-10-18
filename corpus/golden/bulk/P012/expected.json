@@ -38,7 +38,8 @@
         "name": "file-12.bin",
         "size": 8,
         "sha256": "52d058774a88aa407754a8c6491f4b5749c41d74b6696983834c795a3b80ae1a",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "file-12.bin"
       }
     ]
   }

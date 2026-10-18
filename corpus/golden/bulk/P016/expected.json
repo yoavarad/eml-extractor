@@ -38,7 +38,8 @@
         "name": "file-16.bin",
         "size": 8,
         "sha256": "5ad83c5e6785065e50912e11f18b6439a1a139e94fc0f3301b070586425463bd",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "file-16.bin"
       }
     ]
   }

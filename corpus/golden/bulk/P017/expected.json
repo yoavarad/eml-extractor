@@ -38,7 +38,8 @@
         "name": "file-17.bin",
         "size": 8,
         "sha256": "f070a1a9c39d8158dad9bec6eaf2137491e8770c0d6e7da9d79612bea8f13e34",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "file-17.bin"
       }
     ]
   }

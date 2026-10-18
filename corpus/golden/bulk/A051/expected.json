@@ -39,7 +39,8 @@
         "name": "legacy.ppt",
         "size": 8,
         "sha256": "bb6b963702b093d125191217530b55871e6e480a3d752976b1cf8dad0ee5c421",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "legacy.ppt"
       }
     ]
   }

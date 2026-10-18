@@ -39,7 +39,8 @@
         "name": "a.tar",
         "size": 8,
         "sha256": "8d472625f477a91fb074e84862c5a68b2d87de74f43b9c2bca30a6ef41f0e66d",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "a.tar"
       }
     ]
   }

@@ -39,7 +39,8 @@
         "name": "a.xml",
         "size": 14,
         "sha256": "f7637a57f60a983af638489e22ea2ddf14c52e7cf0d793eeab48f0ca6ba39f26",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "a.xml"
       }
     ]
   }

@@ -39,7 +39,8 @@
         "name": "pic.jpg",
         "size": 12,
         "sha256": "f3a1228bbcbc8dab2e4b077075e6c56807bf3e772990a2d5e1d2cc781309ecae",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "pic.jpg"
       }
     ]
   }

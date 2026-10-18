@@ -39,7 +39,8 @@
         "name": "a.rtf",
         "size": 14,
         "sha256": "db625a1a3c9e1580f43ae1a8999dd9d1fbe8de178b0b37d3dfd0687d69c61281",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "a.rtf"
       }
     ]
   }

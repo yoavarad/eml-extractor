@@ -39,6 +39,7 @@
         "size": 8,
         "sha256": "f722db5b180d4b55a14be243ef3ca2ad83d22fa3154af872a0f472047d09df7d",
         "disposition": "attachment",
+        "full_path": "file.txt",
         "original_path": "inbox/26/file.txt"
       }
     ]

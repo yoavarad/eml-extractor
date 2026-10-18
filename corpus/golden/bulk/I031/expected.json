@@ -39,7 +39,8 @@
         "name": "pic.bmp",
         "size": 10,
         "sha256": "b0b9746c6e53ae7559b180de7e5bb35bd665d0661bab54aef8edc59c77da3a21",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "pic.bmp"
       }
     ]
   }

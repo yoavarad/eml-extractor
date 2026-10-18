@@ -39,7 +39,8 @@
         "name": "a.mp3",
         "size": 11,
         "sha256": "f1d236bd927b5735c20a49cb683248c55b72eb086250d72db69d9e051c89a8cb",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "a.mp3"
       }
     ]
   }

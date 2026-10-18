@@ -41,12 +41,14 @@
         "name": "a.png",
         "sha256": "c414cd0e204de974f73753c7e28d7638e7b3691bb8b1a2bab6b25bb7fed7ce77",
         "disposition": "inline",
+        "full_path": "a.png",
         "content_location": "images/a20.png"
       },
       {
         "name": "b.jpg",
         "sha256": "4b2db5350ae6e77550e4754fdf8b038027b30e8c689ae3e844f6a3e647cb27aa",
-        "disposition": "inline"
+        "disposition": "inline",
+        "full_path": "b.jpg"
       }
     ]
   }

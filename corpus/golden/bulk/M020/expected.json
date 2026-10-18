@@ -38,7 +38,8 @@
         "name": "note-20.txt",
         "size": 8,
         "sha256": "d5e3e524f967f01c7540bc06cbd35fc8550828c9f6132aa725b1029338901194",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "note-20.txt"
       }
     ]
   }

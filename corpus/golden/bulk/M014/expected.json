@@ -38,7 +38,8 @@
         "name": "note-14.txt",
         "size": 8,
         "sha256": "99b236278d04a882e7c3e156d5ad390ec2eef48e4d1f229505ad6f0d29543d6e",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "note-14.txt"
       }
     ]
   }
