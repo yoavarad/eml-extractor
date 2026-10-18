@@ -20,6 +20,20 @@ public sealed class EmlExtractor : IEmlExtractor
         set => Fault.Value = value;
     }
 
+    /// <summary>Provisional default input-size limit (150 MiB).</summary>
+    public const long DefaultMaxInputBytes = 157_286_400;
+
+    private readonly long _maxInputBytes;
+
+    /// <summary>Creates an extractor.</summary>
+    /// <param name="maxInputBytes">Largest input, in bytes, that is parsed; larger inputs yield an <c>input_too_large</c> warning.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxInputBytes"/> is not positive.</exception>
+    public EmlExtractor(long maxInputBytes = DefaultMaxInputBytes)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxInputBytes);
+        _maxInputBytes = maxInputBytes;
+    }
+
     /// <inheritdoc/>
     public EmlExtractionResult Extract(ReadOnlyMemory<byte> eml)
         => Extract(new EmlExtractionRequest { FileBytes = eml });
@@ -30,6 +44,12 @@ public sealed class EmlExtractor : IEmlExtractor
         ArgumentNullException.ThrowIfNull(request);
         var eml = request.FileBytes;
         var warnings = new List<string>();
+        if (eml.Length > _maxInputBytes)
+        {
+            warnings.Add($"input_too_large: {eml.Length} > {_maxInputBytes}");
+            return Empty(warnings);
+        }
+
         MimeMessage message;
         try
         {
