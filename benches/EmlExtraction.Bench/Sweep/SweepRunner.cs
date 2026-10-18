@@ -56,7 +56,8 @@ internal static class SweepRunner
 
                 bytes[id] = processed;
                 recorded[id] = Math.Min(seen, lat.Length);
-            }) { IsBackground = true, Name = $"sweep-{id}" };
+            })
+            { IsBackground = true, Name = $"sweep-{id}" };
         }
 
         foreach (var t in threads)
