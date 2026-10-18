@@ -17,7 +17,13 @@ target: >-
   3.9, docs/perf-results.md). Peak working-set growth for one extraction of a maxInputBytes input <= 6 x
   maxInputBytes: M measured 1.3-4.2 in the large-file pass (#49, run at a 150 MiB input, about 730 MB peak working set; the default is now the OWNER-SET 500 MiB, M not re-measured there, ceiling 3 GB per extraction),
   about 40% headroom over the max 4.2. M < ceiling, so streaming stays DEFERRED (docs/specs/scope.md). Both limits
-  need re-checking on the public corpus and on target hardware.
+  need re-checking on the public corpus and on target hardware. Optimization targets (ADR-022, PROVISIONAL, set by
+  #74 from docs/perf/profile-2026-10-18.md, see docs/perf/triage-2026-10-18.md; closing re-profile #75 marks them met
+  or not met): M of the 100% pass <= 2.0 at the 500 MiB maxInputBytes default (reported max also recorded) (profile rows 4
+  and 8: 3.33 at the 100% pass, 4.71 max, at 150 MiB; floor about 1.74 without streaming); attachment copy factor on
+  synthetic/attach-1mb <= 1.5 (row 4: 4.07); bytes allocated per message on the synthetic sweep -30% against the
+  pre-optimization measurement (rows 3 and 7; baseline A 23.3-24.5, about 39 KB per message), with A <= 32 kept as
+  the regression guard and not lowered; detect allocation on synthetic/small-20kb <= 4,000 B/op (row 5: 66,795).
 measurement: >-
   A = GC allocated-bytes delta over the sweep window / input bytes processed. Large-file pass (ADR-015): generated
   messages at 25%, 50%, and 100% of maxInputBytes, each with one base64 attachment, extracted on one thread after a

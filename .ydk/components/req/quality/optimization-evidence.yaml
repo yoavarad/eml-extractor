@@ -2,8 +2,8 @@ $schema: ydk:schema:req
 id: ydk:req:quality/optimization-evidence
 description: >-
   Every performance optimization is data-driven and individually proven (ADR-022, per project owner 2026-10-18).
-  Target; not implemented (Stage 02). No numeric target exists yet; the triage task sets provisional targets from
-  the first profile report relative to the ADR-015 baseline.
+  Target; not implemented (Stage 02). Provisional targets were set by the triage task (#74) from the first profile
+  report and are recorded in the NFR manifests and ADR-022.
 type: policy
 priority: medium
 rule: >-

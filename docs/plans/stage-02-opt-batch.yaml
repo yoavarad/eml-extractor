@@ -1,0 +1,255 @@
+# Stage 02 optimization batch: the ranked tasks from the #74 triage (docs/perf/triage-2026-10-18.md, ADR-022).
+# Source: docs/perf/profile-2026-10-18.md (#70) hotspot rows; owner triage rules on #74 (2026-10-18).
+# Validate:  PYTHONUTF8=1 ydk task create-batch --from docs/plans/stage-02-opt-batch.yaml --dry-run
+# NOT CREATED YET: the owner approves the #74 PR first, and the coordinator runs create-batch after merge.
+#
+# Existing issues referenced (create-batch passes known issue numbers through unchanged):
+#   #67 S-optimization (story every task below belongs to)
+#   #75 T-opt-reprofile (closing re-profile; ADR-022 "Closing")
+#   #106 (ADR-023 stage-guard refactor) is merged (PR #113), so the owner's "none may start before #106" rule is met
+#   and no task depends on it.
+#
+# Link to #75 ("related"): it is NOT in this file. `ydk task start` treats every dependency, "related" included,
+# as blocking (see docs/plans/stage-02-throw-batch.yaml), so a "75:related" entry here would block each optimization
+# until the closing task finished, and #75 can never finish first. After create-batch the coordinator adds every new
+# id to #75's **Dependencies** line as "<id> (related)". #75 then starts only once all five have merged or closed,
+# which is what its description asks for.
+#
+# Order: the five tasks form one "blocks" chain in rank order. Reasons: (1) each task's before/after runs need a
+# quiet machine, and parallel task agents on the one dev machine would run benchmarks at the same time; (2) each
+# "before" is then the merged state of the previous optimization, so every delta belongs to one change (ADR-022
+# "one optimization, one task"). The owner may loosen the chain if runs are serialised another way.
+#
+# Conventions for every task below (those at the top of stage-02-batch.yaml and stage-02-perf-batch.yaml also apply):
+# - Before/after protocol (ADR-022, ydk:req:quality/optimization-evidence). Same machine, net8.0 and net10.0, the
+#   same GC mode, nothing else heavy running. "Before" is measured fresh on the task's base commit. The numbers in
+#   the profile report are only the hypothesis source, because they predate #106 and #72 and come from one cold run.
+#     1. `dotnet run -c Release --project benches/EmlExtraction.Bench -f net10.0 -- profile --job dry --out <dir>`
+#        (per-stage allocated bytes/op and copy factor; allocation is exact even on the dry job).
+#     2. `-- sweep --set synthetic --corpus C:\Users\yoava\Projects\eml-extraction\corpus\internal --out <dir>` at the
+#        default full windows (2 s warm-up, 10 s window, 3 passes), both GC modes. The corpus is absent on this
+#        machine today, so the run prints SKIPPED and uses the synthetic set only. Run before and after, once with
+#        -f net8.0 and once with -f net10.0 (the comparable baseline is net10.0).
+#     3. `-- compare --baseline <before sweep.json> --current <after sweep.json>`: zero new warnings, and the named
+#        metric moved in the right direction. compare checks Extract points only; detect figures are read from
+#        the sweep JSON detect points. The PR also runs compare against docs/perf-baseline.json and reports
+#        the result, which is informational because that baseline is a different commit.
+#     4. Task-specific runs (large pass, profile-trace) as listed in the task.
+#   Run the after measurement twice. The named metric must beat the before by more than the spread of the two
+#   after runs, or the change is reverted, not merged.
+# - Merge rules (ADR-022): GoldenKit 1212/1212; dotnet test green on net8.0 and net10.0; no public API change
+#   (ExtractedAttachment.BinaryData stays byte[], no new public members) without its own ADR; no ADR-015 metric
+#   (T(1), T(cores), A, P(cores)) past the 20% warn threshold in compare; telemetry budget intact
+#   (ydk:nfr:observability/metrics-overhead: 0 B/call without a listener, the TelemetryNoListenerAllocationTests pass;
+#   MeterListener <= 5%, ActivityListener <= 10% on tiny, owner-confirmed PR #124); dotnet build -warnaserror and
+#   dotnet format --verify-no-changes clean.
+# - Each PR adds one row to the "Optimization log" in docs/perf-results.md (task, metric, before, after, threshold,
+#   kept or reverted, commit). T-opt-attach (first in the chain) creates that section. The closing task #75 builds
+#   its delta table from those rows.
+# - M target (ADR-022 Targets): M of the 100% pass at the 524288000 (500 MiB) default. The reported max of the
+#   25/50/100% passes is recorded too but is not the target, because the small passes carry fixed runtime growth.
+# - Throughput (owner priority 3): no task has a T pass threshold. T(1) and T(cores) are reported from the
+#   full-window sweep and must not trip the compare warning.
+
+tasks:
+  - id: T-opt-attach
+    title: "Optimize attachments: decode each part into one exact-size array (no MemoryStream growth plus ToArray)"
+    story: "67"
+    component_refs:
+      - ydk:req:quality/optimization-evidence
+      - ydk:nfr:performance/memory-footprint
+      - ydk:req:attachments/attachment-record
+      - ydk:test:attachments/attachment.unit
+      - ydk:contract:api/eml-extractor
+      - ydk:nfr:reliability/golden-pass-rate
+    spec_refs:
+      - quality.md
+      - docs/adrs/022-data-driven-optimization.md
+      - docs/adrs/015-load-test-method.md
+      - docs/perf/triage-2026-10-18.md
+    description: >-
+      Size S (complexity ~3). Owner priority 1 (large-input copy factor M). Hotspot rows 4 and 8 of
+      docs/perf/profile-2026-10-18.md: the attachments stage allocates 4,067,400 B/op for the 1,000,000 decoded bytes of
+      synthetic/attach-1mb (copy factor 4.07, both TFMs, exact BDN figure), which is 69.4% of the 5-message allocation.
+      On the 150 MiB large pass the gcdump at peak holds two input-sized byte[] (314.6 MB) and M = 3.33 at 100% (4.71
+      max of the three passes). Cause (hypothesis, high confidence): PartCollector.AddMimePart and AddRfc822 write into
+      an unsized `new MemoryStream()`. The stream grows by doubling (about 2x the decoded size in discarded buffers),
+      then `stream.ToArray()` copies the result once more (1x). Change: produce the final byte[] with one allocation
+      of the exact decoded size. Two ways: count the decoded length first (base64 or quoted-printable over the
+      encoded content, which is seekable in memory) and decode into `new byte[len]` through a non-growing stream; or
+      decode into a buffer sized from the encoded length and return it as-is when the length matches. Either way, keep
+      the warning on decode failure, identical bytes, and BinaryData as byte[] (no public API change). First step: take
+      a gcdump with roots at the large-pass peak (`-- large`, peak hook) and record which allocation the second
+      157,286,424-byte array is. It is exactly the input size, not the about 3/4 a base64 decode gives, so it may be the
+      MimeKit content copy (T-opt-parse) or a duplicate input copy rather than the decoded attachment. Write the answer
+      in the PR; it decides the expected M share between this task and T-opt-parse. Expected gain: attachments B/op on
+      attach-1mb from 4,067,400 to about 1,000,000-1,050,000 (copy factor about 1.0); large-pass M down by about 1 at
+      the 100% pass; sweep A on the synthetic set down about 5% (attach-1mb is one message of 1,217).
+    acceptance:
+      - "PR records which allocation the second input-sized byte[] at the large-pass peak is (gcdump with roots)"
+      - "BDN profile: AttachmentsStage.Collect(synthetic/attach-1mb) copy factor <= 1.5 on net8.0 and net10.0 (before 4.07), measured before and after on the same machine"
+      - "Large pass at --max-input-bytes 157286400 and at the 524288000 default: M of the 100% pass at 524288000 at least 0.5 lower than before and beyond the after-run spread; per-pass M at both sizes recorded"
+      - "compare (before vs after full-window synthetic sweep, both GC modes) shows no new warning; A does not rise"
+      - "Attachment bytes identical: GoldenKit 1212/1212, attachment.unit green on both TFMs, part_decode_failed and rfc822_extract_failed warnings unchanged"
+      - "docs/perf-results.md gains an Optimization log section (task, metric, before, after, threshold, kept or reverted, commit) with this task's row"
+    test_strategy: >-
+      TDD: add attachment.unit cases first (base64, quoted-printable, 7bit/8bit/binary, empty part, truncated base64
+      that warns, message/rfc822) that assert BinaryData bytes and length against the current output; then change the
+      code; then the before/after protocol in the batch header plus the large pass at both sizes.
+    depends_on: []
+
+  - id: T-opt-parse
+    title: "Optimize parse: persistent MimeKit load over the input buffer (no content copy), kept open until the result is built"
+    story: "67"
+    component_refs:
+      - ydk:req:quality/optimization-evidence
+      - ydk:nfr:performance/memory-footprint
+      - ydk:contract:api/eml-extractor
+      - ydk:nfr:reliability/golden-pass-rate
+    spec_refs:
+      - quality.md
+      - docs/adrs/022-data-driven-optimization.md
+      - docs/adrs/002-mimekit-parser.md
+      - docs/perf/triage-2026-10-18.md
+    description: >-
+      Size M (complexity ~5). Owner priority 1 (M) and 2 (per-message allocation). Hotspot rows 3 and 8: the parse
+      stage allocates 1,424,957 B/op on attach-1mb (1,351,406 input bytes, so about one full copy of the input) and
+      15,226 of the 24,412 B/op on tiny (62%). Frames: `MemoryStream.set_Capacity`, `BufferPool.Rent` under
+      `MimeMessage.Load`. Cause (hypothesis, medium confidence): EmlExtractor.Parse loads with MimeKit's default
+      persistent = false, so the parser copies every part's content out of the input stream into its own buffers.
+      The input is already a byte[] held for the whole call, so the copy is not needed. Change: `MimeMessage.Load(Options, stream,
+      persistent: true)` and the persistent MimeParser overload for the mbox path. Then MimePart content is a bounded
+      view over the input MemoryStream. Move the stream's lifetime from Parse to the end of Extract, because body and
+      attachment decoding read from it, and keep the non-array-backed input path (`eml.ToArray()`). Do not dispose
+      the MimeMessage here: that is a separate hypothesis (row 9, not taken). The profiling harness calls Parse
+      directly; adjust its stage benchmarks so the post-parse stages still get a live stream. Expected gain: parse B/op
+      on attach-1mb from 1,424,957 to under 150,000. With T-opt-attach merged, large-pass M of the 100% pass at about
+      2.0 or below (floor: resident input 1.0 plus the decoded attachment, about 0.74, held in the result). On tiny,
+      parse B/op down 10-40%; the MimeKit fixed per-message objects (parser buffer, header lists) stay, which makes the
+      size of this gain uncertain.
+    acceptance:
+      - "BDN profile: ParseStage.Parse(synthetic/attach-1mb) <= 150,000 B/op on net8.0 and net10.0 (before 1,424,957); all 5 samples' parse B/op recorded before/after"
+      - "Large pass at --max-input-bytes 524288000 (the default) and 157286400: M of the 100% pass at the default <= 2.0 (PROVISIONAL target, ydk:nfr:performance/memory-footprint); per-pass M and the reported max recorded. If parse B/op passes but M misses, the PR records the gap and the owner decides on merge"
+      - "Full-window synthetic sweep (Workstation, DOP 1): bytes allocated per message at least 15% lower than before (half of the owner -30% target; the cumulative -30% is checked at #75) and beyond the after-run spread; compare shows no new warning"
+      - "Results identical: GoldenKit 1212/1212; dotnet test green on both TFMs; no use of the input after Extract returns (the result holds no reference to the MimeMessage or stream)"
+      - "Optimization log row added in docs/perf-results.md"
+    test_strategy: >-
+      TDD: add a unit test that extracts a multi-part message (text, HTML, base64 attachment, rfc822, TNEF fixture),
+      then overwrites the caller's input array and asserts the result is unchanged (no lazy view escapes Extract); a
+      test that the mbox path still parses. Then the protocol in the batch header plus the large pass at both sizes.
+    depends_on:
+      - "T-opt-attach:blocks"
+
+  - id: T-opt-body-dir
+    title: "Optimize body: detect HTML text direction by scanning past tags instead of building a tag-stripped string"
+    story: "67"
+    component_refs:
+      - ydk:req:quality/optimization-evidence
+      - ydk:nfr:performance/memory-footprint
+      - ydk:req:content/text-direction
+      - ydk:nfr:reliability/golden-pass-rate
+    spec_refs:
+      - quality.md
+      - docs/adrs/022-data-driven-optimization.md
+      - docs/adrs/006-report-text-direction.md
+      - docs/perf/triage-2026-10-18.md
+    description: >-
+      Size XS-S (complexity ~2). Owner priority 2 (per-message allocation). Hotspot row 7: the body stage allocates
+      211,660 B/op on synthetic/small-20kb (80% of that message's 264,519 B). Cause (hypothesis, high confidence for
+      the part addressed): when the HTML has no dir attribute or CSS direction, TextDirection.Detect calls
+      StripTags(html). That allocates a StringBuilder of html.Length chars and then a string of the same length, about 4
+      bytes per HTML char that are thrown away at once, only so FromFirstStrong can find the first strong character.
+      Change: one span scan over the HTML that skips `<...>` runs with the same rules as StripTags (a '>' ends a tag
+      only inside one; text outside tags is scanned rune by rune with the existing first-strong logic) and allocates
+      nothing. Same result for every input. The MimeKit text decode (`TextPart.Text`, "other post-parse" CPU) is out of
+      scope. Expected gain: body B/op on small-20kb down about 30-40% (about 60-80 KB). Small on the tiny-message
+      mix; it adds to the per-message target together with T-opt-parse.
+    acceptance:
+      - "BDN profile: BodyStage.Body(synthetic/small-20kb) B/op lower by >= 25% on net8.0 and net10.0 (before 211,660)"
+      - "TextDirection gives the same result as before for every golden input and for new edge cases (unclosed '<', '>' outside a tag, tags only, RTL inside attribute values, surrogate pairs)"
+      - "Full-window synthetic sweep: bytes allocated per message not higher than before; compare shows no new warning; GoldenKit 1212/1212; tests green on both TFMs"
+      - "Optimization log row added in docs/perf-results.md"
+    test_strategy: >-
+      TDD: add text-direction unit cases (edge cases above) asserting the current results, plus an equivalence test
+      that runs the old StripTags + FromFirstStrong path (kept in the test project) against the new scan over every
+      golden HTML body; then the protocol in the batch header.
+    depends_on:
+      - "T-opt-parse:blocks"
+
+  - id: T-opt-detect
+    title: "Optimize detect: span-based header-block check without decoding the sniff window to a string and splitting it"
+    story: "67"
+    component_refs:
+      - ydk:req:quality/optimization-evidence
+      - ydk:req:detection/detect-eml
+      - ydk:test:detection/detector.unit
+      - ydk:contract:api/eml-detector
+      - ydk:nfr:reliability/golden-pass-rate
+    spec_refs:
+      - quality.md
+      - detection.md
+      - docs/adrs/022-data-driven-optimization.md
+      - docs/perf/triage-2026-10-18.md
+    description: >-
+      Size S (complexity ~3). Owner priority 2 (per-message allocation), on the detect API that hosts call once per
+      file (Detect / IsEml). It does not move extract A. Hotspot row 5: DetectStage allocates 66,795 B/op on
+      small-20kb against 1,986 on tiny, so the allocation grows with input size up to the sniff limit. In the DOP 22
+      trace `EmlDetector.Sniff` is 34.5% of all samples, with `String.CreateStringFromEncoding` 10.9% exclusive and
+      `String.Split` 14.1%. Cause (high confidence, visible in code): LooksLikeHeaderBlock runs
+      `Encoding.ASCII.GetString(window).Split(...)` over the whole sniff window, but it only reads lines up to the
+      first blank line or the first non-header line. Change: walk the byte span line by line (CRLF or LF) with the
+      same rules (continuation lines, header-name check, classic-header count, blank line) and stop at the same point;
+      no string per line. Same verdict for every input. Expected gain: detect B/op on small-20kb from 66,795 to under
+      2,000; sweep detect A from 2.1 to under 0.5 B/B.
+    acceptance:
+      - "BDN profile: DetectStage.Detect(synthetic/small-20kb) <= 4,000 B/op on net8.0 and net10.0 (before 66,795); tiny not higher than before"
+      - "Same verdict as before on every golden input, every corpus/realistic file and the detector.unit cases (equivalence test against the old implementation kept in the test project)"
+      - "Full-window synthetic sweep: detect A (sweep JSON detect points; compare does not check detect) lower than before beyond the after-run spread; compare shows no new Extract warning"
+      - "Optimization log row added in docs/perf-results.md"
+    test_strategy: >-
+      TDD: add detector.unit edge cases first (LF-only, CRLF, mixed, continuation as first line, colon at index 0,
+      window cut mid-line, BOM, mbox From line, non-ASCII bytes in header names) asserting current verdicts, plus an
+      old-vs-new equivalence test over the golden and realistic inputs; then the protocol in the batch header.
+    depends_on:
+      - "T-opt-body-dir:blocks"
+
+  - id: T-opt-encoding
+    title: "Optimize metadata and parse: cache Encoding lookups to remove CodePagesEncodingProvider lock contention at high DOP"
+    story: "67"
+    component_refs:
+      - ydk:req:quality/optimization-evidence
+      - ydk:nfr:performance/throughput-dop-sweep
+      - ydk:req:metadata/all-headers
+      - ydk:contract:api/eml-extractor
+      - ydk:nfr:reliability/golden-pass-rate
+    spec_refs:
+      - quality.md
+      - docs/adrs/022-data-driven-optimization.md
+      - docs/adrs/015-load-test-method.md
+      - docs/perf/triage-2026-10-18.md
+    description: >-
+      Size S (complexity ~3). Owner priority 3 (throughput), so the pass threshold is contention and CPU share, not T.
+      Hotspot rows 2 and 1: at Workstation DOP 22 (net10.0) `ReaderWriterLockSlim.TryEnterUpgradeableReadLockCore`
+      is 15.19 of 34.94 extraction samples (about 43%). `CodePagesEncodingProvider.GetEncoding` is 16.11% of samples
+      (about 46% of extraction), reached through `Encoding.GetEncoding` and MimeKit `CharsetUtils.GetEncodingOrDefault`
+      (RFC 2047 header decode and address parsing in HeaderMapper.Map, text decode). The counters show 97-99 lock
+      contentions at DOP 22 and 0 at DOP 1. Metadata's share rises from 19% at DOP 1 to 46% at DOP 22. Cause
+      (hypothesis, medium-high confidence on the lock, low on the size of any throughput gain because GC pause is
+      also 42% of run time at that DOP): EmlExtractor's static constructor registers CodePagesEncodingProvider.Instance.
+      Once a provider is registered, every Encoding.GetEncoding call asks it first, even for utf-8, and its cache uses
+      an upgradeable read lock, which only one thread can hold at a time. Change: register an internal EncodingProvider
+      that wraps CodePagesEncodingProvider.Instance and caches its GetEncoding(int) and GetEncoding(string) results
+      (including null) in ConcurrentDictionary instances. It returns the same Encoding objects, so decoding does not
+      change. No public API change; the process-wide registration side effect already exists. Expected gain: the lock
+      frames drop out of the ws-dop22 trace and metadata CPU share at DOP 22 comes back toward its DOP 1 share. Any T(22)
+      gain is reported, not targeted.
+    acceptance:
+      - "profile-trace (both TFMs, --window-ms 10000 --warmup-ms 2000 --min-passes 3, ws-dop22 and server-dop22): lock contentions in the counters CSV <= 10 per run (before 93-99) and ReaderWriterLockSlim frames < 2% of extraction CPU (before about 43%); before and after recorded"
+      - "Full-window sweep (both GC modes): T(1), T(22), A, P(22) reported before/after; compare shows no new warning (no T pass threshold, owner rule)"
+      - "Same Encoding instance returned as CodePagesEncodingProvider for every code page and name in the golden set; GoldenKit 1212/1212; tests green on both TFMs"
+      - "Optimization log row added in docs/perf-results.md"
+    test_strategy: >-
+      TDD: unit tests for the caching provider (same instance per code page and name, null cached for unknown names,
+      thread-safe under Parallel.For); then the protocol in the batch header plus the profile-trace full-window run.
+    depends_on:
+      - "T-opt-detect:blocks"

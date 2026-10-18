@@ -14,6 +14,11 @@ target: >-
   Every DOP from 1 to ProcessorCount measured in both GC modes and committed in docs/perf-baseline.json with the
   hardware block; regression warning when T(1) or T(ProcessorCount) drops by more than the threshold versus the
   comparable baseline (threshold 20%, kept, PROVISIONAL: A and P spread is 2-11% so 20% works for them, but T(1) and T(ProcessorCount) varied 24-80% between short sweeps (T(1) workstation 5549-9110 f/s), so T warnings are noise until full 10 s windows on a quiet machine; warn-only, never fails a build).
+  Optimization targets (ADR-022, PROVISIONAL, set by #74, see docs/perf/triage-2026-10-18.md): no T(1) or
+  T(ProcessorCount) target until full-window runs, ideally on the public corpus (owner rule 2026-10-18); optimization
+  PRs report T and must not trip the compare warning. Lock contentions at DOP 22 in a full-window profile-trace run
+  <= 10 per run (profile row 2: 93-99, CodePagesEncodingProvider reader-writer lock); the closing re-profile #75
+  marks it met or not met.
 measurement: >-
   Inputs loaded into memory first. Per DOP (defaults kept, PROVISIONAL; baseline used 300 ms / 1.5 s / 2 passes): 2 s warm-up, then a window of at least 10 s and at least 3
   full passes; n worker threads take the next message from a shared list. The harness sets ServerGarbageCollection
