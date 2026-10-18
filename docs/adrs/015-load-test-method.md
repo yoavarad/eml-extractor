@@ -1,7 +1,7 @@
 # ADR-015: Load-test method - DOP sweep on real mail, measured memory, committed baseline
 
 ## Status
-Accepted (per project owner, 2026-10-17). Implementation pending, tracked as Stage 02 work. Per project owner (2026-10-18), all numeric run parameters and thresholds below are provisional: they are placeholders until the first sweep, and the load-test task replaces them with values set from measured data plus headroom.
+Accepted (per project owner, 2026-10-17). Implementation pending, tracked as Stage 02 work. Per project owner (2026-10-18), all numeric run parameters and thresholds below were checked against the first measurements in task #51 (synthetic set only, short windows, one Windows machine, 22 cores). They stay PROVISIONAL; values and sources are in `docs/perf-results.md`, section "Provisional limits (#51)". Streaming stays DEFERRED: measured M 1.3-4.2 is under the ceiling of 6.
 
 ## Context
 The brief's load test asks for the maximum files per second on the available hardware, so the team can derive resource needs. Today's figures (`docs/perf-results.md`):
@@ -23,7 +23,7 @@ Per project owner, 2026-10-17.
   - the synthetic set: the five existing bench messages plus the 1,212 golden inputs.
 - A separate large-file pass on one thread: generated messages at 25%, 50%, and 100% of the configured input limit (`ydk:req:extraction/max-input-size`), each holding one base64 attachment, plus one message one byte over the limit to confirm the guard. This pass feeds the memory ceiling (`ydk:nfr:performance/memory-footprint`) and is kept out of the DOP mix so a few huge files do not dominate throughput figures.
 - All inputs are loaded into memory before timing; no disk I/O is timed.
-- Per DOP (provisional): 2 s warm-up, then a measured window of at least 10 s and at least 3 full passes over the set.
+- Per DOP (PROVISIONAL, kept in #51): 2 s warm-up, then a measured window of at least 10 s and at least 3 full passes over the set.
 
 ### Garbage collector
 - Workstation GC is the .NET default for console and library hosts; Server GC must be opted into. The harness sets `ServerGarbageCollection` explicitly for each run, never relying on the default.
@@ -32,7 +32,7 @@ Per project owner, 2026-10-17.
 ### What is reported per DOP and GC mode
 - Throughput T(n), files per second.
 - Per-message latency P50 and P95.
-- Peak working set P(n): the process working set sampled at a fixed interval (provisional: 50 ms), maximum over the window.
+- Peak working set P(n): the process working set sampled at a fixed interval (PROVISIONAL, kept in #51: 50 ms), maximum over the window.
 - Allocated bytes per input byte A: allocated-bytes delta over the window divided by input bytes processed.
 - Scaling efficiency E(n) = T(n) / (n x T(1)). E(n) replaces the 0.7 guess.
 
@@ -49,7 +49,7 @@ The team reruns the sweep on its own server class, in its GC mode, and applies:
 ### Baseline and regression rule
 - The results of a sweep on the project owner's development machine are committed as `docs/perf-baseline.json`, with the hardware block.
 - Each run compares itself with the baseline when CPU model, logical core count, runtime major.minor, and GC mode all match. Otherwise it prints `baseline not comparable: <field>` and skips the comparison, so a retargeted runtime or new machine never compares against a stale baseline.
-- Warn-only rule (provisional threshold 20%, to be set from the run-to-run spread of the first sweeps): a warning is printed when T(1) or T(ProcessorCount) drops, or A or P(ProcessorCount) rises, by more than the threshold. It never fails a build.
+- Warn-only rule (threshold 20%, PROVISIONAL, kept in #51: A and P run-to-run spread is 2-11%, T spread 24-80% at short windows): a warning is printed when T(1) or T(ProcessorCount) drops, or A or P(ProcessorCount) rises, by more than the threshold. It never fails a build.
 - A nightly CI job runs the synthetic set only (the public corpus is not in CI) against its own `docs/perf-baseline-ci.json`, with the same warn-only rule.
 - The baseline is refreshed, in the same commit, whenever the runtime, the parser library version, or the measuring machine changes.
 
