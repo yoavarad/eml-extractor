@@ -2,6 +2,7 @@ using System.Text;
 
 namespace EmlExtraction;
 
+/// <summary>Header-sniffing <see cref="IEmlDetector"/>: inspects a bounded prefix for RFC 5322 header lines.</summary>
 public sealed class EmlDetector : IEmlDetector
 {
     private const int MinLength = 20;
@@ -14,6 +15,7 @@ public sealed class EmlDetector : IEmlDetector
         "in-reply-to", "references", "content-type"
     };
 
+    /// <inheritdoc/>
     public bool IsEml(ReadOnlySpan<byte> data)
     {
         if (data.Length < MinLength)
