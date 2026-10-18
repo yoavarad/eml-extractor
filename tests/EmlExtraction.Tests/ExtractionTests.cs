@@ -96,8 +96,8 @@ public sealed class ExtractionTests
         Assert.Contains("bob@example.com", result.Metadata["to"]);
         Assert.Contains("carol@example.com", result.Metadata["cc"]);
         Assert.Equal("שלום 😀 中文 हिंदी", result.Metadata["subject"]);
-        Assert.True(result.Metadata.ContainsKey("messageid"));
-        Assert.True(result.Metadata.ContainsKey("dkim_signature"));
+        Assert.True(result.Metadata.ContainsKey("message-id"));
+        Assert.True(result.Metadata.ContainsKey("dkim-signature"));
         Assert.Contains("X-Mailer: SandboxMail", result.XFields);
         Assert.Contains("X_Custom_Field: team-value", result.XFields);
         Assert.Contains("X-Spam-Score: 1.2", result.XFields);
@@ -210,6 +210,52 @@ public sealed class ExtractionTests
         var result = _extractor.Extract(SampleFactory.ToBytes(message));
         Assert.Contains("יוסי", result.Metadata["from"]);
         Assert.Contains("li@example.com", result.Metadata["to"]);
+    }
+
+    [Fact]
+    public void HyphenAndUnderscoreHeadersDoNotCollide()
+    {
+        var message = SampleFactory.Plain("c", "b");
+        message.Headers.Add("X-Foo", "a");
+        message.Headers.Add("X_Foo", "b");
+        var result = _extractor.Extract(SampleFactory.ToBytes(message));
+        Assert.Equal("a", result.Metadata["x-foo"]);
+        Assert.Equal("b", result.Metadata["x_foo"]);
+    }
+
+    [Fact]
+    public void OverlayWritesInPlaceAndOldKeysAbsent()
+    {
+        var message = SampleFactory.Plain("o", "b");
+        message.ReplyTo.Add(MailboxAddress.Parse("reply@example.com"));
+        message.Headers.Add("DKIM-Signature", "v=1");
+        var result = _extractor.Extract(SampleFactory.ToBytes(message));
+        Assert.Contains("reply@example.com", result.Metadata["reply-to"]);
+        Assert.True(result.Metadata.ContainsKey("message-id"));
+        Assert.DoesNotContain("<", result.Metadata["message-id"]);
+        Assert.True(result.Metadata.ContainsKey("dkim-signature"));
+        Assert.True(result.Metadata.ContainsKey("content-type"));
+        foreach (var gone in new[] { "messageid", "replyto", "dkim_signature", "contenttype", "subject_direction", "content_direction", "mimeversion", "returnpath", "deliveredto", "inreplyto", "reply_to", "message_id" })
+            Assert.False(result.Metadata.ContainsKey(gone), gone);
+    }
+
+    [Fact]
+    public void HeaderNamedXFieldsIsStoredUnderReservedPrefix()
+    {
+        var message = SampleFactory.Plain("x", "b");
+        message.Headers.Add("XFields", "q");
+        var result = _extractor.Extract(SampleFactory.ToBytes(message));
+        Assert.Equal("q", result.Metadata["header:xfields"]);
+        Assert.True(result.Metadata.ContainsKey("xfields"));
+    }
+
+    [Fact]
+    public void ParseFailedHasExactlyFixedKeys()
+    {
+        var result = _extractor.Extract(Array.Empty<byte>());
+        Assert.Contains(result.Warnings, w => w.StartsWith("parse_failed", StringComparison.Ordinal));
+        Assert.Equal(["bcc", "cc", "from", "to", "xfields"], result.Metadata.Keys.Order(StringComparer.Ordinal).ToArray());
+        Assert.All(result.Metadata.Values, v => Assert.Equal("", v));
     }
 
     [Fact]

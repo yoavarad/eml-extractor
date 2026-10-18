@@ -91,7 +91,7 @@ internal static class Catalog
             m.Body = new TextPart("plain") { Text = $"hbody-{i}" };
             var expect = PlainExpect($"classic-{i}", $"hbody-{i}");
             if (i % 2 == 0) expect.Metadata["cc"] = MimeBuild.Contains("carol@example.com");
-            if (i % 3 == 0) expect.Metadata["replyto"] = MimeBuild.Contains("reply@example.com");
+            if (i % 3 == 0) expect.Metadata["reply-to"] = MimeBuild.Contains("reply@example.com");
             if (i % 5 == 0) expect.Metadata["sender"] = MimeBuild.Contains("sender@example.com");
             if (i % 7 == 0) expect.Metadata["bcc"] = MimeBuild.Contains("hidden@example.com");
             list.Add(MimeBuild.FromMessage($"H{i:D3}", tags, m, expect));
@@ -107,8 +107,8 @@ internal static class Catalog
             m.Body = new TextPart("plain") { Text = "recv" };
             var expect = PlainExpect($"received-{i}", "recv");
             expect.Metadata["received"] = MimeBuild.Contains("example.net");
-            expect.Metadata["returnpath"] = MimeBuild.Contains("bounce@example.com");
-            expect.Metadata["inreplyto"] = MimeBuild.Contains("prev@example.com");
+            expect.Metadata["return-path"] = MimeBuild.Contains("bounce@example.com");
+            expect.Metadata["in-reply-to"] = MimeBuild.Contains("prev@example.com");
             list.Add(MimeBuild.FromMessage($"H{i:D3}", tags, m, expect));
         }
 
@@ -134,7 +134,7 @@ internal static class Catalog
                 NotContains = i % 2 == 0 ? ["DKIM-Signature"] : []
             };
             if (i % 2 == 0)
-                expect.Metadata["dkim_signature"] = MimeBuild.Contains("v=1");
+                expect.Metadata["dkim-signature"] = MimeBuild.Contains("v=1");
             list.Add(MimeBuild.FromMessage($"X{i:D3}", tags, m, expect));
         }
 
@@ -194,11 +194,6 @@ internal static class Catalog
                     2 => MimeBuild.Alternative(id, t.Concat(["multipart-alternative"]).ToArray(), subject, "plain-" + lang.Body, htmlBody),
                     _ => MimeBuild.Plain(id, t, subject, plainBody)
                 };
-                c.Expect.Metadata["subject_direction"] = MimeBuild.Eq(StartsRtl(subject) ? "rtl" : "ltr");
-                var contentDir = v is 1 or 2 && wrapRtl
-                    ? "rtl"
-                    : StartsRtl(v is 1 or 2 ? lang.Body : plainBody) ? "rtl" : "ltr";
-                c.Expect.Metadata["content_direction"] = MimeBuild.Eq(contentDir);
                 list.Add(c);
             }
         }

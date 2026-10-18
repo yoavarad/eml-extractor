@@ -37,7 +37,7 @@ public sealed class EmlExtractor : IEmlExtractor
         {
             warnings.Add($"parse_failed: {ex.GetType().Name}: {ex.Message}");
             return new EmlExtractionResult(
-                new Dictionary<string, string>(),
+                HeaderMapper.EmptyMetadata(),
                 string.Empty,
                 null,
                 null,
@@ -76,8 +76,6 @@ public sealed class EmlExtractor : IEmlExtractor
                    && contentType.Contains("html", StringComparison.OrdinalIgnoreCase);
         var subjectDir = TextDirection.Detect(metadata.GetValueOrDefault("subject"), html: false);
         var contentDir = TextDirection.Detect(content, html);
-        metadata["subject_direction"] = subjectDir;
-        metadata["content_direction"] = contentDir;
         return new EmlExtractionResult(metadata, xfields, content, contentType, attachments, warnings)
         {
             SubjectDirection = subjectDir,

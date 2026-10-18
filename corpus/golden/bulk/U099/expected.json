@@ -26,16 +26,6 @@
           "bob@example.com"
         ],
         "not_contains": []
-      },
-      "subject_direction": {
-        "eq": "rtl",
-        "contains": [],
-        "not_contains": []
-      },
-      "content_direction": {
-        "eq": "rtl",
-        "contains": [],
-        "not_contains": []
       }
     },
     "main_content": {

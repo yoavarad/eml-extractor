@@ -28,8 +28,8 @@ public sealed class ExoticLanguageTests
         var rtl = _extractor.Extract(SampleFactory.ToBytes(SampleFactory.Plain("שלום עולם", "גוף המייל")));
         Assert.Equal("rtl", rtl.SubjectDirection);
         Assert.Equal("rtl", rtl.ContentDirection);
-        Assert.Equal("rtl", rtl.Metadata["subject_direction"]);
-        Assert.Equal("rtl", rtl.Metadata["content_direction"]);
+        Assert.False(rtl.Metadata.ContainsKey("subject_direction"));
+        Assert.False(rtl.Metadata.ContainsKey("content_direction"));
         Assert.Equal("שלום עולם", rtl.Metadata["subject"]);
         Assert.Equal("גוף המייל", rtl.MainContent);
 

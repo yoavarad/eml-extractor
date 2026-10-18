@@ -19,13 +19,13 @@
         ],
         "not_contains": []
       },
-      "returnpath": {
+      "return-path": {
         "contains": [
           "bounce@example.com"
         ],
         "not_contains": []
       },
-      "inreplyto": {
+      "in-reply-to": {
         "contains": [
           "prev@example.com"
         ],
