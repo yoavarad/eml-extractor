@@ -20,6 +20,8 @@
   <ItemGroup>
     <!-- Extract(MimeMessage) is internal (ADR-012); GoldenKit's probe uses it. -->
     <InternalsVisibleTo Include="GoldenKit" />
+    <!-- Tests drive Extract(MimeMessage) and the StageFault seam (ADR-004). -->
+    <InternalsVisibleTo Include="EmlExtraction.Tests" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />

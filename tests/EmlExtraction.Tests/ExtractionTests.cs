@@ -6,7 +6,7 @@ namespace EmlExtraction.Tests;
 
 public sealed class ExtractionTests
 {
-    private readonly EmlExtractor _extractor = new();
+    private readonly IEmlExtractor _extractor = new CheckedExtractor();
 
     [Fact]
     public void FromToCcBccAreAlwaysPresent()
