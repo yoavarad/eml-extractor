@@ -4,13 +4,13 @@
       "file": "attached-docx.eml",
       "generator": "tools/RealisticSamples",
       "license": "generated: repo license",
-      "sha256": "57e066ef68dc92e6a443b39fc7a7eb960bf304c1f791526290a159cc564d9dcc",
+      "sha256": "8967b7c06257717223f7da162711c0412eae911290b2f050364b67ac199cd9bb",
       "expected": {
         "attachments": [
           {
             "fileName": "report.docx",
-            "sizeInBytes": 898,
-            "sha256": "6bf0980e2a49b133ca6f8fe8bf95b95f48dd8fda6cd0972c3815da2a000e4adb",
+            "sizeInBytes": 1218,
+            "sha256": "68980825b9dcb0edcdce792f55ad7fe9787b9b377981faa672d1b997835042af",
             "fullPath": "report.docx"
           }
         ]
@@ -36,13 +36,13 @@
       "file": "attached-image.eml",
       "generator": "tools/RealisticSamples",
       "license": "generated: repo license",
-      "sha256": "9a59e49aec124ac8fc548b9f853e6e93766cd986886ef2c8500f445e7adc4f79",
+      "sha256": "c95fe65565dd9697484eac00e05ecb355880642877858406de4f501b369ad348",
       "expected": {
         "attachments": [
           {
             "fileName": "photo.png",
-            "sizeInBytes": 494,
-            "sha256": "4fd7eb56b8dbf0c78e66accb31d52e1415b08997b6c25bb2da8558000458e00b",
+            "sizeInBytes": 852,
+            "sha256": "ab8624a2180e8213f7040c65611bbb9138564c143a83b0623252af2557100bd3",
             "fullPath": "photo.png"
           }
         ]
@@ -68,13 +68,13 @@
       "file": "attached-pptx.eml",
       "generator": "tools/RealisticSamples",
       "license": "generated: repo license",
-      "sha256": "db7ad2d330b536851e78ec00f3e96c06e131993e734cdd22320899d2c21ed3d6",
+      "sha256": "3f270e632e9f214d13629b9fda319f69fe3dab34b281edcb7a5b122f5dd39576",
       "expected": {
         "attachments": [
           {
             "fileName": "deck.pptx",
-            "sizeInBytes": 845,
-            "sha256": "d658b7619954581f7da1dd625d09bee3775d0ec9353eb1e665619845fbc3d148",
+            "sizeInBytes": 1140,
+            "sha256": "4b1920408c7e797d33da2392c92be68e968e58bc30f84773078d0bfed4d1813b",
             "fullPath": "deck.pptx"
           }
         ]
@@ -84,13 +84,13 @@
       "file": "attached-xlsx.eml",
       "generator": "tools/RealisticSamples",
       "license": "generated: repo license",
-      "sha256": "e1bf0609040f2c217eed84d96f286da5e76fef6f77513ec92bb76696728915b7",
+      "sha256": "70aaed51b2ec594817fd7044e73ca51d2b0c5b3286664f508de1e7825ce47ee3",
       "expected": {
         "attachments": [
           {
             "fileName": "data.xlsx",
-            "sizeInBytes": 1532,
-            "sha256": "f18cf214cd361533f9bf29cb6cdb61a956f4484f1c1ec44a16b4e25915e825c9",
+            "sizeInBytes": 2182,
+            "sha256": "1730c7cfd222300ba0b3872d4229a75bd9e4c3b2e52a8f3a95a83654e483a21e",
             "fullPath": "data.xlsx"
           }
         ]
@@ -100,15 +100,15 @@
       "file": "gmail-paste.eml",
       "generator": "tools/RealisticSamples",
       "license": "generated: repo license",
-      "sha256": "aa79185533ae95a95cb70eefb8da4eedeea5016e1e64286c3ea66f6acda95719",
+      "sha256": "5d3faf8933ddf1e819a8b4a30bb3fd577b6327533f438dcc4a5b4da3a685494a",
       "expected": {
         "inlineImages": [
           {
             "contentId": "ii_lq8x2k1a0",
             "file": {
               "fileName": "image.png",
-              "sizeInBytes": 521,
-              "sha256": "189fc815801f7e754888e98254f08b4403c9bb683ae0272cfc95af00040fc9b1",
+              "sizeInBytes": 852,
+              "sha256": "a51d316e9b6dd41a58f35dbccaa726a2ab9e26e4425248ed3aa81b6f6eea1ee9",
               "fullPath": "image.png"
             }
           }
@@ -119,15 +119,15 @@
       "file": "outlook-paste.eml",
       "generator": "tools/RealisticSamples",
       "license": "generated: repo license",
-      "sha256": "d6157946f5b5ba032fbd33d9c569f2c04cec2a80fc94d0f4591621695697d205",
+      "sha256": "7798adfce392f28fa5bb65d11628ac5a8c305890995f950b95b522e4454cd014",
       "expected": {
         "inlineImages": [
           {
             "contentId": "image001.png@01D9A1B2.3C4D5E60",
             "file": {
               "fileName": "image001.png",
-              "sizeInBytes": 521,
-              "sha256": "f9fb2f182bca475b670c3860f94b771213569f7b50159fb58cc6f92d254ffc74",
+              "sizeInBytes": 852,
+              "sha256": "3feca125dba1eba5b26fbcdfdb266d5b62621e3c29b6c6927d30c2309b07219f",
               "fullPath": "image001.png"
             }
           }
@@ -138,13 +138,13 @@
       "file": "tnef-docx.eml",
       "generator": "tools/RealisticSamples",
       "license": "generated: repo license",
-      "sha256": "79ad1e06ac6cb6418abae4bdaf7738499d3dc660a8d7853a1ee4ca03b2b32db4",
+      "sha256": "2e39c431d838f556ca3e3f26445502aecaa78af7d362e662efc37fc4bcf48f6b",
       "expected": {
         "attachments": [
           {
             "fileName": "report.docx",
-            "sizeInBytes": 898,
-            "sha256": "6bf0980e2a49b133ca6f8fe8bf95b95f48dd8fda6cd0972c3815da2a000e4adb",
+            "sizeInBytes": 1218,
+            "sha256": "68980825b9dcb0edcdce792f55ad7fe9787b9b377981faa672d1b997835042af",
             "fullPath": "winmail.dat/report.docx"
           }
         ]

@@ -43,10 +43,15 @@ public static class SampleGenerator
         return mp;
     }
 
+    /// <summary>CRLF regardless of platform so output is identical on every OS.</summary>
+    public static readonly FormatOptions Fmt = NewFmt();
+
+    static FormatOptions NewFmt() { var o = FormatOptions.Default.Clone(); o.NewLineFormat = NewLineFormat.Dos; return o; }
+
     static byte[] Serialize(MimeMessage m)
     {
         using var ms = new MemoryStream();
-        m.WriteTo(ms);
+        m.WriteTo(Fmt, ms);
         return ms.ToArray();
     }
 

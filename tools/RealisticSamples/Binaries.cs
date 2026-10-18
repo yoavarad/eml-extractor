@@ -87,7 +87,7 @@ internal static class Binaries
         Be(ihdr, 0, w); Be(ihdr, 4, h); ihdr[8] = 8; ihdr[9] = 2;
         Chunk(ms, "IHDR", ihdr);
         using var z = new MemoryStream();
-        using (var zs = new ZLibStream(z, CompressionLevel.Optimal, true)) zs.Write(raw);
+        using (var zs = new ZLibStream(z, CompressionLevel.NoCompression, true)) zs.Write(raw);
         Chunk(ms, "IDAT", z.ToArray());
         Chunk(ms, "IEND", []);
         return ms.ToArray();
@@ -154,7 +154,7 @@ internal static class Binaries
                 var data = data0;
                 if (name.EndsWith(".xml", StringComparison.Ordinal) || name.EndsWith(".rels", StringComparison.Ordinal))
                     data = Encoding.UTF8.GetBytes(rx.Replace(Encoding.UTF8.GetString(data), m => map.GetValueOrDefault(m.Value, m.Value)));
-                var ne = dst.CreateEntry(name, CompressionLevel.Optimal);
+                var ne = dst.CreateEntry(name, CompressionLevel.NoCompression);
                 ne.LastWriteTime = FixedTime;
                 using var o = ne.Open(); o.Write(data);
             }

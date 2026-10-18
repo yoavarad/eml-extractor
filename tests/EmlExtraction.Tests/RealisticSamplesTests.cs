@@ -111,7 +111,7 @@ public class RealisticSamplesTests
             {
                 using var ms = new MemoryStream();
                 ArgumentNullException.ThrowIfNull(mp.Message);
-                mp.Message.WriteTo(ms);
+                mp.Message.WriteTo(SampleGenerator.Fmt, ms);
                 return ms.ToArray();
             }
             if (p is MimePart m && m.FileName == name) return Bytes(m);
