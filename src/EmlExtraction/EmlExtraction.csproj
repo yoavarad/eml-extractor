@@ -18,6 +18,10 @@
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
   <ItemGroup>
+    <!-- Extract(MimeMessage) is internal (ADR-012); GoldenKit's probe uses it. -->
+    <InternalsVisibleTo Include="GoldenKit" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
   <ItemGroup>

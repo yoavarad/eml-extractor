@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text;
 using MimeKit;
 
@@ -302,5 +303,82 @@ public sealed class ExtractionTests
         Assert.Equal("passwd.txt", att.Name);
         Assert.Equal("../../etc/passwd.txt", att.FullPath);
         Assert.Equal(payload, att.Data);
+    }
+
+    [Fact]
+    public void NullRequestThrows()
+        => Assert.Throws<ArgumentNullException>(() => _extractor.Extract((EmlExtractionRequest)null!));
+
+    [Fact]
+    public void FileNameDoesNotAffectResult()
+    {
+        var bytes = SampleFactory.ToBytes(SampleFactory.Plain("name", "body"));
+        var unnamed = _extractor.Extract(new EmlExtractionRequest { FileBytes = bytes });
+        var named = _extractor.Extract(new EmlExtractionRequest { FileBytes = bytes, FileName = "x.eml" });
+        Assert.Equal(ResultProjection.Of(unnamed), ResultProjection.Of(named));
+    }
+
+    [Fact]
+    public void MboxFromPrefixWorksThroughRequest()
+    {
+        var inner = SampleFactory.ToBytes(SampleFactory.Plain("mbox-subject", "mbox-body"));
+        var raw = Encoding.ASCII.GetBytes("From alice@example.com Tue Sep 15 07:00:00 2026\n")
+            .Concat(inner)
+            .ToArray();
+        var result = _extractor.Extract(new EmlExtractionRequest { FileBytes = raw, FileName = "a.mbox" });
+        Assert.Equal("mbox-subject", result.Metadata["subject"]);
+        Assert.Equal("mbox-body", result.MainContent);
+        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed"));
+    }
+
+    [Fact]
+    public void PublicSurfaceExposesNoMimeKitType()
+    {
+        const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static
+                                   | BindingFlags.DeclaredOnly;
+        var leaks = new List<string>();
+        foreach (var type in typeof(EmlExtractor).Assembly.GetExportedTypes())
+        {
+            var exposed = new List<(string Where, Type Type)>();
+            if (type.BaseType is not null)
+                exposed.Add(("base", type.BaseType));
+            exposed.AddRange(type.GetInterfaces().Select(i => ("interface", i)));
+            foreach (var member in type.GetMembers(flags))
+            {
+                switch (member)
+                {
+                    case MethodInfo m:
+                        exposed.Add((m.Name, m.ReturnType));
+                        exposed.AddRange(m.GetParameters().Select(p => (m.Name, p.ParameterType)));
+                        break;
+                    case ConstructorInfo c:
+                        exposed.AddRange(c.GetParameters().Select(p => (".ctor", p.ParameterType)));
+                        break;
+                    case PropertyInfo p:
+                        exposed.Add((p.Name, p.PropertyType));
+                        break;
+                    case FieldInfo f:
+                        exposed.Add((f.Name, f.FieldType));
+                        break;
+                    case EventInfo e when e.EventHandlerType is not null:
+                        exposed.Add((e.Name, e.EventHandlerType));
+                        break;
+                }
+            }
+
+            leaks.AddRange(exposed.Where(x => MentionsMimeKit(x.Type)).Select(x => $"{type.Name}.{x.Where}: {x.Type}"));
+        }
+
+        Assert.Empty(leaks);
+    }
+
+    private static bool MentionsMimeKit(Type type)
+    {
+        if (type.HasElementType)
+            return MentionsMimeKit(type.GetElementType()!);
+        if (type.IsGenericType && type.GetGenericArguments().Any(MentionsMimeKit))
+            return true;
+        return type.Assembly.GetName().Name is "MimeKit"
+               || (type.Namespace?.StartsWith("MimeKit", StringComparison.Ordinal) ?? false);
     }
 }
