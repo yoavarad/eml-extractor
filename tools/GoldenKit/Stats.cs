@@ -7,7 +7,7 @@ namespace GoldenKit;
 internal sealed class Stats
 {
     public int Files, Messages, Detected, NotDetected, MboxFiles, EmptyFiles, SkippedLarge, ReadFail;
-    public int Warned, Thrown, ParseFailed, InternalErrors, DetectedButParseFailed;
+    public int Warned, Thrown, ParseFailed, DetectedButParseFailed;
     public int HasBody, EmptyBody, NoAttach, WithAttach, CidMessages, CidParts;
     public int TnefOpaque, TnefHeaders, TnefContentType, ExchangeHeaders, Office, NestedMail;
     public int Headers, XFields, AttachCount;
@@ -34,7 +34,7 @@ internal sealed class Stats
         var sb = new StringBuilder();
         sb.AppendLine($"root={root}");
         sb.AppendLine($"files_seen={fileCount} files_read={Files} mbox={MboxFiles} empty={EmptyFiles} skipped_large={SkippedLarge} read_fail={ReadFail}");
-        sb.AppendLine($"messages={Messages} detected={Detected} not_detected={NotDetected} parse_failed={ParseFailed} internal_error={InternalErrors} warned={Warned} thrown={Thrown} elapsed={elapsed:hh\\:mm\\:ss} rate={(elapsed.TotalSeconds > 0 ? Messages / elapsed.TotalSeconds : 0):F1}/s");
+        sb.AppendLine($"messages={Messages} detected={Detected} not_detected={NotDetected} parse_failed={ParseFailed} warned={Warned} thrown={Thrown} elapsed={elapsed:hh\\:mm\\:ss} rate={(elapsed.TotalSeconds > 0 ? Messages / elapsed.TotalSeconds : 0):F1}/s");
         sb.AppendLine($"body={HasBody} empty_body={EmptyBody} with_attach={WithAttach} no_attach={NoAttach} cid_msgs={CidMessages} cid_parts={CidParts}");
         sb.AppendLine($"tnef_headers={TnefHeaders} tnef_left_as_winmail={TnefOpaque} exchange_hdr={ExchangeHeaders} office={Office} nested_rfc822={NestedMail}");
         sb.AppendLine($"max_headers={MaxHeaders} ({MaxHeadersLabel}) max_xfields={MaxXFields} ({MaxXFieldsLabel}) max_attach={MaxAttach} ({MaxAttachLabel})");
@@ -64,7 +64,6 @@ internal sealed class Stats
             Warned,
             Thrown,
             ParseFailed,
-            InternalErrors,
             HasBody,
             EmptyBody,
             WithAttach,

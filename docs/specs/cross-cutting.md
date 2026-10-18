@@ -17,7 +17,6 @@ There is one diagnostic channel: the ordered warnings list on [ydk:entity:extrac
 - [ydk:warning:extraction/part-decode-failed] - one attachment could not be decoded and is skipped.
 - [ydk:warning:extraction/rfc822-extract-failed] - one nested message could not be serialised and is skipped.
 - [ydk:warning:extraction/tnef-extract-failed] - an Outlook wrapper could not be unpacked and is kept whole.
-- [ydk:warning:extraction/internal-error] - deprecated by ADR-023. Today the code records it for a library bug in one stage; in Stage 02 that case throws instead (see below) and the warning is removed. An input over the size limit already throws and has no warning.
 
 A caller tells warnings apart by their leading code, never by the free text after it. The policy that turns content failures into warnings is [ydk:req:extraction/no-throw-on-malformed] (ADR-004, narrowed by ADR-023).
 
@@ -46,7 +45,7 @@ The message date is the only timestamp. It is re-emitted in ISO 8601 round-trip 
 
 Adversarial review of the fixed design. Each answer describes current behaviour, not a proposal.
 
-- **Malformed or hostile MIME.** The handled content failure kinds become [ydk:warning:extraction/parse-failed]. Per-part failures skip only that part. Any other failure is a library bug: today it is recorded as [ydk:warning:extraction/internal-error]; target (ADR-023, Stage 02) it throws [ydk:entity:extraction/EmlExtractionException].
+- **Malformed or hostile MIME.** The handled content failure kinds become [ydk:warning:extraction/parse-failed]. Per-part failures skip only that part. Any other failure is a library bug and throws [ydk:entity:extraction/EmlExtractionException] (ADR-023).
 - **Path traversal in attachment names.** The display name is reduced to its last path segment. The full path is built only from those reduced names, so it never contains a parent-directory step ([ydk:req:attachments/container-path]). The sender's raw path and declared content location are reported separately and untouched ([ydk:req:attachments/attachment-record]). Callers must not use either to write files.
 - **Disguised non-mail files.** Leading-byte checks reject OLE, PDF, PNG, JPEG, ZIP, JSON, and markup before any header sniffing ([ydk:req:detection/reject-non-email-magic]).
 - **Very large inputs.** Today nothing caps input size; throughput falls roughly in proportion to decoded bytes, and memory grows with them. Inputs over the host-set limit are refused before parsing ([ydk:req:extraction/max-input-size]); the refusal is a thrown [ydk:entity:extraction/EmlInputTooLargeException], and the peak memory of a maximum-size input is measured against a fixed ceiling ([ydk:nfr:performance/memory-footprint]). No public sample of 50 MB or more has been tested ([scope.md](scope.md), DEFERRED).

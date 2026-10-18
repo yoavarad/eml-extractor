@@ -60,7 +60,7 @@ internal static class PartCollector
             foreach (var entity in tnef.ExtractAttachments())
                 Walk(entity, body, insideBodyAlternative: false, segment, parts, warnings);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (EmlExtractor.IsContentFailure(ex))
         {
             warnings.Add($"tnef_extract_failed: {ex.Message}");
             AddMimePart(tnef, container, parts, warnings);
@@ -96,7 +96,7 @@ internal static class PartCollector
 
             Add(parts, rfc822, stream.ToArray(), fallback: "attached.eml", container);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (EmlExtractor.IsContentFailure(ex))
         {
             warnings.Add($"rfc822_extract_failed: {ex.Message}");
         }
@@ -110,7 +110,7 @@ internal static class PartCollector
             part.Content?.DecodeTo(stream);
             Add(parts, part, stream.ToArray(), FallbackName(part, parts.Count), container);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (EmlExtractor.IsContentFailure(ex))
         {
             warnings.Add($"part_decode_failed: {part.FileName ?? part.ContentType.MimeType}: {ex.Message}");
         }

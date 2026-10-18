@@ -19,15 +19,27 @@ public sealed class EmlDetector : IEmlDetector
     private static readonly EmlDetectionResult Unsupported = new(false, "");
 
     /// <inheritdoc/>
+    /// <exception cref="EmlExtractionException">An unexpected exception (library bug) occurred during detection; stage <c>detect</c>.</exception>
     public bool IsEml(ReadOnlySpan<byte> data) => Counted(data);
 
-    /// <summary>Detects whether <paramref name="data"/> is a mail message. Never throws.</summary>
+    /// <summary>Detects whether <paramref name="data"/> is a mail message; input that is not a message gives an unsupported result.</summary>
+    /// <exception cref="EmlExtractionException">An unexpected exception (library bug) occurred during detection; stage <c>detect</c>.</exception>
     public EmlDetectionResult Detect(ReadOnlySpan<byte> data)
         => Counted(data) ? Supported : Unsupported;
 
     private static bool Counted(ReadOnlySpan<byte> data)
     {
-        var supported = Sniff(data);
+        bool supported;
+        try
+        {
+            EmlExtractor.StageFault?.Invoke("detect");
+            supported = Sniff(data);
+        }
+        catch (Exception ex) when (EmlExtractor.IsWrapped(ex))
+        {
+            throw new EmlExtractionException("detect", ex);
+        }
+
         EmlExtractionTelemetry.RecordDetect(supported);
         return supported;
     }

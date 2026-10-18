@@ -10,7 +10,7 @@ if (fault >= 0)
         return 2;
     }
 
-    // ADR-004 fault seam: proves score/probe exit non-zero on internal_error.
+    // ADR-023 fault seam: proves score/probe exit non-zero when extraction throws.
     var stage = args[fault + 1];
     EmlExtraction.EmlExtractor.StageFault = s =>
     {

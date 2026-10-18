@@ -35,17 +35,17 @@ Per project owner, 2026-10-18.
 | `eml_extraction.extract.attachments` | Histogram<int> | `{attachment}` | - | once per Extract call that parsed, attachment count |
 | `eml_extraction.extract.warnings` | Counter<long> | `{warning}` | `eml_extraction.warning.code` | once per warning added to a result |
 | `eml_extraction.detect.calls` | Counter<long> | `{call}` | `eml_extraction.detect.result` | once per Detect or IsEml call |
-| `eml_extraction.extract.internal_errors` | Counter<long> | `{error}` | `eml_extraction.stage`, `error.type` | once per stage that recorded `internal_error` |
+| `eml_extraction.extract.internal_errors` | Counter<long> | `{error}` | `eml_extraction.stage`, `error.type` | once per Extract call that threw `EmlExtractionException` (ADR-023) |
 | `eml_extraction.extract.input_too_large` | Counter<long> | `{request}` | - | once per Extract call refused by the size guard |
 
 Tag values are closed sets:
-- `eml_extraction.outcome`: `clean` (no warnings), `warnings` (at least one warning, content returned), `parse_failed`, `input_too_large`.
-- `eml_extraction.warning.code`: the warning codes of `ydk:crosscut:core/warning-format` (`parse_failed`, `body_decode_failed`, `part_decode_failed`, `rfc822_extract_failed`, `tnef_extract_failed`, `internal_error`).
+- `eml_extraction.outcome`: `clean` (no warnings), `warnings` (at least one warning, content returned), `parse_failed`, `input_too_large`, `internal_error` (the last two: the call threw, ADR-023).
+- `eml_extraction.warning.code`: the warning codes of `ydk:crosscut:core/warning-format` (`parse_failed`, `body_decode_failed`, `part_decode_failed`, `rfc822_extract_failed`, `tnef_extract_failed`).
 - `eml_extraction.detect.result`: `supported`, `not_supported`.
 - `eml_extraction.stage`: `parse`, `metadata`, `body`, `attachments` (the ADR-004 guarded stages; ADR-020 profiles these four plus the profiling-only `request` and `detect`).
 - `error.type`: the .NET exception type's full name (bounded by the code, not by input).
 
-The `internal_error` counter overlaps with the warnings counter on purpose, and the `input_too_large` counter is separate from it (oversized input throws and records no warning): they are the two signals an operator alerts on, and the internal-error counter carries the stage.
+The `internal_errors` and `input_too_large` counters are separate from the warnings counter (both cases throw and record no warning): they are the two signals an operator alerts on, and the internal-error counter carries the stage.
 
 No histogram bucket advice is set: the API for it is not in the net8.0 BCL. Consumers configure buckets with views.
 

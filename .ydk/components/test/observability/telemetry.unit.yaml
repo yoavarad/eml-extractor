@@ -31,12 +31,17 @@ cases:
     description: Library-bug signal carries the stage
     given: A test hook that throws an unexpected exception inside the attachments stage
     when: Extract is called
-    then: Extract throws EmlExtractionException (stage attachments); internal_errors gets +1 tagged stage=attachments and error.type with the inner exception type name; the stage activity has status Error (ADR-023)
+    then: Extract throws EmlExtractionException (stage attachments); internal_errors gets +1 tagged stage=attachments and error.type with the inner exception type name; duration tagged outcome=internal_error; warnings gets nothing; the stage activity has status Error (ADR-023, activity part in #72)
   - name: DetectCountedByResult
     description: Detection counter
     given: One mail buffer and one PDF buffer
     when: Detect is called on each and IsEml on the mail buffer
     then: detect.calls is supported=2 and not_supported=1
+  - name: HostListenerExceptionPropagatesUnwrapped
+    description: Host callbacks sit outside the stage wrappers
+    given: A MeterListener whose measurement callback throws
+    when: Extract and Detect are called
+    then: The host's exception propagates unchanged, not wrapped in EmlExtractionException (ADR-023)
   - name: ExtractActivityAndStageChildren
     description: Tracing shape
     given: An ActivityListener sampling AllData on source EmlExtraction

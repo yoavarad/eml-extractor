@@ -82,19 +82,45 @@ internal static class Scorer
     private static CaseScore Evaluate(GoldenSpecFile spec, byte[] eml, EmlDetector detector, EmlExtractor extractor)
     {
         var s = new CaseScore { Id = spec.Id, Tags = spec.Tags };
-        Check(s, "detect", spec.IsEml == detector.IsEml(eml));
+        bool isEml;
+        try
+        {
+            isEml = detector.IsEml(eml);
+        }
+        catch (Exception ex)
+        {
+            Check(s, "no_throw", false, ex.GetType().FullName);
+            return s;
+        }
+
+        Check(s, "detect", spec.IsEml == isEml);
         if (!spec.IsEml)
             return s;
 
-        var result = extractor.Extract(eml);
-        ScoreResult(s, result, spec.Expect, extractor, depth: 0);
+        ScoreExtract(s, eml, spec.Expect, extractor, depth: 0);
         return s;
+    }
+
+    /// <summary>ADR-023: one "no_throw" check per extraction; a throw fails the case and skips the rest of its checks.</summary>
+    private static void ScoreExtract(CaseScore s, byte[] eml, GoldenExpect expect, EmlExtractor extractor, int depth)
+    {
+        EmlExtractionResult result;
+        try
+        {
+            result = extractor.Extract(eml);
+        }
+        catch (Exception ex)
+        {
+            Check(s, "no_throw", false, ex is EmlExtractionException e ? $"{e.Stage}: {e.InnerException?.GetType().FullName}" : ex.GetType().FullName);
+            return;
+        }
+
+        Check(s, "no_throw", true);
+        ScoreResult(s, result, expect, extractor, depth);
     }
 
     private static void ScoreResult(CaseScore s, EmlExtractionResult result, GoldenExpect expect, EmlExtractor extractor, int depth)
     {
-        var internalError = result.Warnings.FirstOrDefault(w => w.StartsWith("internal_error", StringComparison.Ordinal));
-        Check(s, "no_internal_error", internalError is null, internalError);
         foreach (var (key, field) in expect.Metadata)
         {
             result.Metadata.TryGetValue(key, out var actual);
@@ -137,7 +163,7 @@ internal static class Scorer
             if (wanted.ContentLocation is string loc)
                 Check(s, $"attach.location:{match.FileName}", match.ContentLocation == loc, $"got {match.ContentLocation}");
             if (wanted.Reextract is not null && depth < 2)
-                ScoreResult(s, extractor.Extract(match.BinaryData), wanted.Reextract, extractor, depth + 1);
+                ScoreExtract(s, match.BinaryData, wanted.Reextract, extractor, depth + 1);
         }
     }
 

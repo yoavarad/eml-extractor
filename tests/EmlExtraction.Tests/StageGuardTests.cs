@@ -2,131 +2,147 @@ using MimeKit;
 
 namespace EmlExtraction.Tests;
 
-/// <summary>ADR-004 per-stage guards, driven by the internal <see cref="EmlExtractor.StageFault"/> seam.</summary>
+/// <summary>
+/// ADR-023 stage wrappers, driven by the internal <see cref="EmlExtractor.StageFault"/> seam: an unexpected exception
+/// in a stage throws <see cref="EmlExtractionException"/> naming that stage, with the injected exception as
+/// <see cref="Exception.InnerException"/>. No partial result is returned (ports the #37 partial-result cases).
+/// </summary>
 public sealed class StageGuardTests
 {
-    private static readonly string[] FixedKeys = ["bcc", "cc", "from", "to", "xfields"];
-
     private readonly EmlExtractor _extractor = new();
 
-    [Fact]
-    public void MetadataFaultKeepsFixedKeysAndOtherStages()
+    [Theory]
+    [InlineData("parse")]
+    [InlineData("metadata")]
+    [InlineData("body")]
+    [InlineData("attachments")]
+    public void ByteOverloadWrapsStageFault(string stage)
     {
         var bytes = SampleFactory.ToBytes(Sample());
-        var baseline = _extractor.Extract(bytes);
-
-        var result = WithFault("metadata", () => _extractor.Extract(bytes));
-
-        AssertFixedKeysOnly(result);
-        Assert.Equal("", result.Metadata["xfields"]);
-        Assert.Equal("rtl", baseline.SubjectDirection);
-        Assert.Equal("ltr", result.SubjectDirection);
-        Assert.Equal(baseline.MainContent, result.MainContent);
-        Assert.Equal(baseline.MainContentMimeType, result.MainContentMimeType);
-        Assert.Equal(baseline.ContentDirection, result.ContentDirection);
-        Assert.Equal(Names(baseline), Names(result));
-        AssertOneInternalError(result, "metadata");
+        AssertWrapped(stage, () => _extractor.Extract(bytes));
     }
 
-    [Fact]
-    public void BodyFaultNullsContentAndKeepsOtherStages()
+    [Theory]
+    [InlineData("parse")]
+    [InlineData("metadata")]
+    [InlineData("body")]
+    [InlineData("attachments")]
+    public void RequestOverloadWrapsStageFault(string stage)
     {
         var bytes = SampleFactory.ToBytes(Sample());
-        var baseline = _extractor.Extract(bytes);
-
-        var result = WithFault("body", () => _extractor.Extract(bytes));
-
-        Assert.Null(result.MainContent);
-        Assert.Null(result.MainContentMimeType);
-        Assert.Equal("rtl", baseline.ContentDirection);
-        Assert.Equal("ltr", result.SubjectDirection);
-        Assert.Equal("ltr", result.ContentDirection);
-        Assert.Equal(baseline.Metadata, result.Metadata);
-        Assert.Equal(baseline.Metadata["xfields"], result.Metadata["xfields"]);
-        Assert.Equal(Names(baseline), Names(result));
-        AssertOneInternalError(result, "body");
-    }
-
-    [Fact]
-    public void AttachmentsFaultDropsAttachmentsAndKeepsOtherStages()
-    {
-        var bytes = SampleFactory.ToBytes(Sample());
-        var baseline = _extractor.Extract(bytes);
-        Assert.NotEmpty(baseline.Attachments);
-
-        var result = WithFault("attachments", () => _extractor.Extract(bytes));
-
-        Assert.Empty(result.Attachments);
-        Assert.Equal(baseline.Metadata, result.Metadata);
-        Assert.Equal(baseline.Metadata["xfields"], result.Metadata["xfields"]);
-        Assert.Equal(baseline.MainContent, result.MainContent);
-        Assert.Equal(baseline.SubjectDirection, result.SubjectDirection);
-        Assert.Equal(baseline.ContentDirection, result.ContentDirection);
-        AssertOneInternalError(result, "attachments");
-    }
-
-    [Fact]
-    public void UnlistedParseExceptionGivesResultNotThrow()
-    {
-        var bytes = SampleFactory.ToBytes(Sample());
-
-        var result = WithFault("parse", () => _extractor.Extract(new EmlExtractionRequest { FileBytes = bytes }));
-
-        AssertFixedKeysOnly(result);
-        Assert.Equal("", result.Metadata["xfields"]);
-        Assert.Null(result.MainContent);
-        Assert.Null(result.MainContentMimeType);
-        Assert.Empty(result.Attachments);
-        Assert.Equal("ltr", result.SubjectDirection);
-        Assert.Equal("ltr", result.ContentDirection);
-        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed", StringComparison.Ordinal));
-        AssertOneInternalError(result, "parse");
+        AssertWrapped(stage, () => _extractor.Extract(new EmlExtractionRequest { FileBytes = bytes }));
     }
 
     [Theory]
     [InlineData("metadata")]
     [InlineData("body")]
     [InlineData("attachments")]
-    public void MimeMessageOverloadMatchesByteOverload(string stage)
+    public void MimeMessageOverloadWrapsStageFault(string stage)
     {
         var bytes = SampleFactory.ToBytes(Sample());
-        var fromBytes = WithFault(stage, () => _extractor.Extract(bytes));
-        var fromMessage = WithFault(stage, () => _extractor.Extract(MimeMessage.Load(new MemoryStream(bytes))));
-
-        Assert.Equal(ResultProjection.Of(fromBytes), ResultProjection.Of(fromMessage));
-        AssertOneInternalError(fromMessage, stage);
+        AssertWrapped(stage, () => _extractor.Extract(MimeMessage.Load(new MemoryStream(bytes))));
     }
 
     [Fact]
-    public void EachFailedStageAddsOneWarningInStageOrder()
+    public void MetadataFaultThrowsInsteadOfDefaultSubjectDirection()
     {
+        // #37 gap: a metadata fault used to leave SubjectDirection "ltr" on a result whose subject is RTL.
         var bytes = SampleFactory.ToBytes(Sample());
-        EmlExtractor.StageFault = s =>
-        {
-            if (s is "metadata" or "attachments")
-                throw new InvalidCastException(s);
-        };
-        EmlExtractionResult result;
-        try
-        {
-            result = _extractor.Extract(bytes);
-        }
-        finally
-        {
-            EmlExtractor.StageFault = null;
-        }
+        Assert.Equal("rtl", _extractor.Extract(bytes).SubjectDirection);
 
-        Assert.Equal(
-            ["internal_error: metadata: InvalidCastException: metadata", "internal_error: attachments: InvalidCastException: attachments"],
-            result.Warnings);
-        Assert.NotNull(result.MainContent);
+        AssertWrapped("metadata", () => _extractor.Extract(bytes));
     }
 
     [Fact]
-    public void NoFaultMeansNoInternalError()
+    public void BodySelectionFaultThrowsInsteadOfLeakingBodyAsAttachment()
+    {
+        // #37 gap: a body-stage fault left body null, so the attachments stage collected the body part as an attachment.
+        var bytes = SampleFactory.ToBytes(Sample());
+        Assert.DoesNotContain(_extractor.Extract(bytes).Attachments, a => a.FileName.EndsWith(".plain", StringComparison.Ordinal));
+
+        AssertWrapped("body", () => _extractor.Extract(bytes));
+    }
+
+    [Fact]
+    public void FirstFailingStageWins()
+    {
+        var bytes = SampleFactory.ToBytes(Sample());
+        var ex = WithFault(
+            s => s is "metadata" or "attachments" ? new InvalidCastException(s) : null,
+            () => Assert.Throws<EmlExtractionException>(() => _extractor.Extract(bytes)));
+
+        Assert.Equal("metadata", ex.Stage);
+        Assert.Equal("metadata", ex.InnerException!.Message);
+    }
+
+    [Fact]
+    public void ParseContentExceptionStaysParseFailed()
+    {
+        var bytes = SampleFactory.ToBytes(Sample());
+        var result = WithFault(
+            s => s == "parse" ? new ArgumentException("bad") : null,
+            () => _extractor.Extract(bytes));
+
+        Assert.StartsWith("parse_failed: ArgumentException", Assert.Single(result.Warnings), StringComparison.Ordinal);
+        Assert.Null(result.MainContent);
+        Assert.Empty(result.Attachments);
+    }
+
+    [Theory]
+    [InlineData("parse")]
+    [InlineData("metadata")]
+    [InlineData("body")]
+    [InlineData("attachments")]
+    public void OutOfMemoryIsNotWrapped(string stage)
+    {
+        var bytes = SampleFactory.ToBytes(Sample());
+        var oom = new OutOfMemoryException("oom");
+        var thrown = WithFault(
+            s => s == stage ? oom : null,
+            () => Assert.Throws<OutOfMemoryException>(() => _extractor.Extract(bytes)));
+        Assert.Same(oom, thrown);
+    }
+
+    [Fact]
+    public void EmlExtractionExceptionIsNotWrappedAgain()
+    {
+        var bytes = SampleFactory.ToBytes(Sample());
+        var inner = new EmlExtractionException("metadata", new InvalidCastException("x"));
+        var thrown = WithFault(
+            s => s == "body" ? inner : null,
+            () => Assert.Throws<EmlExtractionException>(() => _extractor.Extract(bytes)));
+        Assert.Same(inner, thrown);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void DetectorWrapsFaultWithStageDetect(bool isEml)
+    {
+        var bytes = SampleFactory.ToBytes(Sample());
+        var detector = new EmlDetector();
+        var boom = new InvalidCastException("boom");
+        var ex = WithFault(
+            s => s == "detect" ? boom : null,
+            () => Assert.Throws<EmlExtractionException>(() =>
+            {
+                if (isEml)
+                    detector.IsEml(bytes);
+                else
+                    detector.Detect(bytes);
+            }));
+
+        Assert.Equal("detect", ex.Stage);
+        Assert.Same(boom, ex.InnerException);
+    }
+
+    [Fact]
+    public void NoFaultReturnsCleanResult()
     {
         var result = _extractor.Extract(Sample());
-        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("internal_error", StringComparison.Ordinal));
+        Assert.Empty(result.Warnings);
+        Assert.NotNull(result.MainContent);
+        Assert.NotEmpty(result.Attachments);
     }
 
     [Fact]
@@ -143,34 +159,31 @@ public sealed class StageGuardTests
         return message;
     }
 
-    private static EmlExtractionResult WithFault(string stage, Func<EmlExtractionResult> extract)
+    private static void AssertWrapped(string stage, Func<EmlExtractionResult> extract)
+    {
+        var boom = new InvalidCastException("boom");
+        var ex = WithFault(
+            s => s == stage ? boom : null,
+            () => Assert.Throws<EmlExtractionException>(() => extract()));
+
+        Assert.Equal(stage, ex.Stage);
+        Assert.Same(boom, ex.InnerException);
+    }
+
+    private static T WithFault<T>(Func<string, Exception?> fault, Func<T> run)
     {
         EmlExtractor.StageFault = s =>
         {
-            if (s == stage)
-                throw new InvalidCastException("boom");
+            if (fault(s) is { } ex)
+                throw ex;
         };
         try
         {
-            return extract();
+            return run();
         }
         finally
         {
             EmlExtractor.StageFault = null;
         }
     }
-
-    private static void AssertFixedKeysOnly(EmlExtractionResult result)
-    {
-        Assert.Equal(FixedKeys, result.Metadata.Keys.Order(StringComparer.Ordinal));
-        Assert.All(result.Metadata.Values, v => Assert.Equal("", v));
-    }
-
-    private static void AssertOneInternalError(EmlExtractionResult result, string stage)
-    {
-        var errors = result.Warnings.Where(w => w.StartsWith("internal_error", StringComparison.Ordinal)).ToList();
-        Assert.Equal($"internal_error: {stage}: InvalidCastException: boom", Assert.Single(errors));
-    }
-
-    private static IEnumerable<string> Names(EmlExtractionResult result) => result.Attachments.Select(a => a.FileName);
 }

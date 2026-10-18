@@ -58,7 +58,7 @@ Owner-approved 2026-10-18: wrap, in `EmlExtractionException`, and never wrap the
 - ADR-012's error model now matches OLE's direction (typed exceptions). `docs/team-questions.md` Q1 is narrowed to exception naming and base types.
 - ADR-005 / ADR-014 / ADR-016: the fixed metadata keys are present on every returned result, including `parse_failed`. There is no `input_too_large` result.
 - Breaking change. Acceptable: there are no consumers yet.
-- Manifests: `ydk:req:extraction/no-throw-on-malformed` (narrowed to content), `ydk:req:extraction/max-input-size`, `ydk:nfr:reliability/real-world-harvest-no-throw`, `ydk:warning:extraction/internal-error` and `ydk:warning:extraction/input-too-large` (deprecated), `ydk:contract:api/eml-extractor`, `ydk:contract:api/eml-detector`, `ydk:entity:extraction/EmlExtractionException`, `ydk:entity:extraction/EmlInputTooLargeException`.
+- Manifests: `ydk:req:extraction/no-throw-on-malformed` (narrowed to content), `ydk:req:extraction/max-input-size`, `ydk:nfr:reliability/real-world-harvest-no-throw`, `ydk:warning:extraction/internal-error` and `ydk:warning:extraction/input-too-large` (deleted, #105 and #106), `ydk:contract:api/eml-extractor`, `ydk:contract:api/eml-detector`, `ydk:entity:extraction/EmlExtractionException`, `ydk:entity:extraction/EmlInputTooLargeException`.
 
 ## Alternatives
 - Keep ADR-004 (never throw, `internal_error` warning). Rejected by the owner: it hides bugs and oversized inputs behind warning strings.

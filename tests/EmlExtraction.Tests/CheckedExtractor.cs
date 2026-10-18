@@ -1,8 +1,14 @@
 namespace EmlExtraction.Tests;
 
-/// <summary><see cref="EmlExtractor"/> that fails the calling test on any <c>internal_error</c> warning (ADR-004).</summary>
+/// <summary>
+/// <see cref="EmlExtractor"/> that fails the calling test unless every warning is a content warning (ADR-023). A library
+/// bug throws <see cref="EmlExtractionException"/>, which fails the test on its own.
+/// </summary>
 internal sealed class CheckedExtractor : IEmlExtractor
 {
+    private static readonly string[] ContentCodes =
+        ["parse_failed", "body_decode_failed", "part_decode_failed", "rfc822_extract_failed", "tnef_extract_failed"];
+
     private readonly EmlExtractor _inner = new();
 
     public EmlExtractionResult Extract(ReadOnlyMemory<byte> eml) => Check(_inner.Extract(eml));
@@ -11,7 +17,7 @@ internal sealed class CheckedExtractor : IEmlExtractor
 
     public static EmlExtractionResult Check(EmlExtractionResult result)
     {
-        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("internal_error", StringComparison.Ordinal));
+        Assert.All(result.Warnings, w => Assert.Contains(w.Split(':', 2)[0], ContentCodes));
         return result;
     }
 }

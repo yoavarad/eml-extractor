@@ -25,11 +25,11 @@ public sealed class TelemetryTests
 
     private static readonly Dictionary<string, HashSet<string>> AllowedTags = new()
     {
-        ["eml_extraction.outcome"] = ["clean", "warnings", "parse_failed", "input_too_large"],
+        ["eml_extraction.outcome"] = ["clean", "warnings", "parse_failed", "input_too_large", "internal_error"],
         ["eml_extraction.warning.code"] =
         [
             "parse_failed", "body_decode_failed", "part_decode_failed", "rfc822_extract_failed",
-            "tnef_extract_failed", "internal_error"
+            "tnef_extract_failed"
         ],
         ["eml_extraction.detect.result"] = ["supported", "not_supported"],
         ["eml_extraction.stage"] = ["parse", "metadata", "body", "attachments"],
@@ -162,7 +162,8 @@ public sealed class TelemetryTests
         };
         try
         {
-            _extractor.Extract(bytes);
+            var ex = Assert.Throws<EmlExtractionException>(() => _extractor.Extract(bytes));
+            Assert.Equal("attachments", ex.Stage);
         }
         finally
         {
@@ -174,12 +175,13 @@ public sealed class TelemetryTests
         Assert.Equal(
             [Tag("eml_extraction.stage", "attachments"), Tag("error.type", typeof(InvalidCastException).FullName)],
             error.Tags.OrderBy(t => t.Key, StringComparer.Ordinal));
-        Assert.Equal(Tag("eml_extraction.warning.code", "internal_error"), Assert.Single(Assert.Single(rec.Of(Warnings)).Tags));
-        Assert.Equal(Tag("eml_extraction.outcome", "warnings"), Assert.Single(Assert.Single(rec.Of(Duration)).Tags));
+        Assert.Empty(rec.Of(Warnings));
+        Assert.Empty(rec.Of(Attachments));
+        Assert.Equal(Tag("eml_extraction.outcome", "internal_error"), Assert.Single(Assert.Single(rec.Of(Duration)).Tags));
     }
 
     [Fact]
-    public void ParseStageInternalErrorTaggedParseFailed()
+    public void ParseStageInternalErrorCountedAndThrown()
     {
         using var rec = new Recorder();
         EmlExtractor.StageFault = s =>
@@ -189,7 +191,9 @@ public sealed class TelemetryTests
         };
         try
         {
-            _extractor.Extract(new EmlExtractionRequest { FileBytes = SampleFactory.ToBytes(SampleFactory.Plain("s", "t")) });
+            var ex = Assert.Throws<EmlExtractionException>(() =>
+                _extractor.Extract(new EmlExtractionRequest { FileBytes = SampleFactory.ToBytes(SampleFactory.Plain("s", "t")) }));
+            Assert.Equal("parse", ex.Stage);
         }
         finally
         {
@@ -197,8 +201,8 @@ public sealed class TelemetryTests
         }
 
         Assert.Contains(Tag("eml_extraction.stage", "parse"), Assert.Single(rec.Of(InternalErrors)).Tags);
-        Assert.Equal(Tag("eml_extraction.warning.code", "internal_error"), Assert.Single(Assert.Single(rec.Of(Warnings)).Tags));
-        Assert.Equal(Tag("eml_extraction.outcome", "parse_failed"), Assert.Single(Assert.Single(rec.Of(Duration)).Tags));
+        Assert.Empty(rec.Of(Warnings));
+        Assert.Equal(Tag("eml_extraction.outcome", "internal_error"), Assert.Single(Assert.Single(rec.Of(Duration)).Tags));
         Assert.Empty(rec.Of(Attachments));
     }
 
@@ -218,6 +222,40 @@ public sealed class TelemetryTests
         Assert.Equal(3, calls.Count);
         Assert.Equal(2d, calls.Where(c => c.Tags.Single().Value is "supported").Sum(c => c.Value));
         Assert.Equal(1d, calls.Where(c => c.Tags.Single().Value is "not_supported").Sum(c => c.Value));
+    }
+
+    [Fact]
+    public void HostListenerExceptionPropagatesUnwrapped()
+    {
+        var host = new InvalidCastException("host");
+        var bytes = SampleFactory.ToBytes(SampleFactory.Plain("s", "t"));
+        var armed = true;
+        using var listener = new MeterListener();
+        listener.InstrumentPublished = (instrument, l) =>
+        {
+            if (instrument.Meter.Name == "EmlExtraction")
+                l.EnableMeasurementEvents(instrument);
+        };
+        listener.SetMeasurementEventCallback<long>((_, _, _, _) =>
+        {
+            if (armed)
+                throw host;
+        });
+        listener.SetMeasurementEventCallback<double>((_, _, _, _) =>
+        {
+            if (armed)
+                throw host;
+        });
+        listener.Start();
+        try
+        {
+            Assert.Same(host, Assert.Throws<InvalidCastException>(() => _extractor.Extract(bytes)));
+            Assert.Same(host, Assert.Throws<InvalidCastException>(() => new EmlDetector().Detect(bytes)));
+        }
+        finally
+        {
+            armed = false;
+        }
     }
 
     [Fact]
@@ -250,7 +288,8 @@ public sealed class TelemetryTests
         };
         try
         {
-            _extractor.Extract(new EmlExtractionRequest { FileBytes = bytes, FileName = $"{marker}.eml" });
+            Assert.Throws<EmlExtractionException>(() =>
+                _extractor.Extract(new EmlExtractionRequest { FileBytes = bytes, FileName = $"{marker}.eml" }));
         }
         finally
         {

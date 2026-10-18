@@ -6,7 +6,8 @@ description: >-
   Pure byte sniff: never parses MIME, ignores file extension and file name. Non-email input is a result
   (IsSupported false / false), never an error. Throw contract (ADR-023, per project owner 2026-10-18): misuse throws
   (the ReadOnlySpan<byte> overloads have no argument that can be null or invalid, so none applies today); a library
-  bug throws ydk:entity:extraction/EmlExtractionException with stage detect (target, Stage 02).
+  bug throws ydk:entity:extraction/EmlExtractionException with stage detect (implemented, #106). A detect-stage
+  throw records no telemetry: the eml_extraction.stage tag set (ADR-021) has only the four extract stages.
   Target (ADR-012, shared team contract; not implemented, Stage 02): Detect returns the typed
   ydk:entity:extraction/EmlDetectionResult ; IsEml stays as the bool convenience the brief describes. Today only
   IsEml exists.

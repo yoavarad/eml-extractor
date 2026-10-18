@@ -26,7 +26,7 @@ Input: a buffer already identified as EML. Output: metadata, main content, neste
 EmlExtractionResult result = new EmlExtractor().Extract(bytes);
 ```
 
-Does not throw on malformed MIME content (bad charset, undecodable part, broken structure); those problems go into `result.Warnings` with whatever could be extracted. Input over `maxInputBytes` throws `EmlInputTooLargeException` (`InputLength`, `MaxInputBytes`) before parsing. Planned (ADR-023, Stage 02): misuse throws `ArgumentException` types and a library bug throws `EmlExtractionException` naming the failed stage. Today a library bug is reported as an `internal_error` warning.
+Does not throw on malformed MIME content (bad charset, undecodable part, broken structure); those problems go into `result.Warnings` with whatever could be extracted. Input over `maxInputBytes` throws `EmlInputTooLargeException` (`InputLength`, `MaxInputBytes`) before parsing. Misuse throws `ArgumentException` types, and a library bug throws `EmlExtractionException` naming the failed stage (`Stage`), with the original exception as `InnerException` (ADR-023).
 
 #### Metadata
 
@@ -72,8 +72,8 @@ The library publishes runtime metrics through the BCL `System.Diagnostics.Metric
 | `eml_extraction.extract.input_too_large` | Counter<long> | `{request}` | - |
 
 Tag values (closed sets):
-- `eml_extraction.outcome`: `clean`, `warnings`, `parse_failed` (nothing parsed: parse failure or an `internal_error` in the parse stage), `input_too_large`
-- `eml_extraction.warning.code`: `parse_failed`, `body_decode_failed`, `part_decode_failed`, `rfc822_extract_failed`, `tnef_extract_failed`, `internal_error`
+- `eml_extraction.outcome`: `clean`, `warnings`, `parse_failed`, `input_too_large` (threw `EmlInputTooLargeException`), `internal_error` (threw `EmlExtractionException`)
+- `eml_extraction.warning.code`: `parse_failed`, `body_decode_failed`, `part_decode_failed`, `rfc822_extract_failed`, `tnef_extract_failed`
 - `eml_extraction.detect.result`: `supported`, `not_supported`
 - `eml_extraction.stage`: `parse`, `metadata`, `body`, `attachments`
 - `error.type`: the .NET exception type's full name

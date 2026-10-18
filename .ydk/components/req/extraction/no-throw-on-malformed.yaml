@@ -13,12 +13,10 @@ rule: >-
   ydk:warning:extraction/tnef-extract-failed and extraction continues with the other parts. Warnings never abort
   extraction of other parts. Every content catch site handles only content exception types (FormatException,
   ParseException, IOException, InvalidOperationException, ArgumentException, NotSupportedException,
-  DecoderFallbackException). Target (ADR-023; Stage 02): any other exception is a library bug and is thrown as
+  DecoderFallbackException). ADR-023 (implemented, #105/#106): any other exception is a library bug and is thrown as
   ydk:entity:extraction/EmlExtractionException naming the stage, with the original as InnerException; a null argument
   throws ArgumentNullException; input over maxInputBytes throws ydk:entity:extraction/EmlInputTooLargeException
   (ydk:req:extraction/max-input-size). Tests and GoldenKit fail when extraction throws on a golden or realistic input.
-  Current code (Stage 02 gap): bugs are still recorded as internal_error
-  warnings, and the per-part catch sites catch every exception type.
 failure_behavior: See the five content warning components; each defines the resulting partial result.
 related_components:
   - ydk:contract:api/eml-extractor
@@ -28,4 +26,5 @@ acceptance_criteria:
   - Corrupt base64 body extracts the subject without throwing (ExtractionTests.CorruptBase64DoesNotCrash; golden corrupt-transfer-encoding 10/10)
   - Headers-only message records no parse_failed warning (HeadersOnlyDoesNotThrow)
   - Public harvest of 12,853 detected messages records 0 exceptions, 0 parse_failed, 0 warnings (ydk:nfr:reliability/real-world-harvest-no-throw)
-  - A non-content exception injected into any stage throws EmlExtractionException with that stage and the injected exception as InnerException (target, ADR-023)
+  - A non-content exception injected into any stage throws EmlExtractionException with that stage and the injected exception as InnerException (StageGuardTests, ADR-023)
+  - A non-content exception inside a per-part catch site is wrapped by its stage, a content one stays its warning (ContentCatchSiteTests)

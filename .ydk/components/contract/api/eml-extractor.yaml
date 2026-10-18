@@ -20,8 +20,7 @@ description: >-
   body, attachments) -> ydk:entity:extraction/EmlExtractionException naming the stage, original as InnerException
   (OutOfMemoryException is not wrapped); an exception from a host callback (MeterListener, ActivityListener)
   propagates unchanged. Messages name the parameter and the bad value or limit and never quote message content.
-  Current code (gap, Stage 02 work): each stage guard turns an unexpected exception into an internal_error warning
-  with that stage's empty default (#37).
+  Implemented (#105 size guard, #106 stage wrappers).
 methods:
   Extract(EmlExtractionRequest):
     description: >-

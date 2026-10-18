@@ -54,7 +54,7 @@ internal static class Probe
         File.WriteAllText(reportPath, stats.ToJson(root, files.Count, sw.Elapsed));
         Console.WriteLine(stats.ToText(root, files.Count, sw.Elapsed));
         Console.WriteLine($"report: {reportPath}");
-        return stats.Thrown > 0 || stats.InternalErrors > 0 ? 1 : 0;
+        return stats.Thrown > 0 ? 1 : 0;
     }
 
     private static IEnumerable<string> Discover(string root)
@@ -265,8 +265,6 @@ internal static class Probe
 
         if (result.Warnings.Any(w => w.StartsWith("parse_failed", StringComparison.Ordinal)))
             stats.ParseFailed++;
-        if (result.Warnings.Any(w => w.StartsWith("internal_error", StringComparison.Ordinal)))
-            stats.InternalErrors++;
 
         stats.Headers += result.Metadata.Count;
         if (result.Metadata.Count > stats.MaxHeaders)

@@ -14,7 +14,7 @@ public sealed class EmlExtractor : IEmlExtractor
 
     private static readonly AsyncLocal<Action<string>?> Fault = new();
 
-    /// <summary>Test seam (ADR-004): invoked with the stage name (parse, metadata, body, attachments) inside that stage's guard, so a test can inject a throw.</summary>
+    /// <summary>Test seam (ADR-023): invoked with the stage name (detect, parse, metadata, body, attachments) inside that stage's wrapper, so a test can inject a throw.</summary>
     internal static Action<string>? StageFault
     {
         get => Fault.Value;
@@ -37,12 +37,14 @@ public sealed class EmlExtractor : IEmlExtractor
 
     /// <inheritdoc/>
     /// <exception cref="EmlInputTooLargeException"><paramref name="eml"/> is longer than the configured <c>maxInputBytes</c>.</exception>
+    /// <exception cref="EmlExtractionException">An unexpected exception (library bug) occurred in a stage.</exception>
     public EmlExtractionResult Extract(ReadOnlyMemory<byte> eml)
         => Extract(new EmlExtractionRequest { FileBytes = eml });
 
     /// <inheritdoc/>
     /// <exception cref="ArgumentNullException"><paramref name="request"/> is null.</exception>
     /// <exception cref="EmlInputTooLargeException"><see cref="EmlExtractionRequest.FileBytes"/> is longer than the configured <c>maxInputBytes</c>.</exception>
+    /// <exception cref="EmlExtractionException">An unexpected exception (library bug) occurred in a stage.</exception>
     public EmlExtractionResult Extract(EmlExtractionRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -63,20 +65,17 @@ public sealed class EmlExtractor : IEmlExtractor
             StageFault?.Invoke("parse");
             message = Parse(eml);
         }
-        catch (Exception ex) when (ex is FormatException or ParseException or IOException
-                                       or InvalidOperationException or ArgumentException
-                                       or NotSupportedException or DecoderFallbackException)
+        catch (Exception ex) when (IsContentFailure(ex))
         {
             warnings.Add($"parse_failed: {ex.GetType().Name}: {ex.Message}");
             return Recorded(start, EmlExtractionTelemetry.OutcomeParseFailed, Empty(warnings));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (IsWrapped(ex))
         {
-            warnings.Add(InternalError("parse", ex));
-            return Recorded(start, EmlExtractionTelemetry.OutcomeParseFailed, Empty(warnings));
+            throw Wrap("parse", ex, start);
         }
 
-        return Recorded(start, null, Extract(message, warnings));
+        return Recorded(start, null, Extract(message, warnings, start));
     }
 
     /// <summary>Extracts from an already parsed <see cref="MimeMessage"/>.</summary>
@@ -85,7 +84,21 @@ public sealed class EmlExtractor : IEmlExtractor
     {
         ArgumentNullException.ThrowIfNull(message);
         var start = Stopwatch.GetTimestamp();
-        return Recorded(start, null, Extract(message, []));
+        return Recorded(start, null, Extract(message, [], start));
+    }
+
+    /// <summary>The seven content exception types (ADR-023): a content catch site turns these into its warning.</summary>
+    internal static bool IsContentFailure(Exception ex)
+        => ex is FormatException or ParseException or IOException or InvalidOperationException or ArgumentException
+               or NotSupportedException or DecoderFallbackException;
+
+    /// <summary>Whether a stage wrapper wraps <paramref name="ex"/>: everything except OutOfMemoryException and an already wrapped exception.</summary>
+    internal static bool IsWrapped(Exception ex) => ex is not (OutOfMemoryException or EmlExtractionException);
+
+    private static EmlExtractionException Wrap(string stage, Exception ex, long start)
+    {
+        EmlExtractionTelemetry.RecordInternalError(stage, ex, start);
+        return new EmlExtractionException(stage, ex);
     }
 
     private static EmlExtractionResult Recorded(long start, string? outcome, EmlExtractionResult result)
@@ -94,7 +107,7 @@ public sealed class EmlExtractor : IEmlExtractor
         return result;
     }
 
-    /// <summary>Parse stage body (ADR-004), without its guard; the profiling harness (ADR-020) calls it directly.</summary>
+    /// <summary>Parse stage body, without its wrapper; the profiling harness (ADR-020) calls it directly.</summary>
     internal static MimeMessage Parse(ReadOnlyMemory<byte> eml)
     {
         using var stream = Open(eml);
@@ -107,7 +120,7 @@ public sealed class EmlExtractor : IEmlExtractor
         return MimeMessage.Load(Options, stream);
     }
 
-    internal static EmlExtractionResult Extract(MimeMessage message, List<string> warnings)
+    private static EmlExtractionResult Extract(MimeMessage message, List<string> warnings, long start)
     {
         IReadOnlyDictionary<string, string> metadata;
         try
@@ -115,17 +128,16 @@ public sealed class EmlExtractor : IEmlExtractor
             StageFault?.Invoke("metadata");
             metadata = HeaderMapper.Map(message);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (IsWrapped(ex))
         {
-            metadata = HeaderMapper.EmptyMetadata();
-            warnings.Add(InternalError("metadata", ex));
+            throw Wrap("metadata", ex, start);
         }
 
-        TextPart? body = null;
+        TextPart? body;
         string? content = null;
         string? contentType = null;
-        var subjectDir = "ltr";
-        var contentDir = "ltr";
+        string subjectDir;
+        string contentDir;
         try
         {
             body = BodySelector.Select(message.Body);
@@ -137,7 +149,7 @@ public sealed class EmlExtractor : IEmlExtractor
                     content = body.Text.TrimEnd('\r', '\n');
                     contentType = body.ContentType.MimeType;
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (IsContentFailure(ex))
                 {
                     warnings.Add($"body_decode_failed: {ex.Message}");
                 }
@@ -148,13 +160,9 @@ public sealed class EmlExtractor : IEmlExtractor
             subjectDir = TextDirection.Detect(metadata.GetValueOrDefault("subject"), html: false);
             contentDir = TextDirection.Detect(content, html);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (IsWrapped(ex))
         {
-            content = null;
-            contentType = null;
-            subjectDir = "ltr";
-            contentDir = "ltr";
-            warnings.Add(InternalError("body", ex));
+            throw Wrap("body", ex, start);
         }
 
         IReadOnlyList<ExtractedAttachment> attachments;
@@ -163,10 +171,9 @@ public sealed class EmlExtractor : IEmlExtractor
             StageFault?.Invoke("attachments");
             attachments = PartCollector.Collect(message.Body, body, warnings);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (IsWrapped(ex))
         {
-            attachments = [];
-            warnings.Add(InternalError("attachments", ex));
+            throw Wrap("attachments", ex, start);
         }
 
         return new EmlExtractionResult(metadata, content, contentType, attachments, warnings)
@@ -174,12 +181,6 @@ public sealed class EmlExtractor : IEmlExtractor
             SubjectDirection = subjectDir,
             ContentDirection = contentDir
         };
-    }
-
-    private static string InternalError(string stage, Exception ex)
-    {
-        EmlExtractionTelemetry.RecordInternalError(stage, ex);
-        return $"internal_error: {stage}: {ex.GetType().Name}: {ex.Message}";
     }
 
     private static EmlExtractionResult Empty(List<string> warnings)

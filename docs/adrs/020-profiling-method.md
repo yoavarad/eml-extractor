@@ -26,7 +26,7 @@ Each stage is measured on its own and as a share of one whole extraction:
 | body | main-content selection and subject/body direction (ADR-003, ADR-006) |
 | attachments | attachment collection, TNEF unwrap, container path (ADR-008, ADR-013) |
 
-`request` and `detect` are profiling-only stages. `parse`, `metadata`, `body`, and `attachments` are the ADR-004 guarded stages and share their names with the `eml_extraction.stage` tag of ADR-021 (which keeps only those four values), so a hotspot in one of them maps to one guarded stage and to one `internal_error` stage name.
+`request` and `detect` are profiling-only stages. `parse`, `metadata`, `body`, and `attachments` are the extraction stages and share their names with the `eml_extraction.stage` tag of ADR-021 (which keeps only those four values), so a hotspot in one of them maps to one `EmlExtractionException.Stage` value (ADR-023).
 
 ### What is measured
 - CPU time per stage (inclusive and exclusive), from sampling.

@@ -5,14 +5,12 @@ description: >-
   project owner 2026-10-18; supersedes the ADR-004 "never throws" rule): malformed-but-readable content is a warning
   string on the result; misuse (ArgumentException family), input over maxInputBytes
   (ydk:entity:extraction/EmlInputTooLargeException) and library bugs (ydk:entity:extraction/EmlExtractionException)
-  throw instead. Today the per-stage bug guards still record internal_error
-  warnings (Stage 02 work removes them).
+  throw instead.
 kind: error-format
 specification: >-
   EmlExtractionResult.Warnings is an ordered list of strings, in the order problems were met during extraction.
   Each string is "<code>: <detail>" where <code> is one of parse_failed, body_decode_failed, part_decode_failed,
-  rfc822_extract_failed, tnef_extract_failed (lower snake_case, no spaces; internal_error is
-  deprecated by ADR-023 and leaves the set in Stage 02) and <detail> is the template defined on the
+  rfc822_extract_failed, tnef_extract_failed (lower snake_case, no spaces) and <detail> is the template defined on the
   matching warning component (typically the .NET exception message, prefixed for parse_failed by the exception type
   name and for part_decode_failed by the part's filename or MIME type). Consumers identify a warning by its prefix
   (string StartsWith "<code>"), never by the free-text detail. An empty list on a returned result means a clean
@@ -27,6 +25,5 @@ related:
   - ydk:warning:extraction/part-decode-failed
   - ydk:warning:extraction/rfc822-extract-failed
   - ydk:warning:extraction/tnef-extract-failed
-  - ydk:warning:extraction/internal-error
   - ydk:entity:extraction/EmlExtractionResult
   - ydk:crosscut:core/observability

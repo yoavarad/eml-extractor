@@ -2,9 +2,9 @@ $schema: ydk:schema:entity
 id: ydk:entity:extraction/EmlExtractionException
 description: >-
   Exception thrown when an unexpected (non-content) exception occurs inside detection or extraction, i.e. a library
-  bug. Target (ADR-023, per project owner 2026-10-18; not implemented, Stage 02): public sealed class
-  EmlExtractionException : Exception, in src/EmlExtraction. Replaces the internal_error warning and the per-stage
-  partial-result defaults of ADR-004. Not used for misuse (ArgumentException family), for
+  bug. ADR-023, per project owner 2026-10-18 (type #104; thrown by the stage wrappers since #106): public sealed class
+  EmlExtractionException : Exception, in src/EmlExtraction. Replaces the removed internal_error warning and the
+  per-stage partial-result defaults of ADR-004. Not used for misuse (ArgumentException family), for
   ydk:entity:extraction/EmlInputTooLargeException , for OutOfMemoryException, or for exceptions thrown by host
   callbacks (MeterListener, ActivityListener); those propagate unwrapped.
 fields:
