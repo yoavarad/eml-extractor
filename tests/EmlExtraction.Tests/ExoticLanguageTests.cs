@@ -1,3 +1,4 @@
+using System.Text;
 using MimeKit;
 
 namespace EmlExtraction.Tests;
@@ -99,6 +100,125 @@ public sealed class ExoticLanguageTests
         Assert.Equal("ltr", englishFirst.SubjectDirection);
         Assert.Equal("ltr", englishFirst.ContentDirection);
     }
+
+    public static TheoryData<string> Sequences => new()
+    {
+        "\U0001F468‍\U0001F469‍\U0001F467",
+        "\U0001F44D\U0001F3FD",
+        "\U0001F1EE\U0001F1F1",
+        "1️⃣",
+        "é",
+        "é",
+        "שָׁלוֹם",
+    };
+
+    [Theory]
+    [MemberData(nameof(Sequences))]
+    public void SubjectBEncodedWordIsOrdinalExact(string seq)
+    {
+        var r = _extractor.Extract(Eml("Subject: =?UTF-8?B?" + B64(seq) + "?=", "text/plain; charset=utf-8", "7bit", "x"));
+        Assert.Equal(seq, r.Metadata["subject"]);
+    }
+
+    [Theory]
+    [MemberData(nameof(Sequences))]
+    public void SubjectQEncodedWordIsOrdinalExact(string seq)
+    {
+        var r = _extractor.Extract(Eml("Subject: =?UTF-8?Q?" + Qp(seq) + "?=", "text/plain; charset=utf-8", "7bit", "x"));
+        Assert.Equal(seq, r.Metadata["subject"]);
+    }
+
+    [Theory]
+    [MemberData(nameof(Sequences))]
+    public void PlainBodyIsOrdinalExactInAllTransferEncodings(string seq)
+    {
+        var text = "a " + seq + " b";
+        foreach (var (cte, body) in new[]
+                 {
+                     ("base64", B64(text)),
+                     ("quoted-printable", Qp(text)),
+                     ("8bit", text),
+                 })
+        {
+            var r = _extractor.Extract(Eml("Subject: s", "text/plain; charset=utf-8", cte, body));
+            Assert.Equal(text, r.MainContent);
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(Sequences))]
+    public void HtmlBodyIsOrdinalExactInAllTransferEncodings(string seq)
+    {
+        var html = "<html><body><p>a " + seq + " b</p></body></html>";
+        foreach (var (cte, body) in new[]
+                 {
+                     ("base64", B64(html)),
+                     ("quoted-printable", Qp(html)),
+                     ("8bit", html),
+                 })
+        {
+            var r = _extractor.Extract(Eml("Subject: s", "text/html; charset=utf-8", cte, body));
+            Assert.Contains("a " + seq + " b", r.MainContent, StringComparison.Ordinal);
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(Sequences))]
+    public void AttachmentFileNameIsOrdinalExact(string seq)
+    {
+        var name = seq + ".txt";
+        var encodedWord = "=?UTF-8?B?" + B64(name) + "?=";
+        var rfc2231 = "UTF-8''" + string.Concat(Encoding.UTF8.GetBytes(name).Select(b => "%" + b.ToString("X2")));
+        foreach (var disposition in new[]
+                 {
+                     "attachment; filename=\"" + encodedWord + "\"",
+                     "attachment; filename*=" + rfc2231,
+                 })
+        {
+            var att = Assert.Single(_extractor.Extract(WithFile(disposition)).Attachments);
+            Assert.Equal(name, att.FileName);
+        }
+    }
+
+    [Fact]
+    public void ZwjSequenceSplitAcrossAdjacentEncodedWordsIsOrdinalExact()
+    {
+        const string first = "\U0001F468‍";
+        const string second = "\U0001F469‍\U0001F467";
+        foreach (var (word1, word2) in new[]
+                 {
+                     ("=?UTF-8?B?" + B64(first) + "?=", "=?UTF-8?B?" + B64(second) + "?="),
+                     ("=?UTF-8?Q?" + Qp(first) + "?=", "=?UTF-8?Q?" + Qp(second) + "?="),
+                 })
+        {
+            var r = _extractor.Extract(Eml("Subject: " + word1 + "\r\n " + word2, "text/plain; charset=utf-8", "7bit", "x"));
+            Assert.Equal(first + second, r.Metadata["subject"]);
+        }
+    }
+
+    [Fact]
+    public void Rfc2231FlagFilenameIsOrdinalExact()
+    {
+        var att = Assert.Single(_extractor.Extract(
+            WithFile("attachment; filename*=UTF-8''%F0%9F%87%AE%F0%9F%87%B1.txt")).Attachments);
+        Assert.Equal("\U0001F1EE\U0001F1F1.txt", att.FileName);
+    }
+
+    private static byte[] Eml(string subjectHeader, string contentType, string cte, string body) =>
+        Encoding.UTF8.GetBytes("MIME-Version: 1.0\r\n" + subjectHeader + "\r\nContent-Type: " + contentType
+                               + "\r\nContent-Transfer-Encoding: " + cte + "\r\n\r\n" + body + "\r\n");
+
+    private static byte[] WithFile(string disposition) =>
+        Encoding.UTF8.GetBytes("MIME-Version: 1.0\r\nSubject: s\r\nContent-Type: multipart/mixed; boundary=\"b\"\r\n\r\n"
+                               + "--b\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Transfer-Encoding: 7bit\r\n\r\nbody\r\n"
+                               + "--b\r\nContent-Type: application/octet-stream\r\nContent-Transfer-Encoding: base64\r\n"
+                               + "Content-Disposition: " + disposition + "\r\n\r\n" + B64("data") + "\r\n--b--\r\n");
+
+    private static string B64(string s) => Convert.ToBase64String(Encoding.UTF8.GetBytes(s));
+
+    // Every byte outside [A-Za-z0-9] as =XX (valid for QP bodies and RFC 2047 Q words).
+    private static string Qp(string s) => string.Concat(Encoding.UTF8.GetBytes(s)
+        .Select(b => char.IsAsciiLetterOrDigit((char)b) ? ((char)b).ToString() : "=" + b.ToString("X2")));
 
     private static MimeMessage Html(string subject, string html)
     {
