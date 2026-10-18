@@ -1,0 +1,37 @@
+From: Alice Example <alice@example.com>
+Date: Tue, 04 Mar 2025 09:30:00 +0000
+Subject: Outlook wrapper
+Message-Id: <tnef-docx@example.com>
+To: Bob Example <bob@example.net>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-bnd-tnef-docx"
+
+--=-bnd-tnef-docx
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+
+Body.
+--=-bnd-tnef-docx
+Content-Type: application/ms-tnef; name=winmail.dat
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=winmail.dat
+
+eJ8+IgEAAgKQBgAOAAAAAAAAAAAAAAAAAAAAAAAAAAIQgAEADAAAAHJlcG9ydC5kb2N4AHgEAg+A
+BgCCAwAAUEsDBBQAAAAIAAAAIVDfGwJXzgAAAFoBAAATAAAAW0NvbnRlbnRfVHlwZXNdLnhtbJXQ
+QU7EMAwF0KtE2aImhQVCqO0sBm7ABaLUaSMSO4rdIZyNBUfiCmg6aBaIDWt//afvr4/P4dByUieo
+HAlHfWt6rQA9zRGXUW8Sugd9mIaX9wKsWk7Io15FyqO17FfIjg0VwJZToJqdsKG62OL8q1vA3vX9
+vfWEAiidnDv0NDxBcFsS9dwE8MK2nLQ6XnJnatSulBS9k0hoTzj/QjoKIXqYyW8ZUMwb1blU8sAc
+ccnJXC/ZRbzZ6+2fcoXE/6N/tpkKac/wGgtfCbt/avoGUEsDBBQAAAAIAAAAIVCpq+AKqwAAAB0B
+AAALAAAAX3JlbHMvLnJlbHONz7ENwjAQheFVrOvJBQqEUBwaGlqUBSz7kljYPss2EGajYCRWoKEg
+iIL26dcnvef90ewm78SFUrYcJCyrGgQFzcaGQcK59IsN7NrmSE4VyyGPNmYxeReyhLGUuEXMeiSv
+csWRwuRdz8mrkitOA0alT2ogXNX1GtOnAXNTdLdI/4jc91bTnvXZUyg/4K8CRKfSQEUCXjkZNO+9
+mrwDcTAS0sEsQWDb4Oxk+wJQSwMEFAAAAAgAAAAhUPGLKlixAAAA8wAAABEAAAB3b3JkL2RvY3Vt
+ZW50LnhtbEXPQU7FMAwE0KtYWUNSWCBUtf1LDsAJQuLfRkrs4Li0vT3KZ8HmzW5GM93OkuEHpSWm
+2bzYwQBS4Jhonc2u9+d3c1umY4wc9oKkcJZMbTxms6nW0bkWNiy+Wa5IZ8l3luK1WZbVHSyxCgds
+LdFasnsdhjdXfCLTK784Xj1rRzq6fF6kG2oK8L17UZR8gWBlUQsfSCheMULzpWZ8AmIQ9BmiV28n
+1wu68rA+/Btx/weWX1BLAQIUABQAAAAIAAAAIVDfGwJXzgAAAFoBAAATAAAAAAAAAAAAAAAAAAAA
+AABbQ29udGVudF9UeXBlc10ueG1sUEsBAhQAFAAAAAgAAAAhUKmr4AqrAAAAHQEAAAsAAAAAAAAA
+AAAAAAAA/wAAAF9yZWxzLy5yZWxzUEsBAhQAFAAAAAgAAAAhUPGLKlixAAAA8wAAABEAAAAAAAAA
+AAAAAAAA0wEAAHdvcmQvZG9jdW1lbnQueG1sUEsFBgAAAAADAAMAuQAAALMCAAAAADVS
+
+--=-bnd-tnef-docx--

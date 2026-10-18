@@ -1,0 +1,36 @@
+From: Alice Example <alice@example.com>
+Date: Tue, 04 Mar 2025 09:30:00 +0000
+Subject: Slides
+Message-Id: <attached-pptx@example.com>
+To: Bob Example <bob@example.net>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-bnd-attached-pptx"
+
+--=-bnd-attached-pptx
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+
+See attached file.
+--=-bnd-attached-pptx
+Content-Type: application/vnd.openxmlformats-officedocument.presentationml.presentation;
+	name=deck.pptx
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=deck.pptx
+
+UEsDBBQAAAAIAAAAIVBaa3YbywAAAFwBAAATAAAAW0NvbnRlbnRfVHlwZXNdLnhtbJXQQUrFMBCA
+4auEbKVJfQsRafsW6g28QEgnbTCZCZnpI+9sLjySV5DXJ4LixuXAz3zMfLy9D8eWkzpB5Ug46lvT
+awXoaY64jHqT0N3r4zS8nAuwajkhj3oVKQ/Wsl8hOzZUAFtOgWp2wobqYovzr24Be+j7O+sJBVA6
+uezQ0/AEwW1J1HMTwCvbctLq8dpdqFG7UlL0TiKhPeH8C+kohOhhJr9lQDGlAgPKnuf0YzTZRbzZ
+AfunXSHx//Cv60yFtDe8xsLfhN1/NX0CUEsDBBQAAAAIAAAAIVAjRq3rrAAAACABAAALAAAAX3Jl
+bHMvLnJlbHONzz0KwkAQQOGrLNObSSxEJBsbm7SSCyybSbK4f+xOJJ7NwiN5BcHKiIX944P3vD/q
+4+KsuFLKJngJVVGCIK9Db/woYeZhs4djU5/JKjbB58nELBZnfZYwMccDYtYTOZWLEMkvzg4hOcW5
+CGnEqPRFjYTbstxh+jRgbYruFukfMQyD0XQKenbk+Qf8VYDoVBqJJWCMjDFRJs/vvFicBdH2ElLb
+VyCwqXH12bwAUEsDBBQAAAAIAAAAIVBKM5mSeAAAAJoAAAAUAAAAcHB0L3ByZXNlbnRhdGlvbi54
+bWxVzUEKwyAQQNGriPtmbBeliJp1oJeQaBLBGcWZlhy/dNce4L/v5hOreufBpZHX18lolWltqdDu
+9Uu2y0PPwXXbR+ZMEqU0UidWYtu9PkS6BeD1yBh5aj3TiXVrA6Pw1MYOvx1WuBlzB4yF9Bflmpb0
+ZFEQHPw/wgdQSwECFAAUAAAACAAAACFQWmt2G8sAAABcAQAAEwAAAAAAAAAAAAAAAAAAAAAAW0Nv
+bnRlbnRfVHlwZXNdLnhtbFBLAQIUABQAAAAIAAAAIVAjRq3rrAAAACABAAALAAAAAAAAAAAAAAAA
+APwAAABfcmVscy8ucmVsc1BLAQIUABQAAAAIAAAAIVBKM5mSeAAAAJoAAAAUAAAAAAAAAAAAAAAA
+ANEBAABwcHQvcHJlc2VudGF0aW9uLnhtbFBLBQYAAAAAAwADALwAAAB7AgAAAAA=
+
+--=-bnd-attached-pptx--

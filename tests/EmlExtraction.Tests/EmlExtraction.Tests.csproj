@@ -14,6 +14,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\EmlExtraction\EmlExtraction.csproj" />
+    <ProjectReference Include="..\..\tools\RealisticSamples\RealisticSamples.csproj" />
   </ItemGroup>
   <ItemGroup>
     <!-- Single golden schema, shared with GoldenKit. -->

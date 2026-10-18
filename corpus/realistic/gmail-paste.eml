@@ -1,0 +1,33 @@
+From: Alice Example <alice@example.com>
+Date: Tue, 04 Mar 2025 09:30:00 +0000
+Subject: Pasted image
+Message-Id: <gmail-paste@example.com>
+To: Bob Example <bob@example.net>
+MIME-Version: 1.0
+Content-Type: multipart/related; boundary="=-bnd-gmail-paste"
+
+--=-bnd-gmail-paste
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">Screenshot:<br><img src=3D"cid:ii_lq8x2k1a0" alt=3D"image.=
+png" width=3D"16" height=3D"16"><br></div>=
+
+--=-bnd-gmail-paste
+Content-Type: image/png; name=image.png
+Content-Transfer-Encoding: base64
+Content-Id: <ii_lq8x2k1a0>
+Content-Disposition: inline; filename=image.png
+
+iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAB0ElEQVR4nAXBIRJEAAAAQCMIgiCK
+oih66EZRFMULgiAIgiAIgiAIgiCY2w306l7Ta3td79cbelNv6W29o3f1nt7Xi3pJLzCqR82oHXWj
+32gYTaNltI2O0TV6Rt8oGiWjwKyeNbN21s1+s2E2zZbZNjtm1+yZfbNolswCq3rVrNpVt/qthtW0
+Wlbb6lhdq2f1raJVsgrs6l2za3fd7rcbdtNu2W27Y3ftnt23i3bJLnCqT82pPXWn32k4TafltJ2O
+03V6Tt8pOiWnwK2+Nbf21t1+t+E23Zbbdjtu1+25fbfoltwCr/rVvNpX9/q9htf0Wl7b63hdr+f1
+vaJX8gqE6lATakNd6BcaQlNoCW2hI3SFntAXikJJKBCrY02sjXWxX2yITbEltsWO2BV7Yl8siiWx
+QKpONak21aV+qSE1pZbUljpSV+pJfakolaQCmTrTZNpMl/llhsyUWTJb5shcmSfzZaJMkgnk6lyT
+a3Nd7pcbclNuyW25I3flntyXi3JJLlCoC02hLXSFX2EoTIWlsBWOwlV4Cl8hKiSFQKkuNaW21JV+
+paE0lZbSVjpKV+kpfaWolJQClbrSVNpKV/lVhspUWSpb5ahclafyVaJKUvkDk6fGEM4vAUkAAAAA
+SUVORK5CYII=
+
+--=-bnd-gmail-paste--
