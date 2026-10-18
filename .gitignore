@@ -13,3 +13,4 @@ docs/golden-score.json
 .ydk/cache/
 .ydk/worktrees/
 .ydk/tdd-state.json
+sweep-results/

@@ -21,4 +21,10 @@
     <Compile Include="..\..\tools\GoldenKit\Schema\*.cs" Link="GoldenSchema\%(Filename)%(Extension)" />
     <Using Include="GoldenKit.Schema" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- Pure parts of the bench DOP sweep (ADR-015), unit-tested without referencing the bench exe. -->
+    <Compile Include="..\..\benches\EmlExtraction.Bench\Sweep\SweepMath.cs" Link="Sweep\SweepMath.cs" />
+    <Compile Include="..\..\benches\EmlExtraction.Bench\Sweep\CpuInfoParser.cs" Link="Sweep\CpuInfoParser.cs" />
+    <Compile Include="..\..\benches\EmlExtraction.Bench\Sweep\MboxSplitter.cs" Link="Sweep\MboxSplitter.cs" />
+  </ItemGroup>
 </Project>

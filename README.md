@@ -121,7 +121,7 @@ Measured on Apple M1 Pro, 1 thread, Release, in-memory `byte[]` (no disk). Use t
 | ~20 KB HTML | ~16,900 |
 | Mail + 1 MB attachment | ~259 |
 
-Rough multi-core: `files/sec ≈ extract/s × cores × 0.7`. Attachment-heavy mail is RAM-bound. Full table and formula: [docs/perf-results.md](docs/perf-results.md).
+Multi-core capacity is measured, not estimated: `dotnet run -c Release --project benches/EmlExtraction.Bench -- sweep` runs the DOP sweep (ADR-015). Attachment-heavy mail is RAM-bound. Full table and sweep options: [docs/perf-results.md](docs/perf-results.md).
 
 ### 2. Correctness A — emoji and exotic languages
 
