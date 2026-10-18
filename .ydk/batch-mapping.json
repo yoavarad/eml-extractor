@@ -1,14 +1,8 @@
 {
-  "E-perf": "#64",
-  "S-profiling": "#65",
-  "S-runtime-metrics": "#66",
-  "S-optimization": "#67",
-  "T-profile-harness": "#68",
-  "T-profile-trace": "#69",
-  "T-profile-report": "#70",
-  "T-runtime-metrics": "#71",
-  "T-runtime-tracing": "#72",
-  "T-metrics-overhead": "#73",
-  "T-opt-triage": "#74",
-  "T-opt-reprofile": "#75"
+  "E-error-model": "#102",
+  "S-throw": "#103",
+  "T-throw-types": "#104",
+  "T-throw-size": "#105",
+  "T-throw-bugs": "#106",
+  "T-throw-docs": "#107"
 }
