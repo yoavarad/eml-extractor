@@ -325,7 +325,7 @@ public sealed class ExtractionTests
         var att = Assert.Single(result.Attachments);
         Assert.Equal("passwd.txt", att.FileName);
         Assert.Equal("../../etc/passwd.txt", att.OriginalPath);
-        Assert.Equal("../../etc/passwd.txt", att.FullPath);
+        Assert.Equal("passwd.txt", att.FullPath);
         Assert.Equal(payload, att.BinaryData);
     }
 

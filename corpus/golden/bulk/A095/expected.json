@@ -39,7 +39,8 @@
         "name": "file.pdf",
         "size": 17,
         "sha256": "7bf309346ebc55fa6a7330bda3fd31e5fc48b385f850b09d6111e6fa9eb3c503",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "file.pdf"
       }
     ]
   }

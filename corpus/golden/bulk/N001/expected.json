@@ -37,6 +37,7 @@
     "attachments": [
       {
         "name": "forwarded-1.eml",
+        "full_path": "forwarded-1.eml",
         "reextract": {
           "metadata": {
             "subject": {

@@ -9,6 +9,7 @@
     "attachments": [
       {
         "name": "report.docx",
+        "full_path": "report.docx",
         "size": 17,
         "sha256": "90c08aca87e13b1272ae46b66537280d13b92263dde610a1c7b7cae6ac592ea3",
         "disposition": "attachment"

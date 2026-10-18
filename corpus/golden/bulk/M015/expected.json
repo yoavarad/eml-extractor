@@ -38,7 +38,8 @@
         "name": "note-15.txt",
         "size": 8,
         "sha256": "a991dfe18cebfbb6020a9a19c95fc34e4fa8163eef2ecff60743484fa23e48b2",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "note-15.txt"
       }
     ]
   }

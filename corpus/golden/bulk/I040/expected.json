@@ -39,7 +39,8 @@
         "name": "pic.tif",
         "size": 12,
         "sha256": "fcae0425f385c26277c715b549cd3ff09d09830f0d7ca21bb9e3c9a082525783",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "pic.tif"
       }
     ]
   }

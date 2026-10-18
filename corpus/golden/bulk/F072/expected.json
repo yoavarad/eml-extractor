@@ -39,7 +39,8 @@
         "name": "mail.msg",
         "size": 16,
         "sha256": "8b39c51594280f086683304d5ddd5b74017ba3a149737566205dce520c7d3848",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "mail.msg"
       }
     ]
   }

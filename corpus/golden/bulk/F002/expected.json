@@ -39,7 +39,8 @@
         "name": "a.zip",
         "size": 12,
         "sha256": "7a4971dc0ed4934dcd997b608e7a819ac6d6005c970cf48dd0564c4b057cfc3e",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "a.zip"
       }
     ]
   }

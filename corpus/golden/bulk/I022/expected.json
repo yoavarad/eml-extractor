@@ -39,7 +39,8 @@
         "name": "pic.webp",
         "size": 21,
         "sha256": "e75fbdc92dfaf9002489d081de77fbde197705696e93cb5919eb5305d4526200",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "pic.webp"
       }
     ]
   }

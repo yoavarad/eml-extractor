@@ -39,7 +39,8 @@
         "name": "pic.heic",
         "size": 21,
         "sha256": "505776893e2150ecf6476536b84176112cc82f821fd578b72afddf79a968c418",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "pic.heic"
       }
     ]
   }

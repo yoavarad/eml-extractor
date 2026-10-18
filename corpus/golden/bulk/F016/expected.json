@@ -39,7 +39,8 @@
         "name": "a.gz",
         "size": 10,
         "sha256": "acce3a7ee61ea150f2b082823b6c0cc1841b9d213083b92c6d5b15e062338e75",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "a.gz"
       }
     ]
   }

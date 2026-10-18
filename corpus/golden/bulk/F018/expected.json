@@ -39,7 +39,8 @@
         "name": "a.txt",
         "size": 14,
         "sha256": "6c037ad808e4042f33e59b17bb2b809e7d8a86ced4483a0e4c7c883059f0d487",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "a.txt"
       }
     ]
   }

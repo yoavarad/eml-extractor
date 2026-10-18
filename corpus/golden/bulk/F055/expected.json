@@ -39,7 +39,8 @@
         "name": "a.wav",
         "size": 20,
         "sha256": "b6dd5d5694b2cdea8e855025a1217e8b474a4afaffe753216949604a8f9c488d",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "a.wav"
       }
     ]
   }

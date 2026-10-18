@@ -40,7 +40,8 @@
         "name": "text.odt",
         "size": 12,
         "sha256": "5e2d1bbaca935bea7b782b758a4eb8374583863d9306bf8800536bb727df2677",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "text.odt"
       }
     ]
   }

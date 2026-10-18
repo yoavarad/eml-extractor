@@ -38,7 +38,8 @@
         "name": "note-9.txt",
         "size": 8,
         "sha256": "94d78bd2d96d040013fddb7bc0fd3f03c37d044b024d95a2548b1b3d67a2d064",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "note-9.txt"
       }
     ]
   }

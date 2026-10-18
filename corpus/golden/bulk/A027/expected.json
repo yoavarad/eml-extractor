@@ -39,7 +39,8 @@
         "name": "deck.pptx",
         "size": 13,
         "sha256": "05a86f30d9f1a4187cf94d411f98ce281dd49ece2c3e16c7f03a11661605bf29",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "deck.pptx"
       }
     ]
   }

@@ -37,7 +37,8 @@
       {
         "name": "smime.p7s",
         "size": 6,
-        "sha256": "8cb081175d2ee18043ab24168f8341dfad8fc8984858796447ee05b97ee8c0b1"
+        "sha256": "8cb081175d2ee18043ab24168f8341dfad8fc8984858796447ee05b97ee8c0b1",
+        "full_path": "smime.p7s"
       }
     ]
   }

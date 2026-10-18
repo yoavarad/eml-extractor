@@ -61,6 +61,21 @@ public sealed class GoldenTests
         }
     }
 
+    [Fact]
+    public void FullPathIsSetAndUniquePerResultOnEveryGoldenInput()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "corpus", "golden")))
+            dir = dir.Parent;
+        Assert.NotNull(dir);
+        foreach (var path in Directory.EnumerateFiles(Path.Combine(dir.FullName, "corpus", "golden"), "input.eml", SearchOption.AllDirectories))
+        {
+            var paths = _extractor.Extract(File.ReadAllBytes(path)).Attachments.Select(a => a.FullPath).ToList();
+            Assert.All(paths, p => Assert.False(string.IsNullOrEmpty(p), path));
+            Assert.True(paths.Distinct(StringComparer.OrdinalIgnoreCase).Count() == paths.Count, path);
+        }
+    }
+
     private void Check(EmlExtractionResult result, GoldenExpect expect, string label, int depth)
     {
         foreach (var (key, field) in expect.Metadata)
@@ -87,6 +102,8 @@ public sealed class GoldenTests
                 Assert.Equal(sha, Convert.ToHexString(SHA256.HashData(match.BinaryData)), StringComparer.OrdinalIgnoreCase);
             if (wanted.Disposition is string disp)
                 Assert.Equal(disp, match.Disposition);
+            if (wanted.FullPath is string fullPath)
+                Assert.Equal(fullPath, match.FullPath);
             if (wanted.OriginalPath is string path)
                 Assert.Equal(path, match.OriginalPath);
             if (wanted.ContentLocation is string loc)

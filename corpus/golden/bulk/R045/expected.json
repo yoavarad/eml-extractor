@@ -44,7 +44,8 @@
         "name": "paste.jpg",
         "size": 12,
         "sha256": "c01855aee4b0d470b2aa82d85bcd1c84fdb5fe6a5d99d57572627a701c106b36",
-        "disposition": "inline"
+        "disposition": "inline",
+        "full_path": "paste.jpg"
       }
     ]
   }

@@ -39,7 +39,8 @@
         "name": "a.html",
         "size": 14,
         "sha256": "37ac24a992962f792d990c67919271e1490a2379e214fa9a6b30306f723dbe8e",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "a.html"
       }
     ]
   }

@@ -130,6 +130,8 @@ internal static class Scorer
 
             if (wanted.Disposition is string disp)
                 Check(s, $"attach.disp:{match.FileName}", string.Equals(match.Disposition, disp, StringComparison.OrdinalIgnoreCase), $"got {match.Disposition}");
+            if (wanted.FullPath is string fullPath)
+                Check(s, $"attach.full_path:{match.FileName}", match.FullPath == fullPath, $"got {match.FullPath}");
             if (wanted.OriginalPath is string path)
                 Check(s, $"attach.path:{match.FileName}", match.OriginalPath == path, $"got {match.OriginalPath}");
             if (wanted.ContentLocation is string loc)

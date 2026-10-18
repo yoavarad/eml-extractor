@@ -39,7 +39,8 @@
         "name": "a.json",
         "size": 14,
         "sha256": "21bc917716d4d4107ce85575398f05bda3ca73b6c962c3002fec7c400848f640",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "a.json"
       }
     ]
   }

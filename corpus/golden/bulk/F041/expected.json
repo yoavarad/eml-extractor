@@ -39,7 +39,8 @@
         "name": "meet.ics",
         "size": 14,
         "sha256": "50a01031cced5f960f679c036b1f6c4843ca2d0d59a33250fdb38afd7ff80a90",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "meet.ics"
       }
     ]
   }

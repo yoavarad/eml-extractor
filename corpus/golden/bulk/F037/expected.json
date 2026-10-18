@@ -39,7 +39,8 @@
         "name": "a.md",
         "size": 14,
         "sha256": "fa1b18f5efdca2583251df7353614b6262ca73820b470a432632e389b545802d",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "a.md"
       }
     ]
   }
