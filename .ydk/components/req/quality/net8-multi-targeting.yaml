@@ -2,8 +2,8 @@ $schema: ydk:schema:req
 id: ydk:req:quality/net8-multi-targeting
 description: >-
   The library and its tests target both net8.0 and net10.0 so a .NET 8 template can load the component (ADR-019,
-  per project owner 2026-10-18). Target; not implemented (Stage 02). Today every project targets net10.0 only
-  (Directory.Build.props). .NET 8 LTS support ends 2026-11-10; net8.0 is dropped once the team template is on net10.
+  per project owner 2026-10-18). Implemented (task #30): Directory.Build.props sets
+  TargetFrameworks for the library, tests and bench; other projects default to net10.0. .NET 8 LTS support ends 2026-11-10; net8.0 is dropped once the team template is on net10.
 type: constraint
 priority: high
 rule: >-
