@@ -4,12 +4,14 @@ using MimeKit;
 
 namespace EmlExtraction;
 
+/// <summary>MimeKit-based <see cref="IEmlExtractor"/>.</summary>
 public sealed class EmlExtractor : IEmlExtractor
 {
     static EmlExtractor() => Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
     private static readonly ParserOptions Options = CreateOptions();
 
+    /// <inheritdoc/>
     public EmlExtractionResult Extract(ReadOnlyMemory<byte> eml)
     {
         var warnings = new List<string>();
@@ -44,6 +46,8 @@ public sealed class EmlExtractor : IEmlExtractor
         }
     }
 
+    /// <summary>Extracts from an already parsed <see cref="MimeMessage"/>.</summary>
+    /// <param name="message">Parsed message.</param>
     public EmlExtractionResult Extract(MimeMessage message)
         => Extract(message, []);
 
