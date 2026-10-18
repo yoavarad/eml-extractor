@@ -74,15 +74,25 @@ internal static class PartCollector
         return haystack is Multipart multipart && multipart.Any(child => Contains(child, needle));
     }
 
+    // Platform-independent output: nested message bytes must not depend on the OS newline.
+    private static readonly FormatOptions Crlf = NewCrlf();
+
+    private static FormatOptions NewCrlf()
+    {
+        var o = FormatOptions.Default.Clone();
+        o.NewLineFormat = NewLineFormat.Dos;
+        return o;
+    }
+
     private static void AddRfc822(MessagePart rfc822, string? container, List<ExtractedAttachment> parts, List<string> warnings)
     {
         try
         {
             using var stream = new MemoryStream();
             if (rfc822.Message is not null)
-                rfc822.Message.WriteTo(stream);
+                rfc822.Message.WriteTo(Crlf, stream);
             else
-                rfc822.WriteTo(stream);
+                rfc822.WriteTo(Crlf, stream);
 
             Add(parts, rfc822, stream.ToArray(), fallback: "attached.eml", container);
         }
