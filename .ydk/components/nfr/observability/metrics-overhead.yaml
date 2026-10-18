@@ -3,7 +3,7 @@ id: ydk:nfr:observability/metrics-overhead
 description: >-
   Cost of the runtime telemetry of ydk:req:observability/runtime-telemetry (ADR-021). Set from the overhead benchmark run of
   #73 (docs/perf-results.md, Telemetry overhead: BenchmarkDotNet, Intel Core Ultra 7 155H, net8.0 and net10.0, two
-  runs 2026-10-18). Proposed from data, pending owner confirmation.
+  runs 2026-10-18). Proposed from data; confirmed by the owner (2026-10-18), 10% ActivityListener limit kept.
 category: observability
 tags: [overhead, telemetry]
 target: >-

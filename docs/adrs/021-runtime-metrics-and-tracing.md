@@ -1,7 +1,7 @@
 # ADR-021: Runtime metrics and tracing with BCL Meter and ActivitySource
 
 ## Status
-Accepted (per project owner, 2026-10-18). Implemented (metrics #71, activities #72). The overhead budget is set from the #73 measurement (`docs/perf-results.md`), pending owner confirmation. Instrument names may be renamed once if the team answers `docs/team-questions.md` question 6 before the first release that ships them. Amended by ADR-023 (2026-10-18): `internal_errors` and `input_too_large` count thrown exceptions, and those two codes leave the warning-code tag set.
+Accepted (per project owner, 2026-10-18). Implemented (metrics #71, activities #72). The overhead budget is set from the #73 measurement (`docs/perf-results.md`) and confirmed by the owner (2026-10-18). Instrument names may be renamed once if the team answers `docs/team-questions.md` question 6 before the first release that ships them. Amended by ADR-023 (2026-10-18): `internal_errors` and `input_too_large` count thrown exceptions, and those two codes leave the warning-code tag set.
 
 ## Context
 Today the warnings list on the result is the only diagnostic channel; the library writes no logs, traces, or metrics (`ydk:crosscut:core/warning-format`). The factory sees each result, but it cannot see, without wrapping every call itself, how long extraction takes per message size, how often each warning kind fires across a fleet, how often the size guard refuses input, or which stage hit an `internal_error`. The owner decided (2026-10-18) to add runtime metrics in the library, next to dev-time profiling (ADR-020).
@@ -62,10 +62,10 @@ No histogram bucket advice is set: the API for it is not in the net8.0 BCL. Cons
 - Every tag value comes from a closed set fixed in code or is a number. A test asserts this on every instrument and activity (`ydk:test:observability/telemetry.unit`).
 
 ### Overhead budget
-`ydk:nfr:observability/metrics-overhead`. Set from the #73 BenchmarkDotNet run (`docs/perf-results.md`, both TFMs, two runs); pending owner confirmation:
+`ydk:nfr:observability/metrics-overhead`. Set from the #73 BenchmarkDotNet run (`docs/perf-results.md`, both TFMs, two runs); confirmed by the owner (2026-10-18):
 - No listener: zero added allocated bytes per call (asserted on the telemetry hooks by a unit test). Time is not A/B measured (no uninstrumented build); the hooks are `Enabled`/null checks.
 - MeterListener on every instrument: at most 5% added time on the tiny message. Measured: inside noise (-6.9% to +0.5%), no added bytes.
-- ActivityListener sampling all, with stage children: at most 10% on the tiny message, else the children are dropped. Measured +0.8% to +9.7% and +2.2 KB per Extract, so the children stay; headroom is only about 0.3 points on net8.0, so a noisier run could cross 10% (owner to confirm).
+- ActivityListener sampling all, with stage children: at most 10% on the tiny message, else the children are dropped. Measured +0.8% to +9.7% and +2.2 KB per Extract, so the children stay; headroom is only about 0.3 points on net8.0, so a noisier run could cross 10%. The owner kept the 10% limit and the stage children (2026-10-18).
 - Verified by a BenchmarkDotNet comparison of no listener versus listener attached, on both target frameworks (`-- overhead`).
 
 ## Alternatives
