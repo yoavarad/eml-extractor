@@ -59,7 +59,7 @@ No further extraction: no file-type detection, no parsing inside Office/PDF/imag
 
 ## Telemetry
 
-The library publishes runtime metrics through the BCL `System.Diagnostics.Metrics` API (ADR-021). It takes no OpenTelemetry, logging or EventSource dependency; nothing is emitted unless a listener subscribes. Meter name: `EmlExtraction` (version = the library's informational version).
+The library publishes runtime metrics through the BCL `System.Diagnostics.Metrics` API and traces through `System.Diagnostics.ActivitySource` (ADR-021). It takes no OpenTelemetry, logging or EventSource dependency; nothing is emitted unless a listener subscribes. Meter name and ActivitySource name: `EmlExtraction` (version = the library's informational version).
 
 | Instrument | Kind | Unit | Tags |
 | --- | --- | --- | --- |
@@ -78,13 +78,23 @@ Tag values (closed sets):
 - `eml_extraction.stage`: `parse`, `metadata`, `body`, `attachments`
 - `error.type`: the .NET exception type's full name
 
-PII: no tag carries message content or anything derived from it (subject, body, headers, addresses, file names, content IDs), the request `FileName`, or exception messages. A unit test enforces this.
+Activities (all kind Internal; none for `Detect` / `IsEml`):
+- `eml_extraction.extract`, one per `Extract` call. Tags `eml_extraction.input.size` (bytes), `eml_extraction.attachments.count`, `eml_extraction.warnings.count` (the two counts only on a returned result), `eml_extraction.outcome`.
+- Children `eml_extraction.parse`, `eml_extraction.metadata`, `eml_extraction.body`, `eml_extraction.attachments`, created only when the parent is sampled with all data.
+- When `Extract` throws `EmlExtractionException`, the failing stage activity gets status Error and `error.type` (inner exception type), and `eml_extraction.extract` gets status Error, `error.type` `EmlExtraction.EmlExtractionException` and outcome `internal_error`. On `EmlInputTooLargeException` the parent gets status Error, its `error.type` and outcome `input_too_large`. No status description, event or exception message is recorded. Exceptions thrown by your own listener callbacks propagate unchanged.
+
+PII: no tag, activity name, event, baggage or status description carries message content or anything derived from it (subject, body, headers, addresses, file names, content IDs), the request `FileName`, or exception messages. A unit test enforces this.
 
 Subscribe with OpenTelemetry:
 
 ```csharp
 using var meterProvider = Sdk.CreateMeterProviderBuilder()
     .AddMeter("EmlExtraction")
+    .AddOtlpExporter()
+    .Build();
+
+using var tracerProvider = Sdk.CreateTracerProviderBuilder()
+    .AddSource("EmlExtraction")
     .AddOtlpExporter()
     .Build();
 ```

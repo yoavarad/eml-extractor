@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Reflection;
 using System.Text;
@@ -11,7 +12,7 @@ public sealed class TelemetryCollection
     public const string Name = "Telemetry";
 }
 
-/// <summary>ydk:test:observability/telemetry.unit, metric cases (ADR-021). Real MeterListener on meter "EmlExtraction".</summary>
+/// <summary>ydk:test:observability/telemetry.unit (ADR-021). Real MeterListener on meter and real ActivityListener on source "EmlExtraction".</summary>
 [Collection(TelemetryCollection.Name)]
 public sealed class TelemetryTests
 {
@@ -35,6 +36,18 @@ public sealed class TelemetryTests
         ["eml_extraction.stage"] = ["parse", "metadata", "body", "attachments"],
         ["error.type"] = [typeof(InvalidCastException).FullName!]
     };
+
+    private static readonly HashSet<string> NumericSpanTags =
+        ["eml_extraction.input.size", "eml_extraction.attachments.count", "eml_extraction.warnings.count"];
+
+    private static readonly Dictionary<string, HashSet<string>> AllowedSpanTags = new()
+    {
+        ["eml_extraction.outcome"] = AllowedTags["eml_extraction.outcome"],
+        ["error.type"] = [typeof(InvalidCastException).FullName!, typeof(EmlExtractionException).FullName!]
+    };
+
+    private static readonly string[] StageSpans =
+        ["eml_extraction.parse", "eml_extraction.metadata", "eml_extraction.body", "eml_extraction.attachments"];
 
     private readonly EmlExtractor _extractor = new();
 
@@ -155,6 +168,7 @@ public sealed class TelemetryTests
         var bytes = SampleFactory.ToBytes(SampleFactory.Plain("s", "t"));
 
         using var rec = new Recorder();
+        using var spans = new SpanRecorder();
         EmlExtractor.StageFault = s =>
         {
             if (s == "attachments")
@@ -178,6 +192,21 @@ public sealed class TelemetryTests
         Assert.Empty(rec.Of(Warnings));
         Assert.Empty(rec.Of(Attachments));
         Assert.Equal(Tag("eml_extraction.outcome", "internal_error"), Assert.Single(Assert.Single(rec.Of(Duration)).Tags));
+
+        var stage = Assert.Single(spans.Named("eml_extraction.attachments"));
+        Assert.Equal(ActivityStatusCode.Error, stage.Status);
+        Assert.Null(stage.StatusDescription);
+        Assert.Equal(typeof(InvalidCastException).FullName, stage.GetTagItem("error.type"));
+        Assert.Empty(stage.Events);
+        foreach (var name in StageSpans[..3])
+            Assert.Equal(ActivityStatusCode.Unset, Assert.Single(spans.Named(name)).Status);
+
+        var extract = Assert.Single(spans.Named("eml_extraction.extract"));
+        Assert.Equal(ActivityStatusCode.Error, extract.Status);
+        Assert.Null(extract.StatusDescription);
+        Assert.Equal(typeof(EmlExtractionException).FullName, extract.GetTagItem("error.type"));
+        Assert.Equal("internal_error", extract.GetTagItem("eml_extraction.outcome"));
+        Assert.Equal((long)bytes.Length, extract.GetTagItem("eml_extraction.input.size"));
     }
 
     [Fact]
@@ -279,6 +308,7 @@ public sealed class TelemetryTests
         var bytes = SampleFactory.ToBytes(message);
 
         using var rec = new Recorder();
+        using var spans = new SpanRecorder();
         _extractor.Extract(new EmlExtractionRequest { FileBytes = bytes, FileName = $"{marker}.eml" });
         new EmlDetector().Detect(bytes);
         EmlExtractor.StageFault = s =>
@@ -307,6 +337,212 @@ public sealed class TelemetryTests
                 Assert.Contains(value, values);
             }
         }
+
+        var activities = spans.All;
+        Assert.Equal(2, activities.Count(a => a.OperationName == "eml_extraction.extract"));
+        Assert.Contains(activities, a => a.Status == ActivityStatusCode.Error);
+        foreach (var a in activities)
+        {
+            Assert.Contains(a.OperationName, StageSpans.Append("eml_extraction.extract"));
+            Assert.Equal(a.OperationName, a.DisplayName);
+            Assert.Null(a.StatusDescription);
+            Assert.Empty(a.Events);
+            Assert.Empty(a.Baggage);
+            Assert.Empty(a.Links);
+            foreach (var tag in a.TagObjects)
+            {
+                if (NumericSpanTags.Contains(tag.Key))
+                {
+                    Assert.True(tag.Value is int or long, $"non-numeric {tag.Key}");
+                    continue;
+                }
+
+                Assert.True(AllowedSpanTags.TryGetValue(tag.Key, out var values), $"unlisted span tag key {tag.Key}");
+                var value = Assert.IsType<string>(tag.Value);
+                Assert.DoesNotContain(marker, value, StringComparison.Ordinal);
+                Assert.Contains(value, values);
+            }
+        }
+    }
+
+    [Fact]
+    public void ExtractActivityAndStageChildren()
+    {
+        var builder = new BodyBuilder { TextBody = "hello" };
+        builder.Attachments.Add("a.bin", [1, 2, 3], new ContentType("application", "octet-stream"));
+        builder.Attachments.Add("b.bin", [4, 5, 6], new ContentType("application", "octet-stream"));
+        var message = SampleFactory.Plain("s", "t");
+        message.Body = builder.ToMessageBody();
+        var bytes = SampleFactory.ToBytes(message);
+        var detector = new EmlDetector();
+
+        using var spans = new SpanRecorder();
+        detector.Detect(bytes);
+        detector.IsEml(bytes);
+        Assert.Empty(spans.All);
+
+        _extractor.Extract(bytes);
+
+        var extract = Assert.Single(spans.Named("eml_extraction.extract"));
+        Assert.Equal(ActivityKind.Internal, extract.Kind);
+        Assert.Equal(ActivityStatusCode.Unset, extract.Status);
+        Assert.Equal(
+            typeof(EmlExtractor).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
+            extract.Source.Version);
+        Assert.Equal(
+            new Dictionary<string, object?>
+            {
+                ["eml_extraction.input.size"] = (long)bytes.Length,
+                ["eml_extraction.attachments.count"] = 2,
+                ["eml_extraction.warnings.count"] = 0,
+                ["eml_extraction.outcome"] = "clean"
+            },
+            extract.TagObjects.ToDictionary(t => t.Key, t => t.Value));
+
+        Assert.Equal(StageSpans.Length + 1, spans.All.Count);
+        foreach (var name in StageSpans)
+        {
+            var stage = Assert.Single(spans.Named(name));
+            Assert.Equal(ActivityKind.Internal, stage.Kind);
+            Assert.Equal(extract.SpanId, stage.ParentSpanId);
+            Assert.Equal(extract.TraceId, stage.TraceId);
+            Assert.Equal(ActivityStatusCode.Unset, stage.Status);
+            Assert.Empty(stage.TagObjects);
+        }
+    }
+
+    [Fact]
+    public void ParseFailedAndTooLargeActivities()
+    {
+        var bytes = SampleFactory.ToBytes(SampleFactory.Plain("s", new string('x', 2000)));
+
+        using var spans = new SpanRecorder();
+        Assert.Throws<EmlInputTooLargeException>(() => new EmlExtractor(1024).Extract(bytes));
+        var tooLarge = Assert.Single(spans.All);
+        Assert.Equal("eml_extraction.extract", tooLarge.OperationName);
+        Assert.Equal("input_too_large", tooLarge.GetTagItem("eml_extraction.outcome"));
+        Assert.Equal((long)bytes.Length, tooLarge.GetTagItem("eml_extraction.input.size"));
+        Assert.Equal(ActivityStatusCode.Error, tooLarge.Status);
+        Assert.Equal(typeof(EmlInputTooLargeException).FullName, tooLarge.GetTagItem("error.type"));
+        Assert.Null(tooLarge.StatusDescription);
+
+        spans.Clear();
+        EmlExtractor.StageFault = s =>
+        {
+            if (s == "parse")
+                throw new FormatException("x");
+        };
+        try
+        {
+            _extractor.Extract(bytes);
+        }
+        finally
+        {
+            EmlExtractor.StageFault = null;
+        }
+
+        var parseFailed = Assert.Single(spans.Named("eml_extraction.extract"));
+        Assert.Equal("parse_failed", parseFailed.GetTagItem("eml_extraction.outcome"));
+        Assert.Equal(1, parseFailed.GetTagItem("eml_extraction.warnings.count"));
+        Assert.Equal(0, parseFailed.GetTagItem("eml_extraction.attachments.count"));
+        Assert.Equal(ActivityStatusCode.Unset, parseFailed.Status);
+        Assert.Equal(ActivityStatusCode.Unset, Assert.Single(spans.Named("eml_extraction.parse")).Status);
+        Assert.Equal(2, spans.All.Count);
+    }
+
+    [Fact]
+    public void NoListenerNoActivity()
+    {
+        var bytes = SampleFactory.ToBytes(SampleFactory.Plain("שלום", "hello"));
+        Assert.Null(Activity.Current);
+
+        var seen = new List<Activity?>();
+        EmlExtractor.StageFault = _ => seen.Add(Activity.Current);
+        IReadOnlyList<string> without;
+        try
+        {
+            without = ResultProjection.Of(_extractor.Extract(bytes));
+        }
+        finally
+        {
+            EmlExtractor.StageFault = null;
+        }
+
+        Assert.Equal(4, seen.Count);
+        Assert.All(seen, Assert.Null);
+        Assert.Null(Activity.Current);
+
+        using var rec = new Recorder();
+        using var spans = new SpanRecorder();
+        var with = ResultProjection.Of(_extractor.Extract(bytes));
+        Assert.NotEmpty(spans.All);
+        Assert.Equal(without, with);
+    }
+
+    [Theory]
+    [InlineData("start", "eml_extraction.extract")]
+    [InlineData("start", "eml_extraction.parse")]
+    [InlineData("start", "eml_extraction.metadata")]
+    [InlineData("start", "eml_extraction.body")]
+    [InlineData("start", "eml_extraction.attachments")]
+    [InlineData("stop", "eml_extraction.parse")]
+    [InlineData("stop", "eml_extraction.metadata")]
+    [InlineData("stop", "eml_extraction.body")]
+    [InlineData("stop", "eml_extraction.attachments")]
+    [InlineData("stop", "eml_extraction.extract")]
+    public void HostActivityListenerExceptionPropagatesUnwrapped(string when, string name)
+    {
+        var host = new InvalidCastException("host");
+        var bytes = SampleFactory.ToBytes(SampleFactory.Plain("s", "t"));
+        var armed = true;
+        using var listener = new ActivityListener
+        {
+            ShouldListenTo = s => s.Name == "EmlExtraction",
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
+            ActivityStarted = a =>
+            {
+                if (armed && when == "start" && a.OperationName == name)
+                    throw host;
+            },
+            ActivityStopped = a =>
+            {
+                if (armed && when == "stop" && a.OperationName == name)
+                    throw host;
+            }
+        };
+        ActivitySource.AddActivityListener(listener);
+        Assert.Null(Activity.Current);
+        try
+        {
+            Assert.Same(host, Assert.Throws<InvalidCastException>(() => _extractor.Extract(bytes)));
+            Assert.Null(Activity.Current);
+        }
+        finally
+        {
+            armed = false;
+            Activity.Current = null;
+        }
+    }
+
+    [Fact]
+    public void PropagationOnlySamplingStartsNoChildren()
+    {
+        var stopped = new List<Activity>();
+        using var listener = new ActivityListener
+        {
+            ShouldListenTo = s => s.Name == "EmlExtraction",
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.PropagationData,
+            ActivityStopped = stopped.Add
+        };
+        ActivitySource.AddActivityListener(listener);
+
+        _extractor.Extract(SampleFactory.ToBytes(SampleFactory.Plain("s", "t")));
+
+        var extract = Assert.Single(stopped);
+        Assert.Equal("eml_extraction.extract", extract.OperationName);
+        Assert.False(extract.IsAllDataRequested);
+        Assert.Empty(extract.TagObjects);
+        Assert.Null(Activity.Current);
     }
 
     [Fact]
@@ -374,6 +610,47 @@ public sealed class TelemetryTests
             lock (Measurements)
                 Measurements.Add(new Measurement(i.Name, v, copy));
         }
+    }
+
+    /// <summary>Real ActivityListener on source EmlExtraction, sampling AllData; keeps stopped activities.</summary>
+    private sealed class SpanRecorder : IDisposable
+    {
+        private readonly ActivityListener _listener;
+        private readonly List<Activity> _stopped = [];
+
+        public SpanRecorder()
+        {
+            _listener = new ActivityListener
+            {
+                ShouldListenTo = s => s.Name == "EmlExtraction",
+                Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
+                ActivityStopped = a =>
+                {
+                    lock (_stopped)
+                        _stopped.Add(a);
+                }
+            };
+            ActivitySource.AddActivityListener(_listener);
+        }
+
+        public List<Activity> All
+        {
+            get
+            {
+                lock (_stopped)
+                    return [.. _stopped];
+            }
+        }
+
+        public List<Activity> Named(string name) => All.Where(a => a.OperationName == name).ToList();
+
+        public void Clear()
+        {
+            lock (_stopped)
+                _stopped.Clear();
+        }
+
+        public void Dispose() => _listener.Dispose();
     }
 
     private sealed class ThrowingStream : Stream

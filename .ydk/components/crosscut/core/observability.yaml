@@ -1,7 +1,7 @@
 $schema: ydk:schema:crosscut
 id: ydk:crosscut:core/observability
 description: >-
-  Library-wide rules for runtime telemetry (ADR-021). Meter implemented (#71, EmlExtractionTelemetry); ActivitySource target (#72).
+  Library-wide rules for runtime telemetry (ADR-021). Meter implemented (#71, EmlExtractionTelemetry); ActivitySource implemented (#72, EmlExtractionTelemetry.Source).
 kind: observability
 specification: >-
   Mechanism: BCL only. One static readonly System.Diagnostics.Metrics.Meter and one static readonly
