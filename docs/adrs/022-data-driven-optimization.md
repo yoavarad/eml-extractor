@@ -1,7 +1,7 @@
 # ADR-022: Data-driven optimization process
 
 ## Status
-Accepted (per project owner, 2026-10-18). Target; not implemented (Stage 02). No optimization target is set yet: targets come from the first profile report (ADR-020).
+Accepted (per project owner, 2026-10-18). Target; not implemented (Stage 02). Performance targets live in the NFR component manifests, not in this ADR; none is set yet and they come from the first profile report (ADR-020).
 
 ## Context
 ADR-015 gives a measured baseline and ADR-020 a hotspot report. The owner decided (2026-10-18) that optimization follows from those data, not from intuition. Optimizations in a parser library carry real risk: a faster path that changes a decoded byte breaks the golden set, and a wider public surface (for example span-returning attachment data) is a contract change.
@@ -10,8 +10,9 @@ ADR-015 gives a measured baseline and ADR-020 a hotspot report. The owner decide
 Per project owner, 2026-10-18.
 
 ### Targets
-- Targets are set from the profile report, relative to the committed ADR-015 baseline (`docs/perf-baseline.json`): for example "attachments-stage allocated bytes per input byte -30%" or "T(1) on the public mix +15%".
-- The triage task records each target in this ADR (Targets section, added then) and in `ydk:nfr:performance/memory-footprint` or the relevant throughput NFR, marked provisional until the closing re-profile confirms it.
+- The source of targets is the NFR component manifests: `ydk:nfr:performance/memory-footprint`, the throughput NFRs under `ydk:nfr:performance/`, and `ydk:nfr:observability/metrics-overhead`. This ADR holds the process only and no target numbers.
+- Targets are set from the profile report, relative to the committed ADR-015 baseline (`docs/perf-baseline.json`). The triage task records each one in the relevant NFR manifest, marked provisional until the closing re-profile confirms it.
+- A new ADR is needed only if the contract (this process or its merge rules) changes, not when a target changes.
 
 ### One optimization, one task
 Each optimization is its own Stage 02 task under the optimization story and states:

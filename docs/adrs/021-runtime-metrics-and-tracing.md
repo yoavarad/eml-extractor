@@ -42,7 +42,7 @@ Tag values are closed sets:
 - `eml_extraction.outcome`: `clean` (no warnings), `warnings` (at least one warning, content returned), `parse_failed`, `input_too_large`.
 - `eml_extraction.warning.code`: the warning codes of `ydk:crosscut:core/warning-format` (`parse_failed`, `body_decode_failed`, `part_decode_failed`, `rfc822_extract_failed`, `tnef_extract_failed`, `internal_error`, `input_too_large`).
 - `eml_extraction.detect.result`: `supported`, `not_supported`.
-- `eml_extraction.stage`: `parse`, `metadata`, `body`, `attachments` (the ADR-004 guarded stages, same names as ADR-020).
+- `eml_extraction.stage`: `parse`, `metadata`, `body`, `attachments` (the ADR-004 guarded stages; ADR-020 profiles these four plus the profiling-only `request` and `detect`).
 - `error.type`: the .NET exception type's full name (bounded by the code, not by input).
 
 The `internal_error` and `input_too_large` counters overlap with the warnings counter on purpose: they are the two signals an operator alerts on, and the internal-error counter carries the stage.

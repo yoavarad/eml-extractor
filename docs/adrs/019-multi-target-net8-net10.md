@@ -1,7 +1,7 @@
 # ADR-019: Multi-target net8.0 and net10.0
 
 ## Status
-Accepted (per project owner, 2026-10-18). Implementation pending, tracked as Stage 02 work. Amends ADR-001.
+Accepted (per project owner, 2026-10-18). Implementation pending, tracked as Stage 02 work. Amends ADR-001. Amended by ADR-020: the bench project also multi-targets net8.0 and net10.0 (GoldenKit stays net10.0 only).
 
 ## Context
 ADR-001 fixes the stack at C# on .NET 10, as the brief says. The team's extraction template, which will host this component, may still run on .NET 8 LTS. A net10.0-only library cannot be referenced from a net8.0 host, so the component would be unusable there until the template moves.
@@ -15,7 +15,7 @@ Package-level facts checked on 2026-10-18 in the local NuGet cache (nuspec depen
 
 ## Decision
 Per project owner, 2026-10-18:
-- `src/EmlExtraction` and `tests/EmlExtraction.Tests` target both `net8.0` and `net10.0` (`TargetFrameworks`). The repo-wide default in `Directory.Build.props` stays `net10.0`, so `tools/GoldenKit` and `benches/EmlExtraction.Bench` stay net10.0 only.
+- `src/EmlExtraction` and `tests/EmlExtraction.Tests` target both `net8.0` and `net10.0` (`TargetFrameworks`). The repo-wide default in `Directory.Build.props` stays `net10.0`, so `tools/GoldenKit` stays net10.0 only (`benches/EmlExtraction.Bench` was net10.0 only here; ADR-020 amends it to net8.0 and net10.0).
 - CI builds and runs the tests on both target frameworks, either as a matrix or as one multi-target `dotnet test` run. CI installs the .NET 8 runtime next to the SDK pinned by `global.json`.
 - The golden score gate (ADR-011) runs on net10.0; running it on net8.0 too is optional.
 - The load test (ADR-015) reports the target framework; its committed baseline is for net10.0.
@@ -32,7 +32,7 @@ Per project owner, 2026-10-18:
 - net10.0 only (status quo). Rejected for now: the component could not be loaded by a net8.0 template.
 - net8.0 only. Rejected: the brief names .NET 10, and .NET 8 support ends in weeks.
 - netstandard2.0. Rejected: loses modern APIs (span overloads, `ReadOnlyMemory<byte>` ergonomics) and adds a compatibility surface nobody asked for.
-- Multi-target GoldenKit and the bench too. Rejected: developer tools, not shipped; doubling their runtime buys nothing.
+- Multi-target GoldenKit and the bench too. Rejected: developer tools, not shipped; doubling their runtime buys nothing. (Bench part reversed by ADR-020 for profiling.)
 
 ## Consequences
 - Every library and test change must build and pass on both targets.
