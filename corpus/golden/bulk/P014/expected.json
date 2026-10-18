@@ -38,7 +38,8 @@
         "name": "file-14.bin",
         "size": 8,
         "sha256": "b15109ec2e838f9609b4c3e89d1e92a9ba8756f5558f65ef128e1ebac1847470",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "file-14.bin"
       }
     ]
   }

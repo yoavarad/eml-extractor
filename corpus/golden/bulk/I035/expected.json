@@ -40,6 +40,7 @@
         "size": 10,
         "sha256": "f3e2cfe47671362b0a71d4a85c7a9479255124cacf71e2964be86608eb182c1f",
         "disposition": "attachment",
+        "full_path": "pic.bmp",
         "original_path": "photos/pic.bmp"
       }
     ]

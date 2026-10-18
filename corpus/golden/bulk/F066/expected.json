@@ -39,7 +39,8 @@
         "name": "a.exe",
         "size": 10,
         "sha256": "095740ad416f7964ce73cbf6ab22c2d7e65f60843946c974b092deb7b28bcf09",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "a.exe"
       }
     ]
   }

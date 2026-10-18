@@ -39,7 +39,8 @@
         "name": "report.docx",
         "size": 13,
         "sha256": "8efea28c466c5c91f662fa2ae1bf1f67f4aa9f57f74b99e4e46d66821b0abc13",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "report.docx"
       }
     ]
   }

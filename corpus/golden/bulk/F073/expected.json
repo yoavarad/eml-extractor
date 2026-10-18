@@ -39,7 +39,8 @@
         "name": "a.dat",
         "size": 8,
         "sha256": "ed0446065378c3f4be324c66b8bb548306d655cc1cb5ef88cfe051f5bfabb2d0",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "a.dat"
       }
     ]
   }

@@ -39,7 +39,8 @@
         "name": "me.vcf",
         "size": 14,
         "sha256": "05223886ff0d96cb0135c58e30080ccc324792706fbe5f661d35b19ea88203a0",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "me.vcf"
       }
     ]
   }

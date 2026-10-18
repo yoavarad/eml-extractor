@@ -38,7 +38,8 @@
         "name": "file-4.bin",
         "size": 8,
         "sha256": "a613ec87175a186d8ba30858402f008e21bee9e1164cad9955ed6acd65a5e61c",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "file-4.bin"
       }
     ]
   }

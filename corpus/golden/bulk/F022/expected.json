@@ -39,7 +39,8 @@
         "name": "a.csv",
         "size": 14,
         "sha256": "731c70d6212b3c3c188a8e528f2a255b28425e7d6efd27ba2813b48488afc102",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "a.csv"
       }
     ]
   }

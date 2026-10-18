@@ -38,7 +38,8 @@
         "name": "file-18.bin",
         "size": 8,
         "sha256": "db35e83cde7d84fbc162e584d3fe499a0e6a4c3569fcc253eb1a86ed1fae3b6b",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "file-18.bin"
       }
     ]
   }

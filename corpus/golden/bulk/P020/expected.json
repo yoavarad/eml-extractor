@@ -38,7 +38,8 @@
         "name": "file-20.bin",
         "size": 8,
         "sha256": "7e72cc5fd39c222a492aa9ddba4d7cebdb37606d233bcc2bdcca0d812c8185fb",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "file-20.bin"
       }
     ]
   }

@@ -39,7 +39,8 @@
         "name": "pic.gif",
         "size": 14,
         "sha256": "03bf765103105ba64556f4f0cbba9727b7b3c5380c99d460af41475f0193ffe0",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "pic.gif"
       }
     ]
   }

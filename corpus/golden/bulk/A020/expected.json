@@ -41,6 +41,7 @@
         "size": 13,
         "sha256": "15d21fce577668c9b4fbd4773d374cc99c6c58bc1e84856867220c77969db21c",
         "disposition": "attachment",
+        "full_path": "sheet.xlsx",
         "original_path": "docs/sheet.xlsx"
       }
     ]

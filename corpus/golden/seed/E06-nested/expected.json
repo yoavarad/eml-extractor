@@ -9,6 +9,7 @@
     "attachments": [
       {
         "name": "forwarded.eml",
+        "full_path": "forwarded.eml",
         "reextract": {
           "metadata": { "subject": { "eq": "inner" } },
           "main_content": { "eq": "inner-body" },

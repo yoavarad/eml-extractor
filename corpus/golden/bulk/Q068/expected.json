@@ -48,12 +48,14 @@
       {
         "name": "p.png",
         "sha256": "c414cd0e204de974f73753c7e28d7638e7b3691bb8b1a2bab6b25bb7fed7ce77",
-        "disposition": "inline"
+        "disposition": "inline",
+        "full_path": "p.png"
       },
       {
         "name": "r.docx",
         "size": 13,
-        "sha256": "8972e2dc6da95bb7986e074798cd38a73ddf4447af5801390c7bbda0d3029cbd"
+        "sha256": "8972e2dc6da95bb7986e074798cd38a73ddf4447af5801390c7bbda0d3029cbd",
+        "full_path": "r.docx"
       }
     ]
   }

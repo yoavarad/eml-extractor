@@ -39,7 +39,8 @@
         "name": "a.mp4",
         "size": 20,
         "sha256": "fe0f4b212276c3d1dbc6406f61ddda092e264b362ece734dfd27f908195a9de7",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "a.mp4"
       }
     ]
   }

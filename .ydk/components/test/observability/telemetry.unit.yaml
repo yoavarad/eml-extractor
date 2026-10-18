@@ -1,8 +1,8 @@
 $schema: ydk:schema:test
 id: ydk:test:observability/telemetry.unit
 description: >-
-  Unit tests for the runtime telemetry contract (ydk:req:observability/runtime-telemetry , ADR-021). Target; not
-  implemented (Stage 02). Uses the real MeterListener and ActivityListener from the BCL; runs on net8.0 and net10.0
+  Unit tests for the runtime telemetry contract (ydk:req:observability/runtime-telemetry , ADR-021). Metric cases
+  implemented (#71, TelemetryTests); activity cases target (#72). Uses the real MeterListener and ActivityListener from the BCL; runs on net8.0 and net10.0
   in one non-parallel collection, filtering by meter and source name "EmlExtraction".
 level: unit
 target: ydk:req:observability/runtime-telemetry

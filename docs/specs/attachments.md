@@ -16,8 +16,6 @@ The path never includes the name the caller gave the whole message. Files are vi
 
 Two other location hints are kept beside the path, never mixed into it: the sender's original filename when it contained directory parts, and the part's declared content location. Both are sender-controlled, so they are reported and not trusted ([cross-cutting.md](cross-cutting.md), path traversal).
 
-Today the code fills the full path only when the sender's filename contains a directory part, and ignores the content location. Closing that gap is Stage 02 work.
-
 ## Why the library stops at the bytes
 
 The original specification is explicit: no file-type detection and no extraction of nested content. [perf-results.md](../perf-results.md) lists type detection and nested Office extraction as downstream work, outside this library (ADR-008). The library therefore:

@@ -9,6 +9,7 @@
     "attachments": [
       {
         "name": "pic.png",
+        "full_path": "pic.png",
         "size": 70,
         "sha256": "c414cd0e204de974f73753c7e28d7638e7b3691bb8b1a2bab6b25bb7fed7ce77",
         "disposition": "attachment"

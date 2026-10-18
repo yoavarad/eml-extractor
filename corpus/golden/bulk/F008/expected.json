@@ -39,7 +39,8 @@
         "name": "a.7z",
         "size": 13,
         "sha256": "4c036a963499ff7e8b545164db80d8c9c44d7c8d7115aeb6e8e0399d767210f4",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "a.7z"
       }
     ]
   }

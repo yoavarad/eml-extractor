@@ -39,7 +39,8 @@
         "name": "legacy.doc",
         "size": 8,
         "sha256": "0817127b2974ab464b16b5cb50095f979c007fe5e0a2b2b3edb20fddb74db79e",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "legacy.doc"
       }
     ]
   }

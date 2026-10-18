@@ -39,7 +39,8 @@
         "name": "sheet.xlsx",
         "size": 13,
         "sha256": "010b6a8d3cfd915d86406df458b31a35653247eb2fd8f0218002fbca2af2843b",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "sheet.xlsx"
       }
     ]
   }

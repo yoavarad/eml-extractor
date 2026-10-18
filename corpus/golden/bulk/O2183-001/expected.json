@@ -39,7 +39,8 @@
         "name": "\u0444\u0430\u0439\u043B-1.txt",
         "size": 4,
         "sha256": "66e16dd53ecf4fd7b2d4e7c2bafb4c6792b2a1b845d45c01dc0b3e26f072be03",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "\u0444\u0430\u0439\u043B-1.txt"
       }
     ]
   }

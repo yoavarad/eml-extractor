@@ -39,7 +39,8 @@
         "name": "legacy.xls",
         "size": 8,
         "sha256": "587ee50feb2d28e1f8e8487eefa2d5a10d5018c98a2df8ef568d2cb7a14f95d9",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "legacy.xls"
       }
     ]
   }

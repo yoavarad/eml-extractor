@@ -39,7 +39,8 @@
         "name": "\u05E7\u05D5\u05D1\u05E5-12.txt",
         "size": 5,
         "sha256": "1c1fceea055ba5361c240be4796a3632d22696baf032b0be601e9e9140311ffb",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "\u05E7\u05D5\u05D1\u05E5-12.txt"
       }
     ]
   }

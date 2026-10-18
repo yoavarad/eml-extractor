@@ -13,7 +13,7 @@ specification: >-
   ydk:entity:extraction/EmlDetectionResult . No MimeKit type appears in the target public surface.
   Not present, by design of the original spec and README: HTTP routes, authentication/authorisation, frontend pages,
   CORS, health checks, pagination, persistence, generated IDs, logging, configuration files, environment
-  variables. Target (ADR-021; not implemented, Stage 02): BCL metrics and activities under the name EmlExtraction, with
+  variables. ADR-021: BCL metrics (implemented, #71) and activities (target, #72) under the name EmlExtraction, with
   no telemetry package dependency (ydk:crosscut:core/observability). Input is a whole message held in memory, capped by maxInputBytes (target, ydk:req:extraction/max-input-size);
   output holds all decoded bytes in memory; no streaming, no disk or network I/O. Timestamps: the only one is the
   message Date, emitted in ISO 8601 round-trip ("o") form.

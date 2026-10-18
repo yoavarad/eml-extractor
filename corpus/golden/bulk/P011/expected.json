@@ -38,7 +38,8 @@
         "name": "file-11.bin",
         "size": 8,
         "sha256": "c772b3877133cc610ff7d1ca8ae1e8248ab3562b1bc993db3e1e1e7d6ff0640f",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "file-11.bin"
       }
     ]
   }

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using MimeKit;
@@ -42,43 +43,37 @@ public sealed class EmlExtractor : IEmlExtractor
     public EmlExtractionResult Extract(EmlExtractionRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
+        var start = Stopwatch.GetTimestamp();
         var eml = request.FileBytes;
+        EmlExtractionTelemetry.RecordInputSize(eml.Length);
         var warnings = new List<string>();
         if (eml.Length > _maxInputBytes)
         {
             warnings.Add($"input_too_large: {eml.Length} > {_maxInputBytes}");
-            return Empty(warnings);
+            EmlExtractionTelemetry.RecordInputTooLarge();
+            return Recorded(start, EmlExtractionTelemetry.OutcomeInputTooLarge, Empty(warnings));
         }
 
         MimeMessage message;
         try
         {
             StageFault?.Invoke("parse");
-            using var stream = Open(eml);
-            if (StartsWithMboxFrom(eml.Span))
-            {
-                var parser = new MimeParser(Options, stream, MimeFormat.Mbox);
-                message = parser.ParseMessage();
-            }
-            else
-            {
-                message = MimeMessage.Load(Options, stream);
-            }
+            message = Parse(eml);
         }
         catch (Exception ex) when (ex is FormatException or ParseException or IOException
                                        or InvalidOperationException or ArgumentException
                                        or NotSupportedException or DecoderFallbackException)
         {
             warnings.Add($"parse_failed: {ex.GetType().Name}: {ex.Message}");
-            return Empty(warnings);
+            return Recorded(start, EmlExtractionTelemetry.OutcomeParseFailed, Empty(warnings));
         }
         catch (Exception ex)
         {
             warnings.Add(InternalError("parse", ex));
-            return Empty(warnings);
+            return Recorded(start, EmlExtractionTelemetry.OutcomeParseFailed, Empty(warnings));
         }
 
-        return Extract(message, warnings);
+        return Recorded(start, null, Extract(message, warnings));
     }
 
     /// <summary>Extracts from an already parsed <see cref="MimeMessage"/>.</summary>
@@ -86,7 +81,27 @@ public sealed class EmlExtractor : IEmlExtractor
     internal EmlExtractionResult Extract(MimeMessage message)
     {
         ArgumentNullException.ThrowIfNull(message);
-        return Extract(message, []);
+        var start = Stopwatch.GetTimestamp();
+        return Recorded(start, null, Extract(message, []));
+    }
+
+    private static EmlExtractionResult Recorded(long start, string? outcome, EmlExtractionResult result)
+    {
+        EmlExtractionTelemetry.RecordExtract(start, outcome, result);
+        return result;
+    }
+
+    /// <summary>Parse stage body (ADR-004), without its guard; the profiling harness (ADR-020) calls it directly.</summary>
+    internal static MimeMessage Parse(ReadOnlyMemory<byte> eml)
+    {
+        using var stream = Open(eml);
+        if (StartsWithMboxFrom(eml.Span))
+        {
+            var parser = new MimeParser(Options, stream, MimeFormat.Mbox);
+            return parser.ParseMessage();
+        }
+
+        return MimeMessage.Load(Options, stream);
     }
 
     internal static EmlExtractionResult Extract(MimeMessage message, List<string> warnings)
@@ -159,7 +174,10 @@ public sealed class EmlExtractor : IEmlExtractor
     }
 
     private static string InternalError(string stage, Exception ex)
-        => $"internal_error: {stage}: {ex.GetType().Name}: {ex.Message}";
+    {
+        EmlExtractionTelemetry.RecordInternalError(stage, ex);
+        return $"internal_error: {stage}: {ex.GetType().Name}: {ex.Message}";
+    }
 
     private static EmlExtractionResult Empty(List<string> warnings)
         => new(HeaderMapper.EmptyMetadata(), null, null, [], warnings);

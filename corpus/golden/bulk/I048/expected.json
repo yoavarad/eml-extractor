@@ -39,7 +39,8 @@
         "name": "pic.svg",
         "size": 51,
         "sha256": "863f1d1644cabc72e5091cd2044c28a0bce7f839b4b585cf2031381458bde6e8",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "pic.svg"
       }
     ]
   }

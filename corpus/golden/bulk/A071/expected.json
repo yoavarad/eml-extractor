@@ -39,7 +39,8 @@
         "name": "calc.ods",
         "size": 12,
         "sha256": "731438c68086536fccb8d62209a1d9643884dff1831e3c03440ecb675c14413e",
-        "disposition": "attachment"
+        "disposition": "attachment",
+        "full_path": "calc.ods"
       }
     ]
   }

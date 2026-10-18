@@ -29,5 +29,7 @@
     <Compile Include="..\..\benches\EmlExtraction.Bench\Sweep\CpuInfoParser.cs" Link="Sweep\CpuInfoParser.cs" />
     <Compile Include="..\..\benches\EmlExtraction.Bench\Sweep\MboxSplitter.cs" Link="Sweep\MboxSplitter.cs" />
     <Compile Include="..\..\benches\EmlExtraction.Bench\Sweep\LargeFileMath.cs" Link="Sweep\LargeFileMath.cs" />
+    <!-- Pure parts of the per-stage profiling harness (ADR-020). -->
+    <Compile Include="..\..\benches\EmlExtraction.Bench\Profile\ProfileMath.cs" Link="Profile\ProfileMath.cs" />
   </ItemGroup>
 </Project>

@@ -1,8 +1,8 @@
 $schema: ydk:schema:req
 id: ydk:req:attachments/container-path
 description: >-
-  Brief "full path if it exists" read as the subfile's position inside the message (ADR-013). Target; not implemented
-  (Stage 02). Today FullPath is the raw filename only when it contains / or \ and is otherwise null.
+  Brief "full path if it exists" read as the subfile's position inside the message (ADR-013). Implemented in
+  PartCollector (task #34).
 type: business-rule
 priority: high
 rule: >-
