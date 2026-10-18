@@ -1,8 +1,9 @@
 <Project>
   <PropertyGroup>
     <!-- Library, tests and bench ship/run on net8.0 and net10.0 (ADR-019; bench per ADR-020).
+         RealisticSamples too, because the tests reference it.
          Every other project (tools/GoldenKit) stays net10.0 only. -->
-    <EmlMultiTarget Condition="'$(MSBuildProjectName)' == 'EmlExtraction' or '$(MSBuildProjectName)' == 'EmlExtraction.Tests' or '$(MSBuildProjectName)' == 'EmlExtraction.Bench'">true</EmlMultiTarget>
+    <EmlMultiTarget Condition="'$(MSBuildProjectName)' == 'EmlExtraction' or '$(MSBuildProjectName)' == 'EmlExtraction.Tests' or '$(MSBuildProjectName)' == 'EmlExtraction.Bench' or '$(MSBuildProjectName)' == 'RealisticSamples'">true</EmlMultiTarget>
     <TargetFrameworks Condition="'$(EmlMultiTarget)' == 'true'">net8.0;net10.0</TargetFrameworks>
     <TargetFramework Condition="'$(EmlMultiTarget)' != 'true'">net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
