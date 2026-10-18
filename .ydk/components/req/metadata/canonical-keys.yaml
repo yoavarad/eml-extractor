@@ -14,8 +14,8 @@ rule: >-
   key is "xfields" (ydk:req:metadata/xfields); a header named xfields in any case is stored under "header:xfields"
   (":" cannot occur in an RFC 5322 field name). Direction values are not in Metadata
   (ydk:req:content/text-direction). Keys "from", "to", "cc", "bcc", "xfields" are present in every result, including
-  results carrying ydk:warning:extraction/parse-failed or ydk:warning:extraction/input-too-large , with "" when unknown.
-failure_behavior: Not a failure path. On parse_failed and input_too_large Metadata holds exactly the five fixed keys with "".
+  results carrying ydk:warning:extraction/parse-failed , with "" when unknown (oversized input throws, ADR-023).
+failure_behavior: Not a failure path. On parse_failed Metadata holds exactly the five fixed keys with "".
 related_components:
   - ydk:entity:extraction/Metadata
   - ydk:req:metadata/all-headers

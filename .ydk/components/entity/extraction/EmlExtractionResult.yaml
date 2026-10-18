@@ -12,8 +12,8 @@ fields:
     nullable: false
     description: >-
       Header map; key set and value formats defined by ydk:entity:extraction/Metadata . Target: always holds
-      from, to, cc, bcc, xfields, also on ydk:warning:extraction/parse-failed and
-      ydk:warning:extraction/input-too-large (ydk:req:metadata/canonical-keys). Today it is empty on parse_failed.
+      from, to, cc, bcc, xfields, also on ydk:warning:extraction/parse-failed (ydk:req:metadata/canonical-keys).
+      Oversized input throws ydk:entity:extraction/EmlInputTooLargeException , so no result exists for it (ADR-023).
   XFields:
     type: string
     required: true
@@ -29,7 +29,7 @@ fields:
     nullable: true
     constraints: >-
       Decoded text of the selected body part with trailing CR/LF trimmed; HTML is kept as markup.
-      null when no selectable body part exists, when body decode fails, on parse failure, or on input_too_large.
+      null when no selectable body part exists, when body decode fails, or on parse failure.
     description: Main body selected per ydk:req:content/main-content-selection .
   MainContentMimeType:
     type: string
@@ -50,7 +50,10 @@ fields:
     nullable: false
     default: []
     constraints: "Each item formatted per ydk:crosscut:core/warning-format"
-    description: Non-fatal diagnostics recorded during extraction (ydk:req:extraction/no-throw-on-malformed).
+    description: >-
+      Non-fatal content diagnostics recorded during extraction (ydk:req:extraction/no-throw-on-malformed). Target
+      (ADR-023): content problems only; misuse, oversized input and library bugs throw instead, so internal_error and
+      input_too_large never appear here.
   SubjectDirection:
     type: enum
     values: [ltr, rtl]

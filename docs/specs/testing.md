@@ -9,7 +9,7 @@
 | Realistic samples | Correctness B on committed, licensed Office, Outlook item, mail, TNEF, and pasted-image samples | Target: yes, always (ADR-018, Stage 02) |
 | Internal corpus | Behaviour on specific real public samples | Only when the samples are present locally; target is a visible skip otherwise |
 | Bulk golden score | 1,200 authored cases across 48 tags | Not yet. Target is a CI gate at the 1212 of 1212 baseline (ADR-011); today it is run by hand |
-| Harvest probe | No crash across every local public sample | No, run by hand |
+| Harvest probe | No exception on any local public sample (ADR-023) | No, run by hand |
 | Load test | Throughput, latency, and memory across every degree of parallelism | By hand on the owner's machine; target is a nightly warn-only synthetic run (ADR-015) |
 | Telemetry | Every runtime measurement is emitted with its contracted name and labels, and no message content leaks into it | Target: yes, on both .NET versions (ADR-021, Stage 02) |
 | Profiling | Where time and memory go per stage, and the cost of telemetry | No, run by hand on the owner's machine (ADR-020, Stage 02) |
@@ -32,6 +32,7 @@ Per the project owner (ADR-019), the unit, seed-golden, and realistic-sample lay
 - Emoji and script assertions compare exactly, with no normalisation ([ydk:req:content/unicode-fidelity]).
 - Raw-text message fixtures must be converted to CRLF line endings in a way that is safe when the checkout already uses CRLF. See Known Gotchas in [project-rules.md](../project-rules.md).
 - Assert on warning code prefixes, never on the free-text part ([ydk:crosscut:core/warning-format]).
+- Assert exceptions by type and by their data (parameter name, size, limit, stage), not by full message text. The golden scorer's per-result check is that extraction does not throw on a golden input (ADR-023; today it checks for no internal-error warning).
 - A test whose sample cannot be committed must show as skipped, naming the missing file, when the sample is absent. It must never pass without running (ADR-018).
 - Re-run the bulk score, the harvest, and the load test after any MimeKit upgrade or any change to extraction rules, and commit the new reports.
 - Telemetry tests share one process-wide measurement source, so they run one at a time and listen only to this library's name.

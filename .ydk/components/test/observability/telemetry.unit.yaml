@@ -26,12 +26,12 @@ cases:
     description: Size guard signal
     given: An extractor with a small maxInputBytes and a longer input
     when: Extract is called
-    then: input_too_large gets +1, warnings gets +1 tagged input_too_large, duration tagged outcome=input_too_large, no attachments record
+    then: Extract throws EmlInputTooLargeException; input_too_large gets +1, warnings gets nothing, duration tagged outcome=input_too_large, no attachments record (ADR-023)
   - name: InternalErrorCountedByStage
     description: Library-bug signal carries the stage
     given: A test hook that throws an unexpected exception inside the attachments stage
     when: Extract is called
-    then: internal_errors gets +1 tagged stage=attachments and error.type with the exception type name; the stage activity has status Error
+    then: Extract throws EmlExtractionException (stage attachments); internal_errors gets +1 tagged stage=attachments and error.type with the inner exception type name; the stage activity has status Error (ADR-023)
   - name: DetectCountedByResult
     description: Detection counter
     given: One mail buffer and one PDF buffer

@@ -15,7 +15,7 @@ The original specification is translated in [docs/requirements.md](../requiremen
 - Returning text exactly as written, including emoji sequences and combining marks: [ydk:req:content/unicode-fidelity].
 - Reporting left-to-right or right-to-left direction for subject and body: [ydk:req:content/text-direction].
 - Returning every other MIME part as a flat attachment record with decoded bytes and its position in the message: [ydk:req:attachments/attachment-record], [ydk:req:attachments/container-path] (target, ADR-013), including pasted inline images [ydk:req:attachments/inline-cid-images] and the files inside Outlook TNEF wrappers [ydk:req:attachments/tnef-unwrap].
-- Never crashing the caller on malformed MIME, and reporting problems as warnings: [ydk:req:extraction/no-throw-on-malformed]. The original spec did not ask for this; it was implemented anyway.
+- Never crashing the caller on malformed but readable MIME content, and reporting those problems as warnings: [ydk:req:extraction/no-throw-on-malformed]. The original spec did not ask for this; it was implemented anyway. Misuse, oversized input, and library bugs throw informative exceptions (ADR-023, target).
 - The authored golden set, the public-mail harvest tool, and the load test as developer tooling: [quality.md](quality.md).
 - A CI gate on the full golden score (1,200 bulk plus 12 seed cases), failing below the 1212 of 1212 baseline: [ydk:nfr:reliability/golden-pass-rate] (ADR-011). Accepted but not implemented yet; CI runs only the seed cases today.
 - A committed, licensed realistic sample set run in CI, and visible skips for absent samples (target, ADR-018): [ydk:req:quality/realistic-attachment-samples].

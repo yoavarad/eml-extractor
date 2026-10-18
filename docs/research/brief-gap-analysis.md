@@ -30,10 +30,10 @@ Status legend: **Met** (in code, tested) / **Partial** (in code, gaps listed) / 
 | Gap | Decision / plan |
 | --- | --- |
 | Public `Extract(MimeMessage)` leaks MimeKit types into the API | Made internal; `Extract(EmlExtractionRequest)` primary, `Extract(ReadOnlyMemory<byte>)` kept as a thin wrapper (ADR-012) |
-| No input-size guard; every attachment held in memory | configurable `maxInputBytes` (provisional default 150 MiB, matching Exchange Online's documented 150 MB message limit; final value set from measurement) with `input_too_large` warning; memory ceiling measured (`ydk:req:extraction/max-input-size`, `ydk:nfr:performance/memory-footprint`). Streaming DEFERRED unless measurement demands it |
+| No input-size guard; every attachment held in memory | configurable `maxInputBytes` (provisional default 150 MiB, matching Exchange Online's documented 150 MB message limit; final value set from measurement); oversized input throws `EmlInputTooLargeException` (ADR-023; #38 shipped it as an `input_too_large` warning); memory ceiling measured (`ydk:req:extraction/max-input-size`, `ydk:nfr:performance/memory-footprint`). Streaming DEFERRED unless measurement demands it |
 | Direction values stored as metadata keys | Removed from metadata; result properties only (ADR-016) |
 | No runtime visibility: the host cannot see durations, warning rates, size-guard refusals, or per-stage library bugs without wrapping every call | BCL `Meter` + `ActivitySource` named `EmlExtraction`, no OpenTelemetry dependency, no message content in tags, provisional overhead budget (ADR-021, `ydk:req:observability/runtime-telemetry`, `ydk:nfr:observability/metrics-overhead`); naming to align with the team (`docs/team-questions.md` question 6) |
-| Unexpected exceptions can still escape `Extract` | Already decided in ADR-004 (`internal_error`); Stage 02 |
+| Unexpected exceptions can still escape `Extract` | Decided in ADR-004 (`internal_error`, done in #37); superseded by ADR-023: they throw `EmlExtractionException` naming the stage; Stage 02 |
 
 ## Breaking API change summary (Stage 02)
 
@@ -69,7 +69,7 @@ What the sibling extractor does, and whether this repo adopts it.
 
 | OLE practice | Why not |
 | --- | --- |
-| Typed exceptions | EML keeps no-throw + warnings (ADR-004): one bad message must not abort a batch. Divergence flagged for the team |
-| Batch API `ExtractManyAsync(maxDOP)` | Rejected by the owner (2026-10-18, ADR-012): the factory owns parallelism (YAGNI); each call is independent and stateless, and EML has no exceptions that need per-item error slots |
+| Typed exceptions | Was: EML keeps no-throw + warnings (ADR-004). Now (ADR-023, owner 2026-10-18): EML throws typed exceptions for misuse, oversized input and bugs; content problems stay warnings |
+| Batch API `ExtractManyAsync(maxDOP)` | Rejected by the owner (2026-10-18, ADR-012): the factory owns parallelism (YAGNI); each call is independent and stateless, and the factory catches per item (EML throws only for misuse, oversized input and bugs, ADR-023) |
 | `InputStream` / `FilePath` request sources | DEFERRED; the request record leaves room for them |
 | `DetectedFormat` enum | EML handles one format |

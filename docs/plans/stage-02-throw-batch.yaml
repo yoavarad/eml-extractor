@@ -1,0 +1,222 @@
+# Stage 02 throw batch: exceptions for misuse, limits and library bugs; warnings for content (ADR-023).
+# Owner decision 2026-10-18: discard the ADR-004 "never throws" contract. Misuse, input over maxInputBytes and
+# library bugs throw informative exceptions; malformed-but-readable content stays a warning with a partial result.
+# Validate:  PYTHONUTF8=1 ydk task create-batch --from docs/plans/stage-02-throw-batch.yaml --dry-run
+#
+# Epic #12 ("Robust extraction", which delivered #37 guards and #38 size guard) is closed and retro-done, so this
+# batch opens a new epic.
+#
+# Existing issues referenced in depends_on (create-batch passes known issue numbers through unchanged):
+#   #34 T-fullpath (in review; edits PartCollector, where the per-part content catch sites live)
+#   #47 T-readme (open; README rewrite for the Stage 02 API)
+#   #49 T-load-largefile (in review; its +1 byte check expects the input_too_large warning)
+#   #68 T-profile-harness (in review; uses the internal stage entry points behind the #37 guards)
+#   #71 T-runtime-metrics (in review; outcome tags and counters reference internal_error / input_too_large)
+#   #72 T-runtime-tracing (open, not started; stage activity status Error "on internal_error")
+# Each code task below waits for the in-review PR whose code it overlaps, then adapts that code, so no open PR has to
+# be reworked. #72 is "related": when it starts after T-throw-bugs it implements the ADR-023 wording directly.
+#
+# Planning conventions (those at the top of stage-02-batch.yaml all apply):
+# - TDD: failing test first, then code. Every code task ends with dotnet build -warnaserror, dotnet format
+#   --verify-no-changes, dotnet test on net8.0 and net10.0, GoldenKit score 1212/1212 with extraction never throwing
+#   on a golden input.
+# - Exception messages name the parameter and the bad value or limit and never quote message content. Tests assert
+#   exception type and data (ParamName, InputLength, MaxInputBytes, Stage, InnerException), not full message text.
+# - Proposed names (EmlExtractionException, EmlInputTooLargeException) and "wrap, do not propagate" are owner decisions
+#   pending confirmation on the ADR-023 PR; if the owner changes them, edit this file before creating issues.
+
+epics:
+  - id: E-error-model
+    title: "Error model: exceptions for misuse, limits and bugs; warnings for content (ADR-023)"
+    description: >-
+      Replace the ADR-004 never-throw contract. Argument and option misuse throw ArgumentException types naming the
+      parameter and bad value; input over maxInputBytes throws EmlInputTooLargeException (InputLength, MaxInputBytes)
+      instead of the input_too_large warning; an unexpected exception in any stage throws EmlExtractionException
+      (Stage, InnerException) instead of the internal_error warning; host callback exceptions propagate. Malformed but
+      readable content keeps its warnings and partial results.
+    spec_refs:
+      - extraction.md
+      - detection.md
+      - cross-cutting.md
+      - testing.md
+      - docs/adrs/023-exceptions-for-misuse-limits-and-bugs.md
+
+stories:
+  - id: S-throw
+    title: "Caller gets an informative exception for misuse, oversized input and library bugs, and warnings only for bad content"
+    epic: E-error-model
+    spec_refs:
+      - extraction.md
+      - detection.md
+      - cross-cutting.md
+      - docs/adrs/023-exceptions-for-misuse-limits-and-bugs.md
+    component_refs:
+      - ydk:req:extraction/no-throw-on-malformed
+      - ydk:req:extraction/max-input-size
+      - ydk:entity:extraction/EmlExtractionException
+      - ydk:entity:extraction/EmlInputTooLargeException
+      - ydk:contract:api/eml-extractor
+      - ydk:contract:api/eml-detector
+      - ydk:nfr:reliability/real-world-harvest-no-throw
+    acceptance:
+      - "Null or invalid arguments and maxInputBytes <= 0 throw ArgumentException types whose ParamName and message name the parameter and value"
+      - "Input over maxInputBytes throws EmlInputTooLargeException with InputLength and MaxInputBytes; no input_too_large warning exists"
+      - "An injected non-content exception in any stage throws EmlExtractionException with that Stage and the original as InnerException; no internal_error warning exists"
+      - "Malformed content (corrupt base64, bad charset, broken TNEF, undecodable part) still returns a partial result with its warning; GoldenKit 1212/1212 and harvest 0 exceptions"
+
+tasks:
+  - id: T-throw-types
+    title: "Add EmlExtractionException and EmlInputTooLargeException; argument and option validation with informative messages"
+    story: S-throw
+    component_refs:
+      - ydk:entity:extraction/EmlExtractionException
+      - ydk:entity:extraction/EmlInputTooLargeException
+      - ydk:contract:api/eml-extractor
+      - ydk:contract:api/eml-detector
+    spec_refs:
+      - cross-cutting.md
+      - docs/adrs/023-exceptions-for-misuse-limits-and-bugs.md
+    description: >-
+      Size S (complexity ~3). Add public sealed EmlExtractionException : Exception (ctor (string stage, Exception
+      inner); Stage property, one of request/detect/parse/metadata/body/attachments; message "EML extraction failed
+      in stage '<stage>': <inner type full name>." without the inner message) and public sealed
+      EmlInputTooLargeException : ArgumentException (ctor (long inputLength, long maxInputBytes, string paramName);
+      InputLength and MaxInputBytes properties; message "Input is <n> bytes, which exceeds maxInputBytes <limit>."),
+      one file each in src/EmlExtraction, per ydk:entity:extraction/EmlExtractionException and
+      ydk:entity:extraction/EmlInputTooLargeException . Audit every public entry point (EmlExtractor ctor,
+      Extract(EmlExtractionRequest), Extract(ReadOnlyMemory<byte>), internal Extract(MimeMessage), EmlDetector) so
+      misuse throws ArgumentNullException / ArgumentException / ArgumentOutOfRangeException with the parameter name
+      and the bad value in the message (ThrowIfNull / ThrowIfNegativeOrZero already do this; keep them). Types are
+      not thrown yet by extraction; T-throw-size and T-throw-bugs wire them in. XML docs on both types.
+    acceptance:
+      - "Both exception types exist, are public and sealed, and their properties and messages match the entity manifests"
+      - "EmlExtractionException message contains the stage and inner type name but not the inner message"
+      - "new EmlExtractor(0) and new EmlExtractor(-1) throw ArgumentOutOfRangeException with ParamName maxInputBytes and the value in the message"
+      - "Extract(null) throws ArgumentNullException with ParamName request"
+      - "Build, format and tests pass on net8.0 and net10.0; GoldenKit 1212/1212"
+    test_strategy: >-
+      TDD unit tests for both types (properties, message content, base type, InnerException kept) and for each
+      misuse path. No behaviour change in extraction, so golden and harvest are unchanged.
+    depends_on: []
+
+  - id: T-throw-size
+    title: "maxInputBytes: throw EmlInputTooLargeException instead of the input_too_large warning"
+    story: S-throw
+    component_refs:
+      - ydk:req:extraction/max-input-size
+      - ydk:entity:extraction/EmlInputTooLargeException
+      - ydk:warning:extraction/input-too-large
+      - ydk:contract:api/eml-extractor
+      - ydk:req:observability/runtime-telemetry
+    spec_refs:
+      - extraction.md
+      - docs/adrs/023-exceptions-for-misuse-limits-and-bugs.md
+      - docs/adrs/021-runtime-metrics-and-tracing.md
+    description: >-
+      Size S (complexity ~3). In EmlExtractor.Extract(EmlExtractionRequest), when FileBytes.Length > maxInputBytes,
+      throw EmlInputTooLargeException(length, limit, nameof(request)) before parsing (the bytes overload forwards, so
+      it throws the same; equal length is parsed). Remove the input_too_large warning string and the Empty-result
+      path for it. Telemetry (#71): the input_too_large counter and the duration record with outcome input_too_large
+      are recorded on the throw path; nothing goes to the warnings counter. Load test (#49): the +1 byte check
+      expects the exception. Update MaxInputBytesTests and any test that expects the warning. Delete
+      .ydk/components/warning/extraction/input-too-large.yaml and remove its references (warning-format related
+      list, spec "today" sentences, ADR-021 warning.code note) so ydk component validate passes. XML docs on the
+      constructor and Extract gain <exception cref="EmlInputTooLargeException">.
+    acceptance:
+      - "With maxInputBytes 1024 a 1025-byte input throws EmlInputTooLargeException (InputLength 1025, MaxInputBytes 1024, ParamName request); a 1024-byte input is extracted"
+      - "The bytes overload throws the same exception for the same input"
+      - "No code path produces a warning starting with input_too_large; the warning manifest is deleted and ydk component validate passes"
+      - "Telemetry tests: input_too_large counter +1 and outcome=input_too_large on the throw; warnings counter unchanged"
+      - "#49 large-file pass +1 byte check asserts the exception; GoldenKit 1212/1212"
+    test_strategy: >-
+      TDD: change MaxInputBytesTests and the telemetry InputTooLargeCounted case to expect the throw (red), implement,
+      green on net8.0 and net10.0. Run the #49 large-file pass once.
+    depends_on:
+      - "T-throw-types:blocks"
+      - "49:blocks"
+      - "71:blocks"
+
+  - id: T-throw-bugs
+    title: "Replace per-stage internal_error guards with EmlExtractionException; narrow content catch sites; GoldenKit no-throw check"
+    story: S-throw
+    component_refs:
+      - ydk:req:extraction/no-throw-on-malformed
+      - ydk:entity:extraction/EmlExtractionException
+      - ydk:warning:extraction/internal-error
+      - ydk:contract:api/eml-extractor
+      - ydk:contract:api/eml-detector
+      - ydk:nfr:reliability/real-world-harvest-no-throw
+      - ydk:req:observability/runtime-telemetry
+    spec_refs:
+      - extraction.md
+      - detection.md
+      - testing.md
+      - docs/adrs/023-exceptions-for-misuse-limits-and-bugs.md
+      - docs/adrs/021-runtime-metrics-and-tracing.md
+    description: >-
+      Size M (complexity ~5). In EmlExtractor, each #37 stage guard (parse, metadata, body, attachments) stops
+      recording internal_error and instead throws new EmlExtractionException(stage, ex) for any exception that is not
+      a content failure; OutOfMemoryException and exceptions already of type EmlExtractionException or the
+      ArgumentException family raised by argument checks are not wrapped. The parse stage keeps mapping the seven
+      content types to parse_failed. In PartCollector, the per-part catch sites (body_decode_failed,
+      part_decode_failed, rfc822_extract_failed, tnef_extract_failed) catch only the seven content exception types;
+      anything else reaches the stage wrapper. EmlDetector.Detect/IsEml wrap unexpected exceptions with stage
+      detect and drop "Never throws" from the XML docs. Host listener callbacks are outside the wrappers, so their
+      exceptions propagate unchanged. Keep the StageFault test seam; rewrite StageGuardTests to assert the throw
+      (Stage, InnerException identity) for every stage and both internal and public paths. Telemetry (#71):
+      internal_errors +1 (stage, error.type = inner type) and outcome internal_error recorded on the throw; stage
+      activity status Error where #72 has landed. Profile harness (#68): stage entry points keep working. GoldenKit:
+      replace the per-result no_internal_error check with "extraction does not throw" (a throw fails the case and the
+      run exits non-zero); probe counts any exception as a throw. Delete
+      .ydk/components/warning/extraction/internal-error.yaml and remove its references so validation passes.
+    acceptance:
+      - "An injected non-content exception in each of parse, metadata, body, attachments throws EmlExtractionException with that Stage and the injected exception as InnerException"
+      - "A non-content exception inside a per-part catch site propagates as EmlExtractionException (stage attachments or body), not as a part warning"
+      - "Corrupt base64, bad charset, broken TNEF and undecodable parts still give their warnings and partial results"
+      - "No code path produces internal_error; the warning manifest is deleted and ydk component validate passes"
+      - "GoldenKit score reports 'no throw' per case and stays 1212/1212; probe over corpus/internal reports 0 throws"
+      - "Telemetry tests: InternalErrorCountedByStage expects the throw and the internal_errors counter"
+    test_strategy: >-
+      TDD: rewrite StageGuardTests and the telemetry internal-error case to expect throws (red), implement, green on
+      net8.0 and net10.0. Add one test per content catch site proving a content exception still becomes its warning
+      and a non-content one is wrapped. Run GoldenKit score and probe (pass --corpus to the main checkout's
+      corpus/internal).
+    depends_on:
+      - "T-throw-types:blocks"
+      - "T-throw-size:blocks"
+      - "34:blocks"
+      - "68:blocks"
+      - "71:blocks"
+      - "72:related"
+
+  - id: T-throw-docs
+    title: "README and XML docs for the ADR-023 error model; drop the 'today' gap notes from specs and manifests"
+    story: S-throw
+    component_refs:
+      - ydk:contract:api/eml-extractor
+      - ydk:contract:api/eml-detector
+      - ydk:crosscut:core/warning-format
+      - ydk:req:extraction/no-throw-on-malformed
+    spec_refs:
+      - overview.md
+      - extraction.md
+      - cross-cutting.md
+      - docs/adrs/023-exceptions-for-misuse-limits-and-bugs.md
+    description: >-
+      Size S (complexity ~2). README: an "Errors" section with the ADR-023 table (what throws, which type, which
+      properties; what stays a warning) and a per-item catch example for batch callers; remove the "Today an
+      oversized input and a library bug are reported as warnings" sentence. Check every public member's XML docs for
+      complete <exception> tags. In docs/specs, docs/project-rules.md and the ADR-023 manifests, drop the "today /
+      current code / Stage 02 gap" sentences that T-throw-size and T-throw-bugs made obsolete, and set ADR-023 status
+      to implemented. Coordinate with #47 (README for the Stage 02 API) if it is open: rebase, do not overwrite.
+    acceptance:
+      - "README Errors section lists every exception type, its properties, and the content warnings, matching ADR-023"
+      - "Every public method and constructor documents the exceptions it throws"
+      - "No spec, rule or manifest still says internal_error or input_too_large is recorded; ydk component validate passes"
+    test_strategy: >-
+      Docs only: grep for internal_error, input_too_large, never throw over docs/, README.md and .ydk/components/
+      returns only ADR history; ydk component validate; dotnet build -warnaserror (XML doc warnings).
+    depends_on:
+      - "T-throw-size:blocks"
+      - "T-throw-bugs:blocks"
+      - "47:related"

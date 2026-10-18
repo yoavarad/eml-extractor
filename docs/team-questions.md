@@ -21,10 +21,10 @@ Default until answered: EML ships its target names; the template adapter maps OL
 
 ### Error model divergence
 
-- EML: never throws on content; every problem is a warning string `"<code>: <detail>"` on the result, and a stage that fails still returns the other stages' output (ADR-004). Only a null argument throws.
+- EML (ADR-023, owner 2026-10-18, target): throws typed exceptions for misuse (`ArgumentException` family), oversized input (`EmlInputTooLargeException : ArgumentException`), and library bugs (`EmlExtractionException`, naming the stage, original as `InnerException`). Malformed-but-readable content still returns a partial result with warning strings `"<code>: <detail>"`.
 - OLE: throws typed exceptions.
 
-Question: which model does the template expect? If exceptions, should EML add a strict mode that throws on `parse_failed` / `internal_error`, or should the template adapter convert warnings? Default: EML keeps no-throw.
+The two models now point the same way. Question: should the exception names and base types be shared across extractors (for example one `ExtractionException` base the template catches)? Default: EML ships `EmlExtractionException` and `EmlInputTooLargeException`; the template adapter maps them.
 
 ## 2. Template and factory integration
 

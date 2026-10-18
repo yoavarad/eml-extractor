@@ -31,7 +31,7 @@ Per the project owner (ADR-018), a realistic sample set is committed and always 
 
 Real public mail cannot be committed: licences vary and the samples contain personal data. So it lives in a gitignored folder and is exercised two ways:
 
-- The GoldenKit probe command runs detection and extraction over every local sample and counts throws, parse failures, and warnings. The target is zero uncaught exceptions ([ydk:nfr:reliability/real-world-harvest-no-throw]). The last run detected 12,853 messages with 0 throws, 0 parse failures, and 0 warnings.
+- The GoldenKit probe command runs detection and extraction over every local sample and counts throws, parse failures, and warnings. The target is zero exceptions on real-world content ([ydk:nfr:reliability/real-world-harvest-no-throw]); under ADR-023 an exception there means a library bug. The last run detected 12,853 messages with 0 throws, 0 parse failures, and 0 warnings.
 - [ydk:test:quality/internal-corpus.integration] makes 17 targeted assertions about specific real samples: Outlook TNEF, large Exchange header blocks, Outlook paste images, legacy Asian charsets, delivery reports, S/MIME, real Office files, and Hebrew from real clients. Today each test passes without running when its sample is absent. The target (ADR-018) is that such a test shows as skipped, naming the missing file, so a green run never hides an unrun test.
 
 The gaps the harvest has not yet closed are listed under DEFERRED in [scope.md](scope.md).

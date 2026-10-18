@@ -26,7 +26,7 @@ Input: a buffer already identified as EML. Output: metadata, main content, neste
 EmlExtractionResult result = new EmlExtractor().Extract(bytes);
 ```
 
-Does not throw on malformed MIME; problems go into `result.Warnings`.
+Does not throw on malformed MIME content (bad charset, undecodable part, broken structure); those problems go into `result.Warnings` with whatever could be extracted. Planned (ADR-023, Stage 02): misuse throws `ArgumentException` types, input over `maxInputBytes` throws `EmlInputTooLargeException`, and a library bug throws `EmlExtractionException` naming the failed stage. Today an oversized input and a library bug are reported as `input_too_large` / `internal_error` warnings.
 
 #### Metadata
 

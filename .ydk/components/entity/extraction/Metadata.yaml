@@ -6,7 +6,7 @@ description: >-
   (ydk:req:metadata/canonical-keys); not implemented (Stage 02).
   Target construction order: (1) every top-level header copied under its canonical key; (2) the classic overlay
   rewrites the value of its own key; (3) xfields computed; (4) any missing fixed key (from, to, cc, bcc, xfields)
-  added with "". On ydk:warning:extraction/parse-failed and ydk:warning:extraction/input-too-large the map holds only
+  added with "". On ydk:warning:extraction/parse-failed (oversized input throws, ADR-023, so it has no map) the map holds only
   the five fixed keys with "".
   Today (differences): raw keys fold "-" to "_" (x_mailer, reply_to); the overlay adds second punctuation-free keys
   (replyto, sender, messageid, inreplyto, mimeversion, contenttype = top-level MIME type, returnpath, deliveredto);
@@ -29,7 +29,7 @@ fields:
     default: ""
     constraints: >-
       Parsed mailbox list formatted "Name <addr>" (or "addr" when no display name), groups "Group: m1; m2;", joined "; ".
-      If MimeKit parsed no mailbox: raw header value kept. If header absent, parse_failed, or input_too_large: "".
+      If MimeKit parsed no mailbox: raw header value kept. If header absent or parse_failed: "".
     description: Always present (ydk:req:metadata/classic-fields).
   to:
     type: string

@@ -6,7 +6,7 @@ The downstream pipeline receives files of every kind and needs a cheap, extensio
 
 ## How it decides
 
-The detector works only on the leading bytes of the buffer and never throws.
+The detector works only on the leading bytes of the buffer. A buffer that is not mail is an answer ("no"), not an error; the detector throws only on programmer misuse or a library bug (ADR-023).
 
 1. **Too short.** Buffers below the minimum length are rejected outright. The threshold is in [ydk:req:detection/detect-eml].
 2. **Byte-order mark.** One leading UTF-8 byte-order mark is ignored.

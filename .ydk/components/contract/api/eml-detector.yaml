@@ -3,7 +3,10 @@ id: ydk:contract:api/eml-detector
 description: >-
   Public detection surface. Interface IEmlDetector, implementation EmlDetector
   (src/EmlExtraction/Models.cs, src/EmlExtraction/EmlDetector.cs). Stateless; constructed with new EmlDetector().
-  Pure byte sniff: never parses MIME, never throws for any input, ignores file extension and file name.
+  Pure byte sniff: never parses MIME, ignores file extension and file name. Non-email input is a result
+  (IsSupported false / false), never an error. Throw contract (ADR-023, per project owner 2026-10-18): misuse throws
+  (the ReadOnlySpan<byte> overloads have no argument that can be null or invalid, so none applies today); a library
+  bug throws ydk:entity:extraction/EmlExtractionException with stage detect (target, Stage 02).
   Target (ADR-012, shared team contract; not implemented, Stage 02): Detect returns the typed
   ydk:entity:extraction/EmlDetectionResult ; IsEml stays as the bool convenience the brief describes. Today only
   IsEml exists.
@@ -19,7 +22,8 @@ methods:
     returns:
       type: EmlDetectionResult
       description: ydk:entity:extraction/EmlDetectionResult ; never null. IsSupported true = pass to ydk:contract:api/eml-extractor .
-    raises: []
+    raises:
+      - ydk:entity:extraction/EmlExtractionException
   IsEml:
     description: >-
       Return true when the buffer looks like an RFC 5322 message (optionally mbox-prefixed / BOM-prefixed).
@@ -32,4 +36,5 @@ methods:
     returns:
       type: bool
       description: true = treat as EML and pass to ydk:contract:api/eml-extractor ; false = not EML.
-    raises: []
+    raises:
+      - ydk:entity:extraction/EmlExtractionException

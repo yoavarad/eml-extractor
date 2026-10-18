@@ -1,7 +1,7 @@
 # ADR-012: Shared team extractor contract (request, detection result, subfile names)
 
 ## Status
-Accepted for EML; proposed to team (per project owner, 2026-10-17; bytes overload and batch API settled by the owner on 2026-10-18). Implementation pending, tracked as Stage 02 work.
+Accepted for EML; proposed to team (per project owner, 2026-10-17; bytes overload and batch API settled by the owner on 2026-10-18). Implementation pending, tracked as Stage 02 work. Amended by ADR-023 (2026-10-18): the error model is now exceptions for misuse, limits and bugs, warnings for content.
 
 ## Context
 The team brief gives two functions per extractor: a detection function (bytes in, "is this the format?") and an extraction function (metadata, main content, sub-files with name, size, full path if it exists, and the binary). The extracted component goes into the team's extraction template, and the team wires it into the factory.

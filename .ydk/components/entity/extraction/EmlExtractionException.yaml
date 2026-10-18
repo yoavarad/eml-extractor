@@ -1,0 +1,35 @@
+$schema: ydk:schema:entity
+id: ydk:entity:extraction/EmlExtractionException
+description: >-
+  Exception thrown when an unexpected (non-content) exception occurs inside detection or extraction, i.e. a library
+  bug. Target (ADR-023, per project owner 2026-10-18; not implemented, Stage 02): public sealed class
+  EmlExtractionException : Exception, in src/EmlExtraction. Replaces the internal_error warning and the per-stage
+  partial-result defaults of ADR-004. Not used for misuse (ArgumentException family), for
+  ydk:entity:extraction/EmlInputTooLargeException , for OutOfMemoryException, or for exceptions thrown by host
+  callbacks (MeterListener, ActivityListener); those propagate unwrapped.
+fields:
+  Stage:
+    type: enum
+    values: [request, detect, parse, metadata, body, attachments]
+    required: true
+    nullable: false
+    description: >-
+      The stage that failed, using the ADR-020 stage names (ADR-021's eml_extraction.stage tag uses parse, metadata,
+      body, attachments).
+  InnerException:
+    type: Exception
+    required: true
+    nullable: false
+    description: The original exception, unchanged (type and stack trace preserved).
+  Message:
+    type: string
+    required: true
+    nullable: false
+    constraints: >-
+      "EML extraction failed in stage '${Stage}': ${InnerExceptionTypeFullName}." The inner exception's message is not
+      copied (MimeKit messages can quote input); it stays on InnerException.
+    description: Human-readable message naming the stage and the original exception type.
+state_transitions: {}
+relationships: []
+indexes: []
+crud: []
