@@ -17,32 +17,44 @@ internal static class HeaderMapper
                 xLines.Add($"{header.Field}: {value}");
         }
 
+        // MimeKit moves entity headers (Content-Type, ...) of a single-part message onto the body part.
+        if (message.Body is not null)
+            foreach (var header in message.Body.Headers.Where(h => h.Field.StartsWith("Content-", StringComparison.OrdinalIgnoreCase)))
+                Append(metadata, NormalizeKey(header.Field), header.Value ?? "");
+
         EnsureAddress(metadata, "from", Join(message.From));
         EnsureAddress(metadata, "to", Join(message.To));
         EnsureAddress(metadata, "cc", Join(message.Cc));
         EnsureAddress(metadata, "bcc", Join(message.Bcc));
-        Set(metadata, "replyto", Join(message.ReplyTo));
+        Set(metadata, "reply-to", Join(message.ReplyTo));
         Set(metadata, "sender", message.Sender?.ToString());
         Set(metadata, "subject", message.Subject);
         if (message.Date != DateTimeOffset.MinValue)
             Set(metadata, "date", message.Date.ToString("o"));
-        Set(metadata, "messageid", message.MessageId);
-        Set(metadata, "inreplyto", message.InReplyTo);
+        Set(metadata, "message-id", message.MessageId);
+        Set(metadata, "in-reply-to", message.InReplyTo);
         Set(metadata, "references", message.References.Count == 0 ? null : string.Join(" ", message.References));
-        Set(metadata, "mimeversion", message.Headers[HeaderId.MimeVersion]);
-        Set(metadata, "contenttype", message.Body?.ContentType?.MimeType);
-        Set(metadata, "returnpath", First(message, "Return-Path"));
-        Set(metadata, "deliveredto", First(message, "Delivered-To"));
-
-        var received = string.Join("\n", message.Headers.Where(h => h.Id == HeaderId.Received).Select(h => h.Value));
-        Set(metadata, "received", string.IsNullOrEmpty(received) ? null : received);
 
         xfields = string.Join("\n", xLines);
+        metadata["xfields"] = xfields;
         return metadata;
     }
 
+    /// <summary>Fixed always-present keys with empty values (parse_failed, input_too_large, ...).</summary>
+    internal static Dictionary<string, string> EmptyMetadata() => new(StringComparer.Ordinal)
+    {
+        ["from"] = "",
+        ["to"] = "",
+        ["cc"] = "",
+        ["bcc"] = "",
+        ["xfields"] = ""
+    };
+
     private static string NormalizeKey(string field)
-        => field.Trim().ToLowerInvariant().Replace('-', '_');
+    {
+        var key = field.Trim().ToLowerInvariant();
+        return key == "xfields" ? "header:xfields" : key;
+    }
 
     private static bool IsXHeader(string field)
         => field.Length >= 2 && field[0] is 'X' or 'x' && field[1] is '-' or '_';
@@ -83,7 +95,4 @@ internal static class HeaderMapper
         GroupAddress group => $"{group.Name}: {string.Join("; ", group.Members.Select(FormatAddress))};",
         _ => address.ToString()
     };
-
-    private static string? First(MimeMessage message, string name)
-        => message.Headers.FirstOrDefault(h => h.Field.Equals(name, StringComparison.OrdinalIgnoreCase))?.Value;
 }

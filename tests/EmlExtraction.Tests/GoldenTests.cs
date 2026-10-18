@@ -36,10 +36,29 @@ public sealed class GoldenTests
         var label = spec.Id;
 
         Assert.True(spec.IsEml == _detector.IsEml(bytes), $"{label} detector");
+        Assert.Equal(_detector.IsEml(bytes), _detector.Detect(bytes).IsSupported);
         if (!spec.IsEml)
             return;
 
         Check(_extractor.Extract(bytes), spec.Expect, label, depth: 0);
+    }
+
+    [Fact]
+    public void RequestAndBytesOverloadsAgreeOnEveryGoldenInput()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "corpus", "golden")))
+            dir = dir.Parent;
+        Assert.NotNull(dir);
+        var inputs = Directory.EnumerateFiles(Path.Combine(dir.FullName, "corpus", "golden"), "input.eml",
+            SearchOption.AllDirectories).ToList();
+        Assert.True(inputs.Count >= 1212, $"expected seed + bulk inputs, found {inputs.Count}");
+        foreach (var path in inputs)
+        {
+            var bytes = File.ReadAllBytes(path);
+            var viaRequest = _extractor.Extract(new EmlExtractionRequest { FileBytes = bytes, FileName = path });
+            Assert.True(ResultProjection.Of(_extractor.Extract(bytes)).SequenceEqual(ResultProjection.Of(viaRequest)), path);
+        }
     }
 
     private void Check(EmlExtractionResult result, GoldenExpect expect, string label, int depth)

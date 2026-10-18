@@ -332,12 +332,12 @@ internal static class Probe
         if (hasTnefLeftover)
             stats.TnefOpaque++;
 
-        if (result.Metadata.Keys.Any(k => k.Contains("ms_exchange", StringComparison.Ordinal)))
+        if (result.Metadata.Keys.Any(k => k.Contains("ms-exchange", StringComparison.Ordinal)))
             stats.ExchangeHeaders++;
-        if (result.Metadata.TryGetValue("contenttype", out var ct) && ct.Contains("tnef", StringComparison.OrdinalIgnoreCase))
+        if (result.Metadata.TryGetValue("content-type", out var ct) && ct.Contains("tnef", StringComparison.OrdinalIgnoreCase))
             stats.TnefContentType++;
         if (result.XFields.Contains("winmail", StringComparison.OrdinalIgnoreCase)
-            || result.Metadata.TryGetValue("x_ms_tnef_correlator", out _))
+            || result.Metadata.TryGetValue("x-ms-tnef-correlator", out _))
             stats.TnefHeaders++;
 
         if (detected && result.Warnings.Any(w => w.StartsWith("parse_failed", StringComparison.Ordinal)))

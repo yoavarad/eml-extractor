@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text;
 using MimeKit;
 
@@ -96,8 +97,8 @@ public sealed class ExtractionTests
         Assert.Contains("bob@example.com", result.Metadata["to"]);
         Assert.Contains("carol@example.com", result.Metadata["cc"]);
         Assert.Equal("שלום 😀 中文 हिंदी", result.Metadata["subject"]);
-        Assert.True(result.Metadata.ContainsKey("messageid"));
-        Assert.True(result.Metadata.ContainsKey("dkim_signature"));
+        Assert.True(result.Metadata.ContainsKey("message-id"));
+        Assert.True(result.Metadata.ContainsKey("dkim-signature"));
         Assert.Contains("X-Mailer: SandboxMail", result.XFields);
         Assert.Contains("X_Custom_Field: team-value", result.XFields);
         Assert.Contains("X-Spam-Score: 1.2", result.XFields);
@@ -213,6 +214,52 @@ public sealed class ExtractionTests
     }
 
     [Fact]
+    public void HyphenAndUnderscoreHeadersDoNotCollide()
+    {
+        var message = SampleFactory.Plain("c", "b");
+        message.Headers.Add("X-Foo", "a");
+        message.Headers.Add("X_Foo", "b");
+        var result = _extractor.Extract(SampleFactory.ToBytes(message));
+        Assert.Equal("a", result.Metadata["x-foo"]);
+        Assert.Equal("b", result.Metadata["x_foo"]);
+    }
+
+    [Fact]
+    public void OverlayWritesInPlaceAndOldKeysAbsent()
+    {
+        var message = SampleFactory.Plain("o", "b");
+        message.ReplyTo.Add(MailboxAddress.Parse("reply@example.com"));
+        message.Headers.Add("DKIM-Signature", "v=1");
+        var result = _extractor.Extract(SampleFactory.ToBytes(message));
+        Assert.Contains("reply@example.com", result.Metadata["reply-to"]);
+        Assert.True(result.Metadata.ContainsKey("message-id"));
+        Assert.DoesNotContain("<", result.Metadata["message-id"]);
+        Assert.True(result.Metadata.ContainsKey("dkim-signature"));
+        Assert.True(result.Metadata.ContainsKey("content-type"));
+        foreach (var gone in new[] { "messageid", "replyto", "dkim_signature", "contenttype", "subject_direction", "content_direction", "mimeversion", "returnpath", "deliveredto", "inreplyto", "reply_to", "message_id" })
+            Assert.False(result.Metadata.ContainsKey(gone), gone);
+    }
+
+    [Fact]
+    public void HeaderNamedXFieldsIsStoredUnderReservedPrefix()
+    {
+        var message = SampleFactory.Plain("x", "b");
+        message.Headers.Add("XFields", "q");
+        var result = _extractor.Extract(SampleFactory.ToBytes(message));
+        Assert.Equal("q", result.Metadata["header:xfields"]);
+        Assert.True(result.Metadata.ContainsKey("xfields"));
+    }
+
+    [Fact]
+    public void ParseFailedHasExactlyFixedKeys()
+    {
+        var result = _extractor.Extract(Array.Empty<byte>());
+        Assert.Contains(result.Warnings, w => w.StartsWith("parse_failed", StringComparison.Ordinal));
+        Assert.Equal(["bcc", "cc", "from", "to", "xfields"], result.Metadata.Keys.Order(StringComparer.Ordinal).ToArray());
+        Assert.All(result.Metadata.Values, v => Assert.Equal("", v));
+    }
+
+    [Fact]
     public void DuplicateReceivedAreConcatenated()
     {
         var message = SampleFactory.Plain("r", "b");
@@ -273,5 +320,82 @@ public sealed class ExtractionTests
         var plain = Assert.Single(result.Attachments, a => a.FileName == "plain.txt");
         Assert.Null(plain.ContentLocation);
         Assert.Null(plain.OriginalPath);
+    }
+
+    [Fact]
+    public void NullRequestThrows()
+        => Assert.Throws<ArgumentNullException>(() => _extractor.Extract((EmlExtractionRequest)null!));
+
+    [Fact]
+    public void FileNameDoesNotAffectResult()
+    {
+        var bytes = SampleFactory.ToBytes(SampleFactory.Plain("name", "body"));
+        var unnamed = _extractor.Extract(new EmlExtractionRequest { FileBytes = bytes });
+        var named = _extractor.Extract(new EmlExtractionRequest { FileBytes = bytes, FileName = "x.eml" });
+        Assert.Equal(ResultProjection.Of(unnamed), ResultProjection.Of(named));
+    }
+
+    [Fact]
+    public void MboxFromPrefixWorksThroughRequest()
+    {
+        var inner = SampleFactory.ToBytes(SampleFactory.Plain("mbox-subject", "mbox-body"));
+        var raw = Encoding.ASCII.GetBytes("From alice@example.com Tue Sep 15 07:00:00 2026\n")
+            .Concat(inner)
+            .ToArray();
+        var result = _extractor.Extract(new EmlExtractionRequest { FileBytes = raw, FileName = "a.mbox" });
+        Assert.Equal("mbox-subject", result.Metadata["subject"]);
+        Assert.Equal("mbox-body", result.MainContent);
+        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed"));
+    }
+
+    [Fact]
+    public void PublicSurfaceExposesNoMimeKitType()
+    {
+        const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static
+                                   | BindingFlags.DeclaredOnly;
+        var leaks = new List<string>();
+        foreach (var type in typeof(EmlExtractor).Assembly.GetExportedTypes())
+        {
+            var exposed = new List<(string Where, Type Type)>();
+            if (type.BaseType is not null)
+                exposed.Add(("base", type.BaseType));
+            exposed.AddRange(type.GetInterfaces().Select(i => ("interface", i)));
+            foreach (var member in type.GetMembers(flags))
+            {
+                switch (member)
+                {
+                    case MethodInfo m:
+                        exposed.Add((m.Name, m.ReturnType));
+                        exposed.AddRange(m.GetParameters().Select(p => (m.Name, p.ParameterType)));
+                        break;
+                    case ConstructorInfo c:
+                        exposed.AddRange(c.GetParameters().Select(p => (".ctor", p.ParameterType)));
+                        break;
+                    case PropertyInfo p:
+                        exposed.Add((p.Name, p.PropertyType));
+                        break;
+                    case FieldInfo f:
+                        exposed.Add((f.Name, f.FieldType));
+                        break;
+                    case EventInfo e when e.EventHandlerType is not null:
+                        exposed.Add((e.Name, e.EventHandlerType));
+                        break;
+                }
+            }
+
+            leaks.AddRange(exposed.Where(x => MentionsMimeKit(x.Type)).Select(x => $"{type.Name}.{x.Where}: {x.Type}"));
+        }
+
+        Assert.Empty(leaks);
+    }
+
+    private static bool MentionsMimeKit(Type type)
+    {
+        if (type.HasElementType)
+            return MentionsMimeKit(type.GetElementType()!);
+        if (type.IsGenericType && type.GetGenericArguments().Any(MentionsMimeKit))
+            return true;
+        return type.Assembly.GetName().Name is "MimeKit"
+               || (type.Namespace?.StartsWith("MimeKit", StringComparison.Ordinal) ?? false);
     }
 }

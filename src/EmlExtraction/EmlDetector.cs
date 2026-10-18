@@ -15,8 +15,17 @@ public sealed class EmlDetector : IEmlDetector
         "in-reply-to", "references", "content-type"
     };
 
+    private static readonly EmlDetectionResult Supported = new(true, "message/rfc822");
+    private static readonly EmlDetectionResult Unsupported = new(false, "");
+
     /// <inheritdoc/>
-    public bool IsEml(ReadOnlySpan<byte> data)
+    public bool IsEml(ReadOnlySpan<byte> data) => Detect(data).IsSupported;
+
+    /// <summary>Detects whether <paramref name="data"/> is a mail message. Never throws.</summary>
+    public EmlDetectionResult Detect(ReadOnlySpan<byte> data)
+        => Sniff(data) ? Supported : Unsupported;
+
+    private static bool Sniff(ReadOnlySpan<byte> data)
     {
         if (data.Length < MinLength)
             return false;

@@ -1,0 +1,38 @@
+From: Alice Example <alice@example.com>
+Date: Tue, 04 Mar 2025 09:30:00 +0000
+Subject: Pasted image
+Message-Id: <outlook-paste@example.com>
+To: Bob Example <bob@example.net>
+MIME-Version: 1.0
+Content-Type: multipart/related; boundary="=-bnd-outlook-paste"
+
+--=-bnd-outlook-paste
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+<html><body><p>Screenshot:</p><img src=3D"cid:image001.png@01D9A1B2.3C4D5E6=
+0" width=3D16 height=3D16></body></html>=
+
+--=-bnd-outlook-paste
+Content-Type: image/png; name=image001.png
+Content-Transfer-Encoding: base64
+Content-Id: <image001.png@01D9A1B2.3C4D5E60>
+Content-Disposition: inline; filename=image001.png
+
+iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAADG0lEQVR4AQEQA+/8AFoOWmIOWmoO
+WnIOWnoOWoIOWooOWpIOWpoOWqIOWqoOWrIOWroOWsIOWsoOWtIOWgBaFlpiFlpqFlpyFlp6FlqC
+FlqKFlqSFlqaFlqiFlqqFlqyFlq6FlrCFlrKFlrSFloAWh5aYh5aah5ach5aeh5agh5aih5akh5a
+mh5aoh5aqh5ash5auh5awh5ayh5a0h5aAFomWmImWmomWnImWnomWoImWoomWpImWpomWqImWqom
+WrImWromWsImWsomWtImWgBaLlpiLlpqLlpyLlp6LlqCLlqKLlqSLlqaLlqiLlqqLlqyLlq6LlrC
+LlrKLlrSLloAWjZaYjZaajZacjZaejZagjZaijZakjZamjZaojZaqjZasjZaujZawjZayjZa0jZa
+AFo+WmI+Wmo+WnI+Wno+WoI+Woo+WpI+Wpo+WqI+Wqo+WrI+Wro+WsI+Wso+WtI+WgBaRlpiRlpq
+RlpyRlp6RlqCRlqKRlqSRlqaRlqiRlqqRlqyRlq6RlrCRlrKRlrSRloAWk5aYk5aak5ack5aek5a
+gk5aik5akk5amk5aok5aqk5ask5auk5awk5ayk5a0k5aAFpWWmJWWmpWWnJWWnpWWoJWWopWWpJW
+WppWWqJWWqpWWrJWWrpWWsJWWspWWtJWWgBaXlpiXlpqXlpyXlp6XlqCXlqKXlqSXlqaXlqiXlqq
+XlqyXlq6XlrCXlrKXlrSXloAWmZaYmZaamZacmZaemZagmZaimZakmZammZaomZaqmZasmZaumZa
+wmZaymZa0mZaAFpuWmJuWmpuWnJuWnpuWoJuWopuWpJuWppuWqJuWqpuWrJuWrpuWsJuWspuWtJu
+WgBadlpidlpqdlpydlp6dlqCdlqKdlqSdlqadlqidlqqdlqydlq6dlrCdlrKdlrSdloAWn5aYn5a
+an5acn5aen5agn5ain5akn5amn5aon5aqn5asn5aun5awn5ayn5a0n5aAFqGWmKGWmqGWnKGWnqG
+WoKGWoqGWpKGWpqGWqKGWqqGWrKGWrqGWsKGWsqGWtKGWqEyOhCcO8F5AAAAAElFTkSuQmCC
+
+--=-bnd-outlook-paste--

@@ -13,7 +13,13 @@ public sealed class EmlExtractor : IEmlExtractor
 
     /// <inheritdoc/>
     public EmlExtractionResult Extract(ReadOnlyMemory<byte> eml)
+        => Extract(new EmlExtractionRequest { FileBytes = eml });
+
+    /// <inheritdoc/>
+    public EmlExtractionResult Extract(EmlExtractionRequest request)
     {
+        ArgumentNullException.ThrowIfNull(request);
+        var eml = request.FileBytes;
         var warnings = new List<string>();
         try
         {
@@ -37,7 +43,7 @@ public sealed class EmlExtractor : IEmlExtractor
         {
             warnings.Add($"parse_failed: {ex.GetType().Name}: {ex.Message}");
             return new EmlExtractionResult(
-                new Dictionary<string, string>(),
+                HeaderMapper.EmptyMetadata(),
                 string.Empty,
                 null,
                 null,
@@ -48,7 +54,7 @@ public sealed class EmlExtractor : IEmlExtractor
 
     /// <summary>Extracts from an already parsed <see cref="MimeMessage"/>.</summary>
     /// <param name="message">Parsed message.</param>
-    public EmlExtractionResult Extract(MimeMessage message)
+    internal EmlExtractionResult Extract(MimeMessage message)
         => Extract(message, []);
 
     internal static EmlExtractionResult Extract(MimeMessage message, List<string> warnings)
@@ -76,8 +82,6 @@ public sealed class EmlExtractor : IEmlExtractor
                    && contentType.Contains("html", StringComparison.OrdinalIgnoreCase);
         var subjectDir = TextDirection.Detect(metadata.GetValueOrDefault("subject"), html: false);
         var contentDir = TextDirection.Detect(content, html);
-        metadata["subject_direction"] = subjectDir;
-        metadata["content_direction"] = contentDir;
         return new EmlExtractionResult(metadata, xfields, content, contentType, attachments, warnings)
         {
             SubjectDirection = subjectDir,

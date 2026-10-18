@@ -1,0 +1,35 @@
+From: Alice Example <alice@example.com>
+Date: Tue, 04 Mar 2025 09:30:00 +0000
+Subject: Photo
+Message-Id: <attached-image@example.com>
+To: Bob Example <bob@example.net>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-bnd-attached-image"
+
+--=-bnd-attached-image
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+
+See attached file.
+--=-bnd-attached-image
+Content-Type: image/png; name=photo.png
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=photo.png
+
+iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAADG0lEQVR4AQEQA+/8ACh4KDB4KDh4
+KEB4KEh4KFB4KFh4KGB4KGh4KHB4KHh4KIB4KIh4KJB4KJh4KKB4KAAogCgwgCg4gChAgChIgChQ
+gChYgChggChogChwgCh4gCiAgCiIgCiQgCiYgCiggCgAKIgoMIgoOIgoQIgoSIgoUIgoWIgoYIgo
+aIgocIgoeIgogIgoiIgokIgomIgooIgoACiQKDCQKDiQKECQKEiQKFCQKFiQKGCQKGiQKHCQKHiQ
+KICQKIiQKJCQKJiQKKCQKAAomCgwmCg4mChAmChImChQmChYmChgmChomChwmCh4mCiAmCiImCiQ
+mCiYmCigmCgAKKAoMKAoOKAoQKAoSKAoUKAoWKAoYKAoaKAocKAoeKAogKAoiKAokKAomKAooKAo
+ACioKDCoKDioKECoKEioKFCoKFioKGCoKGioKHCoKHioKICoKIioKJCoKJioKKCoKAAosCgwsCg4
+sChAsChIsChQsChYsChgsChosChwsCh4sCiAsCiIsCiQsCiYsCigsCgAKLgoMLgoOLgoQLgoSLgo
+ULgoWLgoYLgoaLgocLgoeLgogLgoiLgokLgomLgooLgoACjAKDDAKDjAKEDAKEjAKFDAKFjAKGDA
+KGjAKHDAKHjAKIDAKIjAKJDAKJjAKKDAKAAoyCgwyCg4yChAyChIyChQyChYyChgyChoyChwyCh4
+yCiAyCiIyCiQyCiYyCigyCgAKNAoMNAoONAoQNAoSNAoUNAoWNAoYNAoaNAocNAoeNAogNAoiNAo
+kNAomNAooNAoACjYKDDYKDjYKEDYKEjYKFDYKFjYKGDYKGjYKHDYKHjYKIDYKIjYKJDYKJjYKKDY
+KAAo4Cgw4Cg44ChA4ChI4ChQ4ChY4Chg4Cho4Chw4Ch44CiA4CiI4CiQ4CiY4Cig4CgAKOgoMOgo
+OOgoQOgoSOgoUOgoWOgoYOgoaOgocOgoeOgogOgoiOgokOgomOgooOgoACjwKDDwKDjwKEDwKEjw
+KFDwKFjwKGDwKGjwKHDwKHjwKIDwKIjwKJDwKJjwKKDwKNG5QBBcdbYnAAAAAElFTkSuQmCC
+
+--=-bnd-attached-image--

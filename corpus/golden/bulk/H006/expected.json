@@ -19,7 +19,7 @@
         ],
         "not_contains": []
       },
-      "replyto": {
+      "reply-to": {
         "contains": [
           "reply@example.com"
         ],

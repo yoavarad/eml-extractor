@@ -13,7 +13,7 @@
         "contains": [],
         "not_contains": []
       },
-      "dkim_signature": {
+      "dkim-signature": {
         "contains": [
           "v=1"
         ],
