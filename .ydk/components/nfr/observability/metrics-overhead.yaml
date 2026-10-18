@@ -1,17 +1,18 @@
 $schema: ydk:schema:nfr
 id: ydk:nfr:observability/metrics-overhead
 description: >-
-  Cost of the runtime telemetry of ydk:req:observability/runtime-telemetry (ADR-021). Target; not implemented
-  (Stage 02). Every number here is provisional (per project owner, 2026-10-18): a placeholder until the overhead
-  benchmark runs; the measuring task replaces each with the measured value plus stated headroom and records the source
-  run.
+  Cost of the runtime telemetry of ydk:req:observability/runtime-telemetry (ADR-021). Set from the overhead benchmark run of
+  #73 (docs/perf-results.md, Telemetry overhead: BenchmarkDotNet, Intel Core Ultra 7 155H, net8.0 and net10.0, two
+  runs 2026-10-18). Proposed from data, pending owner confirmation.
 category: observability
-tags: [overhead, telemetry, provisional]
+tags: [overhead, telemetry]
 target: >-
-  Provisional. No listener: added time per Extract on the tiny message within run-to-run noise and <= 1%, and 0 added
-  allocated bytes per Extract and per Detect. MeterListener subscribed to every instrument: <= 5% added time per
-  Extract on the tiny message. ActivityListener sampling all (with stage children): reported separately; if it exceeds
-  10% the stage children are dropped (ADR-021).
+  No listener: 0 added allocated bytes from the Extract and Detect telemetry hooks (asserted by TelemetryNoListenerAllocationTests on the hooks directly, net10.0 always, net8.0 only when run in a process with no earlier listener;
+  time within run-to-run noise, no uninstrumented baseline available to A/B). MeterListener subscribed to every
+  instrument: <= 5% added time per Extract on the tiny message (measured -6.9% to +0.5%, i.e. noise; 0 added bytes).
+  ActivityListener sampling all (with stage children): reported separately; if it exceeds 10% on the tiny message the
+  stage children are dropped (ADR-021); measured +0.8% to +9.7% (net8.0 +9.2% and +9.7%, headroom only about 0.3 points; owner to confirm),
+  +2.2 KB per Extract, so the children stay.
 measurement: >-
   BenchmarkDotNet with MemoryDiagnoser in benches/EmlExtraction.Bench, Release, net8.0 and net10.0: Extract on the
   tiny, 20 KB HTML, and 1 MB attachment bench messages and Detect on the tiny message, in three configurations - no
