@@ -11,8 +11,8 @@ public sealed class InternalCorpusTests
 
         var result = _extractor.Extract(bytes);
         Assert.Empty(result.Warnings);
-        Assert.DoesNotContain(result.Attachments, a => a.Name.Equals("winmail.dat", StringComparison.OrdinalIgnoreCase));
-        Assert.Contains(result.Attachments, a => a.Name.Contains("upload", StringComparison.OrdinalIgnoreCase) && a.Size > 0);
+        Assert.DoesNotContain(result.Attachments, a => a.FileName.Equals("winmail.dat", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(result.Attachments, a => a.FileName.Contains("upload", StringComparison.OrdinalIgnoreCase) && a.SizeInBytes > 0);
     }
 
     [SkippableFact]
@@ -34,7 +34,7 @@ public sealed class InternalCorpusTests
         var result = _extractor.Extract(bytes);
         Assert.Equal("text/html", result.MainContentMimeType);
         Assert.Contains("cid:image001.jpg@test", result.MainContent);
-        Assert.Contains(result.Attachments, a => a.ContentId == "image001.jpg@test" && a.Size > 0);
+        Assert.Contains(result.Attachments, a => a.ContentId == "image001.jpg@test" && a.SizeInBytes > 0);
     }
 
     [SkippableFact]
@@ -79,8 +79,8 @@ public sealed class InternalCorpusTests
         Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed"));
         Assert.False(string.IsNullOrWhiteSpace(result.MainContent));
         Assert.Contains(result.Attachments, a =>
-            a.Name.Contains("delivery-status", StringComparison.OrdinalIgnoreCase)
-            || a.Name.EndsWith(".delivery-status", StringComparison.OrdinalIgnoreCase));
+            a.FileName.Contains("delivery-status", StringComparison.OrdinalIgnoreCase)
+            || a.FileName.EndsWith(".delivery-status", StringComparison.OrdinalIgnoreCase));
     }
 
     [SkippableFact]
@@ -91,10 +91,10 @@ public sealed class InternalCorpusTests
         var result = _extractor.Extract(bytes);
         Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed"));
         Assert.Contains("signed by Thunderbird", result.MainContent);
-        Assert.Contains(result.Attachments, a => a.Name.Contains("signed.jpg", StringComparison.OrdinalIgnoreCase) && a.Size > 100);
+        Assert.Contains(result.Attachments, a => a.FileName.Contains("signed.jpg", StringComparison.OrdinalIgnoreCase) && a.SizeInBytes > 100);
         Assert.Contains(result.Attachments, a =>
-            a.Name.Contains("p7s", StringComparison.OrdinalIgnoreCase)
-            || a.Name.Contains("pkcs7-signature", StringComparison.OrdinalIgnoreCase));
+            a.FileName.Contains("p7s", StringComparison.OrdinalIgnoreCase)
+            || a.FileName.Contains("pkcs7-signature", StringComparison.OrdinalIgnoreCase));
     }
 
     [SkippableFact]
@@ -104,13 +104,13 @@ public sealed class InternalCorpusTests
 
         var result = _extractor.Extract(bytes);
         Assert.Empty(result.Warnings);
-        Assert.DoesNotContain(result.Attachments, a => a.Name.Equals("winmail.dat", StringComparison.OrdinalIgnoreCase));
-        var doc = Assert.Single(result.Attachments, a => a.Name.Equals("quick.doc", StringComparison.OrdinalIgnoreCase));
-        Assert.True(HasMagic(doc.Data, 0xD0, 0xCF, 0x11, 0xE0));
-        Assert.True(doc.Size > 10_000);
-        var pdf = Assert.Single(result.Attachments, a => a.Name.Equals("quick.pdf", StringComparison.OrdinalIgnoreCase));
-        Assert.True(HasMagic(pdf.Data, "%PDF-"u8));
-        Assert.True(pdf.Size > 10_000);
+        Assert.DoesNotContain(result.Attachments, a => a.FileName.Equals("winmail.dat", StringComparison.OrdinalIgnoreCase));
+        var doc = Assert.Single(result.Attachments, a => a.FileName.Equals("quick.doc", StringComparison.OrdinalIgnoreCase));
+        Assert.True(HasMagic(doc.BinaryData, 0xD0, 0xCF, 0x11, 0xE0));
+        Assert.True(doc.SizeInBytes > 10_000);
+        var pdf = Assert.Single(result.Attachments, a => a.FileName.Equals("quick.pdf", StringComparison.OrdinalIgnoreCase));
+        Assert.True(HasMagic(pdf.BinaryData, "%PDF-"u8));
+        Assert.True(pdf.SizeInBytes > 10_000);
     }
 
     [SkippableFact]
@@ -120,12 +120,12 @@ public sealed class InternalCorpusTests
 
         var result = _extractor.Extract(bytes);
         Assert.Empty(result.Warnings);
-        var pdf = Assert.Single(result.Attachments, a => a.Name.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase));
-        Assert.True(HasMagic(pdf.Data, "%PDF-"u8));
-        Assert.True(pdf.Size > 100_000);
-        var png = Assert.Single(result.Attachments, a => a.Name.EndsWith(".png", StringComparison.OrdinalIgnoreCase));
-        Assert.True(HasMagic(png.Data, 0x89, 0x50, 0x4E, 0x47));
-        Assert.True(png.Size > 100_000);
+        var pdf = Assert.Single(result.Attachments, a => a.FileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase));
+        Assert.True(HasMagic(pdf.BinaryData, "%PDF-"u8));
+        Assert.True(pdf.SizeInBytes > 100_000);
+        var png = Assert.Single(result.Attachments, a => a.FileName.EndsWith(".png", StringComparison.OrdinalIgnoreCase));
+        Assert.True(HasMagic(png.BinaryData, 0x89, 0x50, 0x4E, 0x47));
+        Assert.True(png.SizeInBytes > 100_000);
     }
 
     [SkippableFact]
@@ -136,14 +136,14 @@ public sealed class InternalCorpusTests
         var result = _extractor.Extract(bytes);
         Assert.Empty(result.Warnings);
         Assert.Equal("text/html", result.MainContentMimeType);
-        var docx = Assert.Single(result.Attachments, a => a.Name.EndsWith(".docx", StringComparison.OrdinalIgnoreCase));
-        Assert.True(HasMagic(docx.Data, 0x50, 0x4B, 0x03, 0x04));
-        Assert.True(docx.Size > 8_000);
-        var pdf = Assert.Single(result.Attachments, a => a.Name.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase));
-        Assert.True(HasMagic(pdf.Data, "%PDF-"u8));
-        var nested = Assert.Single(result.Attachments, a => a.Name.EndsWith(".eml", StringComparison.OrdinalIgnoreCase));
-        Assert.DoesNotContain(result.Attachments, a => a.Name.Contains("inner", StringComparison.OrdinalIgnoreCase));
-        var inner = _extractor.Extract(nested.Data);
+        var docx = Assert.Single(result.Attachments, a => a.FileName.EndsWith(".docx", StringComparison.OrdinalIgnoreCase));
+        Assert.True(HasMagic(docx.BinaryData, 0x50, 0x4B, 0x03, 0x04));
+        Assert.True(docx.SizeInBytes > 8_000);
+        var pdf = Assert.Single(result.Attachments, a => a.FileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase));
+        Assert.True(HasMagic(pdf.BinaryData, "%PDF-"u8));
+        var nested = Assert.Single(result.Attachments, a => a.FileName.EndsWith(".eml", StringComparison.OrdinalIgnoreCase));
+        Assert.DoesNotContain(result.Attachments, a => a.FileName.Contains("inner", StringComparison.OrdinalIgnoreCase));
+        var inner = _extractor.Extract(nested.BinaryData);
         Assert.True(inner.Attachments.Count >= 1);
         Assert.Equal(5, result.Attachments.Count);
     }
@@ -155,9 +155,9 @@ public sealed class InternalCorpusTests
 
         var result = _extractor.Extract(bytes);
         Assert.Empty(result.Warnings);
-        Assert.Contains(result.Attachments, a => a.Name.Equals("test.docx", StringComparison.OrdinalIgnoreCase) && HasMagic(a.Data, 0x50, 0x4B, 0x03, 0x04));
-        Assert.Contains(result.Attachments, a => a.Name.Equals("test.xlsx", StringComparison.OrdinalIgnoreCase) && HasMagic(a.Data, 0x50, 0x4B, 0x03, 0x04));
-        Assert.Contains(result.Attachments, a => a.Name.Equals("test.pdf", StringComparison.OrdinalIgnoreCase) && HasMagic(a.Data, "%PDF-"u8));
+        Assert.Contains(result.Attachments, a => a.FileName.Equals("test.docx", StringComparison.OrdinalIgnoreCase) && HasMagic(a.BinaryData, 0x50, 0x4B, 0x03, 0x04));
+        Assert.Contains(result.Attachments, a => a.FileName.Equals("test.xlsx", StringComparison.OrdinalIgnoreCase) && HasMagic(a.BinaryData, 0x50, 0x4B, 0x03, 0x04));
+        Assert.Contains(result.Attachments, a => a.FileName.Equals("test.pdf", StringComparison.OrdinalIgnoreCase) && HasMagic(a.BinaryData, "%PDF-"u8));
     }
 
     [SkippableFact]
@@ -191,9 +191,9 @@ public sealed class InternalCorpusTests
         var result = _extractor.Extract(bytes);
         Assert.Empty(result.Warnings);
         var nested = Assert.Single(result.Attachments);
-        Assert.EndsWith(".eml", nested.Name, StringComparison.OrdinalIgnoreCase);
-        Assert.True(nested.Size > 100);
-        Assert.StartsWith("Return-Path:", System.Text.Encoding.ASCII.GetString(nested.Data.AsSpan(0, Math.Min(12, nested.Data.Length))));
+        Assert.EndsWith(".eml", nested.FileName, StringComparison.OrdinalIgnoreCase);
+        Assert.True(nested.SizeInBytes > 100);
+        Assert.StartsWith("Return-Path:", System.Text.Encoding.ASCII.GetString(nested.BinaryData.AsSpan(0, Math.Min(12, nested.BinaryData.Length))));
     }
 
     [SkippableFact]
@@ -205,13 +205,13 @@ public sealed class InternalCorpusTests
         Assert.Empty(result.Warnings);
         Assert.Equal("text/html", result.MainContentMimeType);
         Assert.Contains("cid:image001.png@01D8693E.BE86BE20", result.MainContent);
-        var img = Assert.Single(result.Attachments, a => a.Name.Equals("image001.png", StringComparison.OrdinalIgnoreCase));
+        var img = Assert.Single(result.Attachments, a => a.FileName.Equals("image001.png", StringComparison.OrdinalIgnoreCase));
         Assert.Equal("image001.png@01D8693E.BE86BE20", img.ContentId);
         Assert.Equal("inline", img.Disposition);
-        Assert.True(HasMagic(img.Data, 0x89, 0x50, 0x4E, 0x47));
-        Assert.True(img.Size > 100);
+        Assert.True(HasMagic(img.BinaryData, 0x89, 0x50, 0x4E, 0x47));
+        Assert.True(img.SizeInBytes > 100);
         Assert.Contains(result.Attachments, a =>
-            a.Name.Equals("duckduckgo_small.png", StringComparison.OrdinalIgnoreCase)
+            a.FileName.Equals("duckduckgo_small.png", StringComparison.OrdinalIgnoreCase)
             && a.Disposition == "attachment"
             && string.IsNullOrEmpty(a.ContentId));
     }
@@ -225,9 +225,9 @@ public sealed class InternalCorpusTests
         Assert.Empty(result.Warnings);
         Assert.Contains("cid:c024cb5b0c6eaf060a837c53db9af39b5b564d3956b8d4223fbf308b11b4e79e", result.MainContent);
         var img = Assert.Single(result.Attachments);
-        Assert.True(HasMagic(img.Data, 0x89, 0x50, 0x4E, 0x47));
+        Assert.True(HasMagic(img.BinaryData, 0x89, 0x50, 0x4E, 0x47));
         Assert.Equal("inline", img.Disposition);
-        Assert.True(img.Size > 1_000);
+        Assert.True(img.SizeInBytes > 1_000);
     }
 
     private static byte[] Load(string[] parts)

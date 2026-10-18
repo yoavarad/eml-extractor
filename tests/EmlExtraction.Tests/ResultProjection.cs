@@ -14,7 +14,7 @@ internal static class ResultProjection
         lines.Add($"mime {result.MainContentMimeType}");
         lines.Add($"dir {result.SubjectDirection}/{result.ContentDirection}");
         lines.AddRange(result.Attachments.Select(a =>
-            $"att {a.Name}|{a.Size}|{a.FullPath}|{Convert.ToHexString(SHA256.HashData(a.Data))}|{a.ContentId}|{a.Disposition}"));
+            $"att {a.FileName}|{a.SizeInBytes}|{a.FullPath}|{Convert.ToHexString(SHA256.HashData(a.BinaryData))}|{a.ContentId}|{a.Disposition}|{a.OriginalPath}|{a.ContentLocation}"));
         lines.AddRange(result.Warnings.Select(w => $"warn {w}"));
         return lines;
     }

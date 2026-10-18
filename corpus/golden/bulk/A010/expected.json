@@ -41,7 +41,7 @@
         "size": 13,
         "sha256": "e08ab8d831254efffcbc1705a39baf6506bf9b1c8fa889509eb728b70423cb03",
         "disposition": "attachment",
-        "full_path": "docs/report.docx"
+        "original_path": "docs/report.docx"
       }
     ]
   }

@@ -120,7 +120,7 @@ public sealed class ExtractionTests
         var result = _extractor.Extract(SampleFactory.ToBytes(message));
         Assert.Equal("<p>html version</p>", result.MainContent);
         Assert.Equal("text/html", result.MainContentMimeType);
-        Assert.DoesNotContain(result.Attachments, a => Encoding.UTF8.GetString(a.Data).Contains("plain version"));
+        Assert.DoesNotContain(result.Attachments, a => Encoding.UTF8.GetString(a.BinaryData).Contains("plain version"));
     }
 
     [Fact]
@@ -300,9 +300,26 @@ public sealed class ExtractionTests
         message.Body = builder.ToMessageBody();
         var result = _extractor.Extract(SampleFactory.ToBytes(message));
         var att = Assert.Single(result.Attachments);
-        Assert.Equal("passwd.txt", att.Name);
+        Assert.Equal("passwd.txt", att.FileName);
+        Assert.Equal("../../etc/passwd.txt", att.OriginalPath);
         Assert.Equal("../../etc/passwd.txt", att.FullPath);
-        Assert.Equal(payload, att.Data);
+        Assert.Equal(payload, att.BinaryData);
+    }
+
+    [Fact]
+    public void ContentLocationIsReportedWhenPresentElseNull()
+    {
+        var builder = new BodyBuilder { TextBody = "x" };
+        var withLoc = (MimePart)builder.Attachments.Add("logo.png", new byte[] { 1, 2, 3 }, new ContentType("image", "png"));
+        withLoc.ContentLocation = new Uri("images/logo.png", UriKind.Relative);
+        builder.Attachments.Add("plain.txt", new byte[] { 4 }, new ContentType("text", "plain"));
+        var message = SampleFactory.Plain("loc", "unused");
+        message.Body = builder.ToMessageBody();
+        var result = _extractor.Extract(SampleFactory.ToBytes(message));
+        Assert.Equal("images/logo.png", Assert.Single(result.Attachments, a => a.FileName == "logo.png").ContentLocation);
+        var plain = Assert.Single(result.Attachments, a => a.FileName == "plain.txt");
+        Assert.Null(plain.ContentLocation);
+        Assert.Null(plain.OriginalPath);
     }
 
     [Fact]

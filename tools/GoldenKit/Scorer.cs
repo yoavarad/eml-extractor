@@ -114,26 +114,28 @@ internal static class Scorer
         {
             var match = result.Attachments.FirstOrDefault(a =>
                 (wanted.Sha256 is string wantSha
-                 && Convert.ToHexString(SHA256.HashData(a.Data)).Equals(wantSha, StringComparison.OrdinalIgnoreCase))
-                || (wanted.Name is not null && a.Name.Equals(wanted.Name, StringComparison.OrdinalIgnoreCase))
-                || (wanted.NameContains is not null && a.Name.Contains(wanted.NameContains, StringComparison.OrdinalIgnoreCase)));
+                 && Convert.ToHexString(SHA256.HashData(a.BinaryData)).Equals(wantSha, StringComparison.OrdinalIgnoreCase))
+                || (wanted.Name is not null && a.FileName.Equals(wanted.Name, StringComparison.OrdinalIgnoreCase))
+                || (wanted.NameContains is not null && a.FileName.Contains(wanted.NameContains, StringComparison.OrdinalIgnoreCase)));
             Check(s, $"attach:{wanted.Name ?? wanted.NameContains}", match is not null);
             if (match is null)
                 continue;
             if (wanted.Size is long size)
-                Check(s, $"attach.size:{match.Name}", match.Size == size, $"got {match.Size}");
+                Check(s, $"attach.size:{match.FileName}", match.SizeInBytes == size, $"got {match.SizeInBytes}");
             if (wanted.Sha256 is string sha)
             {
-                var actual = Convert.ToHexString(SHA256.HashData(match.Data));
-                Check(s, $"attach.sha:{match.Name}", actual.Equals(sha, StringComparison.OrdinalIgnoreCase));
+                var actual = Convert.ToHexString(SHA256.HashData(match.BinaryData));
+                Check(s, $"attach.sha:{match.FileName}", actual.Equals(sha, StringComparison.OrdinalIgnoreCase));
             }
 
             if (wanted.Disposition is string disp)
-                Check(s, $"attach.disp:{match.Name}", string.Equals(match.Disposition, disp, StringComparison.OrdinalIgnoreCase), $"got {match.Disposition}");
-            if (wanted.FullPath is string path)
-                Check(s, $"attach.path:{match.Name}", match.FullPath == path, $"got {match.FullPath}");
+                Check(s, $"attach.disp:{match.FileName}", string.Equals(match.Disposition, disp, StringComparison.OrdinalIgnoreCase), $"got {match.Disposition}");
+            if (wanted.OriginalPath is string path)
+                Check(s, $"attach.path:{match.FileName}", match.OriginalPath == path, $"got {match.OriginalPath}");
+            if (wanted.ContentLocation is string loc)
+                Check(s, $"attach.location:{match.FileName}", match.ContentLocation == loc, $"got {match.ContentLocation}");
             if (wanted.Reextract is not null && depth < 2)
-                ScoreResult(s, extractor.Extract(match.Data), wanted.Reextract, extractor, depth + 1);
+                ScoreResult(s, extractor.Extract(match.BinaryData), wanted.Reextract, extractor, depth + 1);
         }
     }
 

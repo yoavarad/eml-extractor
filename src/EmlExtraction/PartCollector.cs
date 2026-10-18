@@ -103,13 +103,18 @@ internal static class PartCollector
     private static void Add(List<ExtractedAttachment> parts, MimeEntity entity, byte[] data, string fallback)
     {
         var (name, fullPath) = ResolveName(entity, fallback);
+        var location = entity.ContentLocation?.ToString().Trim();
+        if (string.IsNullOrEmpty(location))
+            location = null;
         parts.Add(new ExtractedAttachment(
             name,
             data.Length,
             fullPath,
             data,
             entity.ContentId,
-            entity.ContentDisposition?.Disposition));
+            entity.ContentDisposition?.Disposition,
+            fullPath,
+            location));
     }
 
     private static string FallbackName(MimePart part, int index)

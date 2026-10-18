@@ -170,5 +170,5 @@ public sealed class StageGuardTests
         Assert.Equal($"internal_error: {stage}: InvalidCastException: boom", Assert.Single(errors));
     }
 
-    private static IEnumerable<string> Names(EmlExtractionResult result) => result.Attachments.Select(a => a.Name);
+    private static IEnumerable<string> Names(EmlExtractionResult result) => result.Attachments.Select(a => a.FileName);
 }

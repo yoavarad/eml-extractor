@@ -41,7 +41,7 @@
         "size": 8,
         "sha256": "e4cd91f339dcd020940f7119dea8634dde046d184e604eb44ef7ad2e571599cb",
         "disposition": "attachment",
-        "full_path": "docs/legacy.ppt"
+        "original_path": "docs/legacy.ppt"
       }
     ]
   }
