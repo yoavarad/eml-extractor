@@ -1,0 +1,50 @@
+name: Perf nightly (synthetic, warn-only)
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  sweep:
+    name: Synthetic DOP sweep
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Build bench
+        run: dotnet build benches/EmlExtraction.Bench -c Release --framework net10.0
+      - name: Synthetic sweep (short windows, no corpus)
+        run: >
+          dotnet run -c Release --framework net10.0 --no-build --project benches/EmlExtraction.Bench --
+          sweep --set synthetic --warmup-ms 300 --window-ms 1500 --min-passes 2 --out sweep-results
+      - name: Compare against CI baseline (warn-only)
+        run: |
+          current=$(ls sweep-results/sweep-*.json 2>/dev/null | head -n 1 || true)
+          if [ -z "$current" ]; then echo "::warning::no sweep report produced"; exit 0; fi
+          if [ -f docs/perf-baseline-ci.json ]; then
+            dotnet run -c Release --framework net10.0 --no-build --project benches/EmlExtraction.Bench -- \
+              compare --baseline docs/perf-baseline-ci.json --current "$current" || echo "::warning::compare could not run (exit $?)"
+          else
+            echo "::notice::docs/perf-baseline-ci.json not committed yet; seed it from the uploaded sweep JSON of this run."
+          fi
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf-nightly-report
+          path: sweep-results
+          if-no-files-found: warn

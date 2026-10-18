@@ -26,6 +26,9 @@
   <ItemGroup>
     <!-- Pure parts of the bench DOP sweep (ADR-015), unit-tested without referencing the bench exe. -->
     <Compile Include="..\..\benches\EmlExtraction.Bench\Sweep\SweepMath.cs" Link="Sweep\SweepMath.cs" />
+    <Compile Include="..\..\benches\EmlExtraction.Bench\Sweep\SweepReport.cs" Link="Sweep\SweepReport.cs" />
+    <Compile Include="..\..\benches\EmlExtraction.Bench\Sweep\BaselineCompare.cs" Link="Sweep\BaselineCompare.cs" />
+    <Compile Include="..\..\benches\EmlExtraction.Bench\Sweep\CompareCommand.cs" Link="Sweep\CompareCommand.cs" />
     <Compile Include="..\..\benches\EmlExtraction.Bench\Sweep\CpuInfoParser.cs" Link="Sweep\CpuInfoParser.cs" />
     <Compile Include="..\..\benches\EmlExtraction.Bench\Sweep\MboxSplitter.cs" Link="Sweep\MboxSplitter.cs" />
     <Compile Include="..\..\benches\EmlExtraction.Bench\Sweep\LargeFileMath.cs" Link="Sweep\LargeFileMath.cs" />

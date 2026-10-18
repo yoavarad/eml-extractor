@@ -133,3 +133,27 @@ ram_per_server = P(n_best) + n_best x max_input_bytes x M
 ```
 
 Without a measured sweep the T/E/n_best/P fields print `n/a`; run `sweep` first. The provisional values above (50 ms sampling) are placeholders per ADR-015 until the first full sweep.
+
+## Committed baseline and regression rule (ADR-015)
+
+`docs/perf-baseline.json` is a sweep JSON (schema v1, hardware block included) measured on the dev machine: Intel Core Ultra 7 155H, 22 logical cores, .NET 10.0.12, Windows, `net10.0`, both GC modes. Command (short windows, so provisional):
+
+```
+dotnet run -c Release --framework net10.0 --project benches/EmlExtraction.Bench -- sweep --set all --warmup-ms 300 --window-ms 1500 --min-passes 2 --out <dir>
+```
+
+The `public` and `mix` sets are recorded as `skipped`: no `corpus/internal` existed on the machine at baseline time. Refresh the baseline with the full-window command (and the corpus) when it exists.
+
+Compare a run against a baseline:
+
+```
+dotnet run -c Release --framework net10.0 --project benches/EmlExtraction.Bench -- compare --baseline docs/perf-baseline.json --current <sweep.json> [--threshold 0.2]
+```
+
+- Comparable only when CPU model, logical cores, OS and architecture, runtime major.minor and GC mode all match. Otherwise it prints `baseline not comparable: <field>` (`cpuModel`, `logicalCores`, `osArchitecture`, `os`, `runtime`, `gcMode`) and compares nothing.
+- Warn-only: for each GC mode and measured set it warns when extract T(1) or T(ProcessorCount) drops, or A or P(ProcessorCount) rises, by more than 20% (provisional). Exit code is always 0 (2 only for bad arguments or unreadable files).
+- Refresh rule: re-run the sweep and overwrite `docs/perf-baseline.json` in the same PR whenever a change intentionally moves these numbers, when the dev hardware or runtime major.minor changes, or after a batch of error-model changes (ADR-023, #104-#106) if they touch the hot path. Do not refresh to silence an unexplained warning.
+
+## Nightly synthetic job
+
+`.github/workflows/perf-nightly.yml` (schedule + `workflow_dispatch`, ubuntu-latest, no secrets) runs the `synthetic` set only with short windows, uploads `sweep-results/` as the `perf-nightly-report` artifact, and compares against `docs/perf-baseline-ci.json` (warn-only, GitHub annotations). That file does not exist until seeded: take the sweep JSON from the first nightly run's artifact, commit it as `docs/perf-baseline-ci.json`. Until then the job prints a notice. Runner CPUs vary between runs, so a `baseline not comparable` result is expected now and then.
