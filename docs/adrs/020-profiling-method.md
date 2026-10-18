@@ -1,7 +1,7 @@
 # ADR-020: Profiling method - per-stage CPU, allocation, and GC hotspots on the load-test corpus
 
 ## Status
-Accepted (per project owner, 2026-10-18). Target; not implemented (Stage 02). Every numeric parameter below (top-N size, run lengths, sampling rates) is provisional until the first profile, like ADR-015. Amended by ADR-023 (2026-10-18): the stages are no longer guarded; a library bug throws `EmlExtractionException` naming the stage.
+Accepted (per project owner, 2026-10-18). Target; not implemented (Stage 02). Parameters set from the first profile (`docs/perf/profile-2026-10-18.md`, commit 6ccd29d, synthetic set only because `corpus/internal` was absent): top-N = 10 kept (the data gave about 7 distinct hotspots; the last rows are low-impact or hypotheses); corpus-trace run lengths = 300 ms warmup, 1,500 ms window per phase, min 2 passes; BDN job = `dry` for allocation only (CPU shares come from the traces; `short` was projected at about 40 minutes for 90 benchmarks). Re-confirm N and run lengths on the first profile that includes the public corpus. Amended by ADR-023 (2026-10-18): the stages are no longer guarded; a library bug throws `EmlExtractionException` naming the stage.
 
 ## Context
 ADR-015 measures how fast the library is (throughput, latency, memory per degree of parallelism) but not where the time and memory go. Without that, any optimization is a guess. The owner decided (2026-10-18) to add dev-time profiling and runtime metrics (ADR-021), then optimize only from data (ADR-022).
@@ -64,7 +64,7 @@ No commercial profiler is required to reproduce a report.
 - Never optimize without a profile that shows the hotspot (ADR-022).
 
 ### Output
-- `docs/perf/profile-<YYYY-MM-DD>.md`, committed. It holds: the hardware block per run; the tool list with versions and licenses; per-stage CPU share and allocation share per TFM; GC counts, pause time, LOH bytes, and the attachment copy factor; and a top-N hotspot table (provisional N = 10):
+- `docs/perf/profile-<YYYY-MM-DD>.md`, committed. It holds: the hardware block per run; the tool list with versions and licenses; per-stage CPU share and allocation share per TFM; GC counts, pause time, LOH bytes, and the attachment copy factor; and a top-N hotspot table (N = 10):
 
 | Rank | Stage | % CPU | Alloc share | Suspected cause | Evidence |
 | --- | --- | --- | --- | --- | --- |
