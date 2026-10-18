@@ -32,7 +32,7 @@ Per the project owner (ADR-019), the unit, seed-golden, and realistic-sample lay
 - Emoji and script assertions compare exactly, with no normalisation ([ydk:req:content/unicode-fidelity]).
 - Raw-text message fixtures must be converted to CRLF line endings in a way that is safe when the checkout already uses CRLF. See Known Gotchas in [project-rules.md](../project-rules.md).
 - Assert on warning code prefixes, never on the free-text part ([ydk:crosscut:core/warning-format]).
-- A test whose sample cannot be committed must show as skipped, naming the missing file, when the sample is absent. It must never pass without running (ADR-018; today such tests still pass vacuously, Stage 02).
+- A test whose sample cannot be committed must show as skipped, naming the missing file, when the sample is absent. It must never pass without running (ADR-018).
 - Re-run the bulk score, the harvest, and the load test after any MimeKit upgrade or any change to extraction rules, and commit the new reports.
 - Telemetry tests share one process-wide measurement source, so they run one at a time and listen only to this library's name.
 - An optimization carries its own before-and-after measurement and is never merged on the strength of a test pass alone ([ydk:req:quality/optimization-evidence]).
