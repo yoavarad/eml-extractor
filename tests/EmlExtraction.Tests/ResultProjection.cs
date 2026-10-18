@@ -9,7 +9,6 @@ internal static class ResultProjection
     {
         var lines = new List<string>();
         lines.AddRange(result.Metadata.OrderBy(kv => kv.Key, StringComparer.Ordinal).Select(kv => $"meta {kv.Key}={kv.Value}"));
-        lines.Add($"xfields {result.XFields}");
         lines.Add($"content {result.MainContent}");
         lines.Add($"mime {result.MainContentMimeType}");
         lines.Add($"dir {result.SubjectDirection}/{result.ContentDirection}");

@@ -3,26 +3,26 @@ Date: Tue, 15 Sep 2026 07:00:00 +0000
 Subject: combo 17 中文
 Message-Id: <Q017@golden.example>
 To: Bob <bob@example.com>
-X-Mailer: Combo-17
+X_Mailer: Combo-17
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-GIRB6vmMu6GPdu+NxVLPMQ=="
+Content-Type: multipart/mixed; boundary="=-DcvJGtfIeRrmHnMnZ82wGw=="
 
---=-GIRB6vmMu6GPdu+NxVLPMQ==
-Content-Type: multipart/alternative; boundary="=-vIqM/Cqpo8L1wY6QQ4ob7Q=="
+--=-DcvJGtfIeRrmHnMnZ82wGw==
+Content-Type: multipart/alternative; boundary="=-64IkyxpiLCeP1u6yzmngAg=="
 
---=-vIqM/Cqpo8L1wY6QQ4ob7Q==
+--=-64IkyxpiLCeP1u6yzmngAg==
 Content-Type: text/plain; charset=utf-8
 
 plain-17
---=-vIqM/Cqpo8L1wY6QQ4ob7Q==
-Content-Type: multipart/related; boundary="=-DYSW/9Ko+/VbT+UhIkfBSQ==";
+--=-64IkyxpiLCeP1u6yzmngAg==
+Content-Type: multipart/related; boundary="=-I/DBZSO8Ow9tZHjun7LbDg==";
 	type="text/html"
 
---=-DYSW/9Ko+/VbT+UhIkfBSQ==
+--=-I/DBZSO8Ow9tZHjun7LbDg==
 Content-Type: text/html; charset=utf-8
 
 <p>שלום 17 😀</p><img src="cid:c17@x" />
---=-DYSW/9Ko+/VbT+UhIkfBSQ==
+--=-I/DBZSO8Ow9tZHjun7LbDg==
 Content-Type: image/png; name=p.png
 Content-Transfer-Encoding: base64
 Content-Disposition: inline; filename=p.png
@@ -32,11 +32,11 @@ Content-Id: <c17@x>
 iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
 IQAAAABJRU5ErkJggg==
 
---=-DYSW/9Ko+/VbT+UhIkfBSQ==--
+--=-I/DBZSO8Ow9tZHjun7LbDg==--
 
---=-vIqM/Cqpo8L1wY6QQ4ob7Q==--
+--=-64IkyxpiLCeP1u6yzmngAg==--
 
---=-GIRB6vmMu6GPdu+NxVLPMQ==
+--=-DcvJGtfIeRrmHnMnZ82wGw==
 Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document;
 	name=r.docx
 Content-Transfer-Encoding: base64
@@ -44,4 +44,4 @@ Content-Disposition: attachment; filename=r.docx
 
 UEsDBGRvY3g6UTAxNw==
 
---=-GIRB6vmMu6GPdu+NxVLPMQ==--
+--=-DcvJGtfIeRrmHnMnZ82wGw==--

@@ -18,7 +18,7 @@ public sealed class StageGuardTests
         var result = WithFault("metadata", () => _extractor.Extract(bytes));
 
         AssertFixedKeysOnly(result);
-        Assert.Equal("", result.XFields);
+        Assert.Equal("", result.Metadata["xfields"]);
         Assert.Equal("rtl", baseline.SubjectDirection);
         Assert.Equal("ltr", result.SubjectDirection);
         Assert.Equal(baseline.MainContent, result.MainContent);
@@ -42,7 +42,7 @@ public sealed class StageGuardTests
         Assert.Equal("ltr", result.SubjectDirection);
         Assert.Equal("ltr", result.ContentDirection);
         Assert.Equal(baseline.Metadata, result.Metadata);
-        Assert.Equal(baseline.XFields, result.XFields);
+        Assert.Equal(baseline.Metadata["xfields"], result.Metadata["xfields"]);
         Assert.Equal(Names(baseline), Names(result));
         AssertOneInternalError(result, "body");
     }
@@ -58,6 +58,7 @@ public sealed class StageGuardTests
 
         Assert.Empty(result.Attachments);
         Assert.Equal(baseline.Metadata, result.Metadata);
+        Assert.Equal(baseline.Metadata["xfields"], result.Metadata["xfields"]);
         Assert.Equal(baseline.MainContent, result.MainContent);
         Assert.Equal(baseline.SubjectDirection, result.SubjectDirection);
         Assert.Equal(baseline.ContentDirection, result.ContentDirection);
@@ -72,6 +73,7 @@ public sealed class StageGuardTests
         var result = WithFault("parse", () => _extractor.Extract(new EmlExtractionRequest { FileBytes = bytes }));
 
         AssertFixedKeysOnly(result);
+        Assert.Equal("", result.Metadata["xfields"]);
         Assert.Null(result.MainContent);
         Assert.Null(result.MainContentMimeType);
         Assert.Empty(result.Attachments);

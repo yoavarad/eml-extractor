@@ -102,7 +102,7 @@ internal static class Scorer
         }
 
         if (expect.XFields is not null)
-            Check(s, "xfields", FieldOk(result.XFields, expect.XFields));
+            Check(s, "xfields", FieldOk(result.Metadata["xfields"], expect.XFields));
         if (expect.MainContent is not null)
             Check(s, "main_content", FieldOk(result.MainContent ?? "", expect.MainContent));
         if (expect.MainContentMimeType is not null)

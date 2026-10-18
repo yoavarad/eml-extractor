@@ -3,26 +3,26 @@ Date: Tue, 15 Sep 2026 07:00:00 +0000
 Subject: combo 10 中文
 Message-Id: <Q010@golden.example>
 To: Bob <bob@example.com>
-X-Mailer: Combo-10
+X_Mailer: Combo-10
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-aGZ1jXurDRDEbLCjjRAcuA=="
+Content-Type: multipart/mixed; boundary="=-vcwUXHskZFPR+5op1V1Jyw=="
 
---=-aGZ1jXurDRDEbLCjjRAcuA==
-Content-Type: multipart/alternative; boundary="=-O/oW/NXaRXw56IriOIZt3A=="
+--=-vcwUXHskZFPR+5op1V1Jyw==
+Content-Type: multipart/alternative; boundary="=-qp75yXeD7FGHJTPUhIu6rg=="
 
---=-O/oW/NXaRXw56IriOIZt3A==
+--=-qp75yXeD7FGHJTPUhIu6rg==
 Content-Type: text/plain; charset=utf-8
 
 plain-10
---=-O/oW/NXaRXw56IriOIZt3A==
-Content-Type: multipart/related; boundary="=-dxXvdUvx0AY3YpoVEe8sFw==";
+--=-qp75yXeD7FGHJTPUhIu6rg==
+Content-Type: multipart/related; boundary="=-Shvn8742VIDgUPKyDP0n/A==";
 	type="text/html"
 
---=-dxXvdUvx0AY3YpoVEe8sFw==
+--=-Shvn8742VIDgUPKyDP0n/A==
 Content-Type: text/html; charset=utf-8
 
 <p>שלום 10 😀</p><img src="cid:c10@x" />
---=-dxXvdUvx0AY3YpoVEe8sFw==
+--=-Shvn8742VIDgUPKyDP0n/A==
 Content-Type: image/png; name=p.png
 Content-Transfer-Encoding: base64
 Content-Disposition: inline; filename=p.png
@@ -32,11 +32,11 @@ Content-Id: <c10@x>
 iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
 IQAAAABJRU5ErkJggg==
 
---=-dxXvdUvx0AY3YpoVEe8sFw==--
+--=-Shvn8742VIDgUPKyDP0n/A==--
 
---=-O/oW/NXaRXw56IriOIZt3A==--
+--=-qp75yXeD7FGHJTPUhIu6rg==--
 
---=-aGZ1jXurDRDEbLCjjRAcuA==
+--=-vcwUXHskZFPR+5op1V1Jyw==
 Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document;
 	name=r.docx
 Content-Transfer-Encoding: base64
@@ -44,4 +44,4 @@ Content-Disposition: attachment; filename=r.docx
 
 UEsDBGRvY3g6UTAxMA==
 
---=-aGZ1jXurDRDEbLCjjRAcuA==--
+--=-vcwUXHskZFPR+5op1V1Jyw==--

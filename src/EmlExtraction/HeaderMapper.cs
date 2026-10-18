@@ -4,7 +4,7 @@ namespace EmlExtraction;
 
 internal static class HeaderMapper
 {
-    public static Dictionary<string, string> Map(MimeMessage message, out string xfields)
+    public static Dictionary<string, string> Map(MimeMessage message)
     {
         var metadata = new Dictionary<string, string>(StringComparer.Ordinal);
         var xLines = new List<string>();
@@ -35,8 +35,7 @@ internal static class HeaderMapper
         Set(metadata, "in-reply-to", message.InReplyTo);
         Set(metadata, "references", message.References.Count == 0 ? null : string.Join(" ", message.References));
 
-        xfields = string.Join("\n", xLines);
-        metadata["xfields"] = xfields;
+        metadata["xfields"] = string.Join("\n", xLines);
         return metadata;
     }
 
@@ -57,7 +56,7 @@ internal static class HeaderMapper
     }
 
     private static bool IsXHeader(string field)
-        => field.Length >= 2 && field[0] is 'X' or 'x' && field[1] is '-' or '_';
+        => field.StartsWith("X_", StringComparison.Ordinal);
 
     private static void Append(Dictionary<string, string> map, string key, string value)
         => map[key] = map.TryGetValue(key, out var existing) ? existing + "\n" + value : value;

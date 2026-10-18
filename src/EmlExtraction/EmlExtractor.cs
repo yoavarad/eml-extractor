@@ -72,16 +72,14 @@ public sealed class EmlExtractor : IEmlExtractor
     internal static EmlExtractionResult Extract(MimeMessage message, List<string> warnings)
     {
         IReadOnlyDictionary<string, string> metadata;
-        var xfields = string.Empty;
         try
         {
             StageFault?.Invoke("metadata");
-            metadata = HeaderMapper.Map(message, out xfields);
+            metadata = HeaderMapper.Map(message);
         }
         catch (Exception ex)
         {
             metadata = HeaderMapper.EmptyMetadata();
-            xfields = string.Empty;
             warnings.Add(InternalError("metadata", ex));
         }
 
@@ -133,7 +131,7 @@ public sealed class EmlExtractor : IEmlExtractor
             warnings.Add(InternalError("attachments", ex));
         }
 
-        return new EmlExtractionResult(metadata, xfields, content, contentType, attachments, warnings)
+        return new EmlExtractionResult(metadata, content, contentType, attachments, warnings)
         {
             SubjectDirection = subjectDir,
             ContentDirection = contentDir
@@ -144,7 +142,7 @@ public sealed class EmlExtractor : IEmlExtractor
         => $"internal_error: {stage}: {ex.GetType().Name}: {ex.Message}";
 
     private static EmlExtractionResult Empty(List<string> warnings)
-        => new(HeaderMapper.EmptyMetadata(), string.Empty, null, null, [], warnings);
+        => new(HeaderMapper.EmptyMetadata(), null, null, [], warnings);
 
     private static ParserOptions CreateOptions()
     {

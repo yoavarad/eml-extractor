@@ -3,26 +3,26 @@ Date: Tue, 15 Sep 2026 07:00:00 +0000
 Subject: combo 53 中文
 Message-Id: <Q053@golden.example>
 To: Bob <bob@example.com>
-X-Mailer: Combo-53
+X_Mailer: Combo-53
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-DRt2Mf/OJDk4gXXNNVcEwQ=="
+Content-Type: multipart/mixed; boundary="=-staZAQiX/CCraYe5IzBeCg=="
 
---=-DRt2Mf/OJDk4gXXNNVcEwQ==
-Content-Type: multipart/alternative; boundary="=-ePU+h3iZAYxBuCMGXOf8Lw=="
+--=-staZAQiX/CCraYe5IzBeCg==
+Content-Type: multipart/alternative; boundary="=-9yeCpwa43N8cIzNThurngg=="
 
---=-ePU+h3iZAYxBuCMGXOf8Lw==
+--=-9yeCpwa43N8cIzNThurngg==
 Content-Type: text/plain; charset=utf-8
 
 plain-53
---=-ePU+h3iZAYxBuCMGXOf8Lw==
-Content-Type: multipart/related; boundary="=-PesMyXx/Q6Qzaxy55FUm2g==";
+--=-9yeCpwa43N8cIzNThurngg==
+Content-Type: multipart/related; boundary="=-8nL9lxhskYnuO7v2zS59Iw==";
 	type="text/html"
 
---=-PesMyXx/Q6Qzaxy55FUm2g==
+--=-8nL9lxhskYnuO7v2zS59Iw==
 Content-Type: text/html; charset=utf-8
 
 <p>שלום 53 😀</p><img src="cid:c53@x" />
---=-PesMyXx/Q6Qzaxy55FUm2g==
+--=-8nL9lxhskYnuO7v2zS59Iw==
 Content-Type: image/png; name=p.png
 Content-Transfer-Encoding: base64
 Content-Disposition: inline; filename=p.png
@@ -32,11 +32,11 @@ Content-Id: <c53@x>
 iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
 IQAAAABJRU5ErkJggg==
 
---=-PesMyXx/Q6Qzaxy55FUm2g==--
+--=-8nL9lxhskYnuO7v2zS59Iw==--
 
---=-ePU+h3iZAYxBuCMGXOf8Lw==--
+--=-9yeCpwa43N8cIzNThurngg==--
 
---=-DRt2Mf/OJDk4gXXNNVcEwQ==
+--=-staZAQiX/CCraYe5IzBeCg==
 Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document;
 	name=r.docx
 Content-Transfer-Encoding: base64
@@ -44,4 +44,4 @@ Content-Disposition: attachment; filename=r.docx
 
 UEsDBGRvY3g6UTA1Mw==
 
---=-DRt2Mf/OJDk4gXXNNVcEwQ==--
+--=-staZAQiX/CCraYe5IzBeCg==--

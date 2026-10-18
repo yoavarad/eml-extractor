@@ -25,7 +25,7 @@ internal static class Inspect
 
             var result = extractor.Extract(File.ReadAllBytes(path));
             Console.WriteLine($"== {Path.GetRelativePath(repo, path)} ==");
-            Console.WriteLine($"  warnings={result.Warnings.Count} mime={result.MainContentMimeType} body_len={result.MainContent?.Length ?? 0} attachments={result.Attachments.Count} headers={result.Metadata.Count} xfields={result.XFields.Split('\n', StringSplitOptions.RemoveEmptyEntries).Length}");
+            Console.WriteLine($"  warnings={result.Warnings.Count} mime={result.MainContentMimeType} body_len={result.MainContent?.Length ?? 0} attachments={result.Attachments.Count} headers={result.Metadata.Count} xfields={result.Metadata["xfields"].Split('\n', StringSplitOptions.RemoveEmptyEntries).Length}");
             if (!string.IsNullOrWhiteSpace(result.Metadata.GetValueOrDefault("subject")))
                 Console.WriteLine($"  subject={result.Metadata["subject"]}");
             if (!string.IsNullOrWhiteSpace(result.MainContent))

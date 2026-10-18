@@ -3,26 +3,26 @@ Date: Tue, 15 Sep 2026 07:00:00 +0000
 Subject: combo 7 中文
 Message-Id: <Q007@golden.example>
 To: Bob <bob@example.com>
-X-Mailer: Combo-7
+X_Mailer: Combo-7
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-hrbIxPNdMoXr37/zXz378A=="
+Content-Type: multipart/mixed; boundary="=-C7KUUH16X29GWLQvSAKarQ=="
 
---=-hrbIxPNdMoXr37/zXz378A==
-Content-Type: multipart/alternative; boundary="=-aQ2fBb+mhfLDmar0LP4b/g=="
+--=-C7KUUH16X29GWLQvSAKarQ==
+Content-Type: multipart/alternative; boundary="=-/TKFZoUFOOBazCFDSGZGtw=="
 
---=-aQ2fBb+mhfLDmar0LP4b/g==
+--=-/TKFZoUFOOBazCFDSGZGtw==
 Content-Type: text/plain; charset=utf-8
 
 plain-7
---=-aQ2fBb+mhfLDmar0LP4b/g==
-Content-Type: multipart/related; boundary="=-5Z04foNeRoPmrW3GHWYM1Q==";
+--=-/TKFZoUFOOBazCFDSGZGtw==
+Content-Type: multipart/related; boundary="=-Hjv0KOMpiJf1DxhpmL7JkA==";
 	type="text/html"
 
---=-5Z04foNeRoPmrW3GHWYM1Q==
+--=-Hjv0KOMpiJf1DxhpmL7JkA==
 Content-Type: text/html; charset=utf-8
 
 <p>שלום 7 😀</p><img src="cid:c7@x" />
---=-5Z04foNeRoPmrW3GHWYM1Q==
+--=-Hjv0KOMpiJf1DxhpmL7JkA==
 Content-Type: image/png; name=p.png
 Content-Transfer-Encoding: base64
 Content-Disposition: inline; filename=p.png
@@ -32,11 +32,11 @@ Content-Id: <c7@x>
 iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
 IQAAAABJRU5ErkJggg==
 
---=-5Z04foNeRoPmrW3GHWYM1Q==--
+--=-Hjv0KOMpiJf1DxhpmL7JkA==--
 
---=-aQ2fBb+mhfLDmar0LP4b/g==--
+--=-/TKFZoUFOOBazCFDSGZGtw==--
 
---=-hrbIxPNdMoXr37/zXz378A==
+--=-C7KUUH16X29GWLQvSAKarQ==
 Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document;
 	name=r.docx
 Content-Transfer-Encoding: base64
@@ -44,4 +44,4 @@ Content-Disposition: attachment; filename=r.docx
 
 UEsDBGRvY3g6UTAwNw==
 
---=-hrbIxPNdMoXr37/zXz378A==--
+--=-C7KUUH16X29GWLQvSAKarQ==--

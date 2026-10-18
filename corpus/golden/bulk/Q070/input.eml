@@ -3,26 +3,26 @@ Date: Tue, 15 Sep 2026 07:00:00 +0000
 Subject: combo 70 中文
 Message-Id: <Q070@golden.example>
 To: Bob <bob@example.com>
-X-Mailer: Combo-70
+X_Mailer: Combo-70
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-h89pjhf4tbrzeuQG8jnbWw=="
+Content-Type: multipart/mixed; boundary="=-K3PsZy9NCVwNUbBO2wqwvA=="
 
---=-h89pjhf4tbrzeuQG8jnbWw==
-Content-Type: multipart/alternative; boundary="=-Tf3z66VdM901c6UNYFjbBQ=="
+--=-K3PsZy9NCVwNUbBO2wqwvA==
+Content-Type: multipart/alternative; boundary="=-sYZBpHqJJxDFBoZgQMHawQ=="
 
---=-Tf3z66VdM901c6UNYFjbBQ==
+--=-sYZBpHqJJxDFBoZgQMHawQ==
 Content-Type: text/plain; charset=utf-8
 
 plain-70
---=-Tf3z66VdM901c6UNYFjbBQ==
-Content-Type: multipart/related; boundary="=-1TMrSLAIgeUBD/3oePGwYw==";
+--=-sYZBpHqJJxDFBoZgQMHawQ==
+Content-Type: multipart/related; boundary="=-ozaf/7gmX1Aq2RjzY9O4sg==";
 	type="text/html"
 
---=-1TMrSLAIgeUBD/3oePGwYw==
+--=-ozaf/7gmX1Aq2RjzY9O4sg==
 Content-Type: text/html; charset=utf-8
 
 <p>שלום 70 😀</p><img src="cid:c70@x" />
---=-1TMrSLAIgeUBD/3oePGwYw==
+--=-ozaf/7gmX1Aq2RjzY9O4sg==
 Content-Type: image/png; name=p.png
 Content-Transfer-Encoding: base64
 Content-Disposition: inline; filename=p.png
@@ -32,11 +32,11 @@ Content-Id: <c70@x>
 iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
 IQAAAABJRU5ErkJggg==
 
---=-1TMrSLAIgeUBD/3oePGwYw==--
+--=-ozaf/7gmX1Aq2RjzY9O4sg==--
 
---=-Tf3z66VdM901c6UNYFjbBQ==--
+--=-sYZBpHqJJxDFBoZgQMHawQ==--
 
---=-h89pjhf4tbrzeuQG8jnbWw==
+--=-K3PsZy9NCVwNUbBO2wqwvA==
 Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document;
 	name=r.docx
 Content-Transfer-Encoding: base64
@@ -44,4 +44,4 @@ Content-Disposition: attachment; filename=r.docx
 
 UEsDBGRvY3g6UTA3MA==
 
---=-h89pjhf4tbrzeuQG8jnbWw==--
+--=-K3PsZy9NCVwNUbBO2wqwvA==--

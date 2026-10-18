@@ -16,14 +16,15 @@ public sealed class InternalCorpusTests
     }
 
     [SkippableFact]
-    public void ExchangeMegaHeadersLandInXFields()
+    public void ExchangeMegaHeadersLandInMetadata()
     {
         var bytes = Load(["exchange", "leeholmes-o365-megaheaders.eml"]);
 
         var result = _extractor.Extract(bytes);
         Assert.True(result.Metadata.Count >= 50, $"headers={result.Metadata.Count}");
-        Assert.Contains("X-MS-Exchange-Organization-Network-Message-Id:", result.XFields, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("X-Microsoft-Antispam-Message-Info:", result.XFields, StringComparison.OrdinalIgnoreCase);
+        Assert.True(result.Metadata.ContainsKey("x-ms-exchange-organization-network-message-id"));
+        Assert.True(result.Metadata.ContainsKey("x-microsoft-antispam-message-info"));
+        Assert.Equal("", result.Metadata["xfields"]);
     }
 
     [SkippableFact]

@@ -70,7 +70,7 @@ public sealed class GoldenTests
         }
 
         if (expect.XFields is not null)
-            CheckField($"{label} xfields", result.XFields, expect.XFields);
+            CheckField($"{label} xfields", result.Metadata["xfields"], expect.XFields);
         if (expect.MainContent is not null)
             CheckField($"{label} main_content", result.MainContent ?? "", expect.MainContent);
         if (expect.MainContentMimeType is not null)

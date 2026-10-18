@@ -3,26 +3,26 @@ Date: Tue, 15 Sep 2026 07:00:00 +0000
 Subject: combo 51 中文
 Message-Id: <Q051@golden.example>
 To: Bob <bob@example.com>
-X-Mailer: Combo-51
+X_Mailer: Combo-51
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-3uywaeb0tKl1UGO23hSUNg=="
+Content-Type: multipart/mixed; boundary="=-8OaLGyXGAOYqatrUYevJHg=="
 
---=-3uywaeb0tKl1UGO23hSUNg==
-Content-Type: multipart/alternative; boundary="=-FkSAXyn/TgrvOcJ3tFn2eA=="
+--=-8OaLGyXGAOYqatrUYevJHg==
+Content-Type: multipart/alternative; boundary="=-QP9+ozM4ZUdvOc/+V7wIQA=="
 
---=-FkSAXyn/TgrvOcJ3tFn2eA==
+--=-QP9+ozM4ZUdvOc/+V7wIQA==
 Content-Type: text/plain; charset=utf-8
 
 plain-51
---=-FkSAXyn/TgrvOcJ3tFn2eA==
-Content-Type: multipart/related; boundary="=-KASgf/Al/xW+Jexe2bUL1Q==";
+--=-QP9+ozM4ZUdvOc/+V7wIQA==
+Content-Type: multipart/related; boundary="=-YtLUH/fiIBKZwMqFUWFTWQ==";
 	type="text/html"
 
---=-KASgf/Al/xW+Jexe2bUL1Q==
+--=-YtLUH/fiIBKZwMqFUWFTWQ==
 Content-Type: text/html; charset=utf-8
 
 <p>שלום 51 😀</p><img src="cid:c51@x" />
---=-KASgf/Al/xW+Jexe2bUL1Q==
+--=-YtLUH/fiIBKZwMqFUWFTWQ==
 Content-Type: image/png; name=p.png
 Content-Transfer-Encoding: base64
 Content-Disposition: inline; filename=p.png
@@ -32,11 +32,11 @@ Content-Id: <c51@x>
 iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM
 IQAAAABJRU5ErkJggg==
 
---=-KASgf/Al/xW+Jexe2bUL1Q==--
+--=-YtLUH/fiIBKZwMqFUWFTWQ==--
 
---=-FkSAXyn/TgrvOcJ3tFn2eA==--
+--=-QP9+ozM4ZUdvOc/+V7wIQA==--
 
---=-3uywaeb0tKl1UGO23hSUNg==
+--=-8OaLGyXGAOYqatrUYevJHg==
 Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document;
 	name=r.docx
 Content-Transfer-Encoding: base64
@@ -44,4 +44,4 @@ Content-Disposition: attachment; filename=r.docx
 
 UEsDBGRvY3g6UTA1MQ==
 
---=-3uywaeb0tKl1UGO23hSUNg==--
+--=-8OaLGyXGAOYqatrUYevJHg==--
