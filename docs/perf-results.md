@@ -124,7 +124,7 @@ Single thread, kept out of the DOP mix. Generates (at run time, nothing committe
 dotnet run -c Release --framework net10.0 --project benches/EmlExtraction.Bench -- large [--max-input-bytes N] [--sample-ms N] [--sweep <sweep.json>] [--out <dir>]
 ```
 
-Defaults: `--max-input-bytes` = `EmlExtractor.DefaultMaxInputBytes` (150 MiB; needs roughly 1 GiB of free RAM), `--sweep` = newest `sweep-results/sweep-*.json` (Workstation GC run, set `mix`, else `public`, else `synthetic`). Smoke run: `-- large --max-input-bytes 8388608`. Exit codes: `0` ok, `1` a pass or the limit+1 guard check failed, `2` bad arguments. Output goes to the console and `sweep-results/large-<stamp>.md`, and ends with the formula filled with T(1), E(n_best), n_best, P(n_best) and M, plus a "how the team reruns this" section:
+Defaults: `--max-input-bytes` = `EmlExtractor.DefaultMaxInputBytes` (500 MiB; a full run allocates up to about 500 MiB x M, roughly 2-2.5 GB, and a forced GC per pass. Pass an explicit smaller `--max-input-bytes` for CI or smoke runs), `--sweep` = newest `sweep-results/sweep-*.json` (Workstation GC run, set `mix`, else `public`, else `synthetic`). Smoke run: `-- large --max-input-bytes 8388608`. Exit codes: `0` ok, `1` a pass or the limit+1 guard check failed, `2` bad arguments. Output goes to the console and `sweep-results/large-<stamp>.md`, and ends with the formula filled with T(1), E(n_best), n_best, P(n_best) and M, plus a "how the team reruns this" section:
 
 ```
 cores_needed   = ceil(R / (T(1) x E(n)))
@@ -157,3 +157,30 @@ dotnet run -c Release --framework net10.0 --project benches/EmlExtraction.Bench 
 ## Nightly synthetic job
 
 `.github/workflows/perf-nightly.yml` (schedule + `workflow_dispatch`, ubuntu-latest, no secrets) runs the `synthetic` set only with short windows, uploads `sweep-results/` as the `perf-nightly-report` artifact, and compares against `docs/perf-baseline-ci.json` (warn-only, GitHub annotations). That file does not exist until seeded: take the sweep JSON from the first nightly run's artifact, commit it as `docs/perf-baseline-ci.json`. Until then the job prints a notice. Runner CPUs vary between runs, so a `baseline not comparable` result is expected now and then.
+
+## Provisional limits (#51)
+
+All values below are **PROVISIONAL**. Data caveat: synthetic set only (no `corpus/internal`), short windows (300 ms warm-up, 1.5 s window, 2 passes), one Windows machine (Intel Core Ultra 7 155H, 22 logical cores, .NET 10.0.12). Re-set them from a full-window run on the public corpus and on target hardware. Sources: `docs/perf-baseline.json` (commit 675b4eb) plus local re-runs of the same command (2026-10-18, 3 invocations giving 6 sweep files; 7 sweeps in total with the baseline; the re-runs are not committed).
+
+| Limit | Value | Source and headroom |
+| --- | --- | --- |
+| `maxInputBytes` default | 500 MiB (524,288,000), **OWNER-SET**, not data-derived | Project owner decision (2026-10-18), raised from 150 MiB. Measured M 1.3-4.2 (#49, ran at 150 MiB, about 730 MB peak WS) implies up to about 2-2.5 GB peak WS per extraction at 500 MiB; M at 500 MiB is not measured. The 6 x ceiling is 3 GB per extraction. The host can set its own. |
+| Memory ceiling | peak WS growth <= 6 x `maxInputBytes` per extraction | M max 4.2 (#49); about 40% headroom. Replaces the placeholder 10. |
+| A ceiling | <= 32 allocated bytes per input byte (synthetic set) | Baseline + re-runs: A 22.5-26.3 (max 26.27, both GC modes); about 20% headroom. Replaces the placeholder 8, which sat below every measurement. A is high here because the set is mostly tiny messages; the 1 MB attachment message allocates about 3.9 per byte (table above). |
+| Regression threshold | 20%, **unchanged** | Run-to-run spread (max/min - 1): A 2-10%, P(22) 4-11%, so 20% is about 2x the noise. T(1) and T(22) varied 24-80% between short sweeps (workstation T(1) 5,549-9,110 files/s), so throughput warnings are noise at these windows. Revisit after a quiet full-window run. |
+| Warm-up / window / passes | 2000 ms / 10000 ms / 3, **unchanged** | The short windows used for the baseline show the T spread above; longer windows are the remedy, not shorter. |
+| Sampling interval | 50 ms, **unchanged** | P(n) spread 4-11% at 50 ms; no data argues for a change. |
+
+Re-run values (not committed as JSON; extract, synthetic set; 6 re-run sweep files, per GC mode, DOP 1 and DOP 22):
+
+| Metric | Workstation GC | Server GC |
+| --- | --- | --- |
+| A at DOP 1 | 22.5-24.7 | 23.9-24.9 |
+| A at DOP 22 | 24.3-26.3 | 23.7-24.3 |
+| P(22) MB | 103-114 | 181-189 |
+| T(1) files/s | 5,721-9,110 | 6,714-10,681 |
+| T(22) files/s | 10,007-15,578 | 34,044-42,072 |
+
+The committed baseline alone has A 23.3-24.5 (workstation) and 23.7-24.1 (server); the A ceiling of 32 is 30% above that and 22% above the re-run max. M and the 730 MB peak come from the #49 large-file pass (PR #93, `sweep-results/large-*.md` of that run, not committed; rerun with `-- large`). The ceilings are per extraction: at DOP n on near-limit inputs expect up to n times that growth, so use the sizing formula above (`ram_per_server`), not the ceiling alone. A <= 32 is set on a tiny-message mix and would not catch a regression on large messages; the large-file pass (M) covers those.
+
+Streaming stays DEFERRED (`docs/specs/scope.md`): measured M (max 4.2) is below the ceiling (6). Owner-set: the 500 MiB default. Still to confirm: the A and M ceilings above.

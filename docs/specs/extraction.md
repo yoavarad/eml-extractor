@@ -8,7 +8,7 @@ Per the shared team contract (ADR-012), the caller passes a request, [ydk:entity
 
 ## Input size
 
-Before parsing, the extractor compares the input length with a limit the host can set when it creates the extractor ([ydk:req:extraction/max-input-size]). The default is a provisional placeholder until the load test has measured real memory use; the host can always change it. A longer input is not parsed: per the project owner (2026-10-18, ADR-023) extraction throws [ydk:entity:extraction/EmlInputTooLargeException], which carries the input size and the limit. This keeps one oversized file from exhausting the host's memory, since every attachment is held in memory. The memory each message needs is measured, not guessed ([ydk:nfr:performance/memory-footprint]).
+Before parsing, the extractor compares the input length with a limit the host can set when it creates the extractor ([ydk:req:extraction/max-input-size]). The default (500 MiB) was set by the project owner, not derived from measurements; the first large-file measurement (peak memory 1.3-4.2 times the input, taken at 150 MiB) puts one extraction near 2-2.5 GB at that size, and the host can always change it. A longer input is not parsed: per the project owner (2026-10-18, ADR-023) extraction throws [ydk:entity:extraction/EmlInputTooLargeException], which carries the input size and the limit. This keeps one oversized file from exhausting the host's memory, since every attachment is held in memory. The memory each message needs is measured, not guessed ([ydk:nfr:performance/memory-footprint]).
 
 ## Parsing
 
