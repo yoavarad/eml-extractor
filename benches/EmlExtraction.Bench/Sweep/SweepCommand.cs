@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime;
 using System.Text.Json;
+using EmlExtraction.Bench.Profile;
 
 namespace EmlExtraction.Bench.Sweep;
 
@@ -65,6 +66,7 @@ internal static class SweepCommand
     /// <summary><c>sweep-child --gc-mode &lt;mode&gt; --result-file &lt;path&gt; [sweep options]</c>.</summary>
     public static int Child(string[] args)
     {
+        var trace = TraceSupport.From(ref args);
         if (!TryParse(args, out var o, out var error))
             return Fail(ExitUsage, error);
         if (o.GcMode is null || o.ResultFile is null)
@@ -95,17 +97,20 @@ internal static class SweepCommand
         var extractor = new EmlExtractor();
         var detector = new EmlDetector();
         var results = new List<SetResult>();
+        trace.Wait("start");
+        trace.ResetGcBaseline();
         if (o.Set is "synthetic" or "all")
-            results.Add(Measure("synthetic", synthetic, o.Parameters, extractor, detector));
+            results.Add(Measure("synthetic", synthetic, o.Parameters, o.MinDop, extractor, detector));
         if (wantPublic && o.Set != "mix")
-            results.Add(publicSet is null ? Skipped("public", publicSkip) : Measure("public", publicSet, o.Parameters, extractor, detector));
+            results.Add(publicSet is null ? Skipped("public", publicSkip) : Measure("public", publicSet, o.Parameters, o.MinDop, extractor, detector));
         if (o.Set is "mix" or "all")
         {
             results.Add(publicSet is null
                 ? Skipped("mix", publicSkip)
-                : Measure("mix", SweepInputs.Mix(synthetic, publicSet), o.Parameters, extractor, detector));
+                : Measure("mix", SweepInputs.Mix(synthetic, publicSet), o.Parameters, o.MinDop, extractor, detector));
         }
 
+        trace.PrintGcStats();
         File.WriteAllText(o.ResultFile, JsonSerializer.Serialize(new GcRun(o.GcMode, results), SweepReport.Json));
         return 0;
     }
@@ -117,25 +122,25 @@ internal static class SweepCommand
         return new SetResult(name, "skipped", reason, 0, 0, [], []);
     }
 
-    private static SetResult Measure(string name, byte[][] inputs, SweepParameters p, EmlExtractor extractor, EmlDetector detector)
+    private static SetResult Measure(string name, byte[][] inputs, SweepParameters p, int lo, EmlExtractor extractor, EmlDetector detector)
     {
         var inputBytes = inputs.Sum(i => (long)i.Length);
         Console.WriteLine();
         Console.WriteLine($"--- set {name}: {inputs.Length} messages, {inputBytes} bytes ---");
-        var extract = Sweep("extract", inputs, p, b => extractor.Extract(b));
-        var detect = Sweep("detect", inputs, p, b => detector.IsEml(b));
+        var extract = Sweep("extract", inputs, p, lo, b => extractor.Extract(b));
+        var detect = Sweep("detect", inputs, p, lo, b => detector.IsEml(b));
         return new SetResult(name, "measured", null, inputs.Length, inputBytes, extract, detect);
     }
 
-    private static List<SweepPoint> Sweep(string op, byte[][] inputs, SweepParameters p, Action<byte[]> action)
+    private static List<SweepPoint> Sweep(string op, byte[][] inputs, SweepParameters p, int lo, Action<byte[]> action)
     {
         Console.WriteLine($"{op}:");
         Console.WriteLine(SweepReport.Header());
         var points = new List<SweepPoint>(p.MaxDop);
-        for (var n = 1; n <= p.MaxDop; n++)
+        for (var n = lo; n <= p.MaxDop; n++)
         {
             var point = SweepRunner.Run(inputs, n, action, p);
-            var t1 = n == 1 ? point.FilesPerSec : points[0].FilesPerSec;
+            var t1 = points.Count == 0 ? point.FilesPerSec : points[0].FilesPerSec;
             point = point with { Efficiency = SweepMath.Efficiency(point.FilesPerSec, n, t1) };
             points.Add(point);
             Console.WriteLine(SweepReport.Row(point));
@@ -175,6 +180,7 @@ internal static class SweepCommand
         string RepoRoot,
         string OutDir,
         bool SimulateCpuUnreadable,
+        int MinDop,
         string? GcMode,
         string? ResultFile);
 
@@ -184,6 +190,7 @@ internal static class SweepCommand
         error = "";
         var repoRoot = RepoRoot.Find();
         string set = "all", corpus = Path.Combine(repoRoot, "corpus", "internal"), outDir = Path.Combine(repoRoot, "sweep-results");
+        int minDop = 1, maxDop = Environment.ProcessorCount;
         int warmup = 2000, window = 10_000, passes = 3, sample = 50;
         bool simulate = false;
         string? gcMode = null, resultFile = null;
@@ -206,6 +213,7 @@ internal static class SweepCommand
             switch (key)
             {
                 case "--set": set = value; break;
+                case "--dop" when int.TryParse(value, out var v) && v >= 1 && v <= Environment.ProcessorCount: minDop = maxDop = v; break;
                 case "--corpus": corpus = Path.GetFullPath(value); break;
                 case "--out": outDir = Path.GetFullPath(value); break;
                 case "--warmup-ms" when int.TryParse(value, out var v) && v >= 0: warmup = v; break;
@@ -216,7 +224,7 @@ internal static class SweepCommand
                 case "--result-file": resultFile = value; break;
                 default:
                     error = $"Unknown or invalid option {key} {value}. Usage: sweep [--set synthetic|public|mix|all] [--corpus <path>] " +
-                        "[--warmup-ms N] [--window-ms N] [--min-passes N] [--sample-ms N] [--out <dir>] [--simulate-cpu-unreadable]";
+                        "[--warmup-ms N] [--window-ms N] [--min-passes N] [--sample-ms N] [--dop N] [--out <dir>] [--simulate-cpu-unreadable]";
                     return false;
             }
         }
@@ -228,8 +236,8 @@ internal static class SweepCommand
         }
 
         options = new Options(
-            new SweepParameters(warmup, window, passes, sample, Environment.ProcessorCount, set, corpus),
-            set, repoRoot, outDir, simulate, gcMode, resultFile);
+            new SweepParameters(warmup, window, passes, sample, maxDop, set, corpus),
+            set, repoRoot, outDir, simulate, minDop, gcMode, resultFile);
         return true;
     }
 }

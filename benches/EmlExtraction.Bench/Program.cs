@@ -9,6 +9,8 @@ if (args.Length > 0 && args[0] == "large")
     return LargeFileCommand.Run(args[1..]);
 if (args.Length > 0 && args[0] == "profile")
     return ProfileCommand.Run(args[1..]);
+if (args.Length > 0 && args[0] == "profile-trace")
+    return ProfileTraceCommand.Run(args[1..]);
 if (args.Length > 0 && args[0] == "sweep-child")
     return SweepCommand.Child(args[1..]);
 
