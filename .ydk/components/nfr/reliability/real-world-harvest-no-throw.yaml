@@ -1,17 +1,20 @@
 $schema: ydk:schema:nfr
 id: ydk:nfr:reliability/real-world-harvest-no-throw
 description: >-
-  Detector + extractor run over every local public mail sample under the gitignored corpus/internal/ must not throw.
+  Real-world corpus content produces no exceptions: detector + extractor run over every local public mail sample
+  under the gitignored corpus/internal/ and no call throws (ADR-023: content problems are warnings; an exception on
+  real mail means a library bug (EmlExtractionException); the probe skips files over 40 MB, below maxInputBytes).
   Last recorded harvest (2026-09-15, second pass): 12,853 detected messages, 0 throws, 0 parse_failed, 0 warnings,
   ~3,500 extract/s (README, docs/edge-cases.md). Sources: SpamAssassin 2003/2005, Nazario phishing mboxes,
   cw-l/email-corpus, MimeKit TestData, Apache POI HMEF, php-mime-mail-parser, ProtonMail, Tika, GroupDocs, Chatwoot.
 category: reliability
 tags: [harvest, robustness]
 target: 0
-unit: uncaught exceptions per harvest run
+unit: exceptions thrown per harvest run
 measurement: >-
   dotnet run --project tools/GoldenKit -c Release -- probe [dir]; Probe walks files (mbox files split per message),
-  skips files larger than 40 MB, and tallies detected / throws / parse_failed / warnings.
+  skips files larger than 40 MB, and tallies detected / throws (any exception, including EmlExtractionException) /
+  parse_failed / warnings.
 test_method: >-
   Run probe after any change to the library or a MimeKit upgrade, with corpus/internal/ populated locally.
   Not runnable in CI (samples are not committed: licences and PII vary).

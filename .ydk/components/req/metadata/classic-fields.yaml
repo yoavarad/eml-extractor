@@ -15,7 +15,7 @@ rule: >-
   does.
 failure_behavior: >-
   Not a failure path: absent headers yield "" for the four address keys and no key for the others. On
-  ydk:warning:extraction/parse-failed and ydk:warning:extraction/input-too-large the four address keys are "".
+  ydk:warning:extraction/parse-failed the four address keys are "" (oversized input throws, ADR-023).
 related_components:
   - ydk:entity:extraction/Metadata
   - ydk:contract:api/eml-extractor

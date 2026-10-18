@@ -1,8 +1,12 @@
 $schema: ydk:schema:warning
 id: ydk:warning:extraction/internal-error
 description: >-
-  TARGET BEHAVIOUR (ADR-004, per project owner 2026-10-17; implementation pending as Stage 02 work - today the code
-  does not record this warning). Recorded when an exception that is not one of the known content failures is raised
+  DEPRECATED - removed by ADR-023 (per project owner 2026-10-18): a library bug now throws
+  ydk:entity:extraction/EmlExtractionException naming the stage, with the original as InnerException, and no
+  result is returned. This manifest records the superseded #37 behaviour, which stays in code until the Stage 02
+  throw batch (docs/plans/stage-02-throw-batch.yaml) deletes the warning; then this manifest is deleted too.
+  Superseded behaviour (ADR-004, per project owner 2026-10-17; implemented in #37):
+  Recorded when an exception that is not one of the known content failures is raised
   inside either Extract overload, after the message was parsed. Each extraction stage (metadata = header mapping and
   xfields, body = body selection plus direction, attachments = attachment collection) is guarded separately, so one
   warning names one failed stage. It signals a library bug, not bad input: tests and GoldenKit fail on any

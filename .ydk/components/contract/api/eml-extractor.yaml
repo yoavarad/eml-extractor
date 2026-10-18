@@ -11,26 +11,27 @@ description: >-
   (ydk:req:extraction/max-input-size); Extract(MimeMessage) becomes internal (tests and tools reach it through
   InternalsVisibleTo) so MimeKit types leave the public API. No batch method: the factory owns parallelism. Today IEmlExtractor declares Extract(ReadOnlyMemory<byte>) and
   EmlExtractor also exposes a public Extract(MimeMessage).
-  Throw contract (ADR-004, per project owner 2026-10-17; kept by ADR-012): content-driven failures never throw.
-  Known content failures map to their existing warnings. After parsing, each stage (metadata, body plus direction,
-  attachments) is guarded separately: a stage that throws unexpectedly contributes its empty default and records one
-  ydk:warning:extraction/internal-error naming the stage, while the other stages keep their output. Stage defaults:
-  metadata -> Metadata with exactly from, to, cc, bcc, xfields, each ""; body -> MainContent and MainContentMimeType
-  null, directions ltr; attachments -> none. A parse failure stays an empty result with parse_failed, using the same
-  defaults (the five fixed metadata keys present as ""). Only programmer misuse (null argument) throws
-  ArgumentNullException.
-  Current code (gap, Stage 02 work): the byte overload catches only the seven exception types listed on
-  ydk:warning:extraction/parse-failed and lets others propagate; the MimeMessage overload has no try/catch.
+  Throw contract (ADR-023, per project owner 2026-10-18; supersedes ADR-004 in part and amends ADR-012; target,
+  Stage 02): malformed-but-readable content never throws; it maps to the content warnings below with a partial
+  result, and a parse failure stays an empty result with parse_failed (the five fixed metadata keys present as "").
+  Everything else throws: a null argument -> ArgumentNullException; an invalid option (maxInputBytes <= 0) ->
+  ArgumentOutOfRangeException at construction; input longer than maxInputBytes ->
+  ydk:entity:extraction/EmlInputTooLargeException ; an unexpected exception in a stage (request, parse, metadata,
+  body, attachments) -> ydk:entity:extraction/EmlExtractionException naming the stage, original as InnerException
+  (OutOfMemoryException is not wrapped); an exception from a host callback (MeterListener, ActivityListener)
+  propagates unchanged. Messages name the parameter and the bad value or limit and never quote message content.
+  Current code (gap, Stage 02 work): oversized input returns an input_too_large warning, and each stage guard turns an
+  unexpected exception into an internal_error warning with that stage's empty default (#37, #38).
 methods:
   Extract(EmlExtractionRequest):
     description: >-
       Target; not implemented (Stage 02). Parse request.FileBytes and return metadata, main content, attachments,
       directions, and warnings. When FileBytes is longer than maxInputBytes nothing is parsed and
-      ydk:warning:extraction/input-too-large is recorded. If the buffer (after an optional UTF-8 BOM) starts with
+      ydk:entity:extraction/EmlInputTooLargeException is thrown (ADR-023). If the buffer (after an optional UTF-8 BOM) starts with
       "From " it is parsed in mbox format (first message only); otherwise as a single message. Parser/decoder
       exceptions of the known types become ydk:warning:extraction/parse-failed ; per-part failures become the other
-      warnings below; any other exception becomes ydk:warning:extraction/internal-error . request.FileName never
-      affects the result. A null request throws ArgumentNullException.
+      warnings below; any other exception is thrown as ydk:entity:extraction/EmlExtractionException (ADR-023).
+      request.FileName never affects the result. A null request throws ArgumentNullException.
     params:
       request:
         type: EmlExtractionRequest
@@ -39,18 +40,18 @@ methods:
       type: EmlExtractionResult
       description: ydk:entity:extraction/EmlExtractionResult ; never null.
     raises:
-      - ydk:warning:extraction/input-too-large
+      - ydk:entity:extraction/EmlInputTooLargeException
+      - ydk:entity:extraction/EmlExtractionException
       - ydk:warning:extraction/parse-failed
       - ydk:warning:extraction/body-decode-failed
       - ydk:warning:extraction/part-decode-failed
       - ydk:warning:extraction/rfc822-extract-failed
       - ydk:warning:extraction/tnef-extract-failed
-      - ydk:warning:extraction/internal-error
   Extract(ReadOnlyMemory<byte>):
     description: >-
       Convenience overload, kept public (ADR-012, per project owner 2026-10-18). Target (Stage 02): a thin wrapper
       equal to Extract(new EmlExtractionRequest { FileBytes = eml }), so results, warnings, and the input-size guard
-      are identical; no logic of its own. Today it holds the extraction logic itself and has no size guard. Wrapped
+      are identical; no logic of its own. ReadOnlyMemory<byte> cannot be null, so only the size limit and library bugs throw. Wrapped
       without copy when backed by a full array (offset 0, full length); otherwise copied once.
     params:
       eml:
@@ -60,19 +61,18 @@ methods:
       type: EmlExtractionResult
       description: ydk:entity:extraction/EmlExtractionResult ; never null.
     raises:
-      - ydk:warning:extraction/input-too-large
+      - ydk:entity:extraction/EmlInputTooLargeException
+      - ydk:entity:extraction/EmlExtractionException
       - ydk:warning:extraction/parse-failed
       - ydk:warning:extraction/body-decode-failed
       - ydk:warning:extraction/part-decode-failed
       - ydk:warning:extraction/rfc822-extract-failed
       - ydk:warning:extraction/tnef-extract-failed
-      - ydk:warning:extraction/internal-error
   Extract(MimeMessage):
     description: >-
       Same mapping as the byte path for an already-parsed MimeKit message; no parsing step, so parse-failed is never
-      recorded. Target: internal, not public (ADR-012); same no-throw behaviour as the request method (unexpected
-      exceptions become ydk:warning:extraction/internal-error ); a null message throws ArgumentNullException.
-      Today it is public and has no top-level try/catch.
+      recorded. Internal, not public (ADR-012); same throw contract as the request method (unexpected exceptions
+      throw ydk:entity:extraction/EmlExtractionException , ADR-023); a null message throws ArgumentNullException.
     params:
       message:
         type: MimeKit.MimeMessage
@@ -81,8 +81,8 @@ methods:
       type: EmlExtractionResult
       description: ydk:entity:extraction/EmlExtractionResult ; never null.
     raises:
+      - ydk:entity:extraction/EmlExtractionException
       - ydk:warning:extraction/body-decode-failed
       - ydk:warning:extraction/part-decode-failed
       - ydk:warning:extraction/rfc822-extract-failed
       - ydk:warning:extraction/tnef-extract-failed
-      - ydk:warning:extraction/internal-error

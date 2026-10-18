@@ -1,7 +1,7 @@
 # ADR-020: Profiling method - per-stage CPU, allocation, and GC hotspots on the load-test corpus
 
 ## Status
-Accepted (per project owner, 2026-10-18). Target; not implemented (Stage 02). Every numeric parameter below (top-N size, run lengths, sampling rates) is provisional until the first profile, like ADR-015.
+Accepted (per project owner, 2026-10-18). Target; not implemented (Stage 02). Every numeric parameter below (top-N size, run lengths, sampling rates) is provisional until the first profile, like ADR-015. Amended by ADR-023 (2026-10-18): the stages are no longer guarded; a library bug throws `EmlExtractionException` naming the stage.
 
 ## Context
 ADR-015 measures how fast the library is (throughput, latency, memory per degree of parallelism) but not where the time and memory go. Without that, any optimization is a guess. The owner decided (2026-10-18) to add dev-time profiling and runtime metrics (ADR-021), then optimize only from data (ADR-022).

@@ -20,7 +20,10 @@ rule: >-
   return-path, to, delivered-to, cc, sender, reply-to, in-reply-to, references, content-type.
   The same decision is exposed as EmlDetectionResult.IsSupported by Detect (target, ADR-012, Stage 02), with MimeType
   "message/rfc822" when true and "" when false.
-failure_behavior: Returns false (Detect - IsSupported false, MimeType ""). Never throws.
+failure_behavior: >-
+  Returns false (Detect - IsSupported false, MimeType ""): not-email is a result, not an error. Throws only on misuse
+  (none possible for the span overloads) or a library bug, wrapped as ydk:entity:extraction/EmlExtractionException
+  with stage detect (ADR-023).
 related_components:
   - ydk:contract:api/eml-detector
   - ydk:req:detection/reject-non-email-magic

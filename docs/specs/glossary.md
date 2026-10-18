@@ -28,7 +28,8 @@ One name per concept. Use the canonical term in specs, code comments, and review
 | Inline image | An image part referenced from HTML by content identifier ([ydk:req:attachments/inline-cid-images]) | embedded image, CID attachment |
 | TNEF wrapper | Outlook's `winmail.dat` container, unpacked into its files ([ydk:req:attachments/tnef-unwrap]) | winmail attachment |
 | mbox separator | The "From " line that begins each message in an mbox archive ([ydk:req:extraction/mbox-from-line]) | envelope line, From_ header |
-| Warning | One diagnostic string on the extraction result ([ydk:crosscut:core/warning-format]) | error, exception (unless one is actually thrown) |
+| Warning | One diagnostic string on the extraction result for a content problem ([ydk:crosscut:core/warning-format]) | error, exception (unless one is actually thrown) |
+| Extraction exception | What is thrown for misuse, input over the size limit ([ydk:entity:extraction/EmlInputTooLargeException]), or a library bug ([ydk:entity:extraction/EmlExtractionException]); ADR-023 | warning, internal error warning |
 | Golden case | One authored message with its expected result ([ydk:req:quality/golden-independence]) | fixture (for golden data), snapshot |
 | Seed set | The 12 golden cases run by the normal test command | smoke set |
 | Bulk set | The 1,200 golden cases scored by GoldenKit | full set, big set |

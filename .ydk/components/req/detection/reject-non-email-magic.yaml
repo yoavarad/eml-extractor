@@ -13,7 +13,7 @@ rule: >-
   JPEG FF D8 FF;
   ZIP "PK" followed by a byte <= 0x08 (buffer length >= 4);
   a first byte of '{' or '[' (JSON) or '<' (HTML/XML).
-failure_behavior: Returns false. Never throws.
+failure_behavior: Returns false; not-email is a result, not an error (ADR-023 - only misuse or a library bug throws).
 related_components:
   - ydk:contract:api/eml-detector
   - ydk:req:detection/detect-eml

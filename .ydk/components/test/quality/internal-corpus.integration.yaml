@@ -5,7 +5,8 @@ description: >-
   under the gitignored corpus/internal/. Today each test returns early (passes vacuously) when its file is missing.
   Target (ADR-018; not implemented, Stage 02): a missing sample makes the test report Skipped with the missing path,
   never Passed. CI coverage of real attachments comes from ydk:test:quality/realistic-samples.integration .
-  Complements ydk:nfr:reliability/real-world-harvest-no-throw .
+  Complements ydk:nfr:reliability/real-world-harvest-no-throw . Real content never throws (ADR-023); an exception
+  from any case fails the test.
 level: integration
 target: ydk:contract:api/eml-extractor
 cases:

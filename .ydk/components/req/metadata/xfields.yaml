@@ -15,8 +15,7 @@ rule: >-
   are also present in Metadata under their own canonical keys; X- headers appear only there. Non-matching headers
   (e.g. DKIM-Signature, X-Mailer) never appear in xfields. There is no separate XFields property.
 failure_behavior: >-
-  xfields is "" when no header matches, on ydk:warning:extraction/parse-failed , and on
-  ydk:warning:extraction/input-too-large .
+  xfields is "" when no header matches, and on ydk:warning:extraction/parse-failed (oversized input throws, ADR-023).
 related_components:
   - ydk:entity:extraction/Metadata
   - ydk:entity:extraction/EmlExtractionResult

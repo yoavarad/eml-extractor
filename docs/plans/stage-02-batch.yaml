@@ -1,4 +1,6 @@
 # Stage 02 batch: decomposition of the ADR-004/011..019 target work into epics, stories, tasks.
+# NOTE (2026-10-18): ADR-023 replaces the internal_error / input_too_large warnings and the "never throws" rule
+# referenced below with exceptions; see docs/plans/stage-02-throw-batch.yaml. Issues already created are not edited here.
 # Validate:  ydk task create-batch --from docs/plans/stage-02-batch.yaml --dry-run
 #
 # Planning conventions (apply to every task below):

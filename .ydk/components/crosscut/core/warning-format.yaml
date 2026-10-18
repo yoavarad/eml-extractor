@@ -1,17 +1,22 @@
 $schema: ydk:schema:crosscut
 id: ydk:crosscut:core/warning-format
 description: >-
-  The single diagnostic format of the library. This library has no HTTP error responses. Target (ADR-004): it throws
-  only ArgumentNullException for a null argument, and every other problem is a warning string on the result. Today
-  unlisted exception types still propagate (see ydk:warning:extraction/internal-error , Stage 02 work).
+  The single diagnostic format for content problems. This library has no HTTP error responses. Target (ADR-023, per
+  project owner 2026-10-18; supersedes the ADR-004 "never throws" rule): malformed-but-readable content is a warning
+  string on the result; misuse (ArgumentException family), input over maxInputBytes
+  (ydk:entity:extraction/EmlInputTooLargeException) and library bugs (ydk:entity:extraction/EmlExtractionException)
+  throw instead. Today the size guard and the per-stage bug guards still record input_too_large / internal_error
+  warnings (Stage 02 work removes them).
 kind: error-format
 specification: >-
   EmlExtractionResult.Warnings is an ordered list of strings, in the order problems were met during extraction.
   Each string is "<code>: <detail>" where <code> is one of parse_failed, body_decode_failed, part_decode_failed,
-  rfc822_extract_failed, tnef_extract_failed, internal_error, input_too_large (target, Stage 02) (lower snake_case, no spaces) and <detail> is the template defined on the
+  rfc822_extract_failed, tnef_extract_failed (lower snake_case, no spaces; internal_error and input_too_large are
+  deprecated by ADR-023 and leave the set in Stage 02) and <detail> is the template defined on the
   matching warning component (typically the .NET exception message, prefixed for parse_failed by the exception type
   name and for part_decode_failed by the part's filename or MIME type). Consumers identify a warning by its prefix
-  (string StartsWith "<code>"), never by the free-text detail. An empty list means a clean extraction.
+  (string StartsWith "<code>"), never by the free-text detail. An empty list on a returned result means a clean
+  extraction.
 applies_to: ydk:contract:api/eml-extractor (both Extract overloads). The detector has no diagnostics.
 implementation_notes:
   - Warning strings are not golden-checked (docs/golden.md "What we will not gold"); tests assert only on prefixes.

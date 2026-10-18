@@ -13,8 +13,8 @@ fields:
     default: empty
     constraints: >-
       Whole message bytes. A byte[] converts implicitly. Wrapped without copy when backed by a full array
-      (offset 0, full length); otherwise copied once. Length above the extractor's limit gives
-      ydk:warning:extraction/input-too-large (ydk:req:extraction/max-input-size). Empty gives parse_failed.
+      (offset 0, full length); otherwise copied once. Length above the extractor's limit throws
+      ydk:entity:extraction/EmlInputTooLargeException (ydk:req:extraction/max-input-size, ADR-023). Empty gives parse_failed.
     description: The message to extract.
   FileName:
     type: string

@@ -10,7 +10,7 @@ cases:
     description: One theory row per manifest entry
     given: A committed sample and its manifest entry (expected subfiles with FileName, SizeInBytes, SHA-256, FullPath)
     when: Detect then Extract are called with the sample bytes
-    then: IsSupported true; every expected subfile present with exact FileName, SizeInBytes, SHA-256, FullPath; no internal_error warning
+    then: IsSupported true; every expected subfile present with exact FileName, SizeInBytes, SHA-256, FullPath; Extract does not throw (ADR-023)
   - name: TnefSubfilesCarryContainerPath
     description: TNEF origin is visible
     given: The winmail.dat sample holding an Office file

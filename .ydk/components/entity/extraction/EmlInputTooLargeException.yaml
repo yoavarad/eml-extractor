@@ -1,0 +1,35 @@
+$schema: ydk:schema:entity
+id: ydk:entity:extraction/EmlInputTooLargeException
+description: >-
+  Exception thrown by Extract when the input is longer than the extractor's maxInputBytes limit
+  (ydk:req:extraction/max-input-size). Target (ADR-023, per project owner 2026-10-18; not implemented, Stage 02):
+  public sealed class EmlInputTooLargeException : ArgumentException, in src/EmlExtraction. Replaces the
+  input_too_large warning. Not wrapped in ydk:entity:extraction/EmlExtractionException . Thrown before any parsing.
+fields:
+  InputLength:
+    type: long
+    required: true
+    nullable: false
+    description: Length of the rejected input in bytes (EmlExtractionRequest.FileBytes.Length).
+  MaxInputBytes:
+    type: long
+    required: true
+    nullable: false
+    description: The extractor's configured limit in bytes; InputLength is always greater than this value.
+  ParamName:
+    type: string
+    required: true
+    nullable: false
+    description: Inherited from ArgumentException; "request" for Extract(EmlExtractionRequest), "eml" for the bytes overload.
+  Message:
+    type: string
+    required: true
+    nullable: false
+    constraints: >-
+      "Input is ${InputLength} bytes, which exceeds maxInputBytes ${MaxInputBytes}." plus the standard ArgumentException
+      parameter suffix. Never quotes message content.
+    description: Human-readable message naming the actual size and the limit.
+state_transitions: {}
+relationships: []
+indexes: []
+crud: []
