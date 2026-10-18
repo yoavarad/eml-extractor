@@ -52,8 +52,8 @@ fields:
     constraints: "Each item formatted per ydk:crosscut:core/warning-format"
     description: >-
       Non-fatal content diagnostics recorded during extraction (ydk:req:extraction/no-throw-on-malformed). Target
-      (ADR-023): content problems only; misuse, oversized input and library bugs throw instead, so internal_error and
-      input_too_large never appear here.
+      (ADR-023): content problems only; misuse, oversized input and library bugs throw instead, so internal_error never
+      appears here.
   SubjectDirection:
     type: enum
     values: [ltr, rtl]

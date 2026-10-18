@@ -29,7 +29,7 @@ public sealed class TelemetryTests
         ["eml_extraction.warning.code"] =
         [
             "parse_failed", "body_decode_failed", "part_decode_failed", "rfc822_extract_failed",
-            "tnef_extract_failed", "internal_error", "input_too_large"
+            "tnef_extract_failed", "internal_error"
         ],
         ["eml_extraction.detect.result"] = ["supported", "not_supported"],
         ["eml_extraction.stage"] = ["parse", "metadata", "body", "attachments"],
@@ -115,10 +115,10 @@ public sealed class TelemetryTests
         var bytes = SampleFactory.ToBytes(SampleFactory.Plain("s", new string('x', 2000)));
 
         using var rec = new Recorder();
-        new EmlExtractor(1024).Extract(bytes);
+        Assert.Throws<EmlInputTooLargeException>(() => new EmlExtractor(1024).Extract(bytes));
 
         Assert.Equal(1d, Assert.Single(rec.Of(InputTooLarge)).Value);
-        Assert.Equal(Tag("eml_extraction.warning.code", "input_too_large"), Assert.Single(Assert.Single(rec.Of(Warnings)).Tags));
+        Assert.Empty(rec.Of(Warnings));
         Assert.Equal(Tag("eml_extraction.outcome", "input_too_large"), Assert.Single(Assert.Single(rec.Of(Duration)).Tags));
         Assert.Equal((double)bytes.Length, Assert.Single(rec.Of(InputSize)).Value);
         Assert.Empty(rec.Of(Attachments));

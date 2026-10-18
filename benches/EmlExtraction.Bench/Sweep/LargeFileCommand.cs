@@ -9,7 +9,7 @@ namespace EmlExtraction.Bench.Sweep;
 
 /// <summary>
 /// <c>large</c>: single-thread large-file pass (ADR-015). Messages at 25/50/100% of the limit, each with one base64
-/// attachment, plus one at limit+1 that must yield <c>input_too_large</c>. Prints M, peak working set and the sizing formula.
+/// attachment, plus one at limit+1 that must throw <see cref="EmlInputTooLargeException"/>. Prints M, peak working set and the sizing formula.
 /// </summary>
 internal static class LargeFileCommand
 {
@@ -121,7 +121,17 @@ internal static class LargeFileCommand
         { IsBackground = true };
         sampler.Start();
         var sw = Stopwatch.StartNew();
-        var result = extractor.Extract(input);
+        EmlExtractionResult? result = null;
+        EmlInputTooLargeException? tooLarge = null;
+        try
+        {
+            result = extractor.Extract(input);
+        }
+        catch (EmlInputTooLargeException ex)
+        {
+            tooLarge = ex;
+        }
+
         sw.Stop();
         Volatile.Write(ref stop, true);
         sampler.Join();
@@ -131,17 +141,19 @@ internal static class LargeFileCommand
 
         bool ok;
         string note;
-        var detail = $"attachments={result.Attachments.Count}, warnings={string.Join(";", result.Warnings)}";
+        var detail = result is null
+            ? $"threw {tooLarge?.GetType().Name}"
+            : $"attachments={result.Attachments.Count}, warnings={string.Join(";", result.Warnings)}";
         if (expectAttachment)
         {
-            ok = result.Attachments.Count == 1 && result.Warnings.Count == 0;
+            ok = result is { Attachments.Count: 1, Warnings.Count: 0 };
             note = ok ? "1 attachment" : detail;
         }
         else
         {
-            ok = result.Warnings.Count == 1 && result.Warnings[0].StartsWith("input_too_large", StringComparison.Ordinal)
-                && result.Attachments.Count == 0;
-            note = ok ? "input_too_large, no parse" : "unexpected: " + detail;
+            ok = result is null && tooLarge is not null && tooLarge.InputLength == input.Length
+                && tooLarge.MaxInputBytes == size - 1 && tooLarge.ParamName == "request";
+            note = ok ? "EmlInputTooLargeException, no parse" : "unexpected: " + detail;
         }
 
         GC.KeepAlive(input);

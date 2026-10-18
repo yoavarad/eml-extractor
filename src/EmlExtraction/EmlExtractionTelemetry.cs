@@ -47,10 +47,17 @@ internal static class EmlExtractionTelemetry
             InputSize.Record(bytes);
     }
 
-    public static void RecordInputTooLarge()
+    /// <summary>Records the refusal counter and a duration with outcome input_too_large; nothing goes to the warnings counter.</summary>
+    public static void RecordInputTooLarge(long startTimestamp)
     {
         if (InputTooLarge.Enabled)
             InputTooLarge.Add(1);
+
+        if (Duration.Enabled)
+        {
+            var elapsed = System.Diagnostics.Stopwatch.GetElapsedTime(startTimestamp).TotalSeconds;
+            Duration.Record(elapsed, new KeyValuePair<string, object?>("eml_extraction.outcome", OutcomeInputTooLarge));
+        }
     }
 
     public static void RecordInternalError(string stage, Exception ex)
@@ -101,7 +108,6 @@ internal static class EmlExtractionTelemetry
             "rfc822_extract_failed" => "rfc822_extract_failed",
             "tnef_extract_failed" => "tnef_extract_failed",
             "internal_error" => "internal_error",
-            "input_too_large" => "input_too_large",
             _ => null
         };
     }
