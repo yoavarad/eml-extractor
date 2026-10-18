@@ -7,5 +7,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\EmlExtraction\EmlExtraction.csproj" />
     <PackageReference Include="MimeKit" />
+    <Using Include="GoldenKit.Schema" />
   </ItemGroup>
 </Project>

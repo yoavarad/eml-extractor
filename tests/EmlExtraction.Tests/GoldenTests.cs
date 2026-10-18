@@ -1,7 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace EmlExtraction.Tests;
 
@@ -31,7 +30,7 @@ public sealed class GoldenTests
     [MemberData(nameof(Cases))]
     public void SeedGoldenMatches(string expectedPath)
     {
-        var spec = JsonSerializer.Deserialize<GoldenSpec>(File.ReadAllText(expectedPath), JsonOptions)
+        var spec = JsonSerializer.Deserialize<GoldenSpecFile>(File.ReadAllText(expectedPath), JsonOptions)
                    ?? throw new InvalidOperationException(expectedPath);
         var bytes = File.ReadAllBytes(Path.Combine(Path.GetDirectoryName(expectedPath)!, "input.eml"));
         var label = spec.Id;
@@ -112,74 +111,13 @@ public sealed class GoldenTests
 
     private static IEnumerable<string> Roots()
     {
-        yield return Path.Combine(AppContext.BaseDirectory, "golden");
+        // Resolved from the nearest repo root (walk up from the test output), like the bulk set in GoldenKit.
         var dir = new DirectoryInfo(AppContext.BaseDirectory);
-        while (dir is not null)
-        {
-            yield return Path.Combine(dir.FullName, "corpus", "golden", "seed");
-            yield return Path.Combine(dir.FullName, "corpus", "internal", "golden");
+        while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "corpus", "golden")))
             dir = dir.Parent;
-        }
-    }
-}
-
-internal sealed class GoldenSpec
-{
-    public string Id { get; set; } = "";
-    public string[] Tags { get; set; } = [];
-    public bool IsEml { get; set; } = true;
-    public GoldenExpect Expect { get; set; } = new();
-}
-
-internal sealed class GoldenExpect
-{
-    public Dictionary<string, GoldenField> Metadata { get; set; } = new(StringComparer.OrdinalIgnoreCase);
-    public GoldenField? XFields { get; set; }
-    public GoldenField? MainContent { get; set; }
-    public string? MainContentMimeType { get; set; }
-    public int? AttachmentCount { get; set; }
-    public List<GoldenAttachment> Attachments { get; set; } = [];
-}
-
-internal sealed class GoldenField
-{
-    public string? Eq { get; set; }
-    [JsonConverter(typeof(StringOrListConverter))]
-    public List<string> Contains { get; set; } = [];
-    [JsonConverter(typeof(StringOrListConverter))]
-    public List<string> NotContains { get; set; } = [];
-}
-
-internal sealed class GoldenAttachment
-{
-    public string? Name { get; set; }
-    public string? NameContains { get; set; }
-    public long? Size { get; set; }
-    public string? Sha256 { get; set; }
-    public string? Disposition { get; set; }
-    public string? FullPath { get; set; }
-    public GoldenExpect? Reextract { get; set; }
-}
-
-internal sealed class StringOrListConverter : JsonConverter<List<string>>
-{
-    public override List<string> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-    {
-        if (reader.TokenType == JsonTokenType.String)
-            return [reader.GetString() ?? ""];
-        if (reader.TokenType != JsonTokenType.StartArray)
-            throw new JsonException();
-        var list = new List<string>();
-        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
-            list.Add(reader.GetString() ?? "");
-        return list;
-    }
-
-    public override void Write(Utf8JsonWriter writer, List<string> value, JsonSerializerOptions options)
-    {
-        writer.WriteStartArray();
-        foreach (var item in value)
-            writer.WriteStringValue(item);
-        writer.WriteEndArray();
+        if (dir is null)
+            yield break;
+        yield return Path.Combine(dir.FullName, "corpus", "golden", "seed");
+        yield return Path.Combine(dir.FullName, "corpus", "internal", "golden");
     }
 }

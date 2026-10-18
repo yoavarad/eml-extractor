@@ -16,6 +16,8 @@
     <ProjectReference Include="..\..\src\EmlExtraction\EmlExtraction.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\corpus\golden\seed\**\*" CopyToOutputDirectory="PreserveNewest" Link="golden\%(RecursiveDir)%(Filename)%(Extension)" />
+    <!-- Single golden schema, shared with GoldenKit. -->
+    <Compile Include="..\..\tools\GoldenKit\Schema\*.cs" Link="GoldenSchema\%(Filename)%(Extension)" />
+    <Using Include="GoldenKit.Schema" />
   </ItemGroup>
 </Project>
