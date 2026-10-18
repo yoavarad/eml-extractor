@@ -1,0 +1,4 @@
+* text=auto eol=lf
+
+# Mail samples are byte-exact test inputs: never convert line endings.
+*.eml -text
