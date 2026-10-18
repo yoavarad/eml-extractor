@@ -10,7 +10,7 @@ All input arrives as one in-memory buffer, and all output, attachment bytes incl
 
 ## Diagnostics
 
-There is one diagnostic channel: the ordered warnings list on [ydk:entity:extraction/EmlExtractionResult], in the format defined by [ydk:crosscut:core/warning-format]. Today the library writes no logs, traces, or metrics; the target runtime telemetry is described under Observability below. Five kinds of warning exist:
+There is one diagnostic channel: the ordered warnings list on [ydk:entity:extraction/EmlExtractionResult], in the format defined by [ydk:crosscut:core/warning-format]. The library writes no logs; runtime metrics and traces (ADR-021) are described under Observability below. Five kinds of warning exist:
 
 - [ydk:warning:extraction/parse-failed] - the message could not be parsed; the result is empty.
 - [ydk:warning:extraction/body-decode-failed] - the chosen body could not be decoded; there is no main content.
@@ -31,7 +31,7 @@ Per the project owner (2026-10-18, ADR-023), warnings are only for mail content 
 
 ## Observability
 
-Target; not implemented (Stage 02). Per the project owner (ADR-021), the library also reports how it is doing at run time, through the standard measurement and tracing facilities built into .NET, so the host can see call durations, input sizes, attachment counts, warning rates by kind, detection outcomes, size-guard refusals, and library bugs by stage without wrapping every call. The library adds no telemetry package of its own: the host decides whether and where to send the data. The rules are [ydk:crosscut:core/observability] and the exact list of measurements, with their names and labels, is [ydk:req:observability/runtime-telemetry].
+Implemented (metrics #71, activities #72). Per the project owner (ADR-021), the library also reports how it is doing at run time, through the standard measurement and tracing facilities built into .NET, so the host can see call durations, input sizes, attachment counts, warning rates by kind, detection outcomes, size-guard refusals, and library bugs by stage without wrapping every call. The library adds no telemetry package of its own: the host decides whether and where to send the data. The rules are [ydk:crosscut:core/observability] and the exact list of measurements, with their names and labels, is [ydk:req:observability/runtime-telemetry].
 
 Mail is personal data, so nothing from a message ever appears in telemetry: no subject, body, header value, address, attachment name, or path, and not the caller's file name either. Every label comes from a small fixed set. With nobody listening, the cost must be negligible; the budget is provisional until measured ([ydk:nfr:observability/metrics-overhead]). The names may still change once if the team already has naming rules or a shared measurement source ([docs/team-questions.md](../team-questions.md), question 6).
 

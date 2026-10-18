@@ -1,7 +1,7 @@
 # ADR-013: FullPath is the container path; nested messages stay opaque
 
 ## Status
-Accepted (per project owner, 2026-10-17). Implementation pending, tracked as Stage 02 work. Amends ADR-008.
+Accepted (per project owner, 2026-10-17). Implemented. Amends ADR-008.
 
 ## Context
 The brief asks, for every sub-file, for its "full path if it exists". Today `FullPath` is set only when the sender's MIME filename contains `/` or `\`, and it then holds that raw string. That reading has three problems:

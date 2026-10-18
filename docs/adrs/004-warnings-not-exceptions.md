@@ -1,7 +1,7 @@
 # ADR-004: Record warnings instead of throwing on malformed MIME
 
 ## Status
-Accepted (recorded retroactively, Stage 01 Rewrite). Throw contract decided by the project owner on 2026-10-17. Implementation of that contract is pending, tracked as Stage 02 work. Superseded in part by ADR-023 (2026-10-18): misuse, oversized input and library bugs now throw; `internal_error` is removed; only content failures stay warnings.
+Accepted (recorded retroactively, Stage 01 Rewrite). Throw contract decided by the project owner on 2026-10-17. Contract implemented. Superseded in part by ADR-023 (2026-10-18): misuse, oversized input and library bugs now throw; `internal_error` is removed; only content failures stay warnings.
 
 ## Context
 `docs/requirements.md` lists "Parse does not crash the process" under "Out of original spec (implemented anyway)". The public-mail harvest of 12,853 messages is the evidence offered for 0 throws.
@@ -32,7 +32,7 @@ Per project owner, 2026-10-17: the downstream indexer / LLM pipeline extracts me
 - Callers must inspect the warnings list to tell a clean extraction from a degraded one.
 - An `internal_error` warning means a library bug, not bad input.
 - `docs/golden.md` ("What we will not gold") excludes warning text from golden tests. Tests assert on code prefixes only.
-- Current code gap (Stage 02 work): the byte overload catches only `FormatException`, `ParseException`, `IOException`, `InvalidOperationException`, `ArgumentException`, `NotSupportedException` and `DecoderFallbackException`, and any other type propagates. The `MimeMessage` overload has no top-level try/catch. No `internal_error` warning exists in code, and tests and GoldenKit do not check for it yet.
+- Implemented: `EmlExtractor` catches only content failures (`FormatException`, `ParseException`, `IOException`, `InvalidOperationException`, `ArgumentException`, `NotSupportedException`, `DecoderFallbackException`) as warnings; other exceptions surface as `EmlExtractionException` (ADR-023). No `internal_error` warning exists.
 
 ## Evidence
 `src/EmlExtraction/EmlExtractor.cs`, `src/EmlExtraction/PartCollector.cs`, `README.md`, `docs/requirements.md`, `docs/edge-cases.md`. Project owner decision, 2026-10-17.

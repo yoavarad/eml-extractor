@@ -24,13 +24,13 @@ The metadata map, [ydk:entity:extraction/Metadata], is built in three passes.
 
 The keying rule is in [ydk:req:metadata/canonical-keys] (ADR-016). A key is the header name in lower case and nothing else, so two headers that differ only by a dash versus an underscore no longer merge. The text direction values are not metadata; they are reported only beside it on the result. The four address keys and the custom-header key are present in every result, including one for a message that could not be parsed ([ydk:warning:extraction/parse-failed]).
 
-Today the code still derives keys by folding dashes into underscores, writes a second key for each classic header, puts the two direction values in the map, and returns an empty map on parse failure. Closing these gaps is Stage 02 work. The exact key names and value formats are in [ydk:entity:extraction/Metadata].
+The code keeps dashes and underscores as written, writes one key per header, keeps the two direction values out of the map, and returns the fixed keys on parse failure. The README migration table lists the old behaviour. The exact key names and value formats are in [ydk:entity:extraction/Metadata].
 
 ## Custom headers
 
 The original specification asks for all fields starting with a capital X and an underscore to be joined into one long string in a metadata field. Per the project owner (ADR-014), the rule is applied literally: only header names that begin with exactly those two characters count. Headers that begin with an X and a dash, the usual internet form, are not part of the string; they stay in the general metadata under their own keys. Each matching header becomes one "name: value" line in header order, and the lines are joined into one string held in the metadata map ([ydk:req:metadata/xfields]). Authentication headers such as DKIM signatures never appear in it.
 
-Today the code also matches the dash form, ignores case, and returns the string as a separate property instead of a metadata field. This changes in Stage 02. Whether the team's internal mail uses the underscore form is an open question in [docs/team-questions.md](../team-questions.md).
+The code matches only the literal `X_` form, case-sensitively, and returns the string as `Metadata["xfields"]`, not as a separate property. Whether the team's internal mail uses the underscore form is an open question in [docs/team-questions.md](../team-questions.md).
 
 ## Main content
 

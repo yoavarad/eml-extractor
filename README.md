@@ -13,45 +13,64 @@ Repo: https://github.com/yoavarad/eml-extractor
 Input: bytes. Output: whether the buffer is an EML (RFC 5322) message.
 
 ```csharp
-bool ok = new EmlDetector().IsEml(bytes);
+EmlDetectionResult detection = new EmlDetector().Detect(bytes);
+// detection.IsSupported: true for a message; detection.MimeType: "message/rfc822", otherwise ""
+
+bool ok = new EmlDetector().IsEml(bytes); // same answer as Detect(bytes).IsSupported
 ```
 
-Sniffs headers (and mbox `From `). Ignores file extension. Rejects OLE `.msg`, PDF, ZIP, PNG, JPEG, and markup/JSON (a first byte of `{`, `[` or `<`).
+`Detect` and `IsEml` take a `ReadOnlySpan<byte>` (a `byte[]` converts implicitly). They sniff headers (and mbox `From `), ignore the file name and the file extension, and reject OLE `.msg`, PDF, ZIP, PNG, JPEG, and markup/JSON (a first byte of `{`, `[` or `<`).
 
 ### 2. Extract
 
 Input: a buffer already identified as EML. Output: metadata, main content, nested files.
 
 ```csharp
-EmlExtractionResult result = new EmlExtractor().Extract(bytes);
+var extractor = new EmlExtractor(); // or new EmlExtractor(maxInputBytes: 50_000_000)
+
+// Primary method: a request record.
+EmlExtractionResult result = extractor.Extract(new EmlExtractionRequest
+{
+    FileBytes = bytes,         // required; a byte[] converts implicitly
+    FileName = "mail-17.eml"   // optional; traceability only, never changes the result
+});
+
+// Convenience wrapper: same result as a request with these bytes and no FileName.
+EmlExtractionResult same = extractor.Extract(bytes);
 ```
 
-Does not throw on malformed MIME content (bad charset, undecodable part, broken structure); those problems go into `result.Warnings` with whatever could be extracted. Input over `maxInputBytes` throws `EmlInputTooLargeException` (`InputLength`, `MaxInputBytes`) before parsing. Misuse throws `ArgumentException` types, and a library bug throws `EmlExtractionException` naming the failed stage (`Stage`), with the original exception as `InnerException` (ADR-023).
+`maxInputBytes` is the largest input, in bytes, that is parsed (default 500 MiB). See Errors below for what is thrown and what stays a warning.
 
 #### Metadata
 
-- Classic fields: `from`, `to`, `cc`, `bcc` (always present; empty string if the header is missing), plus `replyto`, `sender`, `subject`, `date`, `messageid`, and the rest of the usual envelope headers
-- `subject_direction` and `content_direction`: `ltr` or `rtl` (HTML `dir` / CSS `direction`, otherwise Unicode first-strong letter)
-- Every other header as well (keys lowercased, `-` → `_`)
-- Headers that start with the literal `X_` (capital X, underscore) are concatenated into `Metadata["xfields"]` (`""` when none); `X-` headers stay under their own metadata keys  
-  (`Name: value` per line)
+`result.Metadata` is an ordinal `IReadOnlyDictionary<string, string>` with one key per header:
+
+- Key = the header field name, trimmed and lower-cased; `-` and `_` are kept (`Message-ID` gives `message-id`, `X-Foo` gives `x-foo`, `X_Foo` gives `x_foo`). A repeated header is joined with `\n` in order.
+- Canonical overlay: `from`, `to`, `cc`, `bcc`, `reply-to`, `sender` (formatted mailboxes), `date` (ISO 8601 when it parses, otherwise the raw value), `message-id`, `in-reply-to`, `references`. Every other header (`subject`, `content-type`, `received`, ...) keeps its decoded, unfolded value.
+- Fixed keys, present in every result (including a failed parse), `""` when unknown: `from`, `to`, `cc`, `bcc`, `xfields`.
+- `xfields`: headers whose name starts with the literal `X_` (capital X, underscore) are concatenated into `Metadata["xfields"]`, one `Name: value` line per header joined by `\n`; `""` when none. `X-` headers are not in it; they stay under their own key. A real header named `xfields` is stored as `header:xfields`.
+- The text directions are not metadata keys: read `result.SubjectDirection` and `result.ContentDirection` (`ltr` or `rtl`).
 
 #### Content
 
-`result.MainContent` is the main body of the mail. If both HTML and plain exist (`multipart/alternative`), HTML is used.
+`result.MainContent` is the main body of the mail (`result.MainContentMimeType` is its media type). If both HTML and plain exist (`multipart/alternative`), HTML is used.
 
-Text direction: HTML `dir="rtl"` / `dir="ltr"` (and `direction:` CSS) is kept in the HTML and copied to `result.ContentDirection`. Plain text uses the first strong character (Hebrew/Arabic → `rtl`, Latin/CJK → `ltr`). Unicode bidi marks (`U+200F` RLM, `U+200E` LRM) are not stripped.
+Text direction: HTML `dir="rtl"` / `dir="ltr"` (and `direction:` CSS) is kept in the HTML and copied to `result.ContentDirection`. Plain text uses the first strong character (Hebrew/Arabic -> `rtl`, Latin/CJK -> `ltr`). Unicode bidi marks (`U+200F` RLM, `U+200E` LRM) are not stripped.
 
 #### Nested files (attachments)
 
-For each attachment:
+`result.Attachments` is a list of `ExtractedAttachment`, one per part, in MIME tree order:
 
 | Field | Meaning |
 | --- | --- |
-| `Name` | File name (basename) |
-| `Size` | Decoded size |
-| `FullPath` | Full path if the MIME filename contained `/` or `\` |
-| `Data` | Decoded binary |
+| `FileName` | File name (basename of the sender's name, or a generated fallback) |
+| `SizeInBytes` | Decoded size; equals `BinaryData.Length` |
+| `FullPath` | Container path (ADR-013): the file containers the part came through (a TNEF `winmail.dat`), then `FileName`, joined by `/`, for example `winmail.dat/budget.xlsx`. Never null; equals `FileName` for a top-level part. Unique within one result (ordinal, case-insensitive; a duplicate gets `~2`, `~3`, ... before the extension). An identifier, not a filesystem-safe path: sanitise before writing files |
+| `BinaryData` | Decoded binary |
+| `ContentId` | Content-ID without angle brackets, or `null` |
+| `Disposition` | Content-Disposition value (`attachment`, `inline`), or `null` |
+| `OriginalPath` | The sender's raw file name when it contained `/` or `\`, else `null`. Information only; do not use it to write files |
+| `ContentLocation` | The part's Content-Location header, decoded and trimmed, or `null` |
 
 No further extraction: no file-type detection, no parsing inside Office/PDF/images, no walking a nested `.eml`. A forwarded mail is one opaque `.eml` blob. Copy-paste images (`cid:` / `multipart/related`) are attachments with the image bytes.
 
@@ -97,6 +116,32 @@ foreach (var (name, bytes) in files)
 ```
 
 Catch `EmlInputTooLargeException` before any `ArgumentException` handler, since it derives from it.
+
+## Migrating from the pre-0.1 API
+
+Every row is a public break (ADR-012, 013, 014, 016, 023). Code that uses none of the old members compiles unchanged except for the constructor row.
+
+| Old API / behavior | New API / behavior | What callers change |
+| --- | --- | --- |
+| `attachment.Name` | `FileName` | Rename. |
+| `attachment.Size` | `SizeInBytes` | Rename. |
+| `attachment.Data` | `BinaryData` | Rename. |
+| `attachment.FullPath` is `string?`: the raw sender file name when it contained `/` or `\`, else `null` | `FullPath` is a non-null `string`: the container path (a TNEF wrapper segment, then `FileName`, joined by `/`), unique per result, not filesystem-safe (ADR-013) | Stop null-checking it. Read the old meaning from `OriginalPath`. Do not write files from it without sanitising. |
+| No field for the sender path or Content-Location | New `OriginalPath` (`string?`) and `ContentLocation` (`string?`) | Use them if you need that information. |
+| `result.XFields`; collected `X-` and `X_` headers, case-insensitive | Property removed. `result.Metadata["xfields"]`, always present; only headers starting with the literal `X_` | Read `Metadata["xfields"]`. `X-` headers are now only under their own keys, for example `x-mailer`. |
+| Metadata keys folded `-` to `_` and added punctuation-free duplicates: `reply_to` + `replyto`, `message_id` + `messageid`, `in_reply_to` + `inreplyto`, `mimeversion`, `returnpath`, `deliveredto`, `dkim_signature`; `X-Foo` and `X_Foo` merged | One lower-case key per header, `-` and `_` kept: `reply-to`, `message-id`, `in-reply-to`, `mime-version`, `return-path`, `delivered-to`, `dkim-signature`, `x-foo` and `x_foo` apart (ADR-016) | Update every key lookup. |
+| `Metadata["contenttype"]` (top-level MIME type) | Key removed. `Metadata["content-type"]` holds the decoded, unfolded header value | Use `result.MainContentMimeType` for the body's type. |
+| `Metadata["subject_direction"]`, `Metadata["content_direction"]` | Keys removed | Read `result.SubjectDirection` and `result.ContentDirection`. |
+| Failed parse returned an empty `Metadata` map | `from`, `to`, `cc`, `bcc`, `xfields` are always present (`""`) | None, unless you checked for an empty map. |
+| Positional records: `ExtractedAttachment(Name, Size, FullPath, Data, ContentId, Disposition)` and `EmlExtractionResult(Metadata, XFields, MainContent, MainContentMimeType, Attachments, Warnings)` | `ExtractedAttachment(FileName, SizeInBytes, FullPath, BinaryData, ContentId, Disposition, OriginalPath, ContentLocation)` (8 parameters); `EmlExtractionResult(Metadata, MainContent, MainContentMimeType, Attachments, Warnings)`, no `XFields` | Update every constructor call and `Deconstruct` in tests and mocks to the new arity and order. |
+| `Extract(ReadOnlyMemory<byte>)` was the only extraction method; `IEmlExtractor` had only it | `Extract(EmlExtractionRequest)` is primary and is also on `IEmlExtractor`; `Extract(ReadOnlyMemory<byte>)` stays as a wrapper with identical results | Optional for callers. Implementers and mocks of `IEmlExtractor` must add the new method. |
+| Public `Extract(MimeMessage)` | Internal | Pass bytes or an `EmlExtractionRequest`; MimeKit types are no longer in the public API. |
+| `bool EmlDetector.IsEml(bytes)` only | `EmlDetectionResult Detect(bytes)` (`IsSupported`, `MimeType`) added; `IsEml` unchanged | Optional. |
+| `new EmlExtractor()` with an implicit parameterless constructor | `EmlExtractor(long maxInputBytes = 500 MiB)`; `maxInputBytes <= 0` throws `ArgumentOutOfRangeException` | Source compatible. A binary break: recompile everything that references the library. |
+| Oversized input: `input_too_large` warning and an empty result | Throws `EmlInputTooLargeException` (an `ArgumentException`; `InputLength`, `MaxInputBytes`) | Catch the exception, not the warning. |
+| A stage fault: `internal_error` warning and a partial result | Throws `EmlExtractionException` (`Stage`, `InnerException`) | Catch it per item in a batch. Stop checking for `internal_error`. |
+| Null request and other misuse had no defined behavior | `ArgumentNullException` for a null request; see Errors | Fix the call. |
+| Targets `net10.0` only | Targets `net8.0` and `net10.0` with identical behavior | None; a .NET 8 host can now reference it. |
 
 ---
 

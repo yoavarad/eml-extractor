@@ -2,7 +2,7 @@
 
 ## Problem statement
 
-We are building an in-process .NET library, for .NET 10 and (target, ADR-019) .NET 8, that receives the raw bytes of a file, decides whether those bytes are an internet mail message (EML, RFC 822/2822/5322 with RFC 2045-2049 MIME), and, for messages, returns the header metadata, the main body, and every attached file as raw decoded bytes. The library stops there: it does not detect file types and does not open attachments.
+We are building an in-process .NET library, for .NET 10 and (ADR-019) .NET 8, that receives the raw bytes of a file, decides whether those bytes are an internet mail message (EML, RFC 822/2822/5322 with RFC 2045-2049 MIME), and, for messages, returns the header metadata, the main body, and every attached file as raw decoded bytes. The library stops there: it does not detect file types and does not open attachments.
 
 The consumer is a downstream file-processing pipeline. The original specification (written in Hebrew, translated in [docs/requirements.md](../requirements.md)) calls it "the factory" and puts its wiring out of scope: the component goes into the team's extraction template, and the team does the factory integration. That pipeline needs one call to classify a file and one call to break a message into parts it can route further. The original specification also asked for evidence that the parts come out right for exotic languages and mixed attachments, and for a measured files-per-second figure to size hardware with.
 
@@ -21,7 +21,7 @@ The two calls are independent. The extractor does not re-run detection, and the 
 3. Every header is copied into the metadata map under one key each, the classic envelope headers are rewritten in parsed form, and headers whose names start with the brief's custom prefix are joined into one metadata field ([ydk:req:metadata/all-headers], [ydk:req:metadata/canonical-keys], [ydk:req:metadata/classic-fields], [ydk:req:metadata/xfields]).
 4. The main body is chosen, preferring HTML over plain text ([ydk:req:content/main-content-selection]), and the subject and body directions are computed ([ydk:req:content/text-direction]). Text is returned exactly as written ([ydk:req:content/unicode-fidelity]). Details are in [extraction.md](extraction.md).
 5. Every remaining MIME leaf becomes an attachment record with its position in the message. Nested messages stay opaque, Outlook TNEF wrappers are unpacked, and pasted inline images are kept as files ([ydk:req:attachments/attachment-record], [ydk:req:attachments/container-path], [ydk:req:attachments/no-recursion], [ydk:req:attachments/tnef-unwrap], [ydk:req:attachments/inline-cid-images]). Details are in [attachments.md](attachments.md).
-6. Content problems along the way, such as a bad charset or an undecodable part, become warnings on the result with partial data ([ydk:req:extraction/no-throw-on-malformed], format in [ydk:crosscut:core/warning-format]). Misuse, oversized input, and library bugs throw informative exceptions instead (ADR-023, target).
+6. Content problems along the way, such as a bad charset or an undecodable part, become warnings on the result with partial data ([ydk:req:extraction/no-throw-on-malformed], format in [ydk:crosscut:core/warning-format]). Misuse, oversized input, and library bugs throw informative exceptions instead (ADR-023).
 
 ## Success criteria
 
@@ -29,7 +29,7 @@ The two calls are independent. The extractor does not re-run detection, and the 
 - Real-world public-mail content produces no exceptions: [ydk:nfr:reliability/real-world-harvest-no-throw]. Last recorded run: 12,853 messages.
 - Committed, licensed realistic attachment samples pass in CI, and tests whose samples are absent show as skipped, never as passed: [ydk:req:quality/realistic-attachment-samples] (target, ADR-018).
 - Throughput is measured across every degree of parallelism on real and synthetic mail, with memory, and published with a sizing formula the team can rerun: [ydk:nfr:performance/throughput-dop-sweep], [ydk:nfr:performance/memory-footprint] (target, ADR-015). The existing single-thread baselines stay as history: [ydk:nfr:performance/extract-tiny-throughput], [ydk:nfr:performance/extract-html-20kb-throughput], [ydk:nfr:performance/extract-1mb-attachment-throughput], [ydk:nfr:performance/detect-tiny-throughput].
-- The library and its tests build and pass on both .NET 8 and .NET 10 ([ydk:req:quality/net8-multi-targeting], target, ADR-019).
+- The library and its tests build and pass on both .NET 8 and .NET 10 ([ydk:req:quality/net8-multi-targeting], ADR-019).
 - The CI pipeline builds with warnings as errors, verifies formatting, runs the unit and seed-golden tests, and fails on High or Critical vulnerable packages (ADR-001).
 
 How these are measured is in [quality.md](quality.md) and [testing.md](testing.md).
@@ -57,4 +57,4 @@ The brief asks for C# on .NET 10. Per the project owner (ADR-019), the library a
 | [testing.md](testing.md) | Test layers and rules |
 | [glossary.md](glossary.md) | Canonical terms |
 
-Decisions are recorded in [docs/adrs/](../adrs/). The original documents stay in place as source material: [README.md](../../README.md), [requirements.md](../requirements.md), [edge-cases.md](../edge-cases.md), [golden.md](../golden.md), [perf-results.md](../perf-results.md), [golden-score.txt](../golden-score.txt). README describes today's API until the Stage 02 changes land.
+Decisions are recorded in [docs/adrs/](../adrs/). The original documents stay in place as source material: [README.md](../../README.md), [requirements.md](../requirements.md), [edge-cases.md](../edge-cases.md), [golden.md](../golden.md), [perf-results.md](../perf-results.md), [golden-score.txt](../golden-score.txt). README describes the Stage 02 API and has a migration table from the pre-0.1 API.

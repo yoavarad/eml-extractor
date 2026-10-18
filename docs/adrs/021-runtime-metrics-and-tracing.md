@@ -1,7 +1,7 @@
 # ADR-021: Runtime metrics and tracing with BCL Meter and ActivitySource
 
 ## Status
-Accepted (per project owner, 2026-10-18). Target; not implemented (Stage 02). The overhead budget is provisional until measured. Instrument names may be renamed once if the team answers `docs/team-questions.md` question 6 before the first release that ships them. Amended by ADR-023 (2026-10-18): `internal_errors` and `input_too_large` count thrown exceptions, and those two codes leave the warning-code tag set.
+Accepted (per project owner, 2026-10-18). Implemented (metrics #71, activities #72). The overhead budget is provisional until measured. Instrument names may be renamed once if the team answers `docs/team-questions.md` question 6 before the first release that ships them. Amended by ADR-023 (2026-10-18): `internal_errors` and `input_too_large` count thrown exceptions, and those two codes leave the warning-code tag set.
 
 ## Context
 Today the warnings list on the result is the only diagnostic channel; the library writes no logs, traces, or metrics (`ydk:crosscut:core/warning-format`). The factory sees each result, but it cannot see, without wrapping every call itself, how long extraction takes per message size, how often each warning kind fires across a fleet, how often the size guard refuses input, or which stage hit an `internal_error`. The owner decided (2026-10-18) to add runtime metrics in the library, next to dev-time profiling (ADR-020).

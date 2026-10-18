@@ -1,7 +1,7 @@
 # ADR-014: xfields joins literal `X_` headers and lives in the metadata
 
 ## Status
-Accepted (per project owner, 2026-10-17). Implementation pending, tracked as Stage 02 work. Supersedes the X-/X_ matching rule in `ydk:req:metadata/xfields` and `docs/requirements.md`. Amended by ADR-023 (2026-10-18): oversized input throws, so there is no `input_too_large` result.
+Accepted (per project owner, 2026-10-17). Implemented. Supersedes the X-/X_ matching rule in `ydk:req:metadata/xfields` and `docs/requirements.md`. Amended by ADR-023 (2026-10-18): oversized input throws, so there is no `input_too_large` result.
 
 ## Context
 The brief says: all metadata fields that start with `X_` (capital X, then underscore) are concatenated into one long string in a field named `xfields`.

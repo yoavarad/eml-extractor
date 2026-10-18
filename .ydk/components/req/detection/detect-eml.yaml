@@ -18,7 +18,7 @@ rule: >-
   (6) at scan end: headerLines >= 2 AND classic >= 1 AND (a blank line ended the header block OR headerLines >= 3).
   "classic" counts header names (case-insensitive) in: from, date, received, mime-version, message-id, subject,
   return-path, to, delivered-to, cc, sender, reply-to, in-reply-to, references, content-type.
-  The same decision is exposed as EmlDetectionResult.IsSupported by Detect (target, ADR-012, Stage 02), with MimeType
+  The same decision is exposed as EmlDetectionResult.IsSupported by Detect (ADR-012), with MimeType
   "message/rfc822" when true and "" when false.
 failure_behavior: >-
   Returns false (Detect - IsSupported false, MimeType ""): not-email is a result, not an error. Throws only on misuse

@@ -15,7 +15,7 @@ Package-level facts checked on 2026-10-18 in the local NuGet cache (nuspec depen
 
 ## Decision
 Per project owner, 2026-10-18:
-- `src/EmlExtraction` and `tests/EmlExtraction.Tests` target both `net8.0` and `net10.0` (`TargetFrameworks`). The repo-wide default in `Directory.Build.props` stays `net10.0`, so `tools/GoldenKit` stays net10.0 only (`benches/EmlExtraction.Bench` was net10.0 only here; ADR-020 amends it to net8.0 and net10.0).
+- `src/EmlExtraction` and `tests/EmlExtraction.Tests` target both `net8.0` and `net10.0` (`TargetFrameworks`, set in `Directory.Build.props` through the `EmlMultiTarget` property; it also covers the bench per ADR-020 and the `RealisticSamples` project the tests reference). Every other project defaults to `net10.0`, so `tools/GoldenKit` stays net10.0 only.
 - CI builds and runs the tests on both target frameworks, either as a matrix or as one multi-target `dotnet test` run. CI installs the .NET 8 runtime next to the SDK pinned by `global.json`.
 - The golden score gate (ADR-011) runs on net10.0; running it on net8.0 too is optional.
 - The load test (ADR-015) reports the target framework; its committed baseline is for net10.0.
