@@ -2,7 +2,7 @@ $schema: ydk:schema:req
 id: ydk:req:observability/runtime-telemetry
 description: >-
   The runtime telemetry contract: the meter, its instruments, and the activities the library emits (ADR-021, per
-  project owner 2026-10-18). Meter and its seven instruments implemented (#71); activities target (#72). Names may be renamed once if team question 6
+  project owner 2026-10-18). Meter and its seven instruments implemented (#71); activities implemented (#72). Names may be renamed once if team question 6
   (docs/team-questions.md) is answered before the first release that ships them.
 type: constraint
 priority: medium

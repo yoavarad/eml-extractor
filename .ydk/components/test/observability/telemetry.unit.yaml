@@ -2,7 +2,7 @@ $schema: ydk:schema:test
 id: ydk:test:observability/telemetry.unit
 description: >-
   Unit tests for the runtime telemetry contract (ydk:req:observability/runtime-telemetry , ADR-021). Metric cases
-  implemented (#71, TelemetryTests); activity cases target (#72). Uses the real MeterListener and ActivityListener from the BCL; runs on net8.0 and net10.0
+  implemented (#71, TelemetryTests); activity cases implemented (#72, TelemetryTests). Uses the real MeterListener and ActivityListener from the BCL; runs on net8.0 and net10.0
   in one non-parallel collection, filtering by meter and source name "EmlExtraction".
 level: unit
 target: ydk:req:observability/runtime-telemetry
@@ -31,7 +31,7 @@ cases:
     description: Library-bug signal carries the stage
     given: A test hook that throws an unexpected exception inside the attachments stage
     when: Extract is called
-    then: Extract throws EmlExtractionException (stage attachments); internal_errors gets +1 tagged stage=attachments and error.type with the inner exception type name; duration tagged outcome=internal_error; warnings gets nothing; the stage activity has status Error (ADR-023, activity part in #72)
+    then: Extract throws EmlExtractionException (stage attachments); internal_errors gets +1 tagged stage=attachments and error.type with the inner exception type name; duration tagged outcome=internal_error; warnings gets nothing; the attachments stage activity has status Error and error.type with the inner exception type name, earlier stages Unset; the extract activity has status Error, error.type EmlExtractionException and outcome internal_error; no status description (ADR-023)
   - name: DetectCountedByResult
     description: Detection counter
     given: One mail buffer and one PDF buffer
@@ -52,6 +52,21 @@ cases:
     given: A probe message with a unique marker string in subject, body, every address, a custom header, an attachment file name, content ID and Content-Location, passed with request FileName containing the marker
     when: Extract and Detect run with both listeners attached
     then: No recorded tag value, activity name, display name, status description, event, or baggage contains the marker; every tag key is in the allowed list and every string tag value is in its closed set
+  - name: ParseFailedAndTooLargeActivities
+    description: Extract activity on the size guard and parse_failed paths
+    given: An ActivityListener sampling AllData; an input over a small maxInputBytes, then a parse-stage content exception
+    when: Extract is called for each
+    then: Too large yields only eml_extraction.extract with outcome input_too_large, input.size, status Error and error.type EmlInputTooLargeException; parse_failed yields extract (outcome parse_failed, warnings.count 1, attachments.count 0, status Unset) plus an Unset parse child
+  - name: HostActivityListenerExceptionPropagatesUnwrapped
+    description: Activity start and stop sit outside the stage wrappers
+    given: An ActivityListener whose ActivityStarted or ActivityStopped callback throws for one of the extract or stage activities
+    when: Extract is called
+    then: The host's exception propagates unchanged, not wrapped in EmlExtractionException (ADR-023), and Activity.Current is null afterwards
+  - name: PropagationOnlySamplingStartsNoChildren
+    description: Children and tags only when all data is requested
+    given: An ActivityListener whose sampler returns PropagationData
+    when: Extract is called
+    then: Only eml_extraction.extract is created, with no tags, and Activity.Current is null afterwards
   - name: NoListenerNoActivity
     description: Zero-listener path
     given: No listener attached to source EmlExtraction
