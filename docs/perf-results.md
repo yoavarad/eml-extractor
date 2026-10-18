@@ -115,3 +115,21 @@ point = {
   "messages": long, "elapsedSec": double, "passes": double
 }
 ```
+
+## Large-file pass and sizing formula (ADR-015)
+
+Single thread, kept out of the DOP mix. Generates (at run time, nothing committed) messages at 25%, 50% and 100% of `maxInputBytes`, each with one base64 attachment, plus one at limit+1 that must return `input_too_large` with no attachments (no parse). A forced full GC runs before each input; the working set is sampled every 50 ms; M = (peak WS - pre-run WS) / input bytes, with the pre-run WS read before the input is generated, so M includes the resident input. The reported M is the largest of the three in-limit passes. The working set does not shrink fully after a GC, so later passes start from a higher baseline and their M reads lower: the max is the conservative figure.
+
+```
+dotnet run -c Release --framework net10.0 --project benches/EmlExtraction.Bench -- large [--max-input-bytes N] [--sample-ms N] [--sweep <sweep.json>] [--out <dir>]
+```
+
+Defaults: `--max-input-bytes` = `EmlExtractor.DefaultMaxInputBytes` (150 MiB; needs roughly 1 GiB of free RAM), `--sweep` = newest `sweep-results/sweep-*.json` (Workstation GC run, set `mix`, else `public`, else `synthetic`). Smoke run: `-- large --max-input-bytes 8388608`. Exit codes: `0` ok, `1` a pass or the limit+1 guard check failed, `2` bad arguments. Output goes to the console and `sweep-results/large-<stamp>.md`, and ends with the formula filled with T(1), E(n_best), n_best, P(n_best) and M, plus a "how the team reruns this" section:
+
+```
+cores_needed   = ceil(R / (T(1) x E(n)))
+servers_needed = ceil(R / T(n_best))
+ram_per_server = P(n_best) + n_best x max_input_bytes x M
+```
+
+Without a measured sweep the T/E/n_best/P fields print `n/a`; run `sweep` first. The provisional values above (50 ms sampling) are placeholders per ADR-015 until the first full sweep.
