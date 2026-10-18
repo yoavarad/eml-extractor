@@ -1,0 +1,29 @@
+From: Alice Example <alice@example.com>
+Date: Tue, 04 Mar 2025 09:30:00 +0000
+Subject: Forwarded
+Message-Id: <attached-eml@example.com>
+To: Bob Example <bob@example.net>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-bnd-attached-eml"
+
+--=-bnd-attached-eml
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+
+See attached message.
+--=-bnd-attached-eml
+Content-Type: message/rfc822
+Content-Disposition: attachment; filename=forwarded.eml
+
+From: Alice Example <alice@example.com>
+Date: Tue, 04 Mar 2025 09:30:00 +0000
+Subject: Inner note
+Message-Id: <inner-note@example.com>
+To: Bob Example <bob@example.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+
+Nested message body.
+
+--=-bnd-attached-eml--
