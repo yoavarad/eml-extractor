@@ -28,16 +28,21 @@ public abstract class StageBenchmark
     }
 }
 
-/// <summary>request: the public wrapper and stage orchestration (ADR-012). Profiling-only stage.</summary>
+/// <summary>request: the public wrapper, size guard and stage orchestration (ADR-012). Profiling-only stage.</summary>
 public class RequestStage : StageBenchmark
 {
     private readonly EmlExtractor _extractor = new();
+    private readonly EmlExtractor _overLimit = new(maxInputBytes: 1);
 
     [Benchmark(Baseline = true)]
     public EmlExtractionResult ExtractBytes() => _extractor.Extract(Bytes);
 
     [Benchmark]
     public EmlExtractionResult ExtractRequest() => _extractor.Extract(new EmlExtractionRequest { FileBytes = Bytes, FileName = Sample });
+
+    /// <summary>Size guard reject path: every sample exceeds a 1-byte limit, so only the guard runs.</summary>
+    [Benchmark]
+    public EmlExtractionResult ExtractOverLimit() => _overLimit.Extract(Bytes);
 }
 
 /// <summary>detect: <see cref="EmlDetector"/>. Profiling-only stage.</summary>
@@ -63,7 +68,7 @@ public class ParseStage : StageBenchmark
 public class MetadataStage : StageBenchmark
 {
     [Benchmark]
-    public Dictionary<string, string> Map() => HeaderMapper.Map(Message, out _);
+    public Dictionary<string, string> Map() => HeaderMapper.Map(Message);
 }
 
 /// <summary>body: main-content selection and subject/body direction; mirrors the ADR-004 body stage in <see cref="EmlExtractor"/>.</summary>
@@ -72,7 +77,7 @@ public class BodyStage : StageBenchmark
     private string? _subject;
 
     protected override void AfterSetup() =>
-        _subject = HeaderMapper.Map(Message, out _).GetValueOrDefault("subject");
+        _subject = HeaderMapper.Map(Message).GetValueOrDefault("subject");
 
     [Benchmark]
     public (string Subject, string Content) Body()
@@ -112,6 +117,6 @@ public class AttachmentsStage : StageBenchmark
     internal static long DecodedBytes(string sample)
     {
         var message = EmlExtractor.Parse(ProfileSamples.Load(sample));
-        return PartCollector.Collect(message.Body, BodySelector.Select(message.Body), []).Sum(a => a.Data.LongLength);
+        return PartCollector.Collect(message.Body, BodySelector.Select(message.Body), []).Sum(a => a.BinaryData.LongLength);
     }
 }
