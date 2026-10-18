@@ -51,7 +51,7 @@ fields:
     default: []
     constraints: "Each item formatted per ydk:crosscut:core/warning-format"
     description: >-
-      Non-fatal content diagnostics recorded during extraction (ydk:req:extraction/no-throw-on-malformed). Target
+      Non-fatal content diagnostics recorded during extraction (ydk:req:extraction/no-throw-on-malformed).
       (ADR-023): content problems only; misuse, oversized input and library bugs throw instead, so internal_error never
       appears here.
   SubjectDirection:

@@ -1,7 +1,7 @@
 $schema: ydk:schema:req
 id: ydk:req:extraction/max-input-size
 description: >-
-  Input-size guard. The size check exists since #38 (as a warning); the throw behaviour is target (ADR-023, Stage 02). Today nothing caps input size and all attachments are decoded
+  Input-size guard (ADR-023: oversized input throws; implemented, #105). All attachments are decoded
   into memory, so one oversized message can exhaust the host's RAM. Streaming stays DEFERRED (docs/specs/scope.md)
   unless ydk:nfr:performance/memory-footprint shows the in-memory model cannot meet its ceiling. Per project owner
   (2026-10-18), measure first. Task #51 recorded the default as OWNER-SET at 500 MiB (see rule).

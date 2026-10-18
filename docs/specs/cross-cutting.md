@@ -4,13 +4,13 @@ The rules on this page apply to the whole library. Feature narratives do not rep
 
 ## Runtime surface
 
-The deliverable is a class library loaded into the caller's process. It exposes no HTTP routes and no authentication, and it has no frontend, CORS policy, health check, pagination, persistence, configuration file, or environment variable. It generates no identifiers of its own. The full statement is [ydk:crosscut:core/library-surface]. The only public entry points are [ydk:contract:api/eml-detector] and [ydk:contract:api/eml-extractor]. Per the shared team contract (ADR-012), the target public surface carries no parser-library types; this lands in Stage 02. How the library plugs into the team's extraction template and factory is the team's work and is not specified in this repo ([docs/team-questions.md](../team-questions.md)).
+The deliverable is a class library loaded into the caller's process. It exposes no HTTP routes and no authentication, and it has no frontend, CORS policy, health check, pagination, persistence, configuration file, or environment variable. It generates no identifiers of its own. The full statement is [ydk:crosscut:core/library-surface]. The only public entry points are [ydk:contract:api/eml-detector] and [ydk:contract:api/eml-extractor]. Per the shared team contract (ADR-012), the public surface carries no parser-library types. How the library plugs into the team's extraction template and factory is the team's work and is not specified in this repo ([docs/team-questions.md](../team-questions.md)).
 
 All input arrives as one in-memory buffer, and all output, attachment bytes included, is returned in memory. [ydk:nfr:performance/extract-1mb-attachment-throughput] shows why memory, not CPU, limits attachment-heavy mail. The memory each message needs is to be measured and capped ([ydk:nfr:performance/memory-footprint]), and inputs over a host-set limit are refused ([ydk:req:extraction/max-input-size]). Streaming stays deferred unless that measurement shows the in-memory model cannot meet its ceiling.
 
 ## Diagnostics
 
-There is one diagnostic channel: the ordered warnings list on [ydk:entity:extraction/EmlExtractionResult], in the format defined by [ydk:crosscut:core/warning-format]. Today the library writes no logs, traces, or metrics; the target runtime telemetry is described under Observability below. Seven kinds of warning exist:
+There is one diagnostic channel: the ordered warnings list on [ydk:entity:extraction/EmlExtractionResult], in the format defined by [ydk:crosscut:core/warning-format]. Today the library writes no logs, traces, or metrics; the target runtime telemetry is described under Observability below. Five kinds of warning exist:
 
 - [ydk:warning:extraction/parse-failed] - the message could not be parsed; the result is empty.
 - [ydk:warning:extraction/body-decode-failed] - the chosen body could not be decoded; there is no main content.
@@ -22,7 +22,7 @@ A caller tells warnings apart by their leading code, never by the free text afte
 
 ## Exceptions
 
-Target (Stage 02). Per the project owner (2026-10-18, ADR-023), warnings are only for mail content that is malformed but still readable. Everything else throws an exception with a message that names the parameter and the bad value or limit, and never quotes message content:
+Per the project owner (2026-10-18, ADR-023), warnings are only for mail content that is malformed but still readable. Everything else throws an exception with a message that names the parameter and the bad value or limit, and never quotes message content:
 
 - Programmer misuse: a missing argument or an invalid one, and invalid options such as a size limit of zero or less.
 - An input over the size limit: [ydk:entity:extraction/EmlInputTooLargeException], which carries the actual size and the limit.
@@ -48,7 +48,7 @@ Adversarial review of the fixed design. Each answer describes current behaviour,
 - **Malformed or hostile MIME.** The handled content failure kinds become [ydk:warning:extraction/parse-failed]. Per-part failures skip only that part. Any other failure is a library bug and throws [ydk:entity:extraction/EmlExtractionException] (ADR-023).
 - **Path traversal in attachment names.** The display name is reduced to its last path segment. The full path is built only from those reduced names, so it never contains a parent-directory step ([ydk:req:attachments/container-path]). The sender's raw path and declared content location are reported separately and untouched ([ydk:req:attachments/attachment-record]). Callers must not use either to write files.
 - **Disguised non-mail files.** Leading-byte checks reject OLE, PDF, PNG, JPEG, ZIP, JSON, and markup before any header sniffing ([ydk:req:detection/reject-non-email-magic]).
-- **Very large inputs.** Today nothing caps input size; throughput falls roughly in proportion to decoded bytes, and memory grows with them. Inputs over the host-set limit are refused before parsing ([ydk:req:extraction/max-input-size]); the refusal is a thrown [ydk:entity:extraction/EmlInputTooLargeException], and the peak memory of a maximum-size input is measured against a fixed ceiling ([ydk:nfr:performance/memory-footprint]). No public sample of 50 MB or more has been tested ([scope.md](scope.md), DEFERRED).
+- **Very large inputs.** Throughput falls roughly in proportion to decoded bytes, and memory grows with them. Inputs over the host-set limit are refused before parsing ([ydk:req:extraction/max-input-size]); the refusal is a thrown [ydk:entity:extraction/EmlInputTooLargeException], and the peak memory of a maximum-size input is measured against a fixed ceiling ([ydk:nfr:performance/memory-footprint]). No public sample of 50 MB or more has been tested ([scope.md](scope.md), DEFERRED).
 - **Header blocks over 16 KB.** The detector inspects only the first 16 KB. A message whose header block runs past that window can still be accepted if the lines it does see qualify, but this has not been tested on a real sample.
 - **Header collisions.** Two headers whose names differ only by a dash versus an underscore get separate metadata keys, and a header that imitates the computed custom-header key is stored under a key no real header can produce ([ydk:req:metadata/canonical-keys]). Target; today such headers merge (Stage 02).
 - **Concurrent use.** Neither public class holds per-instance mutable state, and the shared parser options are read-only. The repo documents no thread-safety guarantee.

@@ -1,7 +1,7 @@
 # ADR-023: Throw for misuse, limits, and library bugs; warn for content
 
 ## Status
-Accepted by owner 2026-10-18. Target; not implemented (Stage 02, `docs/plans/stage-02-throw-batch.yaml`). Supersedes ADR-004 in part (the "never throws" contract, the `internal_error` warning, and the per-stage partial-result defaults for bugs). Amends ADR-012 (error model), ADR-021 (outcome and counter semantics), ADR-020 (stage names are no longer "guarded" stages), and ADR-005 / ADR-014 / ADR-016 (no `input_too_large` result exists any more).
+Accepted by owner 2026-10-18. Implemented (#104, #105, #106; plan `docs/plans/stage-02-throw-batch.yaml`). Supersedes ADR-004 in part (the "never throws" contract, the `internal_error` warning, and the per-stage partial-result defaults for bugs). Amends ADR-012 (error model), ADR-021 (outcome and counter semantics), ADR-020 (stage names are no longer "guarded" stages), and ADR-005 / ADR-014 / ADR-016 (no `input_too_large` result exists any more).
 
 ## Context
 ADR-004 made extraction "never throw": content failures became warnings, and any other exception became an `internal_error` warning with a partial result (#37). ADR-012 kept that as the EML error model. The size guard (#38) returned an empty result with an `input_too_large` warning.
@@ -32,7 +32,7 @@ Per project owner, 2026-10-18: throw relevant, informative errors when the call 
 
 ### New exception types
 Owner-approved 2026-10-18: names, base types, `sealed`, and properties as below.
-- `EmlInputTooLargeException : ArgumentException` (sealed). Properties `long InputLength` and `long MaxInputBytes`. `ParamName` is `request` (or `eml` for the bytes overload). Message: `Input is <InputLength> bytes, which exceeds maxInputBytes <MaxInputBytes>.` A length equal to the limit is parsed. Deriving from `ArgumentException` lets callers that already catch argument errors handle it, and it is the caller's input that is wrong. Manifest: `ydk:entity:extraction/EmlInputTooLargeException`.
+- `EmlInputTooLargeException : ArgumentException` (sealed). Properties `long InputLength` and `long MaxInputBytes`. `ParamName` is `request` (the bytes overload forwards to the request overload). Message: `Input is <InputLength> bytes, which exceeds maxInputBytes <MaxInputBytes>.` A length equal to the limit is parsed. Deriving from `ArgumentException` lets callers that already catch argument errors handle it, and it is the caller's input that is wrong. Manifest: `ydk:entity:extraction/EmlInputTooLargeException`.
 - `EmlExtractionException : Exception` (sealed). Property `string Stage`, one of `request`, `detect`, `parse`, `metadata`, `body`, `attachments` (the ADR-020 stage names; ADR-021 keeps the last four for its `eml_extraction.stage` tag). `InnerException` is the original exception. Message: `EML extraction failed in stage '<Stage>': <InnerTypeFullName>.` The inner exception's message is not copied into the outer message (MimeKit messages can quote input); it stays on `InnerException`. Manifest: `ydk:entity:extraction/EmlExtractionException`.
 
 ### Wrap or propagate unexpected exceptions

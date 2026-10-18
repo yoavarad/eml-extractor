@@ -105,7 +105,6 @@ tasks:
     component_refs:
       - ydk:req:extraction/max-input-size
       - ydk:entity:extraction/EmlInputTooLargeException
-      - ydk:warning:extraction/input-too-large
       - ydk:contract:api/eml-extractor
       - ydk:req:observability/runtime-telemetry
     spec_refs:
@@ -142,7 +141,6 @@ tasks:
     component_refs:
       - ydk:req:extraction/no-throw-on-malformed
       - ydk:entity:extraction/EmlExtractionException
-      - ydk:warning:extraction/internal-error
       - ydk:contract:api/eml-extractor
       - ydk:contract:api/eml-detector
       - ydk:nfr:reliability/real-world-harvest-no-throw

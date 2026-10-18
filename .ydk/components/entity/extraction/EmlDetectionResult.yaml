@@ -1,7 +1,7 @@
 $schema: ydk:schema:entity
 id: ydk:entity:extraction/EmlDetectionResult
 description: >-
-  Typed result of EmlDetector.Detect (ADR-012). Target; not implemented (Stage 02). Today detection returns only bool.
+  Typed result of EmlDetector.Detect (ADR-012).
   Public sealed record. Shared-contract counterpart of the OLE extractor's MimeDetectionResult (IsSupported, MimeType);
   OLE's DetectedFormat enum is OLE-specific and not included.
 fields:
