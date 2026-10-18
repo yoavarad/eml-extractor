@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "C:/Users/yoava/AppData/Roaming/uv/tools/ydk/Scripts/python.exe C:/Users/yoava/Projects/eml-extraction/.claude/hooks/guard.py"
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard.py\""
           }
         ]
       }
