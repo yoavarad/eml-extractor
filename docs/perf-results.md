@@ -124,7 +124,7 @@ Single thread, kept out of the DOP mix. Generates (at run time, nothing committe
 dotnet run -c Release --framework net10.0 --project benches/EmlExtraction.Bench -- large [--max-input-bytes N] [--sample-ms N] [--sweep <sweep.json>] [--out <dir>]
 ```
 
-Defaults: `--max-input-bytes` = `EmlExtractor.DefaultMaxInputBytes` (150 MiB; needs roughly 1 GiB of free RAM), `--sweep` = newest `sweep-results/sweep-*.json` (Workstation GC run, set `mix`, else `public`, else `synthetic`). Smoke run: `-- large --max-input-bytes 8388608`. Exit codes: `0` ok, `1` a pass or the limit+1 guard check failed, `2` bad arguments. Output goes to the console and `sweep-results/large-<stamp>.md`, and ends with the formula filled with T(1), E(n_best), n_best, P(n_best) and M, plus a "how the team reruns this" section:
+Defaults: `--max-input-bytes` = `EmlExtractor.DefaultMaxInputBytes` (500 MiB; a full run allocates up to about 500 MiB x M, roughly 2-2.5 GB, and a forced GC per pass. Pass an explicit smaller `--max-input-bytes` for CI or smoke runs), `--sweep` = newest `sweep-results/sweep-*.json` (Workstation GC run, set `mix`, else `public`, else `synthetic`). Smoke run: `-- large --max-input-bytes 8388608`. Exit codes: `0` ok, `1` a pass or the limit+1 guard check failed, `2` bad arguments. Output goes to the console and `sweep-results/large-<stamp>.md`, and ends with the formula filled with T(1), E(n_best), n_best, P(n_best) and M, plus a "how the team reruns this" section:
 
 ```
 cores_needed   = ceil(R / (T(1) x E(n)))
@@ -164,7 +164,7 @@ All values below are **PROVISIONAL**. Data caveat: synthetic set only (no `corpu
 
 | Limit | Value | Source and headroom |
 | --- | --- | --- |
-| `maxInputBytes` default | 150 MiB (157,286,400), **unchanged** | Large-file pass (#49): M 1.3-4.2, about 730 MB peak working set at 150 MiB. Under the memory ceiling, so nothing forces a change; one machine and synthetic data are too thin to justify another number. The host can set its own. |
+| `maxInputBytes` default | 500 MiB (524,288,000), **OWNER-SET**, not data-derived | Project owner decision (2026-10-18), raised from 150 MiB. Measured M 1.3-4.2 (#49, ran at 150 MiB, about 730 MB peak WS) implies up to about 2-2.5 GB peak WS per extraction at 500 MiB; M at 500 MiB is not measured. The 6 x ceiling is 3 GB per extraction. The host can set its own. |
 | Memory ceiling | peak WS growth <= 6 x `maxInputBytes` per extraction | M max 4.2 (#49); about 40% headroom. Replaces the placeholder 10. |
 | A ceiling | <= 32 allocated bytes per input byte (synthetic set) | Baseline + re-runs: A 22.5-26.3 (max 26.27, both GC modes); about 20% headroom. Replaces the placeholder 8, which sat below every measurement. A is high here because the set is mostly tiny messages; the 1 MB attachment message allocates about 3.9 per byte (table above). |
 | Regression threshold | 20%, **unchanged** | Run-to-run spread (max/min - 1): A 2-10%, P(22) 4-11%, so 20% is about 2x the noise. T(1) and T(22) varied 24-80% between short sweeps (workstation T(1) 5,549-9,110 files/s), so throughput warnings are noise at these windows. Revisit after a quiet full-window run. |
@@ -183,4 +183,4 @@ Re-run values (not committed as JSON; extract, synthetic set; 6 re-run sweep fil
 
 The committed baseline alone has A 23.3-24.5 (workstation) and 23.7-24.1 (server); the A ceiling of 32 is 30% above that and 22% above the re-run max. M and the 730 MB peak come from the #49 large-file pass (PR #93, `sweep-results/large-*.md` of that run, not committed; rerun with `-- large`). The ceilings are per extraction: at DOP n on near-limit inputs expect up to n times that growth, so use the sizing formula above (`ram_per_server`), not the ceiling alone. A <= 32 is set on a tiny-message mix and would not catch a regression on large messages; the large-file pass (M) covers those.
 
-Streaming stays DEFERRED (`docs/specs/scope.md`): measured M (max 4.2) is below the ceiling (6). Owner decision to confirm: the 150 MiB default and the A and M ceilings above.
+Streaming stays DEFERRED (`docs/specs/scope.md`): measured M (max 4.2) is below the ceiling (6). Owner-set: the 500 MiB default. Still to confirm: the A and M ceilings above.

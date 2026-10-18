@@ -4,17 +4,16 @@ description: >-
   Input-size guard. The size check exists since #38 (as a warning); the throw behaviour is target (ADR-023, Stage 02). Today nothing caps input size and all attachments are decoded
   into memory, so one oversized message can exhaust the host's RAM. Streaming stays DEFERRED (docs/specs/scope.md)
   unless ydk:nfr:performance/memory-footprint shows the in-memory model cannot meet its ceiling. Per project owner
-  (2026-10-18), measure first. Task #51 kept the default at 150 MiB (see rule); it stays PROVISIONAL.
+  (2026-10-18), measure first. Task #51 recorded the default as OWNER-SET at 500 MiB (see rule).
 type: constraint
 priority: high
 rule: >-
   EmlExtractor has one optional constructor parameter maxInputBytes (long; must be > 0, otherwise
-  ArgumentOutOfRangeException at construction). The limit is always configurable by the host. Default: 157286400 (150 MiB), PROVISIONAL.
-  Kept, not changed, in #51: chosen to match the 150 MB maximum message size Microsoft documents for Exchange Online
-  (it says nothing about other mail services), and the large-file pass at this limit (#49) measured M 1.3-4.2 (about
-  730 MB peak working set), under the memory ceiling of 6 x maxInputBytes in ydk:nfr:performance/memory-footprint .
-  The data is synthetic-only, from one Windows machine, so it is too thin to justify a different number; the host can
-  always set its own limit. When EmlExtractionRequest.FileBytes.Length > maxInputBytes,
+  ArgumentOutOfRangeException at construction). The limit is always configurable by the host. Default: 524288000 (500 MiB), OWNER-SET
+  (project owner decision, 2026-10-18; not derived from measurements). Sizing: peak working set is about M x input per
+  extraction with M 1.3-4.2 (#49, measured at a 150 MiB input; synthetic only, one Windows machine), so up to about
+  2-2.5 GB at 500 MiB; the memory ceiling of 6 x maxInputBytes in ydk:nfr:performance/memory-footprint is 3 GB per
+  extraction. M at 500 MiB is not measured. The host can always set its own limit. When EmlExtractionRequest.FileBytes.Length > maxInputBytes,
   Extract does not parse and throws ydk:entity:extraction/EmlInputTooLargeException (ADR-023, per project owner
   2026-10-18), carrying InputLength and MaxInputBytes; no result is returned. A length equal to the limit is parsed.
   The bytes convenience overload applies the same limit. The detector is not limited:

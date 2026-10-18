@@ -15,7 +15,7 @@ target: >-
   both GC modes; max 26.27), about 20% headroom. The earlier placeholder 8 was below every measurement and is
   withdrawn; the synthetic set is dominated by tiny messages, which inflate A (the 1 MB attachment message was about
   3.9, docs/perf-results.md). Peak working-set growth for one extraction of a maxInputBytes input <= 6 x
-  maxInputBytes: M measured 1.3-4.2 in the large-file pass (#49, 150 MiB input, about 730 MB peak working set),
+  maxInputBytes: M measured 1.3-4.2 in the large-file pass (#49, run at a 150 MiB input, about 730 MB peak working set; the default is now the OWNER-SET 500 MiB, M not re-measured there, ceiling 3 GB per extraction),
   about 40% headroom over the max 4.2. M < ceiling, so streaming stays DEFERRED (docs/specs/scope.md). Both limits
   need re-checking on the public corpus and on target hardware.
 measurement: >-

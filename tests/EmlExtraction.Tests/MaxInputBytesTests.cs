@@ -55,18 +55,5 @@ public sealed class MaxInputBytesTests
         => Assert.Throws<ArgumentOutOfRangeException>(() => new EmlExtractor(limit));
 
     [Fact]
-    public void DefaultConstantIs150MiB() => Assert.Equal(157_286_400L, EmlExtractor.DefaultMaxInputBytes);
-
-    [Fact]
-    [Trait("Category", "Large")]
-    public void DefaultBoundary()
-    {
-        var extractor = new EmlExtractor();
-        var bytes = Message(checked((int)EmlExtractor.DefaultMaxInputBytes + 1));
-
-        Assert.Throws<EmlInputTooLargeException>(() => extractor.Extract(bytes));
-
-        var at = extractor.Extract(bytes.AsMemory(0, (int)EmlExtractor.DefaultMaxInputBytes));
-        Assert.Empty(at.Warnings);
-    }
+    public void DefaultConstantIs500MiB() => Assert.Equal(524_288_000L, EmlExtractor.DefaultMaxInputBytes);
 }

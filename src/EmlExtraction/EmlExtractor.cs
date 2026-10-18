@@ -21,8 +21,8 @@ public sealed class EmlExtractor : IEmlExtractor
         set => Fault.Value = value;
     }
 
-    /// <summary>Provisional default input-size limit (150 MiB).</summary>
-    public const long DefaultMaxInputBytes = 157_286_400;
+    /// <summary>Default input-size limit (500 MiB), set by the project owner (not derived from measurements).</summary>
+    public const long DefaultMaxInputBytes = 524_288_000;
 
     private readonly long _maxInputBytes;
 
