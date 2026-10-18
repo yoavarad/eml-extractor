@@ -1,7 +1,7 @@
 # ADR-019: Multi-target net8.0 and net10.0
 
 ## Status
-Accepted (per project owner, 2026-10-18). Implementation pending, tracked as Stage 02 work. Amends ADR-001. Amended by ADR-020: the bench project also multi-targets net8.0 and net10.0 (GoldenKit stays net10.0 only).
+Accepted (per project owner, 2026-10-18). Implemented (task #30). Amends ADR-001. Amended by ADR-020: the bench project also multi-targets net8.0 and net10.0 (GoldenKit stays net10.0 only).
 
 ## Context
 ADR-001 fixes the stack at C# on .NET 10, as the brief says. The team's extraction template, which will host this component, may still run on .NET 8 LTS. A net10.0-only library cannot be referenced from a net8.0 host, so the component would be unusable there until the template moves.
