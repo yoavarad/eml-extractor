@@ -23,7 +23,7 @@ internal static partial class TextDirection
             var fromMarkup = FromHtml(text);
             if (fromMarkup is not null)
                 return fromMarkup;
-            return FromFirstStrong(StripTags(text));
+            return FromFirstStrongOutsideTags(text);
         }
 
         return FromFirstStrong(text);
@@ -47,6 +47,9 @@ internal static partial class TextDirection
     }
 
     private static string FromFirstStrong(string text)
+        => FirstStrong(text) ?? Ltr;
+
+    private static string? FirstStrong(ReadOnlySpan<char> text)
     {
         foreach (var rune in text.EnumerateRunes())
         {
@@ -63,7 +66,7 @@ internal static partial class TextDirection
                 return Ltr;
         }
 
-        return Ltr;
+        return null;
     }
 
     private static bool IsRtlLetter(int v)
@@ -84,30 +87,26 @@ internal static partial class TextDirection
             or UnicodeCategory.LetterNumber;
     }
 
-    private static string StripTags(string html)
+    // Same result as first-strong over the tag-stripped text, without building it: a '<' starts a tag, a '>' ends
+    // one only inside a tag, and an unclosed tag swallows the rest. Each closed tag leaves a space, which is never
+    // strong, so text on either side of a tag is never joined (a surrogate pair cannot span a tag).
+    private static string FromFirstStrongOutsideTags(string html)
     {
-        var sb = new StringBuilder(html.Length);
-        var inTag = false;
-        foreach (var ch in html)
+        var rest = html.AsSpan();
+        while (true)
         {
-            if (ch == '<')
-            {
-                inTag = true;
-                continue;
-            }
-
-            if (ch == '>' && inTag)
-            {
-                inTag = false;
-                sb.Append(' ');
-                continue;
-            }
-
-            if (!inTag)
-                sb.Append(ch);
+            var open = rest.IndexOf('<');
+            var text = open < 0 ? rest : rest[..open];
+            var found = FirstStrong(text);
+            if (found is not null)
+                return found;
+            if (open < 0)
+                return Ltr;
+            var close = rest[open..].IndexOf('>');
+            if (close < 0)
+                return Ltr;
+            rest = rest[(open + close + 1)..];
         }
-
-        return sb.ToString();
     }
 
     private static string Normalize(string value)
