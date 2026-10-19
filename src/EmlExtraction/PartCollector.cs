@@ -88,13 +88,13 @@ internal static class PartCollector
     {
         try
         {
-            using var stream = new MemoryStream();
-            if (rfc822.Message is not null)
-                rfc822.Message.WriteTo(Crlf, stream);
-            else
-                rfc822.WriteTo(Crlf, stream);
-
-            Add(parts, rfc822, stream.ToArray(), fallback: "attached.eml", container);
+            Add(parts, rfc822, ExactBytes(stream =>
+            {
+                if (rfc822.Message is not null)
+                    rfc822.Message.WriteTo(Crlf, stream);
+                else
+                    rfc822.WriteTo(Crlf, stream);
+            }), fallback: "attached.eml", container);
         }
         catch (Exception ex) when (EmlExtractor.IsContentFailure(ex))
         {
@@ -106,14 +106,48 @@ internal static class PartCollector
     {
         try
         {
-            using var stream = new MemoryStream();
-            part.Content?.DecodeTo(stream);
-            Add(parts, part, stream.ToArray(), FallbackName(part, parts.Count), container);
+            Add(parts, part, ExactBytes(stream => part.Content?.DecodeTo(stream)), FallbackName(part, parts.Count), container);
         }
         catch (Exception ex) when (EmlExtractor.IsContentFailure(ex))
         {
             warnings.Add($"part_decode_failed: {part.FileName ?? part.ContentType.MimeType}: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Runs <paramref name="write"/> twice: once into a counting sink, then into a fixed <c>byte[]</c> of exactly that
+    /// length. One allocation of the final size; no growth buffers and no <c>ToArray</c> copy.
+    /// </summary>
+    private static byte[] ExactBytes(Action<Stream> write)
+    {
+        var counter = new CountingStream();
+        write(counter);
+        if (counter.Length == 0)
+            return [];
+
+        var buffer = new byte[counter.Length];
+        using var sink = new MemoryStream(buffer);
+        write(sink);
+        if (sink.Position != buffer.Length)
+            throw new InvalidOperationException("Second decode pass produced a different length than the first.");
+        return buffer;
+    }
+
+    private sealed class CountingStream : Stream
+    {
+        private long _length;
+
+        public override bool CanRead => false;
+        public override bool CanSeek => false;
+        public override bool CanWrite => true;
+        public override long Length => _length;
+        public override long Position { get => _length; set => throw new NotSupportedException(); }
+        public override void Flush() { }
+        public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException();
+        public override void Write(byte[] buffer, int offset, int count) => _length += count;
+        public override void Write(ReadOnlySpan<byte> buffer) => _length += buffer.Length;
     }
 
     /// <summary>Pass 1: records carry their literal path (container segments + FileName).</summary>
