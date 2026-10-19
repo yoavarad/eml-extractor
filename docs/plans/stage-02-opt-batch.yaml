@@ -1,7 +1,7 @@
 # Stage 02 optimization batch: the ranked tasks from the #74 triage (docs/perf/triage-2026-10-18.md, ADR-022).
 # Source: docs/perf/profile-2026-10-18.md (#70) hotspot rows; owner triage rules on #74 (2026-10-18).
 # Validate:  PYTHONUTF8=1 ydk task create-batch --from docs/plans/stage-02-opt-batch.yaml --dry-run
-# NOT CREATED YET: the owner approves the #74 PR first, and the coordinator runs create-batch after merge.
+# Created 2026-10-19 after owner approval of the #74 PR (#127); issue numbers in .ydk/batch-mapping.json.
 #
 # Existing issues referenced (create-batch passes known issue numbers through unchanged):
 #   #67 S-optimization (story every task below belongs to)
@@ -15,10 +15,12 @@
 # id to #75's **Dependencies** line as "<id> (related)". #75 then starts only once all five have merged or closed,
 # which is what its description asks for.
 #
-# Order: the five tasks form one "blocks" chain in rank order. Reasons: (1) each task's before/after runs need a
-# quiet machine, and parallel task agents on the one dev machine would run benchmarks at the same time; (2) each
-# "before" is then the merged state of the previous optimization, so every delta belongs to one change (ADR-022
-# "one optimization, one task"). The owner may loosen the chain if runs are serialised another way.
+# Order (owner decision 2026-10-19, loosened from the #74 serial chain): T-opt-attach blocks T-opt-parse (they share
+# the M metric, so each delta must belong to one change). T-opt-body-dir and T-opt-detect have no dependency and may
+# run in parallel with the others: their pass thresholds are exact BDN allocation figures, which machine load does
+# not change. T-opt-encoding runs last, after parse, body-dir and detect, on a quiet machine, because its thresholds
+# are CPU share and lock contention. Wall-time figures from any run made while another task benchmarks are
+# informational only.
 #
 # Conventions for every task below (those at the top of stage-02-batch.yaml and stage-02-perf-batch.yaml also apply):
 # - Before/after protocol (ADR-022, ydk:req:quality/optimization-evidence). Same machine, net8.0 and net10.0, the
@@ -173,8 +175,7 @@ tasks:
       TDD: add text-direction unit cases (edge cases above) asserting the current results, plus an equivalence test
       that runs the old StripTags + FromFirstStrong path (kept in the test project) against the new scan over every
       golden HTML body; then the protocol in the batch header.
-    depends_on:
-      - "T-opt-parse:blocks"
+    depends_on: []
 
   - id: T-opt-detect
     title: "Optimize detect: span-based header-block check without decoding the sniff window to a string and splitting it"
@@ -210,8 +211,7 @@ tasks:
       TDD: add detector.unit edge cases first (LF-only, CRLF, mixed, continuation as first line, colon at index 0,
       window cut mid-line, BOM, mbox From line, non-ASCII bytes in header names) asserting current verdicts, plus an
       old-vs-new equivalence test over the golden and realistic inputs; then the protocol in the batch header.
-    depends_on:
-      - "T-opt-body-dir:blocks"
+    depends_on: []
 
   - id: T-opt-encoding
     title: "Optimize metadata and parse: cache Encoding lookups to remove CodePagesEncodingProvider lock contention at high DOP"
@@ -252,4 +252,6 @@ tasks:
       TDD: unit tests for the caching provider (same instance per code page and name, null cached for unknown names,
       thread-safe under Parallel.For); then the protocol in the batch header plus the profile-trace full-window run.
     depends_on:
+      - "T-opt-parse:blocks"
+      - "T-opt-body-dir:blocks"
       - "T-opt-detect:blocks"
