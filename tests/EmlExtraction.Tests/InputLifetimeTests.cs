@@ -90,6 +90,7 @@ public sealed class InputLifetimeTests
         var message = EmlExtractor.Parse(stream, input);
         var part = message.BodyParts.OfType<MimePart>().Single(p => p.FileName == "data.bin");
 
+        Assert.NotNull(part.Content);
         Array.Fill(input, (byte)'A');
         using var decoded = new MemoryStream();
         part.Content.DecodeTo(decoded);
