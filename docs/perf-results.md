@@ -226,8 +226,9 @@ One row per optimization task (metric, before, after, threshold, kept or reverte
 
 | Task | Metric | Before | After | Threshold | Result | Commit |
 | --- | --- | --- | --- | --- | --- | --- |
-| #129 attachments: one exact-size array | `AttachmentsStage.Collect(synthetic/attach-1mb)` B/op, copy factor (both TFMs, BDN dry job, exact) | 4,067,400 B (4.07) | 1,007,816 B (1.01), two after runs identical | copy factor <= 1.5 | kept | this PR |
-| #129 | M of the 100% pass at 524288000 (net10.0, Workstation, DOP 1) | 2.14, 2.32 (two runs) | 1.38, 1.37 (two runs) | at least 0.5 lower, beyond after-run spread | kept (-0.76 to -0.95) | this PR |
+| #129 attachments: one exact-size array | `AttachmentsStage.Collect(synthetic/attach-1mb)` B/op, copy factor (both TFMs, BDN dry job, exact) | 4,067,400 B (4.07) | 1,007,816 B (1.01), two after runs identical | copy factor <= 1.5 | kept | PR #137 |
+| #129 | M of the 100% pass at 524288000 (net10.0, Workstation, DOP 1) | 2.14, 2.32 (two runs) | 1.38, 1.37 (two runs) | at least 0.5 lower, beyond after-run spread | kept (-0.76 to -0.95) | PR #137 |
+| #131 body text direction | BodyStage.Body(synthetic/small-20kb) B/op, net8.0 and net10.0 | 211,664 | 131,544 (two runs, identical; -37.9%) | >= 25% lower | kept | this PR |
 
 #129 detail:
 - Per-pass M at 157286400 (25 / 50 / 100%): before 4.77 / 2.65 / 2.81 and 4.75 / 2.59 / 3.34; after 2.82 / 1.81 / 2.17 and 2.81 / 1.81 / 2.15. At 524288000: before 4.26 / 2.50 / 2.14 and 4.26 / 3.00 / 2.32; after 2.78 / 1.73 / 1.38 and 2.78 / 1.73 / 1.37. Reported max of the three: 4.77 -> 2.82 (150 MiB), 4.26 -> 2.78 (500 MiB).
