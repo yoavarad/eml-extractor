@@ -244,7 +244,7 @@ tasks:
       frames drop out of the ws-dop22 trace and metadata CPU share at DOP 22 comes back toward its DOP 1 share. Any T(22)
       gain is reported, not targeted.
     acceptance:
-      - "profile-trace (both TFMs, --window-ms 10000 --warmup-ms 2000 --min-passes 3, ws-dop22 and server-dop22): lock contentions in the counters CSV <= 10 per run (before 93-99) and ReaderWriterLockSlim frames < 2% of extraction CPU (before about 43%); before and after recorded"
+      - "profile-trace (both TFMs, --window-ms 10000 --warmup-ms 2000 --min-passes 3, ws-dop22 and server-dop22): ReaderWriterLockSlim frames < 2% of extraction CPU (before about 43%) in each run; lock contention counts (counters CSV) and Monitor.Enter share recorded before and after with no threshold (owner decision 2026-10-19: MimeKit CharsetUtils.GetCodePage takes its own Monitor lock, which this change cannot remove)"
       - "Full-window sweep (both GC modes): T(1), T(22), A, P(22) reported before/after; compare shows no new warning (no T pass threshold, owner rule)"
       - "Same Encoding instance returned as CodePagesEncodingProvider for every code page and name in the golden set; GoldenKit 1212/1212; tests green on both TFMs"
       - "Optimization log row added in docs/perf-results.md"

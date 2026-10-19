@@ -8,7 +8,7 @@ namespace EmlExtraction;
 /// <summary>MimeKit-based <see cref="IEmlExtractor"/>.</summary>
 public sealed class EmlExtractor : IEmlExtractor
 {
-    static EmlExtractor() => Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+    static EmlExtractor() => Encoding.RegisterProvider(CachingEncodingProvider.Instance);
 
     private static readonly ParserOptions Options = CreateOptions();
 
