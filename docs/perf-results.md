@@ -219,3 +219,15 @@ Reading:
 - Not done: the #48 sweep T(1) with and without a listener. The sweep has no listener switch and its T(1) varies 24-80% between short windows (above), which hides a difference of this size; the per-call BDN numbers above are the evidence.
 
 Budget (**confirmed by the owner, 2026-10-18**; set in `ydk:nfr:observability/metrics-overhead` and ADR-021): no listener 0 added bytes per call (tested); MeterListener <= 5% on tiny (measured <= +0.5%, noise +-7%); ActivityListener with stage children <= 10% on tiny (measured +0.8 to +9.7%, headroom only about 0.3 points on net8.0, so a noisier run could cross 10%; owner kept the 10% limit and the child spans), +2.3 KB per Extract.
+
+## Optimization log
+
+One row per optimization task (ADR-022). Allocation figures are exact (BDN profile, dry job, per op); sweep figures are the net10.0 full-window synthetic sweep, detect points, A in B/B at 1..22 threads.
+
+| task | metric | before | after | threshold | kept or reverted | commit |
+|------|--------|--------|-------|-----------|------------------|--------|
+| #132 detect span-based header check | DetectStage.Detect B/op, small-20kb (net8.0 and net10.0) | 66,795 | 0 | <= 4,000 | kept | see PR |
+| #132 | DetectStage.Detect B/op, tiny | 1,986 | 0 | not higher than before | kept | see PR |
+| #132 | sweep detect A (net10.0, synthetic) | 2.10 | 0.00 (runs 1 and 2: 0.00, 0.00; spread 0) | < 0.5 and below before beyond the after spread | kept | see PR |
+
+Notes for #132: verdicts identical (frozen legacy copy in `DetectorEquivalenceTests`: edge cases, boundary windows, all corpus files plus truncations, 20,000 seeded mutations). `compare` before vs after: no regression beyond 20%, no new Extract warning (Extract A unchanged, about 23.8 B/B). Wall time was not a threshold (tasks #129 and #131 ran benchmarks concurrently on the same machine). The net8.0 sweep was not repeated; the profile run covers both runtimes.

@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace EmlExtraction;
 
 /// <summary>Header-sniffing <see cref="IEmlDetector"/>: inspects a bounded prefix for RFC 5322 header lines.</summary>
@@ -8,12 +6,12 @@ public sealed class EmlDetector : IEmlDetector
     private const int MinLength = 20;
     private const int SniffLimit = 16 * 1024;
 
-    private static readonly HashSet<string> ClassicHeaders = new(StringComparer.OrdinalIgnoreCase)
-    {
+    private static readonly string[] ClassicHeaders =
+    [
         "from", "date", "received", "mime-version", "message-id", "subject",
         "return-path", "to", "delivered-to", "cc", "sender", "reply-to",
         "in-reply-to", "references", "content-type"
-    };
+    ];
 
     private static readonly EmlDetectionResult Supported = new(true, "message/rfc822");
     private static readonly EmlDetectionResult Unsupported = new(false, "");
@@ -78,46 +76,114 @@ public sealed class EmlDetector : IEmlDetector
            || (span.Length >= 4 && span[0] == (byte)'P' && span[1] == (byte)'K' && span[2] <= 0x08)
            || span[0] is (byte)'{' or (byte)'[' or (byte)'<';
 
+    // Walks the window line by line (CRLF or LF) with no string per line; same rules and stop points as the
+    // earlier decode-and-split form (ASCII decode turned every byte >= 0x80 into '?', never a name char).
     private static bool LooksLikeHeaderBlock(ReadOnlySpan<byte> window)
     {
-        var lines = Encoding.ASCII.GetString(window).Split(["\r\n", "\n"], StringSplitOptions.None);
         var headerLines = 0;
         var classic = 0;
         var seenBlank = false;
+        var rest = window;
 
-        foreach (var raw in lines)
+        while (true)
         {
-            if (raw.Length == 0)
+            var newline = rest.IndexOf((byte)'\n');
+            var last = newline < 0;
+            ReadOnlySpan<byte> line;
+            if (last)
+            {
+                line = rest;
+            }
+            else
+            {
+                line = rest[..newline];
+                rest = rest[(newline + 1)..];
+                if (line.Length > 0 && line[^1] == (byte)'\r')
+                    line = line[..^1];
+            }
+
+            if (line.Length == 0)
             {
                 seenBlank = headerLines > 0;
                 break;
             }
 
-            if (raw[0] is ' ' or '\t')
+            if (line[0] is (byte)' ' or (byte)'\t')
             {
                 if (headerLines == 0)
                     return false;
                 headerLines++;
-                continue;
+            }
+            else
+            {
+                var colon = line.IndexOf((byte)':');
+                if (colon <= 0)
+                    return headerLines >= 2 && classic >= 1;
+                var name = TrimWhitespace(line[..colon]);
+                if (!IsHeaderName(name))
+                    return headerLines >= 2 && classic >= 1;
+
+                headerLines++;
+                if (IsClassicHeader(name))
+                    classic++;
             }
 
-            var colon = raw.IndexOf(':');
-            if (colon <= 0 || !IsHeaderName(raw[..colon].Trim()))
-                return headerLines >= 2 && classic >= 1;
-
-            headerLines++;
-            if (ClassicHeaders.Contains(raw[..colon].Trim()))
-                classic++;
+            if (last)
+                break;
         }
 
         return headerLines >= 2 && classic >= 1 && (seenBlank || headerLines >= 3);
     }
 
-    private static bool IsHeaderName(string name)
+    private static ReadOnlySpan<byte> TrimWhitespace(ReadOnlySpan<byte> span)
     {
-        if (name.Length == 0 || !(char.IsLetter(name[0]) || char.IsDigit(name[0])))
+        var start = 0;
+        var end = span.Length;
+        while (start < end && IsAsciiWhitespace(span[start]))
+            start++;
+        while (end > start && IsAsciiWhitespace(span[end - 1]))
+            end--;
+        return span[start..end];
+    }
+
+    private static bool IsAsciiWhitespace(byte b) => b == (byte)' ' || b is >= 0x09 and <= 0x0D;
+
+    private static bool IsHeaderName(ReadOnlySpan<byte> name)
+    {
+        if (name.Length == 0 || !IsAsciiLetterOrDigit(name[0]))
             return false;
-        return name.All(c => char.IsLetterOrDigit(c) || c is '-' or '_');
+        foreach (var b in name)
+        {
+            if (!IsAsciiLetterOrDigit(b) && b != (byte)'-' && b != (byte)'_')
+                return false;
+        }
+
+        return true;
+    }
+
+    private static bool IsAsciiLetterOrDigit(byte b)
+        => b is (>= (byte)'a' and <= (byte)'z') or (>= (byte)'A' and <= (byte)'Z') or (>= (byte)'0' and <= (byte)'9');
+
+    private static bool IsClassicHeader(ReadOnlySpan<byte> name)
+    {
+        foreach (var header in ClassicHeaders)
+        {
+            if (header.Length != name.Length)
+                continue;
+            var match = true;
+            for (var i = 0; i < name.Length && match; i++)
+            {
+                var c = name[i];
+                if (c is >= (byte)'A' and <= (byte)'Z')
+                    c += 32;
+                match = c == header[i];
+            }
+
+            if (match)
+                return true;
+        }
+
+        return false;
     }
 
     private static bool HasMagic(ReadOnlySpan<byte> data, ReadOnlySpan<byte> magic)
