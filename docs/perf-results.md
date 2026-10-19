@@ -219,3 +219,11 @@ Reading:
 - Not done: the #48 sweep T(1) with and without a listener. The sweep has no listener switch and its T(1) varies 24-80% between short windows (above), which hides a difference of this size; the per-call BDN numbers above are the evidence.
 
 Budget (**confirmed by the owner, 2026-10-18**; set in `ydk:nfr:observability/metrics-overhead` and ADR-021): no listener 0 added bytes per call (tested); MeterListener <= 5% on tiny (measured <= +0.5%, noise +-7%); ActivityListener with stage children <= 10% on tiny (measured +0.8 to +9.7%, headroom only about 0.3 points on net8.0, so a noisier run could cross 10%; owner kept the 10% limit and the child spans), +2.3 KB per Extract.
+
+## Optimization log
+
+One row per optimization task (ADR-022). Measured on the dev machine (Windows 11), dry profile job, bytes are exact.
+
+| Task | Metric | Before | After | Threshold | Kept or reverted | Commit |
+| --- | --- | ---: | ---: | --- | --- | --- |
+| #131 body text direction | BodyStage.Body(synthetic/small-20kb) B/op, net8.0 and net10.0 | 211,664 | 131,544 (two runs, identical; -37.9%) | >= 25% lower | kept | TBD |
