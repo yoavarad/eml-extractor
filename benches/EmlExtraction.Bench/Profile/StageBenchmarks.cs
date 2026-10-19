@@ -4,7 +4,8 @@ using MimeKit;
 namespace EmlExtraction.Bench.Profile;
 
 // One class per ADR-020 stage. Inputs are loaded and, for the post-parse stages, parsed in GlobalSetup,
-// so each benchmark measures only its stage.
+// so each benchmark measures only its stage. The parse is persistent (content is a view over the input stream),
+// so the stream opened in GlobalSetup stays open for the post-parse stages.
 
 public abstract class StageBenchmark
 {
@@ -15,13 +16,19 @@ public abstract class StageBenchmark
 
     protected MimeMessage Message { get; private set; } = null!;
 
+    private MemoryStream? _input;
+
     [GlobalSetup]
     public void Setup()
     {
         Bytes = ProfileSamples.Load(Sample);
-        Message = EmlExtractor.Parse(Bytes);
+        _input = EmlExtractor.Open(Bytes);
+        Message = EmlExtractor.Parse(_input, Bytes);
         AfterSetup();
     }
+
+    [GlobalCleanup]
+    public void Cleanup() => _input?.Dispose();
 
     protected virtual void AfterSetup()
     {
@@ -61,7 +68,12 @@ public class DetectStage : StageBenchmark
 public class ParseStage : StageBenchmark
 {
     [Benchmark]
-    public MimeMessage Parse() => EmlExtractor.Parse(Bytes);
+    public MimeMessage Parse()
+    {
+        // Mirrors Extract: open over the input, then parse (the stream is disposed once the stage result is built).
+        using var input = EmlExtractor.Open(Bytes);
+        return EmlExtractor.Parse(input, Bytes);
+    }
 }
 
 /// <summary>metadata: header mapping (ADR-004 metadata stage).</summary>
@@ -116,7 +128,9 @@ public class AttachmentsStage : StageBenchmark
     /// <summary>Decoded attachment bytes the stage returns for <paramref name="sample"/>; the copy-factor denominator.</summary>
     internal static long DecodedBytes(string sample)
     {
-        var message = EmlExtractor.Parse(ProfileSamples.Load(sample));
+        var bytes = ProfileSamples.Load(sample);
+        using var input = EmlExtractor.Open(bytes);
+        var message = EmlExtractor.Parse(input, bytes);
         return PartCollector.Collect(message.Body, BodySelector.Select(message.Body), []).Sum(a => a.BinaryData.LongLength);
     }
 }
