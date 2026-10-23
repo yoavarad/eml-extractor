@@ -41,17 +41,17 @@ Streaming input or output stays DEFERRED (`docs/specs/scope.md`). It moves to IN
 ### Closing
 After the optimization tasks merge, a closing task re-runs the sweep and the profile, refreshes the baseline (ADR-015 refresh rule), re-checks the limits, and records the deltas per optimization in a new profile report.
 
-## Targets (provisional)
-PROVISIONAL (#74, 2026-10-18). Source: `docs/perf/profile-2026-10-18.md` (synthetic set only, one run per configuration), owner triage rules on #74, ranking in `docs/perf/triage-2026-10-18.md`. Recorded in `ydk:nfr:performance/memory-footprint` and `ydk:nfr:performance/throughput-dop-sweep`. The closing task (#75) marks each met / not met with numbers.
+## Targets (closing result, #75)
+Provisional targets were set by #74 (2026-10-18). Closing re-profile (#75, 2026-10-23, commit `dc6525e`): `docs/perf/profile-2026-10-23.md`, synthetic set only (no `corpus/internal`), numbers from two runs.
 
-| Target | Value | Report row | Task |
+| Target | Value | Result | Status |
 | --- | --- | --- | --- |
-| Large-input M of the 100% pass at the 500 MiB `maxInputBytes` default (reported max of 25/50/100% recorded too) | <= 2.0 (measured 3.33 at the 100% pass, 4.71 max, at 150 MiB) | 4, 8 | T-opt-attach, T-opt-parse |
-| Attachment copy factor, `synthetic/attach-1mb` | <= 1.5 (measured 4.07) | 4 | T-opt-attach |
-| Bytes allocated per message, synthetic sweep | -30% vs the pre-optimization measurement; A <= 32 stays the regression guard | 3, 7 | T-opt-parse, T-opt-body-dir |
-| Detect allocation, `synthetic/small-20kb` | <= 4,000 B/op (measured 66,795) | 5 | T-opt-detect |
-| Lock contentions at DOP 22, full-window profile-trace | <= 10 per run (measured 93-99) | 2 | T-opt-encoding |
-| Throughput T(1), T(cores) | none until full-window runs (owner rule); reported only, must not trip the `compare` warning | - | all |
+| Large-input M of the 100% pass at the 500 MiB default (reported max recorded too) | <= 2.0 | 1.73 in all four net10.0 runs (reported max 1.74 to 1.77; was 2.14 to 2.32 at the 100% pass, 4.26 max) | MET |
+| Attachment copy factor, `synthetic/attach-1mb` | <= 1.5 | 1.01 (1,007,816 B for 1,000,000 B; was 4.07) | MET |
+| Bytes allocated per message, synthetic sweep | -30% vs pre-optimization; A <= 32 guard | -20% (A 23.9 to 19.1, about 38,900 to 31,100 B per message); A guard holds | NOT MET |
+| Detect allocation, `synthetic/small-20kb` | <= 4,000 B/op | 0 B/op (was 66,795) | MET |
+| Lock contentions at DOP 22, full-window profile-trace | <= 10 per run | 59 to 2,413 (net10.0), 245 to 11,125 (net8.0); was 93 to 99. Owner decision 2026-10-19 replaced the criterion with `ReaderWriterLockSlim` < 2% of extraction CPU: 0.0% | NOT MET as written; owner criterion MET |
+| Throughput T(1), T(cores) | none; must not trip the `compare` warning | reported; Workstation T is bimodal between runs; `compare` against the old baseline warns on P(22) and, in one run, T(22) | NOT MET as written (P(22) warns in every full-window run); throughput itself reported |
 
 ## Alternatives
 - Optimize the known suspects now. Rejected: unmeasured; the suspects may not be the hotspots.
