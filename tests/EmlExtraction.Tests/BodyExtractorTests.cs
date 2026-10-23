@@ -11,7 +11,7 @@ public sealed class BodyExtractorTests
         var message = SampleFactory.Plain("שלום", "hello\r\n");
         var warnings = new List<string>();
 
-        var body = BodyExtractor.ExtractBody(message, message.Subject, warnings);
+        var body = new BodyExtractor().ExtractBody(message, message.Subject, warnings);
 
         Assert.NotNull(body.Part);
         Assert.Equal("hello", body.Content);
@@ -27,7 +27,7 @@ public sealed class BodyExtractorTests
         var message = SampleFactory.Plain("s", "t");
         message.Body = new TextPart("html") { Text = "<html dir=\"rtl\"><body>hello</body></html>" };
 
-        var body = BodyExtractor.ExtractBody(message, "s", []);
+        var body = new BodyExtractor().ExtractBody(message, "s", []);
 
         Assert.Equal("text/html", body.ContentType);
         Assert.Equal(TextDirection.Rtl, body.ContentDirection);
@@ -40,7 +40,7 @@ public sealed class BodyExtractorTests
         message.Body = new TextPart("plain") { Content = new MimeContent(new ThrowingStream(new IOException("unreadable"))) };
         var warnings = new List<string>();
 
-        var body = BodyExtractor.ExtractBody(message, "s", warnings);
+        var body = new BodyExtractor().ExtractBody(message, "s", warnings);
 
         Assert.NotNull(body.Part);
         Assert.Null(body.Content);
@@ -53,7 +53,7 @@ public sealed class BodyExtractorTests
         var message = SampleFactory.Plain("s", "t");
         message.Body = new TextPart("plain") { Content = new MimeContent(new ThrowingStream(new InvalidCastException("boom"))) };
 
-        Assert.Throws<InvalidCastException>(() => BodyExtractor.ExtractBody(message, "s", []));
+        Assert.Throws<InvalidCastException>(() => new BodyExtractor().ExtractBody(message, "s", []));
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public sealed class BodyExtractorTests
         var message = SampleFactory.Plain("s", "t");
         message.Body = new MimePart("application", "octet-stream") { FileName = "a.bin", Content = new MimeContent(new MemoryStream([1, 2])) };
 
-        var body = BodyExtractor.ExtractBody(message, "s", []);
+        var body = new BodyExtractor().ExtractBody(message, "s", []);
 
         Assert.Null(body.Part);
         Assert.Null(body.Content);
@@ -74,11 +74,11 @@ public sealed class BodyExtractorTests
     {
         var bytes = SampleFactory.WithAttachment("a.png", SampleFactory.MinimalPng(), "image", "png");
         using var input = MimeMessageParser.Open(bytes);
-        var message = MimeMessageParser.Parse(input, bytes);
+        var message = new MimeMessageParser().Parse(input, bytes);
         var warnings = new List<string>();
 
-        var body = BodyExtractor.ExtractBody(message, message.Subject, warnings);
-        var attachments = BodyExtractor.ExtractAttachments(message, body.Part, warnings);
+        var body = new BodyExtractor().ExtractBody(message, message.Subject, warnings);
+        var attachments = new BodyExtractor().ExtractAttachments(message, body.Part, warnings);
 
         Assert.Equal("text/html", body.ContentType);
         var attachment = Assert.Single(attachments);

@@ -87,7 +87,7 @@ public sealed class InputLifetimeTests
         // out (and keep the stream open) before returning; the overwrite test above shows that it does.
         var input = Input("multipart");
         using var stream = MimeMessageParser.Open(input);
-        var message = MimeMessageParser.Parse(stream, input);
+        var message = new MimeMessageParser().Parse(stream, input);
         var part = message.BodyParts.OfType<MimePart>().Single(p => p.FileName == "data.bin");
 
         Assert.NotNull(part.Content);

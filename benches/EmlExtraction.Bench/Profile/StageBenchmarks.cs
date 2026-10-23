@@ -9,6 +9,9 @@ namespace EmlExtraction.Bench.Profile;
 
 public abstract class StageBenchmark
 {
+    internal static readonly MimeMessageParser Parser = new();
+    internal static readonly BodyExtractor Extractor = new();
+
     [ParamsSource(typeof(ProfileSamples), nameof(ProfileSamples.Names))]
     public string Sample { get; set; } = "";
 
@@ -23,7 +26,7 @@ public abstract class StageBenchmark
     {
         Bytes = ProfileSamples.Load(Sample);
         _input = MimeMessageParser.Open(Bytes);
-        Message = MimeMessageParser.Parse(_input, Bytes);
+        Message = Parser.Parse(_input, Bytes);
         AfterSetup();
     }
 
@@ -72,7 +75,7 @@ public class ParseStage : StageBenchmark
     {
         // Mirrors Extract: open over the input, then parse (the stream is disposed once the stage result is built).
         using var input = MimeMessageParser.Open(Bytes);
-        return MimeMessageParser.Parse(input, Bytes);
+        return Parser.Parse(input, Bytes);
     }
 }
 
@@ -94,7 +97,7 @@ public class BodyStage : StageBenchmark
     [Benchmark]
     public (string Subject, string Content) Body()
     {
-        var body = BodyExtractor.ExtractBody(Message, _subject, []);
+        var body = Extractor.ExtractBody(Message, _subject, []);
         return (body.SubjectDirection, body.ContentDirection);
     }
 }
@@ -107,14 +110,14 @@ public class AttachmentsStage : StageBenchmark
     protected override void AfterSetup() => _body = BodySelector.Select(Message.Body);
 
     [Benchmark]
-    public IReadOnlyList<ExtractedAttachment> Collect() => BodyExtractor.ExtractAttachments(Message, _body, []);
+    public IReadOnlyList<ExtractedAttachment> Collect() => Extractor.ExtractAttachments(Message, _body, []);
 
     /// <summary>Decoded attachment bytes the stage returns for <paramref name="sample"/>; the copy-factor denominator.</summary>
     internal static long DecodedBytes(string sample)
     {
         var bytes = ProfileSamples.Load(sample);
         using var input = MimeMessageParser.Open(bytes);
-        var message = MimeMessageParser.Parse(input, bytes);
-        return BodyExtractor.ExtractAttachments(message, BodySelector.Select(message.Body), []).Sum(a => a.BinaryData.LongLength);
+        var message = Parser.Parse(input, bytes);
+        return Extractor.ExtractAttachments(message, BodySelector.Select(message.Body), []).Sum(a => a.BinaryData.LongLength);
     }
 }

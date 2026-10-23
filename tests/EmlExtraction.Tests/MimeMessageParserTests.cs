@@ -24,7 +24,7 @@ public sealed class MimeMessageParserTests
         var bytes = Encoding.ASCII.GetBytes(from + Eml + from + Eml.Replace("hello", "second", StringComparison.Ordinal));
         using var input = MimeMessageParser.Open(bytes);
 
-        var message = MimeMessageParser.Parse(input, bytes);
+        var message = new MimeMessageParser().Parse(input, bytes);
 
         Assert.Equal("hello", message.Subject);
         Assert.Equal("body text", message.TextBody?.TrimEnd('\r', '\n'));
@@ -55,7 +55,7 @@ public sealed class MimeMessageParserTests
     private static void AssertParsed(byte[] bytes)
     {
         using var input = MimeMessageParser.Open(bytes);
-        var message = MimeMessageParser.Parse(input, bytes);
+        var message = new MimeMessageParser().Parse(input, bytes);
 
         Assert.Equal("hello", message.Subject);
         Assert.Equal("alice@example.com", Assert.Single(message.From.Mailboxes).Address);

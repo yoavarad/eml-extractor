@@ -22,6 +22,8 @@ public sealed class EmlExtractor : IEmlExtractor
     public const long DefaultMaxInputBytes = 524_288_000;
 
     private readonly long _maxInputBytes;
+    private readonly MimeMessageParser _parser = new();
+    private readonly BodyExtractor _bodyExtractor = new();
 
     /// <summary>Creates an extractor.</summary>
     /// <param name="maxInputBytes">Largest input, in bytes, that is parsed; larger inputs make <c>Extract</c> throw.</param>
@@ -71,7 +73,7 @@ public sealed class EmlExtractor : IEmlExtractor
             try
             {
                 StageFault?.Invoke("parse");
-                message = MimeMessageParser.Parse(input, eml.Span);
+                message = _parser.Parse(input, eml.Span);
             }
             catch (Exception ex) when (IsContentFailure(ex))
             {
@@ -128,7 +130,7 @@ public sealed class EmlExtractor : IEmlExtractor
         return result;
     }
 
-    private static EmlExtractionResult Extract(MimeMessage message, List<string> warnings, long start, Activity? activity)
+    private EmlExtractionResult Extract(MimeMessage message, List<string> warnings, long start, Activity? activity)
     {
         IReadOnlyDictionary<string, string> metadata;
         var stage = EmlExtractionTelemetry.StartStage(activity, "eml_extraction.metadata");
@@ -156,7 +158,7 @@ public sealed class EmlExtractor : IEmlExtractor
             try
             {
                 StageFault?.Invoke("body");
-                body = BodyExtractor.ExtractBody(message, metadata.GetValueOrDefault("subject"), warnings);
+                body = _bodyExtractor.ExtractBody(message, metadata.GetValueOrDefault("subject"), warnings);
             }
             catch (Exception ex) when (IsWrapped(ex))
             {
@@ -175,7 +177,7 @@ public sealed class EmlExtractor : IEmlExtractor
             try
             {
                 StageFault?.Invoke("attachments");
-                attachments = BodyExtractor.ExtractAttachments(message, body.Part, warnings);
+                attachments = _bodyExtractor.ExtractAttachments(message, body.Part, warnings);
             }
             catch (Exception ex) when (IsWrapped(ex))
             {

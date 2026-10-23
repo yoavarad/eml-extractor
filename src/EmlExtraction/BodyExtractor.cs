@@ -3,7 +3,7 @@ using MimeKit;
 namespace EmlExtraction;
 
 /// <summary>Body and attachments stage bodies (ADR-004), without their wrappers; the profiling harness (ADR-020) calls them directly.</summary>
-internal static class BodyExtractor
+internal sealed class BodyExtractor
 {
     /// <summary>Body stage result.</summary>
     /// <param name="Part">The selected main-content part, or null; the attachments stage excludes it.</param>
@@ -22,7 +22,7 @@ internal static class BodyExtractor
     /// <param name="message">Parsed message; if it was parsed persistently, its stream must stay open.</param>
     /// <param name="subject">The mapped subject header, for its direction.</param>
     /// <param name="warnings">Receives <c>body_decode_failed</c> when the content cannot be decoded.</param>
-    internal static BodyContent ExtractBody(MimeMessage message, string? subject, List<string> warnings)
+    internal BodyContent ExtractBody(MimeMessage message, string? subject, List<string> warnings)
     {
         var body = BodySelector.Select(message.Body);
         string? content = null;
@@ -51,6 +51,6 @@ internal static class BodyExtractor
     }
 
     /// <summary>Collects the attachments of <paramref name="message"/>, excluding the main-content <paramref name="body"/>.</summary>
-    internal static IReadOnlyList<ExtractedAttachment> ExtractAttachments(MimeMessage message, TextPart? body, List<string> warnings)
+    internal IReadOnlyList<ExtractedAttachment> ExtractAttachments(MimeMessage message, TextPart? body, List<string> warnings)
         => PartCollector.Collect(message.Body, body, warnings);
 }

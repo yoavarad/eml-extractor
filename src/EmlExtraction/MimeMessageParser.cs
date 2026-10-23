@@ -5,12 +5,12 @@ using MimeKit;
 namespace EmlExtraction;
 
 /// <summary>Parse stage (ADR-004): opens the input and loads it persistently with MimeKit, handling the mbox "From " line.</summary>
-internal static class MimeMessageParser
+internal sealed class MimeMessageParser
 {
     // Callers such as the profiling harness (ADR-020) parse without touching EmlExtractor, so register here too; the runtime ignores a repeat registration.
     static MimeMessageParser() => Encoding.RegisterProvider(CachingEncodingProvider.Instance);
 
-    private static readonly ParserOptions Options = CreateOptions();
+    private readonly ParserOptions _options = CreateOptions();
 
     /// <summary>Read-only stream over <paramref name="eml"/>; wraps the caller's array when it spans the whole array, else copies.</summary>
     internal static MemoryStream Open(ReadOnlyMemory<byte> eml)
@@ -32,15 +32,15 @@ internal static class MimeMessageParser
     /// </summary>
     /// <param name="input">Stream from <see cref="Open"/> over <paramref name="eml"/>.</param>
     /// <param name="eml">The same bytes, for the mbox "From " check.</param>
-    internal static MimeMessage Parse(Stream input, ReadOnlySpan<byte> eml)
+    internal MimeMessage Parse(Stream input, ReadOnlySpan<byte> eml)
     {
         if (StartsWithMboxFrom(eml))
         {
-            var parser = new MimeParser(Options, input, MimeFormat.Mbox, persistent: true);
+            var parser = new MimeParser(_options, input, MimeFormat.Mbox, persistent: true);
             return parser.ParseMessage();
         }
 
-        return MimeMessage.Load(Options, input, persistent: true);
+        return MimeMessage.Load(_options, input, persistent: true);
     }
 
     private static ParserOptions CreateOptions()

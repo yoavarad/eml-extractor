@@ -54,7 +54,7 @@ public static class ProfileSamples
             MimeMessage message;
             try
             {
-                message = MimeMessageParser.Parse(input, bytes);
+                message = new MimeMessageParser().Parse(input, bytes);
             }
             catch (Exception)
             {

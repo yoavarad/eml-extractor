@@ -15,3 +15,7 @@
 - cavecrew-reviewer: 0 red, 2 yellow (mbox test did not prove mbox branch; no body_decode_failed/HTML-direction test) -> fixed with MboxParseStopsAtNextFromLine, BodyDecodeContentFailureIsWarning, BodyDecodeBugPropagates, HtmlBodyContentDirectionUsesHtmlDir.
 - Leftover (accepted): BodyStage bench now rethrows non-content exceptions (old copy swallowed all) and allocates a [] warnings list per call; BodyExtractor<->EmlExtractor.IsContentFailure reference cycle (harmless).
 - Tests net8 380p/18s, net10 381p/17s; format OK; profiling bench dry run (net10) exit 0, 90 benchmarks (ExtractOverLimit throws by design, pre-existing).
+
+## Follow-up: instance classes (done)
+- Merged origin/main; MimeMessageParser/BodyExtractor now internal sealed instance classes, one instance each per EmlExtractor; benches use shared static instances. IsContentFailure move skipped (also used by PartCollector).
+- build -warnaserror OK, format OK, tests net8 380p/18s, net10 381p/17s, GoldenKit 0 failures. Review 1 round (2 bench alloc findings fixed).
