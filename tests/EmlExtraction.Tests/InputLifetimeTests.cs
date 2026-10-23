@@ -86,8 +86,8 @@ public sealed class InputLifetimeTests
         // Proves the parse is persistent: content is read from the caller's buffer when decoded, so Extract must copy it
         // out (and keep the stream open) before returning; the overwrite test above shows that it does.
         var input = Input("multipart");
-        using var stream = EmlExtractor.Open(input);
-        var message = EmlExtractor.Parse(stream, input);
+        using var stream = MimeMessageParser.Open(input);
+        var message = MimeMessageParser.Parse(stream, input);
         var part = message.BodyParts.OfType<MimePart>().Single(p => p.FileName == "data.bin");
 
         Assert.NotNull(part.Content);

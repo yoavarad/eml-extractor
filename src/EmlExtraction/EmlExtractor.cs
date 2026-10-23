@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Text;
 using MimeKit;
 
@@ -9,8 +8,6 @@ namespace EmlExtraction;
 public sealed class EmlExtractor : IEmlExtractor
 {
     static EmlExtractor() => Encoding.RegisterProvider(CachingEncodingProvider.Instance);
-
-    private static readonly ParserOptions Options = CreateOptions();
 
     private static readonly AsyncLocal<Action<string>?> Fault = new();
 
@@ -64,7 +61,7 @@ public sealed class EmlExtractor : IEmlExtractor
         var warnings = new List<string>();
 
         // The parse is persistent: part content stays a view over this stream, so it lives until the result is built.
-        using var input = Open(eml);
+        using var input = MimeMessageParser.Open(eml);
 
         // Stage activities start and stop outside the stage try, so a host listener's exception is never wrapped (ADR-023).
         MimeMessage? message = null;
@@ -74,7 +71,7 @@ public sealed class EmlExtractor : IEmlExtractor
             try
             {
                 StageFault?.Invoke("parse");
-                message = Parse(input, eml.Span);
+                message = MimeMessageParser.Parse(input, eml.Span);
             }
             catch (Exception ex) when (IsContentFailure(ex))
             {
@@ -131,23 +128,6 @@ public sealed class EmlExtractor : IEmlExtractor
         return result;
     }
 
-    /// <summary>
-    /// Parse stage body, without its wrapper; the profiling harness (ADR-020) calls it directly. The parse is persistent:
-    /// part content is read from <paramref name="input"/> on demand, so it must stay open while the message is used.
-    /// </summary>
-    /// <param name="input">Stream from <see cref="Open"/> over <paramref name="eml"/>.</param>
-    /// <param name="eml">The same bytes, for the mbox "From " check.</param>
-    internal static MimeMessage Parse(Stream input, ReadOnlySpan<byte> eml)
-    {
-        if (StartsWithMboxFrom(eml))
-        {
-            var parser = new MimeParser(Options, input, MimeFormat.Mbox, persistent: true);
-            return parser.ParseMessage();
-        }
-
-        return MimeMessage.Load(Options, input, persistent: true);
-    }
-
     private static EmlExtractionResult Extract(MimeMessage message, List<string> warnings, long start, Activity? activity)
     {
         IReadOnlyDictionary<string, string> metadata;
@@ -169,35 +149,14 @@ public sealed class EmlExtractor : IEmlExtractor
             stage?.Dispose();
         }
 
-        TextPart? body;
-        string? content = null;
-        string? contentType = null;
-        string subjectDir;
-        string contentDir;
+        BodyExtractor.BodyContent body;
         stage = EmlExtractionTelemetry.StartStage(activity, "eml_extraction.body");
         try
         {
             try
             {
-                body = BodySelector.Select(message.Body);
                 StageFault?.Invoke("body");
-                if (body is not null)
-                {
-                    try
-                    {
-                        content = body.Text.TrimEnd('\r', '\n');
-                        contentType = body.ContentType.MimeType;
-                    }
-                    catch (Exception ex) when (IsContentFailure(ex))
-                    {
-                        warnings.Add($"body_decode_failed: {ex.Message}");
-                    }
-                }
-
-                var html = contentType is not null
-                           && contentType.Contains("html", StringComparison.OrdinalIgnoreCase);
-                subjectDir = TextDirection.Detect(metadata.GetValueOrDefault("subject"), html: false);
-                contentDir = TextDirection.Detect(content, html);
+                body = BodyExtractor.ExtractBody(message, metadata.GetValueOrDefault("subject"), warnings);
             }
             catch (Exception ex) when (IsWrapped(ex))
             {
@@ -216,7 +175,7 @@ public sealed class EmlExtractor : IEmlExtractor
             try
             {
                 StageFault?.Invoke("attachments");
-                attachments = PartCollector.Collect(message.Body, body, warnings);
+                attachments = BodyExtractor.ExtractAttachments(message, body.Part, warnings);
             }
             catch (Exception ex) when (IsWrapped(ex))
             {
@@ -228,48 +187,13 @@ public sealed class EmlExtractor : IEmlExtractor
             stage?.Dispose();
         }
 
-        return new EmlExtractionResult(metadata, content, contentType, attachments, warnings)
+        return new EmlExtractionResult(metadata, body.Content, body.ContentType, attachments, warnings)
         {
-            SubjectDirection = subjectDir,
-            ContentDirection = contentDir
+            SubjectDirection = body.SubjectDirection,
+            ContentDirection = body.ContentDirection
         };
     }
 
     private static EmlExtractionResult Empty(List<string> warnings)
         => new(HeaderMapper.EmptyMetadata(), null, null, [], warnings);
-
-    private static ParserOptions CreateOptions()
-    {
-        var options = ParserOptions.Default.Clone();
-        options.AllowUnquotedCommasInAddresses = true;
-        options.ParameterComplianceMode = RfcComplianceMode.Loose;
-        options.Rfc2047ComplianceMode = RfcComplianceMode.Loose;
-        return options;
-    }
-
-    /// <summary>Read-only stream over <paramref name="eml"/>; wraps the caller's array when it spans the whole array, else copies.</summary>
-    internal static MemoryStream Open(ReadOnlyMemory<byte> eml)
-    {
-        if (MemoryMarshal.TryGetArray(eml, out var segment)
-            && segment.Array is not null
-            && segment.Offset == 0
-            && segment.Count == eml.Length)
-        {
-            return new MemoryStream(segment.Array, writable: false);
-        }
-
-        return new MemoryStream(eml.ToArray(), writable: false);
-    }
-
-    private static bool StartsWithMboxFrom(ReadOnlySpan<byte> data)
-    {
-        if (data.Length >= 3 && data[0] == 0xEF && data[1] == 0xBB && data[2] == 0xBF)
-            data = data[3..];
-        return data.Length >= 5
-               && data[0] == (byte)'F'
-               && data[1] == (byte)'r'
-               && data[2] == (byte)'o'
-               && data[3] == (byte)'m'
-               && data[4] == (byte)' ';
-    }
 }

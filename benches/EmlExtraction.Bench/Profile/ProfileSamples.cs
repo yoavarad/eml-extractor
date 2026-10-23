@@ -50,11 +50,11 @@ public static class ProfileSamples
         var features = new List<SampleFeatures>();
         foreach (var (name, bytes) in Enumerate(corpus))
         {
-            using var input = EmlExtractor.Open(bytes);
+            using var input = MimeMessageParser.Open(bytes);
             MimeMessage message;
             try
             {
-                message = EmlExtractor.Parse(input, bytes);
+                message = MimeMessageParser.Parse(input, bytes);
             }
             catch (Exception)
             {

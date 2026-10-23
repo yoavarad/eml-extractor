@@ -22,8 +22,8 @@ public abstract class StageBenchmark
     public void Setup()
     {
         Bytes = ProfileSamples.Load(Sample);
-        _input = EmlExtractor.Open(Bytes);
-        Message = EmlExtractor.Parse(_input, Bytes);
+        _input = MimeMessageParser.Open(Bytes);
+        Message = MimeMessageParser.Parse(_input, Bytes);
         AfterSetup();
     }
 
@@ -71,8 +71,8 @@ public class ParseStage : StageBenchmark
     public MimeMessage Parse()
     {
         // Mirrors Extract: open over the input, then parse (the stream is disposed once the stage result is built).
-        using var input = EmlExtractor.Open(Bytes);
-        return EmlExtractor.Parse(input, Bytes);
+        using var input = MimeMessageParser.Open(Bytes);
+        return MimeMessageParser.Parse(input, Bytes);
     }
 }
 
@@ -83,7 +83,7 @@ public class MetadataStage : StageBenchmark
     public Dictionary<string, string> Map() => HeaderMapper.Map(Message);
 }
 
-/// <summary>body: main-content selection and subject/body direction; mirrors the ADR-004 body stage in <see cref="EmlExtractor"/>.</summary>
+/// <summary>body: main-content selection and subject/body direction; <see cref="BodyExtractor.ExtractBody"/> (ADR-004 body stage).</summary>
 public class BodyStage : StageBenchmark
 {
     private string? _subject;
@@ -94,24 +94,8 @@ public class BodyStage : StageBenchmark
     [Benchmark]
     public (string Subject, string Content) Body()
     {
-        var body = BodySelector.Select(Message.Body);
-        string? content = null;
-        string? contentType = null;
-        if (body is not null)
-        {
-            try
-            {
-                content = body.Text.TrimEnd('\r', '\n');
-                contentType = body.ContentType.MimeType;
-            }
-            catch (Exception)
-            {
-                // the library records body_decode_failed and carries on
-            }
-        }
-
-        var html = contentType is not null && contentType.Contains("html", StringComparison.OrdinalIgnoreCase);
-        return (TextDirection.Detect(_subject, html: false), TextDirection.Detect(content, html));
+        var body = BodyExtractor.ExtractBody(Message, _subject, []);
+        return (body.SubjectDirection, body.ContentDirection);
     }
 }
 
@@ -123,14 +107,14 @@ public class AttachmentsStage : StageBenchmark
     protected override void AfterSetup() => _body = BodySelector.Select(Message.Body);
 
     [Benchmark]
-    public IReadOnlyList<ExtractedAttachment> Collect() => PartCollector.Collect(Message.Body, _body, []);
+    public IReadOnlyList<ExtractedAttachment> Collect() => BodyExtractor.ExtractAttachments(Message, _body, []);
 
     /// <summary>Decoded attachment bytes the stage returns for <paramref name="sample"/>; the copy-factor denominator.</summary>
     internal static long DecodedBytes(string sample)
     {
         var bytes = ProfileSamples.Load(sample);
-        using var input = EmlExtractor.Open(bytes);
-        var message = EmlExtractor.Parse(input, bytes);
-        return PartCollector.Collect(message.Body, BodySelector.Select(message.Body), []).Sum(a => a.BinaryData.LongLength);
+        using var input = MimeMessageParser.Open(bytes);
+        var message = MimeMessageParser.Parse(input, bytes);
+        return BodyExtractor.ExtractAttachments(message, BodySelector.Select(message.Body), []).Sum(a => a.BinaryData.LongLength);
     }
 }
