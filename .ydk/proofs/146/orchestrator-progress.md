@@ -10,3 +10,8 @@
 - New: src/EmlExtraction/MimeMessageParser.cs, BodyExtractor.cs; tests MimeMessageParserTests, BodyExtractorTests.
 - EmlExtractor: orchestration only. Benches + InputLifetimeTests call sites updated; BodyStage bench now calls BodyExtractor.ExtractBody.
 - build -warnaserror OK, format OK, tests net8 376p/18s, net10 377p/17s, GoldenKit 1212/1212 (13142 checks).
+
+## Review (done, 1 round)
+- cavecrew-reviewer: 0 red, 2 yellow (mbox test did not prove mbox branch; no body_decode_failed/HTML-direction test) -> fixed with MboxParseStopsAtNextFromLine, BodyDecodeContentFailureIsWarning, BodyDecodeBugPropagates, HtmlBodyContentDirectionUsesHtmlDir.
+- Leftover (accepted): BodyStage bench now rethrows non-content exceptions (old copy swallowed all) and allocates a [] warnings list per call; BodyExtractor<->EmlExtractor.IsContentFailure reference cycle (harmless).
+- Tests net8 380p/18s, net10 381p/17s; format OK; profiling bench dry run (net10) exit 0, 90 benchmarks (ExtractOverLimit throws by design, pre-existing).

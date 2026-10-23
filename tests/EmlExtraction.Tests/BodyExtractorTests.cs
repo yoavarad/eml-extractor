@@ -22,6 +22,41 @@ public sealed class BodyExtractorTests
     }
 
     [Fact]
+    public void HtmlBodyContentDirectionUsesHtmlDir()
+    {
+        var message = SampleFactory.Plain("s", "t");
+        message.Body = new TextPart("html") { Text = "<html dir=\"rtl\"><body>hello</body></html>" };
+
+        var body = BodyExtractor.ExtractBody(message, "s", []);
+
+        Assert.Equal("text/html", body.ContentType);
+        Assert.Equal(TextDirection.Rtl, body.ContentDirection);
+    }
+
+    [Fact]
+    public void BodyDecodeContentFailureIsWarning()
+    {
+        var message = SampleFactory.Plain("s", "t");
+        message.Body = new TextPart("plain") { Content = new MimeContent(new ThrowingStream(new IOException("unreadable"))) };
+        var warnings = new List<string>();
+
+        var body = BodyExtractor.ExtractBody(message, "s", warnings);
+
+        Assert.NotNull(body.Part);
+        Assert.Null(body.Content);
+        Assert.Equal("body_decode_failed: unreadable", Assert.Single(warnings));
+    }
+
+    [Fact]
+    public void BodyDecodeBugPropagates()
+    {
+        var message = SampleFactory.Plain("s", "t");
+        message.Body = new TextPart("plain") { Content = new MimeContent(new ThrowingStream(new InvalidCastException("boom"))) };
+
+        Assert.Throws<InvalidCastException>(() => BodyExtractor.ExtractBody(message, "s", []));
+    }
+
+    [Fact]
     public void NoTextPartGivesNullContent()
     {
         var message = SampleFactory.Plain("s", "t");
@@ -50,5 +85,12 @@ public sealed class BodyExtractorTests
         Assert.Equal("a.png", attachment.FileName);
         Assert.Equal(SampleFactory.MinimalPng(), attachment.BinaryData);
         Assert.Empty(warnings);
+    }
+
+    private sealed class ThrowingStream(Exception ex) : MemoryStream
+    {
+        public override int Read(byte[] buffer, int offset, int count) => throw ex;
+
+        public override int Read(Span<byte> buffer) => throw ex;
     }
 }

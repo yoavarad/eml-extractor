@@ -18,6 +18,19 @@ public sealed class MimeMessageParserTests
         => AssertParsed([0xEF, 0xBB, 0xBF, .. Encoding.ASCII.GetBytes("From alice@example.com Mon Sep 15 07:00:00 2026\r\n" + Eml)]);
 
     [Fact]
+    public void MboxParseStopsAtNextFromLine()
+    {
+        const string from = "From alice@example.com Mon Sep 15 07:00:00 2026\r\n";
+        var bytes = Encoding.ASCII.GetBytes(from + Eml + from + Eml.Replace("hello", "second", StringComparison.Ordinal));
+        using var input = MimeMessageParser.Open(bytes);
+
+        var message = MimeMessageParser.Parse(input, bytes);
+
+        Assert.Equal("hello", message.Subject);
+        Assert.Equal("body text", message.TextBody?.TrimEnd('\r', '\n'));
+    }
+
+    [Fact]
     public void OpenWrapsWholeArrayWithoutCopy()
     {
         var bytes = Encoding.ASCII.GetBytes(Eml);
