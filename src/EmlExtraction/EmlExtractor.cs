@@ -22,16 +22,25 @@ public sealed class EmlExtractor : IEmlExtractor
     public const long DefaultMaxInputBytes = 524_288_000;
 
     private readonly long _maxInputBytes;
-    private readonly MimeMessageParser _parser = new();
+    private readonly MimeMessageParser _parser;
     private readonly BodyExtractor _bodyExtractor = new();
 
     /// <summary>Creates an extractor.</summary>
     /// <param name="maxInputBytes">Largest input, in bytes, that is parsed; larger inputs make <c>Extract</c> throw.</param>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxInputBytes"/> is not positive.</exception>
     public EmlExtractor(long maxInputBytes = DefaultMaxInputBytes)
+        : this(maxInputBytes, null)
+    {
+    }
+
+    /// <summary>Creates an extractor that parses with <paramref name="parserOptions"/>; internal so no MimeKit type is public (ADR-012).</summary>
+    /// <param name="maxInputBytes">Largest input, in bytes, that is parsed.</param>
+    /// <param name="parserOptions">MimeKit options, cloned once at construction; null uses the library's lenient defaults.</param>
+    internal EmlExtractor(long maxInputBytes, ParserOptions? parserOptions)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxInputBytes);
         _maxInputBytes = maxInputBytes;
+        _parser = new MimeMessageParser(parserOptions);
     }
 
     /// <inheritdoc/>

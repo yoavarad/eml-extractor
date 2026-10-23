@@ -10,7 +10,12 @@ internal sealed class MimeMessageParser
     // Callers such as the profiling harness (ADR-020) parse without touching EmlExtractor, so register here too; the runtime ignores a repeat registration.
     static MimeMessageParser() => Encoding.RegisterProvider(CachingEncodingProvider.Instance);
 
-    private readonly ParserOptions _options = CreateOptions();
+    private readonly ParserOptions _options;
+
+    /// <summary>Creates a parser.</summary>
+    /// <param name="options">Options to parse with (cloned once, so later changes to the argument have no effect); null uses the lenient defaults of <see cref="CreateOptions"/>.</param>
+    internal MimeMessageParser(ParserOptions? options = null)
+        => _options = options?.Clone() ?? CreateOptions();
 
     /// <summary>Read-only stream over <paramref name="eml"/>; wraps the caller's array when it spans the whole array, else copies.</summary>
     internal static MemoryStream Open(ReadOnlyMemory<byte> eml)

@@ -30,6 +30,52 @@ public sealed class MimeMessageParserTests
         Assert.Equal("body text", message.TextBody?.TrimEnd('\r', '\n'));
     }
 
+    private const string UnquotedComma = "From: a@example.com\r\nTo: Doe, John <j@example.com>\r\nSubject: s\r\n\r\nb\r\n";
+
+    private static MimeKit.ParserOptions StrictOptions()
+    {
+        var options = MimeKit.ParserOptions.Default.Clone();
+        options.AllowUnquotedCommasInAddresses = false;
+        return options;
+    }
+
+    [Fact]
+    public void DefaultOptionsAllowUnquotedCommasInAddresses()
+    {
+        var bytes = Encoding.ASCII.GetBytes(UnquotedComma);
+        using var input = MimeMessageParser.Open(bytes);
+
+        var message = new MimeMessageParser().Parse(input, bytes);
+
+        Assert.Equal("Doe, John", message.To.Mailboxes.Single().Name);
+    }
+
+    [Fact]
+    public void SuppliedOptionsReplaceDefaultsAndAreCloned()
+    {
+        var bytes = Encoding.ASCII.GetBytes(UnquotedComma);
+        var options = StrictOptions();
+        var parser = new MimeMessageParser(options);
+        options.AllowUnquotedCommasInAddresses = true; // after construction: must not affect the parser
+        using var input = MimeMessageParser.Open(bytes);
+
+        var message = parser.Parse(input, bytes);
+
+        Assert.NotEqual("Doe, John", message.To.Mailboxes.First().Name);
+    }
+
+    [Fact]
+    public void ExtractorAcceptsParserOptions()
+    {
+        var bytes = Encoding.ASCII.GetBytes(UnquotedComma);
+
+        var lenient = new EmlExtractor().Extract(bytes);
+        var strict = new EmlExtractor(EmlExtractor.DefaultMaxInputBytes, StrictOptions()).Extract(bytes);
+
+        Assert.Contains("Doe, John", lenient.Metadata["to"]);
+        Assert.NotEqual(lenient.Metadata["to"], strict.Metadata["to"]);
+    }
+
     [Fact]
     public void OpenWrapsWholeArrayWithoutCopy()
     {
