@@ -136,7 +136,7 @@ Without a measured sweep the T/E/n_best/P fields print `n/a`; run `sweep` first.
 
 ## Committed baseline and regression rule (ADR-015)
 
-`docs/perf-baseline.json` is a sweep JSON (schema v1, hardware block included) measured on the dev machine: Intel Core Ultra 7 155H, 22 logical cores, .NET 10.0.12, Windows, `net10.0`, both GC modes. Command (short windows, so provisional):
+`docs/perf-baseline.json` is a sweep JSON (schema v1, hardware block included), refreshed 2026-10-23 at commit `dc6525e` (task #75, after the ADR-022 optimizations; previous baseline `675b4eb`), measured on the dev machine: Intel Core Ultra 7 155H, 22 logical cores, .NET 10.0.12, Windows, `net10.0`, both GC modes. Command (short windows, so provisional):
 
 ```
 dotnet run -c Release --framework net10.0 --project benches/EmlExtraction.Bench -- sweep --set all --warmup-ms 300 --window-ms 1500 --min-passes 2 --out <dir>
@@ -160,7 +160,7 @@ dotnet run -c Release --framework net10.0 --project benches/EmlExtraction.Bench 
 
 ## Provisional limits (#51)
 
-All values below are **PROVISIONAL**. Data caveat: synthetic set only (no `corpus/internal`), short windows (300 ms warm-up, 1.5 s window, 2 passes), one Windows machine (Intel Core Ultra 7 155H, 22 logical cores, .NET 10.0.12). Re-set them from a full-window run on the public corpus and on target hardware. Sources: `docs/perf-baseline.json` (commit 675b4eb) plus local re-runs of the same command (2026-10-18, 3 invocations giving 6 sweep files; 7 sweeps in total with the baseline; the re-runs are not committed).
+All values below are **PROVISIONAL**. Data caveat: synthetic set only (no `corpus/internal`), short windows (300 ms warm-up, 1.5 s window, 2 passes), one Windows machine (Intel Core Ultra 7 155H, 22 logical cores, .NET 10.0.12). Re-set them from a full-window run on the public corpus and on target hardware. Sources: the pre-batch `docs/perf-baseline.json` (commit 675b4eb, replaced by the 2026-10-23 refresh) plus local re-runs of the same command (2026-10-18, 3 invocations giving 6 sweep files; 7 sweeps in total with the baseline; the re-runs are not committed).
 
 | Limit | Value | Source and headroom |
 | --- | --- | --- |
@@ -183,7 +183,11 @@ Re-run values (not committed as JSON; extract, synthetic set; 6 re-run sweep fil
 
 The committed baseline alone has A 23.3-24.5 (workstation) and 23.7-24.1 (server); the A ceiling of 32 is 30% above that and 22% above the re-run max. M and the 730 MB peak come from the #49 large-file pass (PR #93, `sweep-results/large-*.md` of that run, not committed; rerun with `-- large`). The ceilings are per extraction: at DOP n on near-limit inputs expect up to n times that growth, so use the sizing formula above (`ram_per_server`), not the ceiling alone. A <= 32 is set on a tiny-message mix and would not catch a regression on large messages; the large-file pass (M) covers those.
 
-Streaming stays DEFERRED (`docs/specs/scope.md`): measured M (max 4.2) is below the ceiling (6). Owner-set: the 500 MiB default. Still to confirm: the A and M ceilings above.
+Streaming stays DEFERRED (`docs/specs/scope.md`): measured M (max 4.2 at the time, 1.76 after the optimizations) is below the ceiling (6). Owner-set: the 500 MiB default.
+
+Closing re-check (#75, 2026-10-23, `docs/perf/profile-2026-10-23.md`): no limit changed. After the optimizations M max is 1.76 at the 500 MiB default (100% pass 1.73, peak WS 1,459 MB), A is 19.07 to 19.81 (was 22.5 to 26.3), A spread under 1%. Headroom: M ceiling 6 about 70%, A ceiling 32 about 38%. The 20% threshold stays; Server GC P(22) varied 394 to 683 MB between runs and Workstation T is bimodal (7,425 vs 20,057 files/s at DOP 1), so throughput warnings remain noise. Streaming stays DEFERRED (M 1.76 < 6).
+
+Optimization deltas and ADR-022 target results: `docs/perf/profile-2026-10-23.md`.
 
 ## Telemetry overhead (#73)
 
