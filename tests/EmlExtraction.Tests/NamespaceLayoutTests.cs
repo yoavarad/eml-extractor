@@ -48,4 +48,19 @@ public sealed class NamespaceLayoutTests
 
         Assert.Empty(misplaced);
     }
+
+    [Fact]
+    public void InternalTypesSitInLogics()
+    {
+        var misplaced = typeof(EmlExtractor).Assembly.GetTypes()
+            .Where(t => !t.IsNested && !t.IsPublic && t.Namespace is not null && t.Namespace.StartsWith("EmlExtraction", StringComparison.Ordinal))
+            .Where(t => t.Namespace != "EmlExtraction.Logics")
+            .Select(t => t.FullName)
+            .ToList();
+
+        Assert.Empty(misplaced);
+    }
+
+    [Fact]
+    public void TelemetryNameIsUnchanged() => Assert.Equal("EmlExtraction", EmlExtractionTelemetry.Name);
 }
