@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace EmlExtraction;
+namespace EmlExtraction.Logics;
 
 /// <summary>
 /// Paragraph direction for extracted subject/body: HTML <c>dir</c> / CSS <c>direction</c>,

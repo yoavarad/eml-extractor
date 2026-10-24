@@ -1,4 +1,6 @@
-namespace EmlExtraction;
+using EmlExtraction.Logics;
+
+namespace EmlExtraction.Models;
 
 /// <summary>Outcome of <see cref="EmlDetector.Detect"/>.</summary>
 /// <param name="IsSupported">True when the input looks like a mail message.</param>

@@ -1,7 +1,8 @@
+using EmlExtraction.Models;
 using MimeKit;
 using MimeKit.Tnef;
 
-namespace EmlExtraction;
+namespace EmlExtraction.Logics;
 
 /// <summary>Collects attachment records in ADR-013 processing order and assigns unique container paths.</summary>
 internal static class PartCollector

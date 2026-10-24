@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using MimeKit;
 
-namespace EmlExtraction;
+namespace EmlExtraction.Logics;
 
 /// <summary>Parse stage (ADR-004): loads the input with MimeKit (bytes persistently, streams non-persistently, ADR-024), handling the mbox "From " line.</summary>
 internal sealed class MimeMessageParser

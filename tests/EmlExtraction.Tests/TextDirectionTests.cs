@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using EmlExtraction.Logics;
 using MimeKit;
 
 namespace EmlExtraction.Tests;

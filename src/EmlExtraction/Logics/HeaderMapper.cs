@@ -1,6 +1,6 @@
 using MimeKit;
 
-namespace EmlExtraction;
+namespace EmlExtraction.Logics;
 
 internal static class HeaderMapper
 {

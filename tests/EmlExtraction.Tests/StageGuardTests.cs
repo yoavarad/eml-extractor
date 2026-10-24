@@ -1,3 +1,6 @@
+using EmlExtraction.Exceptions;
+using EmlExtraction.Logics;
+using EmlExtraction.Models;
 using MimeKit;
 
 namespace EmlExtraction.Tests;

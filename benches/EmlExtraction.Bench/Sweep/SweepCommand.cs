@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Runtime;
 using System.Text.Json;
 using EmlExtraction.Bench.Profile;
+using EmlExtraction.Logics;
 
 namespace EmlExtraction.Bench.Sweep;
 

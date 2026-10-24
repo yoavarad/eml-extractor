@@ -1,4 +1,7 @@
-namespace EmlExtraction;
+using EmlExtraction.Exceptions;
+using EmlExtraction.Models;
+
+namespace EmlExtraction.Abstractions;
 
 /// <summary>Extracts metadata, main content and attachments from a mail message.</summary>
 public interface IEmlExtractor

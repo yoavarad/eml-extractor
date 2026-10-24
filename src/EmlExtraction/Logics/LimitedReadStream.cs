@@ -1,4 +1,6 @@
-namespace EmlExtraction;
+using EmlExtraction.Exceptions;
+
+namespace EmlExtraction.Logics;
 
 /// <summary>
 /// Read-only, forward-only view of a caller's stream that counts the bytes read and throws

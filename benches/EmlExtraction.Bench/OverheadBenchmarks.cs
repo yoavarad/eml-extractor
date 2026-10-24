@@ -2,6 +2,8 @@ using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
+using EmlExtraction.Logics;
+using EmlExtraction.Models;
 
 namespace EmlExtraction.Bench;
 

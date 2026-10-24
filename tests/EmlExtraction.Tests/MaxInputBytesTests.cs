@@ -1,4 +1,7 @@
 using System.Text;
+using EmlExtraction.Exceptions;
+using EmlExtraction.Logics;
+using EmlExtraction.Models;
 
 namespace EmlExtraction.Tests;
 

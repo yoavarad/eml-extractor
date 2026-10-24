@@ -8,6 +8,15 @@ Repo: https://github.com/yoavarad/eml-extractor
 
 ## Interface
 
+Public types live in four namespaces (ADR-012 amendment):
+
+```csharp
+using EmlExtraction.Abstractions; // IEmlDetector, IEmlExtractor
+using EmlExtraction.Exceptions;   // EmlExtractionException, EmlInputTooLargeException
+using EmlExtraction.Logics;       // EmlDetector, EmlExtractor
+using EmlExtraction.Models;       // EmlExtractionRequest, EmlExtractionResult, EmlDetectionResult, ExtractedAttachment
+```
+
 ### 1. Detect
 
 Input: bytes. Output: whether the buffer is an EML (RFC 5322) message.
@@ -177,7 +186,7 @@ Tag values (closed sets):
 Activities (all kind Internal; none for `Detect` / `IsEml`):
 - `eml_extraction.extract`, one per `Extract` call. Tags `eml_extraction.input.size` (bytes), `eml_extraction.attachments.count`, `eml_extraction.warnings.count` (the two counts only on a returned result), `eml_extraction.outcome`.
 - Children `eml_extraction.parse`, `eml_extraction.metadata`, `eml_extraction.body`, `eml_extraction.attachments`, created only when the parent is sampled with all data.
-- When `Extract` throws `EmlExtractionException`, the failing stage activity gets status Error and `error.type` (inner exception type), and `eml_extraction.extract` gets status Error, `error.type` `EmlExtraction.EmlExtractionException` and outcome `internal_error`. On `EmlInputTooLargeException` the parent gets status Error, its `error.type` and outcome `input_too_large`. No status description, event or exception message is recorded. Exceptions thrown by your own listener callbacks propagate unchanged.
+- When `Extract` throws `EmlExtractionException`, the failing stage activity gets status Error and `error.type` (inner exception type), and `eml_extraction.extract` gets status Error, `error.type` `EmlExtraction.Exceptions.EmlExtractionException` and outcome `internal_error`. On `EmlInputTooLargeException` the parent gets status Error, its `error.type` and outcome `input_too_large`. No status description, event or exception message is recorded. Exceptions thrown by your own listener callbacks propagate unchanged.
 
 PII: no tag, activity name, event, baggage or status description carries message content or anything derived from it (subject, body, headers, addresses, file names, content IDs), the request `FileName`, or exception messages. A unit test enforces this.
 
@@ -236,7 +245,7 @@ dotnet run --project tools/GoldenKit -c Release -- gen
 ### Layout
 
 ```
-src/EmlExtraction/           detect + extract library
+src/EmlExtraction/           detect + extract library (Abstractions/, Models/, Logics/, Exceptions/)
 tests/EmlExtraction.Tests/   unit tests + seed goldens
 benches/EmlExtraction.Bench  files/sec
 tools/GoldenKit/             generate and score goldens

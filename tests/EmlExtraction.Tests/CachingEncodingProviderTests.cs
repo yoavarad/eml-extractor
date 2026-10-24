@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.RegularExpressions;
+using EmlExtraction.Logics;
 
 namespace EmlExtraction.Tests;
 

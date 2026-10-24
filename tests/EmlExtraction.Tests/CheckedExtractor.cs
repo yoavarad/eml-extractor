@@ -1,3 +1,8 @@
+using EmlExtraction.Abstractions;
+using EmlExtraction.Exceptions;
+using EmlExtraction.Logics;
+using EmlExtraction.Models;
+
 namespace EmlExtraction.Tests;
 
 /// <summary>
