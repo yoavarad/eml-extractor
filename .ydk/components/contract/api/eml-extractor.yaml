@@ -1,7 +1,7 @@
 $schema: ydk:schema:contract
 id: ydk:contract:api/eml-extractor
 description: >-
-  Public extraction surface. Interface IEmlExtractor, implementation EmlExtractor (src/EmlExtraction/EmlExtractor.cs).
+  Public extraction surface. Interface IEmlExtractor, implementation EmlExtractor (src/EmlExtraction/Logics/EmlExtractor.cs).
   Stateless per call; the static constructor registers CodePagesEncodingProvider once and parser options are a
   static, read-only clone (see ydk:library:deps/mimekit). Caller is expected to have checked the buffer with
   ydk:contract:api/eml-detector first; the extractor does not re-run detection.

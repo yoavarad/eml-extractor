@@ -2,7 +2,7 @@ $schema: ydk:schema:contract
 id: ydk:contract:api/eml-detector
 description: >-
   Public detection surface. Interface IEmlDetector, implementation EmlDetector
-  (src/EmlExtraction/Models.cs, src/EmlExtraction/EmlDetector.cs). Stateless; constructed with new EmlDetector().
+  (src/EmlExtraction/Abstractions/IEmlDetector.cs, src/EmlExtraction/Models/EmlDetectionResult.cs, src/EmlExtraction/Logics/EmlDetector.cs). Stateless; constructed with new EmlDetector().
   Pure byte sniff: never parses MIME, ignores file extension and file name. Non-email input is a result
   (IsSupported false / false), never an error. Throw contract (ADR-023, per project owner 2026-10-18): misuse throws
   (the ReadOnlySpan<byte> overloads have no argument that can be null or invalid, so none applies today); a library

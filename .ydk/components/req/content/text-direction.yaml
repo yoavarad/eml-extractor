@@ -2,7 +2,7 @@ $schema: ydk:schema:req
 id: ydk:req:content/text-direction
 description: >-
   Paragraph direction reporting for subject and main content (ADR-006). Implemented in
-  src/EmlExtraction/TextDirection.cs.
+  src/EmlExtraction/Logics/TextDirection.cs.
 type: business-rule
 priority: high
 rule: >-

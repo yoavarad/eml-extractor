@@ -19,3 +19,8 @@
 - Leftover (owner sign-off): error.type tag value for own exceptions is FullName, now EmlExtraction.Exceptions.*; documented in README + ADR-012 amendment.
 - Leftover: .ydk/components manifests cite old file paths (some already stale, e.g. Models.cs); historical ADR path refs left as-is.
 - Known flake: TextDirectionTests.HtmlWithoutMarkupDirectionAllocatesNothing failed once, passed on rerun.
+
+## Leftover fixes (done)
+- .ydk/components manifests: source paths now point at Abstractions/Models/Logics files (incl. stale Models.cs refs).
+- Flaky TextDirectionTests.HtmlWithoutMarkupDirectionAllocatesNothing: root cause = shared static [GeneratedRegex] instances cache a single RegexRunner (Interlocked.Exchange); a parallel test using the same regex holds it, so Match creates a new runner -> allocation on the test thread. Test-side fix: TextDirectionTests joins the existing "NonParallel" xUnit collection. 5x full-suite runs green on net8/net10.
+- Remaining: error.type tag value (EmlExtraction.Exceptions.*) awaits owner sign-off (unchanged by request).
