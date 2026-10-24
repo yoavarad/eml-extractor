@@ -13,6 +13,8 @@ internal sealed class CheckedExtractor : IEmlExtractor
 
     public EmlExtractionResult Extract(ReadOnlyMemory<byte> eml) => Check(_inner.Extract(eml));
 
+    public EmlExtractionResult Extract(Stream eml) => Check(_inner.Extract(eml));
+
     public EmlExtractionResult Extract(EmlExtractionRequest request) => Check(_inner.Extract(request));
 
     public static EmlExtractionResult Check(EmlExtractionResult result)

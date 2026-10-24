@@ -31,13 +31,20 @@ var extractor = new EmlExtractor(); // or new EmlExtractor(maxInputBytes: 50_000
 // Primary method: a request record.
 EmlExtractionResult result = extractor.Extract(new EmlExtractionRequest
 {
-    FileBytes = bytes,         // required; a byte[] converts implicitly
+    FileBytes = bytes,         // set exactly one of FileBytes / InputStream; a byte[] converts implicitly
     FileName = "mail-17.eml"   // optional; traceability only, never changes the result
 });
 
 // Convenience wrapper: same result as a request with these bytes and no FileName.
 EmlExtractionResult same = extractor.Extract(bytes);
+
+// Stream input (ADR-024): parsed straight from the stream, without first copying the whole input.
+// Read forward from the current position; need not be seekable; never seeked or disposed (you own it).
+using var file = File.OpenRead("mail-17.eml");
+EmlExtractionResult fromStream = extractor.Extract(file); // or new EmlExtractionRequest { InputStream = file }
 ```
+
+Pass a stream when the message is on disk or the network: it saves the whole-input `byte[]`. If you already hold the bytes, use the bytes path, which allocates less (see `docs/perf-results.md`, stream input).
 
 `maxInputBytes` is the largest input, in bytes, that is parsed (default 500 MiB). See Errors below for what is thrown and what stays a warning.
 
@@ -82,12 +89,13 @@ Malformed mail content never throws: it is recorded as a warning on `result.Warn
 
 | Case | Exception | Properties |
 | --- | --- | --- |
-| Null `request` | `ArgumentNullException` | `ParamName` |
+| Null `request` or null stream | `ArgumentNullException` | `ParamName` |
+| Both or neither of `FileBytes` / `InputStream` set | `ArgumentException` | `ParamName` (`request`) |
 | `maxInputBytes <= 0` (constructor) | `ArgumentOutOfRangeException` | `ParamName`, `ActualValue` |
-| Input longer than `maxInputBytes` (default 500 MiB; an input of exactly the limit is parsed) | `EmlInputTooLargeException` (derives from `ArgumentException`) | `InputLength`, `MaxInputBytes`, `ParamName` (`request`) |
+| Input longer than `maxInputBytes` (default 500 MiB; an input of exactly the limit is parsed) | `EmlInputTooLargeException` (derives from `ArgumentException`) | `InputLength` (for a stream: bytes read, limit + 1), `MaxInputBytes`, `ParamName` (`request`) |
 | Unexpected exception in a stage (a library bug) | `EmlExtractionException` | `Stage` (`detect`, `parse`, `metadata`, `body` or `attachments`), `InnerException` (the original, with its stack trace) |
 
-- Checks for the first three rows run before any parsing. Messages name the parameter and the size or limit; they never quote message content.
+- Checks for the first four rows run before any parsing, except the size check on a stream, which runs while it is read (reading stops at limit + 1 bytes). Read errors from your stream become a `parse_failed` warning. Messages name the parameter and the size or limit; they never quote message content.
 - `EmlExtractionException.Message` names the stage and the inner exception's type only; read the details from `InnerException`.
 - `OutOfMemoryException` and exceptions thrown by your own `MeterListener` callbacks are not wrapped.
 - `EmlDetector.Detect` / `IsEml` return "not supported" / `false` for input that is not a message. That is a result, not an error. They throw only `EmlExtractionException` (stage `detect`) on a library bug.

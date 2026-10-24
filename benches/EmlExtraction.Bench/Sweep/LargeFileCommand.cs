@@ -10,11 +10,12 @@ namespace EmlExtraction.Bench.Sweep;
 /// <summary>
 /// <c>large</c>: single-thread large-file pass (ADR-015). Messages at 25/50/100% of the limit, each with one base64
 /// attachment, plus one at limit+1 that must throw <see cref="EmlInputTooLargeException"/>. Prints M, peak working set and the sizing formula.
+/// With <c>--stream</c> (ADR-024) each message is written to a temp file and extracted from a FileStream, so the whole input is never resident.
 /// </summary>
 internal static class LargeFileCommand
 {
     private const string Usage =
-        "Usage: large [--max-input-bytes N] [--sample-ms N] [--sweep <sweep.json>] [--out <dir>] [--handshake]";
+        "Usage: large [--max-input-bytes N] [--sample-ms N] [--sweep <sweep.json>] [--out <dir>] [--stream] [--handshake]";
 
     private const string Rerun = """
         ## How the team reruns this
@@ -24,7 +25,7 @@ internal static class LargeFileCommand
         3. Plug the target rate R into the formula above. Use the same machine for both steps; the large-file pass needs free RAM of about 5x the limit.
         """;
 
-    private sealed record Pass(string Label, long InputBytes, long PreWorkingSet, long PeakWorkingSet, double Seconds, bool Ok, string Note)
+    private sealed record Pass(string Label, long InputBytes, long PreWorkingSet, long PeakWorkingSet, long Allocated, double Seconds, bool Ok, string Note)
     {
         public double M => LargeFileMath.PeakGrowthPerInputByte(PeakWorkingSet, PreWorkingSet, InputBytes);
     }
@@ -37,6 +38,8 @@ internal static class LargeFileCommand
         var sampleMs = 50;
         string? sweepPath = null;
         var outDir = Path.Combine(repoRoot, "sweep-results");
+        var stream = args.Contains("--stream");
+        args = args.Where(a => a != "--stream").ToArray();
         for (var i = 0; i < args.Length; i += 2)
         {
             if (i + 1 >= args.Length)
@@ -61,23 +64,23 @@ internal static class LargeFileCommand
         trace.Wait("start");
         trace.ResetGcBaseline();
         foreach (var percent in new[] { 25, 50, 100 })
-            passes.Add(Measure($"{percent}%", max * percent / 100, extractor, sampleMs, expectAttachment: true, percent == 100 ? trace : null));
-        passes.Add(Measure("limit+1", max + 1, extractor, sampleMs, expectAttachment: false, null));
+            passes.Add(Measure($"{percent}%", max * percent / 100, extractor, sampleMs, expectAttachment: true, percent == 100 ? trace : null, stream));
+        passes.Add(Measure("limit+1", max + 1, extractor, sampleMs, expectAttachment: false, null, stream));
         trace.PrintGcStats();
 
         var sb = new StringBuilder();
         sb.AppendLine("# Large-file pass");
         sb.AppendLine();
         sb.AppendLine(string.Create(CultureInfo.InvariantCulture,
-            $"Single thread, {(GCSettings.IsServerGC ? "Server" : "Workstation")} GC, maxInputBytes {max}, working set sampled every {sampleMs} ms, forced full GC before each input. M = (peak - pre-run WS) / input bytes."));
+            $"Single thread, {(GCSettings.IsServerGC ? "Server" : "Workstation")} GC, input {(stream ? "FileStream (--stream)" : "byte[]")}, maxInputBytes {max}, working set sampled every {sampleMs} ms, forced full GC before each input. M = (peak - pre-run WS) / input bytes."));
         sb.AppendLine();
-        sb.AppendLine("| Input | Bytes | Pre WS MB | Peak WS MB | M | Seconds | Result |");
-        sb.AppendLine("| --- | ---: | ---: | ---: | ---: | ---: | --- |");
+        sb.AppendLine("| Input | Bytes | Pre WS MB | Peak WS MB | M | Alloc MB | Seconds | Result |");
+        sb.AppendLine("| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |");
         foreach (var p in passes)
         {
             var m = p.Label == "limit+1" ? "n/a" : p.M.ToString("F2", CultureInfo.InvariantCulture);
             sb.AppendLine(string.Create(CultureInfo.InvariantCulture,
-                $"| {p.Label} | {p.InputBytes} | {Mb(p.PreWorkingSet):F1} | {Mb(p.PeakWorkingSet):F1} | {m} | {p.Seconds:F2} | {(p.Ok ? "ok" : "FAIL")}: {p.Note} |"));
+                $"| {p.Label} | {p.InputBytes} | {Mb(p.PreWorkingSet):F1} | {Mb(p.PeakWorkingSet):F1} | {m} | {Mb(p.Allocated):F1} | {p.Seconds:F2} | {(p.Ok ? "ok" : "FAIL")}: {p.Note} |"));
         }
 
         var okPasses = passes.Where(p => p.Label != "limit+1" && p.Ok).ToList();
@@ -89,20 +92,38 @@ internal static class LargeFileCommand
 
         Console.Write(sb);
         Directory.CreateDirectory(outDir);
-        var file = Path.Combine(outDir, $"large-{DateTime.UtcNow:yyyyMMdd-HHmmss}.md");
+        var file = Path.Combine(outDir, $"large-{(stream ? "stream-" : "")}{DateTime.UtcNow:yyyyMMdd-HHmmss}.md");
         File.WriteAllText(file, sb.ToString());
         Console.WriteLine($"Markdown: {file}");
         return okPasses.Count == 3 && passes[^1].Ok ? 0 : 1;
     }
 
-    private static Pass Measure(string label, long size, EmlExtractor extractor, int sampleMs, bool expectAttachment, TraceSupport? peakHook)
+    private static Pass Measure(string label, long size, EmlExtractor extractor, int sampleMs, bool expectAttachment, TraceSupport? peakHook, bool stream)
+    {
+        // Stream mode: the message goes to a temp file before `pre`, so M covers only what the extractor holds.
+        var tempFile = stream ? Path.GetTempFileName() : null;
+        if (tempFile is not null)
+            File.WriteAllBytes(tempFile, LargeFileMath.BuildMessage(size));
+        try
+        {
+            return Measure(label, size, extractor, sampleMs, expectAttachment, peakHook, tempFile);
+        }
+        finally
+        {
+            if (tempFile is not null)
+                File.Delete(tempFile);
+        }
+    }
+
+    private static Pass Measure(string label, long size, EmlExtractor extractor, int sampleMs, bool expectAttachment, TraceSupport? peakHook, string? tempFile)
     {
         GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, blocking: true, compacting: true);
         GC.WaitForPendingFinalizers();
         using var self = Process.GetCurrentProcess();
         self.Refresh();
         var pre = self.WorkingSet64;
-        var input = LargeFileMath.BuildMessage(size); // built after `pre`, so M includes the resident input
+        var input = tempFile is null ? LargeFileMath.BuildMessage(size) : null; // built after `pre`, so M includes the resident input
+        var inputLength = input?.Length ?? new FileInfo(tempFile!).Length;
         self.Refresh();
         long peak = self.WorkingSet64;
         var stop = false;
@@ -120,12 +141,21 @@ internal static class LargeFileCommand
         })
         { IsBackground = true };
         sampler.Start();
+        var allocatedBefore = GC.GetAllocatedBytesForCurrentThread();
         var sw = Stopwatch.StartNew();
         EmlExtractionResult? result = null;
         EmlInputTooLargeException? tooLarge = null;
         try
         {
-            result = extractor.Extract(input);
+            if (input is not null)
+            {
+                result = extractor.Extract(input);
+            }
+            else
+            {
+                using var file = new FileStream(tempFile!, FileMode.Open, FileAccess.Read, FileShare.Read, 81_920, FileOptions.SequentialScan);
+                result = extractor.Extract(file);
+            }
         }
         catch (EmlInputTooLargeException ex)
         {
@@ -133,6 +163,7 @@ internal static class LargeFileCommand
         }
 
         sw.Stop();
+        var allocated = GC.GetAllocatedBytesForCurrentThread() - allocatedBefore;
         Volatile.Write(ref stop, true);
         sampler.Join();
         self.Refresh();
@@ -151,13 +182,13 @@ internal static class LargeFileCommand
         }
         else
         {
-            ok = result is null && tooLarge is not null && tooLarge.InputLength == input.Length
+            ok = result is null && tooLarge is not null && tooLarge.InputLength == inputLength
                 && tooLarge.MaxInputBytes == size - 1 && tooLarge.ParamName == "request";
             note = ok ? "EmlInputTooLargeException, no parse" : "unexpected: " + detail;
         }
 
         GC.KeepAlive(input);
-        return new Pass(label, input.Length, pre, peak, sw.Elapsed.TotalSeconds, ok, note);
+        return new Pass(label, inputLength, pre, peak, allocated, sw.Elapsed.TotalSeconds, ok, note);
     }
 
     private static string Formula(double? m, long max, string? sweepPath, string repoRoot)

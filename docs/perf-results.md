@@ -121,7 +121,7 @@ point = {
 Single thread, kept out of the DOP mix. Generates (at run time, nothing committed) messages at 25%, 50% and 100% of `maxInputBytes`, each with one base64 attachment, plus one at limit+1 that must throw `EmlInputTooLargeException` (no parse). A forced full GC runs before each input; the working set is sampled every 50 ms; M = (peak WS - pre-run WS) / input bytes, with the pre-run WS read before the input is generated, so M includes the resident input. The reported M is the largest of the three in-limit passes. The working set does not shrink fully after a GC, so later passes start from a higher baseline and their M reads lower: the max is the conservative figure.
 
 ```
-dotnet run -c Release --framework net10.0 --project benches/EmlExtraction.Bench -- large [--max-input-bytes N] [--sample-ms N] [--sweep <sweep.json>] [--out <dir>]
+dotnet run -c Release --framework net10.0 --project benches/EmlExtraction.Bench -- large [--max-input-bytes N] [--sample-ms N] [--sweep <sweep.json>] [--out <dir>] [--stream]
 ```
 
 Defaults: `--max-input-bytes` = `EmlExtractor.DefaultMaxInputBytes` (500 MiB; a full run allocates up to about 500 MiB x M, roughly 2-2.5 GB, and a forced GC per pass. Pass an explicit smaller `--max-input-bytes` for CI or smoke runs), `--sweep` = newest `sweep-results/sweep-*.json` (Workstation GC run, set `mix`, else `public`, else `synthetic`). Smoke run: `-- large --max-input-bytes 8388608`. Exit codes: `0` ok, `1` a pass or the limit+1 guard check failed, `2` bad arguments. Output goes to the console and `sweep-results/large-<stamp>.md`, and ends with the formula filled with T(1), E(n_best), n_best, P(n_best) and M, plus a "how the team reruns this" section:
@@ -133,6 +133,23 @@ ram_per_server = P(n_best) + n_best x max_input_bytes x M
 ```
 
 Without a measured sweep the T/E/n_best/P fields print `n/a`; run `sweep` first. The provisional values above (50 ms sampling) are placeholders per ADR-015 until the first full sweep.
+
+## Stream input vs bytes (ADR-024, #148)
+
+`large --stream` writes each generated message to a temp file before the pre-run working set is read, then extracts from a `FileStream`, so the whole input is never resident; the default `large` keeps the `byte[]` resident (M includes it). Both modes print `Alloc MB`, the bytes allocated on the extracting thread during `Extract` (the `byte[]` build is outside it). Run 2026-10-24, net10.0 Release, Workstation GC, `--max-input-bytes 104857600` (100 MiB), same machine, back to back:
+
+| Input | Mode | Pre WS MB | Peak WS MB | M | Alloc MB | Seconds | Result |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
+| 25% | byte[] | 34.9 | 80.3 | 1.82 | 18.3 | 0.19 | ok |
+| 25% | stream | 60.8 | 104.6 | 1.75 | 43.9 | 0.25 | ok |
+| 50% | byte[] | 80.6 | 142.9 | 1.25 | 36.6 | 0.28 | ok |
+| 50% | stream | 166.3 | 221.7 | 1.11 | 87.7 | 0.32 | ok |
+| 100% | byte[] | 143.0 | 316.3 | 1.73 | 73.1 | 0.45 | ok |
+| 100% | stream | 329.5 | 428.4 | 0.99 | 175.4 | 0.60 | ok |
+| limit+1 | byte[] | 279.9 | 380.0 | n/a | 0.0 | 0.00 | throws, no parse |
+| limit+1 | stream | 431.4 | 501.2 | n/a | 102.3 | 0.12 | throws after limit + 1 bytes |
+
+Reading: at the limit the stream path's peak growth is 0.99 x input against 1.73 x for a resident `byte[]` (the saving is the whole-input copy). It allocates about 2.4 x more: MimeKit's non-persistent parse buffers each part's encoded content, where the persistent bytes parse reads it as a view over the caller's array. An oversized stream is read (and buffered) up to the limit before it is refused; an oversized `byte[]` is refused on its length. The working set does not shrink fully between passes (see above), so compare M, not the absolute WS columns. Callers reading from disk or the network gain from the stream path; callers already holding the bytes should keep the bytes path.
 
 ## Committed baseline and regression rule (ADR-015)
 

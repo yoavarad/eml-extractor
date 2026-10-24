@@ -50,13 +50,29 @@ public sealed class EmlExtractor : IEmlExtractor
         => Extract(new EmlExtractionRequest { FileBytes = eml });
 
     /// <inheritdoc/>
+    /// <exception cref="ArgumentNullException"><paramref name="eml"/> is null.</exception>
+    /// <exception cref="EmlInputTooLargeException">More than the configured <c>maxInputBytes</c> was read from <paramref name="eml"/>.</exception>
+    /// <exception cref="EmlExtractionException">An unexpected exception (library bug) occurred in a stage.</exception>
+    public EmlExtractionResult Extract(Stream eml)
+    {
+        ArgumentNullException.ThrowIfNull(eml);
+        return Extract(new EmlExtractionRequest { InputStream = eml });
+    }
+
+    /// <inheritdoc/>
     /// <exception cref="ArgumentNullException"><paramref name="request"/> is null.</exception>
-    /// <exception cref="EmlInputTooLargeException"><see cref="EmlExtractionRequest.FileBytes"/> is longer than the configured <c>maxInputBytes</c>.</exception>
+    /// <exception cref="ArgumentException">Both or neither of <see cref="EmlExtractionRequest.FileBytes"/> and <see cref="EmlExtractionRequest.InputStream"/> are set.</exception>
+    /// <exception cref="EmlInputTooLargeException">The input is longer than the configured <c>maxInputBytes</c>.</exception>
     /// <exception cref="EmlExtractionException">An unexpected exception (library bug) occurred in a stage.</exception>
     public EmlExtractionResult Extract(EmlExtractionRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
+        if (request.HasFileBytes == request.InputStream is not null)
+            throw new ArgumentException("Set exactly one of FileBytes and InputStream.", nameof(request));
         var start = Stopwatch.GetTimestamp();
+        if (request.InputStream is { } stream)
+            return ExtractStream(stream, start);
+
         var eml = request.FileBytes;
         EmlExtractionTelemetry.RecordInputSize(eml.Length);
         var activity = EmlExtractionTelemetry.StartExtract(eml.Length);
@@ -74,6 +90,51 @@ public sealed class EmlExtractor : IEmlExtractor
         // The parse is persistent: part content stays a view over this stream, so it lives until the result is built.
         using var input = MimeMessageParser.Open(eml);
 
+        var message = ParseStage(input, eml, warnings, start, activity);
+        if (message is null)
+            return Recorded(start, EmlExtractionTelemetry.OutcomeParseFailed, Empty(warnings), activity);
+
+        return Recorded(start, null, Extract(message, warnings, start, activity), activity);
+    }
+
+    /// <summary>Stream path (ADR-024): parses non-persistently while counting bytes; size is known only after reading.</summary>
+    private EmlExtractionResult ExtractStream(Stream stream, long start)
+    {
+        var activity = EmlExtractionTelemetry.StartExtract(null);
+        using var scope = new EmlExtractionTelemetry.ExtractScope(activity);
+        var warnings = new List<string>();
+
+        // Not disposed: disposing the wrapper must not touch the caller's stream, and it holds nothing itself.
+        var input = new LimitedReadStream(stream, _maxInputBytes);
+        MimeMessage? message;
+        try
+        {
+            message = ParseStage(input, null, warnings, start, activity);
+        }
+        catch (EmlInputTooLargeException tooLarge)
+        {
+            EmlExtractionTelemetry.SetError(activity, tooLarge, EmlExtractionTelemetry.OutcomeInputTooLarge);
+            EmlExtractionTelemetry.RecordInputTooLarge(start);
+            throw;
+        }
+        finally
+        {
+            // Recorded on every path (result, refusal, internal error), as the bytes path records it up front.
+            EmlExtractionTelemetry.RecordInputSize(input.BytesRead);
+        }
+
+        if (message is null)
+            return Recorded(start, EmlExtractionTelemetry.OutcomeParseFailed, Empty(warnings), activity);
+
+        return Recorded(start, null, Extract(message, warnings, start, activity), activity);
+    }
+
+    /// <summary>
+    /// Parse stage with its wrapper: persistent over <paramref name="eml"/> when given, else a non-persistent stream parse.
+    /// EmlInputTooLargeException (an ArgumentException) from the size guard passes through: it is neither a content failure nor wrapped.
+    /// </summary>
+    private MimeMessage? ParseStage(Stream input, ReadOnlyMemory<byte>? eml, List<string> warnings, long start, Activity? activity)
+    {
         // Stage activities start and stop outside the stage try, so a host listener's exception is never wrapped (ADR-023).
         MimeMessage? message = null;
         var stage = EmlExtractionTelemetry.StartStage(activity, "eml_extraction.parse");
@@ -82,13 +143,13 @@ public sealed class EmlExtractor : IEmlExtractor
             try
             {
                 StageFault?.Invoke("parse");
-                message = _parser.Parse(input, eml.Span);
+                message = eml is { } bytes ? _parser.Parse(input, bytes.Span) : _parser.Parse(input);
             }
-            catch (Exception ex) when (IsContentFailure(ex))
+            catch (Exception ex) when (ex is not EmlInputTooLargeException && IsContentFailure(ex))
             {
                 warnings.Add($"parse_failed: {ex.GetType().Name}: {ex.Message}");
             }
-            catch (Exception ex) when (IsWrapped(ex))
+            catch (Exception ex) when (ex is not EmlInputTooLargeException && IsWrapped(ex))
             {
                 throw Wrap("parse", ex, start, stage, activity);
             }
@@ -98,10 +159,7 @@ public sealed class EmlExtractor : IEmlExtractor
             stage?.Dispose();
         }
 
-        if (message is null)
-            return Recorded(start, EmlExtractionTelemetry.OutcomeParseFailed, Empty(warnings), activity);
-
-        return Recorded(start, null, Extract(message, warnings, start, activity), activity);
+        return message;
     }
 
     /// <summary>Extracts from an already parsed <see cref="MimeMessage"/>.</summary>
