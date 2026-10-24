@@ -10,9 +10,11 @@ Per the shared team contract (ADR-012), the caller passes a request, [ydk:entity
 
 Before parsing, the extractor compares the input length with a limit the host can set when it creates the extractor ([ydk:req:extraction/max-input-size]). The default (500 MiB) was set by the project owner, not derived from measurements; the first large-file measurement (peak memory 1.3-4.2 times the input, taken at 150 MiB) puts one extraction near 2-2.5 GB at that size, and the host can always change it. A longer input is not parsed: per the project owner (2026-10-18, ADR-023) extraction throws [ydk:entity:extraction/EmlInputTooLargeException], which carries the input size and the limit. This keeps one oversized file from exhausting the host's memory, since every attachment is held in memory. The memory each message needs is measured, not guessed ([ydk:nfr:performance/memory-footprint]).
 
+A stream input (ADR-024) has no length up front, so the limit is enforced while reading: once more than the limit has been read (at most limit + 1 bytes are taken), extraction throws the same exception, with the bytes read as the input size. It is never turned into a parse warning.
+
 ## Parsing
 
-Parsing is delegated to the parser library, [ydk:library:deps/mimekit] (ADR-002). The parser runs in its lenient modes for addresses, header parameters, and encoded words. The repo does not record why these modes were chosen (open question in ADR-002). When the buffer starts with an mbox separator line, the parser reads it as an mbox stream and keeps only the first message ([ydk:req:extraction/mbox-from-line]). Commit 251657d records that mbox separator lines and missing code-page registration were breaking extraction on the SpamAssassin corpus and on Outlook TNEF wrappers.
+Parsing is delegated to the parser library, [ydk:library:deps/mimekit] (ADR-002). The parser runs in its lenient modes for addresses, header parameters, and encoded words. The repo does not record why these modes were chosen (open question in ADR-002). When the buffer starts with an mbox separator line, the parser reads it as an mbox stream and keeps only the first message ([ydk:req:extraction/mbox-from-line]). A stream input (ADR-024) is read forward from its current position, need not be seekable, and is never seeked or disposed; it is parsed non-persistently, and the separator check peeks its first bytes. Commit 251657d records that mbox separator lines and missing code-page registration were breaking extraction on the SpamAssassin corpus and on Outlook TNEF wrappers.
 
 ## Metadata
 

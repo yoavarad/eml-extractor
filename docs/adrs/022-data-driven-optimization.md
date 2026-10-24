@@ -36,7 +36,7 @@ Each becomes a task only if the report shows it as a hotspot:
 - regex in direction detection: compiled or source-generated regex, or a span scan instead.
 
 ### Streaming
-Streaming input or output stays DEFERRED (`docs/specs/scope.md`). It moves to IN scope only if the measured memory ceiling is exceeded (the load-limits task sets the ceiling, `ydk:nfr:performance/memory-footprint`); an optimization task never introduces it on its own.
+Superseded for input by ADR-024 (owner, 2026-10-23): streaming input is implemented; streaming output stays deferred. Original text: Streaming input or output stays DEFERRED (`docs/specs/scope.md`). It moves to IN scope only if the measured memory ceiling is exceeded (the load-limits task sets the ceiling, `ydk:nfr:performance/memory-footprint`); an optimization task never introduces it on its own.
 
 ### Closing
 After the optimization tasks merge, a closing task re-runs the sweep and the profile, refreshes the baseline (ADR-015 refresh rule), re-checks the limits, and records the deltas per optimization in a new profile report.

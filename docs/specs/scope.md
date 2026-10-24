@@ -10,6 +10,7 @@ The original specification is translated in [docs/requirements.md](../requiremen
 - The shared team contract for the public surface (ADR-012): a request record, [ydk:entity:extraction/EmlExtractionRequest], shared sub-file field names, and no parser-library types in the public API.
 - Supporting both .NET 8 and .NET 10 hosts with identical behaviour, with tests run on both in CI (ADR-019): [ydk:req:quality/net8-multi-targeting]. The developer tools stay on .NET 10 only.
 - Refusing inputs over a host-set size limit by throwing (ADR-023): [ydk:req:extraction/max-input-size].
+- Extracting from a caller-supplied stream, seekable or not, without first copying the whole input (ADR-024, owner 2026-10-23). This supersedes the earlier deferral of streaming input (ADR-022, and the OUT list below, which now defers only streaming output).
 - Extracting every top-level header under one canonical key each, the classic envelope headers in parsed form (with the four address keys always present), and the brief's custom-header field: [ydk:req:metadata/all-headers], [ydk:req:metadata/canonical-keys], [ydk:req:metadata/classic-fields], [ydk:req:metadata/xfields]. The canonical keys and the literal custom-header rule are target (ADR-014, ADR-016).
 - Selecting one main body, with HTML preferred, and reporting its media type: [ydk:req:content/main-content-selection].
 - Returning text exactly as written, including emoji sequences and combining marks: [ydk:req:content/unicode-fidelity].
@@ -45,8 +46,8 @@ The original specification is translated in [docs/requirements.md](../requiremen
 
 ## DEFERRED
 
-- Streaming input or output. Whole messages and decoded parts stay in memory. Moves to IN scope only if the measured memory of a maximum-size input exceeds the ceiling in [ydk:nfr:performance/memory-footprint].
-- Additional request input sources (a stream or a file path, as the OLE extractor has). The request record leaves room for them (ADR-012).
+- Streaming output. Decoded parts stay in memory. Moves to IN scope only if the measured memory of a maximum-size input exceeds the ceiling in [ydk:nfr:performance/memory-footprint].
+- Additional request input sources (a file path, as the OLE extractor has). The request record leaves room for them (ADR-012). A stream source was added by ADR-024.
 
 These are recorded gaps in [edge-cases.md](../edge-cases.md) and [requirements.md](../requirements.md). Each needs a real sample before any work starts:
 
