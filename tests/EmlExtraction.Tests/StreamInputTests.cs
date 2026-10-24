@@ -54,6 +54,18 @@ public sealed class StreamInputTests
     }
 
     [Fact]
+    public void MboxTailCountsAgainstLimit()
+    {
+        var bytes = Encoding.ASCII.GetBytes(MboxFrom + Eml + MboxFrom + Eml + new string('x', 5000));
+        using var stream = new NonSeekableStream(bytes);
+
+        var ex = Assert.Throws<EmlInputTooLargeException>(() => new EmlExtractor(4096).Extract(stream));
+
+        Assert.Equal(4097, ex.InputLength);
+        Assert.Throws<EmlInputTooLargeException>(() => new EmlExtractor(4096).Extract(bytes));
+    }
+
+    [Fact]
     public void ShortStreamUnderPeekLengthIsParseResultNotError()
     {
         using var stream = new NonSeekableStream("Fro"u8.ToArray());

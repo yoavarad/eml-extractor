@@ -113,13 +113,16 @@ public sealed class EmlExtractor : IEmlExtractor
         }
         catch (EmlInputTooLargeException tooLarge)
         {
-            EmlExtractionTelemetry.RecordInputSize(input.BytesRead);
             EmlExtractionTelemetry.SetError(activity, tooLarge, EmlExtractionTelemetry.OutcomeInputTooLarge);
             EmlExtractionTelemetry.RecordInputTooLarge(start);
             throw;
         }
+        finally
+        {
+            // Recorded on every path (result, refusal, internal error), as the bytes path records it up front.
+            EmlExtractionTelemetry.RecordInputSize(input.BytesRead);
+        }
 
-        EmlExtractionTelemetry.RecordInputSize(input.BytesRead);
         if (message is null)
             return Recorded(start, EmlExtractionTelemetry.OutcomeParseFailed, Empty(warnings), activity);
 

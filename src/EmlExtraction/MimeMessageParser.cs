@@ -59,7 +59,12 @@ internal sealed class MimeMessageParser
         if (StartsWithMboxFrom(ahead.Head))
         {
             var parser = new MimeParser(_options, ahead, MimeFormat.Mbox, persistent: false);
-            return parser.ParseMessage();
+            var message = parser.ParseMessage();
+
+            // Only the first message is kept, but read the rest so the size limit (and telemetry) covers the whole
+            // input, as on the bytes path, which checks the whole length.
+            ahead.CopyTo(Stream.Null);
+            return message;
         }
 
         return MimeMessage.Load(_options, ahead, persistent: false);
