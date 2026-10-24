@@ -1,5 +1,0 @@
-Pure move: src/EmlExtraction split into Abstractions/Models/Logics/Exceptions folders with matching sub-namespaces (git mv, history kept). Usings updated in src/tests/benches/GoldenKit; README gains a usings block; ADR-012 amended; NamespaceLayoutTests pins the layout, internal types in Logics and the telemetry name. Build -warnaserror, format verify, tests net8/net10 green, GoldenKit 1212/1212.
-
-Needs owner sign-off: the error.type telemetry tag is the exception FullName, so for the library's own exceptions it now reads EmlExtraction.Exceptions.EmlExtractionException / EmlExtraction.Exceptions.EmlInputTooLargeException (documented in README and the ADR-012 amendment). Meter/ActivitySource/instrument names unchanged.
-
-Leftovers: .ydk/components manifests still cite old source paths (some were already stale, e.g. Models.cs); historical ADR path references left untouched. TextDirectionTests.HtmlWithoutMarkupDirectionAllocatesNothing (allocation test) failed once locally and passed on rerun, so it looks flaky and unrelated.
