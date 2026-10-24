@@ -1,4 +1,5 @@
 using EmlExtraction.Bench.Sweep;
+using EmlExtraction.Logics;
 
 namespace EmlExtraction.Tests;
 

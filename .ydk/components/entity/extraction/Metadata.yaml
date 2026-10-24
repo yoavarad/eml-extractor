@@ -1,7 +1,7 @@
 $schema: ydk:schema:entity
 id: ydk:entity:extraction/Metadata
 description: >-
-  The header map exposed as EmlExtractionResult.Metadata. Built by HeaderMapper.Map (src/EmlExtraction/HeaderMapper.cs).
+  The header map exposed as EmlExtractionResult.Metadata. Built by HeaderMapper.Map (src/EmlExtraction/Logics/HeaderMapper.cs).
   Keys are ordinal (case-sensitive) strings. This manifest describes the target per ADR-014 and ADR-016
   (ydk:req:metadata/canonical-keys); not implemented (Stage 02).
   Target construction order: (1) every top-level header copied under its canonical key; (2) the classic overlay

@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using System.Text;
 
-namespace EmlExtraction;
+namespace EmlExtraction.Logics;
 
 /// <summary>
 /// Wraps <see cref="CodePagesEncodingProvider"/> and caches its lookups (including null for unknown names).

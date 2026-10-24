@@ -1,10 +1,15 @@
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using EmlExtraction.Logics;
 using MimeKit;
 
 namespace EmlExtraction.Tests;
 
+// Not parallel: the static generated Regex instances keep one cached runner; a concurrent
+// test (any extraction) can hold it, so Match allocates a fresh runner and the zero-allocation
+// test fails intermittently.
+[Collection("NonParallel")]
 public sealed partial class TextDirectionTests
 {
     [Theory]

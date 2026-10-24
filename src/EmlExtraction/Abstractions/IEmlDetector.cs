@@ -1,4 +1,6 @@
-namespace EmlExtraction;
+using EmlExtraction.Exceptions;
+
+namespace EmlExtraction.Abstractions;
 
 /// <summary>Decides whether a byte buffer is an RFC 822/5322 mail message.</summary>
 public interface IEmlDetector

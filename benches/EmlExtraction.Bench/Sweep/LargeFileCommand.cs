@@ -4,6 +4,9 @@ using System.Runtime;
 using System.Text;
 using System.Text.Json;
 using EmlExtraction.Bench.Profile;
+using EmlExtraction.Exceptions;
+using EmlExtraction.Logics;
+using EmlExtraction.Models;
 
 namespace EmlExtraction.Bench.Sweep;
 

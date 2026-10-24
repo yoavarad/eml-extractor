@@ -1,3 +1,4 @@
+using EmlExtraction.Logics;
 using MimeKit;
 
 namespace EmlExtraction.Tests;

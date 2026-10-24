@@ -1,6 +1,6 @@
-namespace EmlExtraction;
+namespace EmlExtraction.Models;
 
-/// <summary>Input of <see cref="EmlExtractor.Extract(EmlExtractionRequest)"/>. Set exactly one of <see cref="FileBytes"/> and <see cref="InputStream"/>.</summary>
+/// <summary>Input of <see cref="Logics.EmlExtractor.Extract(EmlExtractionRequest)"/>. Set exactly one of <see cref="FileBytes"/> and <see cref="InputStream"/>.</summary>
 public sealed record EmlExtractionRequest
 {
     private readonly ReadOnlyMemory<byte> _fileBytes;

@@ -1,4 +1,4 @@
-namespace EmlExtraction;
+namespace EmlExtraction.Exceptions;
 
 /// <summary>
 /// Thrown when an unexpected (non-content) exception occurs inside detection or extraction, i.e. a library bug.

@@ -1,4 +1,4 @@
-namespace EmlExtraction;
+namespace EmlExtraction.Logics;
 
 /// <summary>
 /// Read-only, forward-only stream that reads the first bytes of an inner stream up front (so they can be inspected,

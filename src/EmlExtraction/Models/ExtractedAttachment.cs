@@ -1,4 +1,4 @@
-namespace EmlExtraction;
+namespace EmlExtraction.Models;
 
 /// <summary>One collected MIME part: attachment, inline image, nested message, TNEF-unpacked file or non-selected body part.</summary>
 /// <param name="FileName">File name to present for this part (basename or a generated fallback).</param>

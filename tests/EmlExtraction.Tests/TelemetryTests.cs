@@ -2,6 +2,9 @@ using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Reflection;
 using System.Text;
+using EmlExtraction.Exceptions;
+using EmlExtraction.Logics;
+using EmlExtraction.Models;
 using MimeKit;
 
 namespace EmlExtraction.Tests;

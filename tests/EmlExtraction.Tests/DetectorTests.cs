@@ -1,5 +1,5 @@
 using System.Text;
-using EmlExtraction;
+using EmlExtraction.Logics;
 
 namespace EmlExtraction.Tests;
 

@@ -1,8 +1,11 @@
 using System.Diagnostics;
 using System.Text;
+using EmlExtraction.Abstractions;
+using EmlExtraction.Exceptions;
+using EmlExtraction.Models;
 using MimeKit;
 
-namespace EmlExtraction;
+namespace EmlExtraction.Logics;
 
 /// <summary>MimeKit-based <see cref="IEmlExtractor"/>.</summary>
 public sealed class EmlExtractor : IEmlExtractor

@@ -1,4 +1,4 @@
-namespace EmlExtraction;
+namespace EmlExtraction.Exceptions;
 
 /// <summary>Thrown by <c>Extract</c> when the input is longer than the extractor's <c>maxInputBytes</c> limit.</summary>
 public sealed class EmlInputTooLargeException : ArgumentException

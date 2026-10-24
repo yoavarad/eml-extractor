@@ -1,4 +1,8 @@
-namespace EmlExtraction;
+using EmlExtraction.Abstractions;
+using EmlExtraction.Exceptions;
+using EmlExtraction.Models;
+
+namespace EmlExtraction.Logics;
 
 /// <summary>Header-sniffing <see cref="IEmlDetector"/>: inspects a bounded prefix for RFC 5322 header lines.</summary>
 public sealed class EmlDetector : IEmlDetector

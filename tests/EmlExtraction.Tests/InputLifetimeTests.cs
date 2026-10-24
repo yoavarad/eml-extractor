@@ -1,5 +1,8 @@
 using System.Runtime.CompilerServices;
 using System.Text;
+using EmlExtraction.Abstractions;
+using EmlExtraction.Logics;
+using EmlExtraction.Models;
 using MimeKit;
 using MimeKit.Tnef;
 

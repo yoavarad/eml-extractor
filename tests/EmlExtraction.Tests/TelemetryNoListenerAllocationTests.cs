@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Reflection;
+using EmlExtraction.Logics;
+using EmlExtraction.Models;
 
 namespace EmlExtraction.Tests;
 

@@ -1,3 +1,5 @@
+using EmlExtraction.Exceptions;
+using EmlExtraction.Logics;
 using MimeKit;
 using MimeKit.Tnef;
 

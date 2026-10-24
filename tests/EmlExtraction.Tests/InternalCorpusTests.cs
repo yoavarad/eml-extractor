@@ -1,3 +1,5 @@
+using EmlExtraction.Abstractions;
+
 namespace EmlExtraction.Tests;
 
 public sealed class InternalCorpusTests
