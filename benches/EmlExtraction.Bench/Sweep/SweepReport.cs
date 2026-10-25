@@ -64,15 +64,16 @@ internal sealed record SweepReport(int SchemaVersion, HardwareBlock Hardware, Sw
         md.AppendLine();
         md.AppendLine("| Hardware | |");
         md.AppendLine("| --- | --- |");
-        md.AppendLine($"| CPU | {Hardware.CpuModel} |");
-        md.AppendLine($"| Cores (physical / logical) | {Hardware.PhysicalCores} / {Hardware.LogicalCores} |");
-        md.AppendLine($"| RAM | {Hardware.TotalMemoryBytes / (1024.0 * 1024 * 1024):F1} GiB |");
-        md.AppendLine($"| OS | {Hardware.Os} ({Hardware.OsArchitecture}) |");
-        md.AppendLine($"| Runtime / TFM | {Hardware.Runtime} / {Hardware.TargetFramework} |");
-        md.AppendLine($"| Date | {Hardware.Date} |");
-        md.AppendLine($"| Commit | {Hardware.GitCommit} |");
+        md.AppendLine(CultureInfo.InvariantCulture, $"| CPU | {Hardware.CpuModel} |");
+        md.AppendLine(CultureInfo.InvariantCulture, $"| Cores (physical / logical) | {Hardware.PhysicalCores} / {Hardware.LogicalCores} |");
+        md.AppendLine(CultureInfo.InvariantCulture, $"| RAM | {Hardware.TotalMemoryBytes / (1024.0 * 1024 * 1024):F1} GiB |");
+        md.AppendLine(CultureInfo.InvariantCulture, $"| OS | {Hardware.Os} ({Hardware.OsArchitecture}) |");
+        md.AppendLine(CultureInfo.InvariantCulture, $"| Runtime / TFM | {Hardware.Runtime} / {Hardware.TargetFramework} |");
+        md.AppendLine(CultureInfo.InvariantCulture, $"| Date | {Hardware.Date} |");
+        md.AppendLine(CultureInfo.InvariantCulture, $"| Commit | {Hardware.GitCommit} |");
         md.AppendLine();
         md.AppendLine(
+            CultureInfo.InvariantCulture,
             $"Parameters: warm-up {Parameters.WarmupMs} ms, window >= {Parameters.WindowMs} ms and >= {Parameters.MinPasses} passes, " +
             $"working set sampled every {Parameters.SampleIntervalMs} ms, n = 1..{Parameters.MaxDop}, set `{Parameters.Set}`, corpus `{Parameters.Corpus}`.");
 
@@ -81,15 +82,15 @@ internal sealed record SweepReport(int SchemaVersion, HardwareBlock Hardware, Sw
             foreach (var set in run.Sets)
             {
                 md.AppendLine();
-                md.AppendLine($"## {set.Name} - {run.GcMode} GC");
+                md.AppendLine(CultureInfo.InvariantCulture, $"## {set.Name} - {run.GcMode} GC");
                 md.AppendLine();
                 if (set.Status != "measured")
                 {
-                    md.AppendLine($"SKIPPED: {set.SkipReason}");
+                    md.AppendLine(CultureInfo.InvariantCulture, $"SKIPPED: {set.SkipReason}");
                     continue;
                 }
 
-                md.AppendLine($"{set.Messages} messages, {set.InputBytes} bytes.");
+                md.AppendLine(CultureInfo.InvariantCulture, $"{set.Messages} messages, {set.InputBytes} bytes.");
                 AppendTable(md, "Extract", set.Extract);
                 AppendTable(md, "Detect", set.Detect);
             }
@@ -111,7 +112,7 @@ internal sealed record SweepReport(int SchemaVersion, HardwareBlock Hardware, Sw
     private static void AppendTable(StringBuilder md, string title, IReadOnlyList<SweepPoint> points)
     {
         md.AppendLine();
-        md.AppendLine($"### {title}");
+        md.AppendLine(CultureInfo.InvariantCulture, $"### {title}");
         md.AppendLine();
         md.AppendLine("| n | T(n) files/s | P50 ms | P95 ms | P(n) MB | A B/B | E(n) |");
         md.AppendLine("| ---: | ---: | ---: | ---: | ---: | ---: | ---: |");

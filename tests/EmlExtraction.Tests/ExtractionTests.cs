@@ -6,7 +6,7 @@ namespace EmlExtraction.Tests;
 
 public sealed class ExtractionTests
 {
-    private readonly IEmlExtractor _extractor = new CheckedExtractor();
+    private readonly CheckedExtractor _extractor = new();
 
     [Fact]
     public void FromToCcBccAreAlwaysPresent()
@@ -133,7 +133,7 @@ public sealed class ExtractionTests
         var result = _extractor.Extract(raw);
         Assert.Equal("mbox-subject", result.Metadata["subject"]);
         Assert.Equal("mbox-body", result.MainContent);
-        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed"));
+        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed", StringComparison.Ordinal));
         Assert.DoesNotContain(result.Metadata, kv => kv.Value.Contains("Tue Sep 15 07:00:00", StringComparison.Ordinal));
     }
 
@@ -152,7 +152,7 @@ public sealed class ExtractionTests
         var result = _extractor.Extract(Encoding.ASCII.GetBytes(raw));
         Assert.Equal("empty", result.Metadata["subject"]);
         Assert.True(string.IsNullOrEmpty(result.MainContent));
-        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed"));
+        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -368,7 +368,7 @@ public sealed class ExtractionTests
         var result = _extractor.Extract(new EmlExtractionRequest { FileBytes = raw, FileName = "a.mbox" });
         Assert.Equal("mbox-subject", result.Metadata["subject"]);
         Assert.Equal("mbox-body", result.MainContent);
-        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed"));
+        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed", StringComparison.Ordinal));
     }
 
     [Fact]

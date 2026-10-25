@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 
@@ -6,6 +7,8 @@ namespace GoldenKit;
 
 internal sealed class Stats
 {
+    private static readonly JsonSerializerOptions IndentedJson = new() { WriteIndented = true };
+
     public int Files, Messages, Detected, NotDetected, MboxFiles, EmptyFiles, SkippedLarge, ReadFail;
     public int Warned, Thrown, ParseFailed, DetectedButParseFailed;
     public int HasBody, EmptyBody, NoAttach, WithAttach, CidMessages, CidParts;
@@ -32,15 +35,15 @@ internal sealed class Stats
     public string ToText(string root, int fileCount, TimeSpan elapsed)
     {
         var sb = new StringBuilder();
-        sb.AppendLine($"root={root}");
-        sb.AppendLine($"files_seen={fileCount} files_read={Files} mbox={MboxFiles} empty={EmptyFiles} skipped_large={SkippedLarge} read_fail={ReadFail}");
-        sb.AppendLine($"messages={Messages} detected={Detected} not_detected={NotDetected} parse_failed={ParseFailed} warned={Warned} thrown={Thrown} elapsed={elapsed:hh\\:mm\\:ss} rate={(elapsed.TotalSeconds > 0 ? Messages / elapsed.TotalSeconds : 0):F1}/s");
-        sb.AppendLine($"body={HasBody} empty_body={EmptyBody} with_attach={WithAttach} no_attach={NoAttach} cid_msgs={CidMessages} cid_parts={CidParts}");
-        sb.AppendLine($"tnef_headers={TnefHeaders} tnef_left_as_winmail={TnefOpaque} exchange_hdr={ExchangeHeaders} office={Office} nested_rfc822={NestedMail}");
-        sb.AppendLine($"max_headers={MaxHeaders} ({MaxHeadersLabel}) max_xfields={MaxXFields} ({MaxXFieldsLabel}) max_attach={MaxAttach} ({MaxAttachLabel})");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"root={root}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"files_seen={fileCount} files_read={Files} mbox={MboxFiles} empty={EmptyFiles} skipped_large={SkippedLarge} read_fail={ReadFail}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"messages={Messages} detected={Detected} not_detected={NotDetected} parse_failed={ParseFailed} warned={Warned} thrown={Thrown} elapsed={elapsed:hh\\:mm\\:ss} rate={(elapsed.TotalSeconds > 0 ? Messages / elapsed.TotalSeconds : 0):F1}/s");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"body={HasBody} empty_body={EmptyBody} with_attach={WithAttach} no_attach={NoAttach} cid_msgs={CidMessages} cid_parts={CidParts}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"tnef_headers={TnefHeaders} tnef_left_as_winmail={TnefOpaque} exchange_hdr={ExchangeHeaders} office={Office} nested_rfc822={NestedMail}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"max_headers={MaxHeaders} ({MaxHeadersLabel}) max_xfields={MaxXFields} ({MaxXFieldsLabel}) max_attach={MaxAttach} ({MaxAttachLabel})");
         sb.AppendLine("top tags:");
         foreach (var kv in Counts.OrderByDescending(k => k.Value).Take(40))
-            sb.AppendLine($"  {kv.Value,7}  {kv.Key}");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"  {kv.Value,7}  {kv.Key}");
         if (Samples.Count > 0)
         {
             sb.AppendLine("samples:");
@@ -84,5 +87,5 @@ internal sealed class Stats
             seconds = elapsed.TotalSeconds,
             counts = Counts.OrderByDescending(k => k.Value).ToDictionary(k => k.Key, k => k.Value),
             samples = Samples
-        }, new JsonSerializerOptions { WriteIndented = true });
+        }, IndentedJson);
 }

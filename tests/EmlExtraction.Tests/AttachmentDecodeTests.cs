@@ -5,7 +5,7 @@ namespace EmlExtraction.Tests;
 /// <summary>Pins the decoded attachment bytes and length per transfer encoding (T-opt-attach characterization).</summary>
 public sealed class AttachmentDecodeTests
 {
-    private readonly IEmlExtractor _extractor = new CheckedExtractor();
+    private readonly CheckedExtractor _extractor = new();
 
     private static byte[] Eml(string encoding, string body, string type = "application/octet-stream") =>
         Encoding.ASCII.GetBytes(

@@ -11,6 +11,11 @@ public static class SampleGenerator
 {
     static readonly DateTimeOffset Date = new(2025, 3, 4, 9, 30, 0, TimeSpan.Zero);
     const string Generator = "tools/RealisticSamples";
+    static readonly JsonSerializerOptions ManifestJson = new()
+    {
+        WriteIndented = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+    };
     const string License = "generated: repo license";
 
     const string PoiCommit = "62322b97f3f1bca39cdcd0b7705973833c74ad25";
@@ -152,11 +157,7 @@ public static class SampleGenerator
             else
                 entries.Add(new { file, generator = Generator, license = License, sha256 = Sha(bytes), expected });
         }
-        var json = JsonSerializer.Serialize(new { samples = entries }, new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        });
+        var json = JsonSerializer.Serialize(new { samples = entries }, ManifestJson);
         File.WriteAllText(Path.Combine(outDir, "manifest.json"), json.ReplaceLineEndings("\n") + "\n", new UTF8Encoding(false));
     }
 

@@ -7,13 +7,13 @@ using MimeKit;
 namespace EmlExtraction.Tests;
 
 [CollectionDefinition(Name, DisableParallelization = true)]
-public sealed class TelemetryCollection
+public sealed class TelemetryCollectionDefinition
 {
     public const string Name = "Telemetry";
 }
 
 /// <summary>ydk:test:observability/telemetry.unit (ADR-021). Real MeterListener on meter and real ActivityListener on source "EmlExtraction".</summary>
-[Collection(TelemetryCollection.Name)]
+[Collection(TelemetryCollectionDefinition.Name)]
 public sealed class TelemetryTests
 {
     private const string Duration = "eml_extraction.extract.duration";

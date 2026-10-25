@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -7,6 +8,8 @@ namespace GoldenKit;
 
 internal static class Scorer
 {
+    private static readonly JsonSerializerOptions IndentedJson = new() { WriteIndented = true };
+
     public static int Run(string repoRoot)
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -44,21 +47,21 @@ internal static class Scorer
         }
 
         var report = new StringBuilder();
-        report.AppendLine($"GOLDEN SCORE");
-        report.AppendLine($"cases: {passed}/{results.Count} passed ({casePct:F1}% cases)");
-        report.AppendLine($"checks: {earned}/{possible} ({pct:F1}% assertions)");
+        report.AppendLine(CultureInfo.InvariantCulture, $"GOLDEN SCORE");
+        report.AppendLine(CultureInfo.InvariantCulture, $"cases: {passed}/{results.Count} passed ({casePct:F1}% cases)");
+        report.AppendLine(CultureInfo.InvariantCulture, $"checks: {earned}/{possible} ({pct:F1}% assertions)");
         report.AppendLine();
         report.AppendLine("By tag (case pass rate):");
         foreach (var kv in byTag.OrderBy(k => k.Key))
-            report.AppendLine($"  {kv.Key,-28} {kv.Value.Pass,4}/{kv.Value.Total,-4} {100.0 * kv.Value.Pass / kv.Value.Total,5:F1}%");
+            report.AppendLine(CultureInfo.InvariantCulture, $"  {kv.Key,-28} {kv.Value.Pass,4}/{kv.Value.Total,-4} {100.0 * kv.Value.Pass / kv.Value.Total,5:F1}%");
 
         var fails = results.Where(r => r.Failed.Count > 0).ToList();
         report.AppendLine();
-        report.AppendLine($"Failures: {fails.Count}");
+        report.AppendLine(CultureInfo.InvariantCulture, $"Failures: {fails.Count}");
         foreach (var f in fails.Take(80))
-            report.AppendLine($"  {f.Id} [{string.Join(",", f.Tags.Take(6))}] {string.Join(" | ", f.Failed.Take(4))}");
+            report.AppendLine(CultureInfo.InvariantCulture, $"  {f.Id} [{string.Join(",", f.Tags.Take(6))}] {string.Join(" | ", f.Failed.Take(4))}");
         if (fails.Count > 80)
-            report.AppendLine($"  ... {fails.Count - 80} more");
+            report.AppendLine(CultureInfo.InvariantCulture, $"  ... {fails.Count - 80} more");
 
         var outDir = Path.Combine(repoRoot, "docs");
         Directory.CreateDirectory(outDir);
@@ -73,7 +76,7 @@ internal static class Scorer
             check_pct = pct,
             tags = byTag.ToDictionary(k => k.Key, k => new { k.Value.Pass, k.Value.Total }),
             failures = fails.Select(f => new { f.Id, f.Tags, f.Failed })
-        }, new JsonSerializerOptions { WriteIndented = true }));
+        }, IndentedJson));
 
         Console.Write(report.ToString());
         return fails.Count == 0 ? 0 : 1;

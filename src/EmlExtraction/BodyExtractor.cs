@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using MimeKit;
 
 namespace EmlExtraction;
@@ -22,6 +23,7 @@ internal sealed class BodyExtractor
     /// <param name="message">Parsed message; if it was parsed persistently, its stream must stay open.</param>
     /// <param name="subject">The mapped subject header, for its direction.</param>
     /// <param name="warnings">Receives <c>body_decode_failed</c> when the content cannot be decoded.</param>
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Stage entry points stay instance members by design (task 146 made BodyExtractor a sealed instance class).")]
     internal BodyContent ExtractBody(MimeMessage message, string? subject, List<string> warnings)
     {
         var body = BodySelector.Select(message.Body);
@@ -51,6 +53,7 @@ internal sealed class BodyExtractor
     }
 
     /// <summary>Collects the attachments of <paramref name="message"/>, excluding the main-content <paramref name="body"/>.</summary>
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Stage entry points stay instance members by design (task 146 made BodyExtractor a sealed instance class).")]
     internal IReadOnlyList<ExtractedAttachment> ExtractAttachments(MimeMessage message, TextPart? body, List<string> warnings)
         => PartCollector.Collect(message.Body, body, warnings);
 }

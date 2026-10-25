@@ -92,7 +92,7 @@ public sealed class DetectorEquivalenceTests
             foreach (var cut in new[] { 20, 64, 200, 1000, 16384 })
             {
                 if (cut < bytes.Length)
-                    Assert.True(Legacy.Sniff(bytes[..cut]) == Detector.IsEml(bytes[..cut]), f + "@" + cut);
+                    Assert.True(Legacy.Sniff(bytes.AsSpan(0, cut)) == Detector.IsEml(bytes.AsSpan(0, cut)), f + "@" + cut);
             }
         }
     }

@@ -3,7 +3,7 @@ using EmlExtraction.Bench.Sweep;
 namespace EmlExtraction.Tests;
 
 [CollectionDefinition("NonParallel", DisableParallelization = true)]
-public sealed class NonParallelCollection;
+public sealed class NonParallelCollectionDefinition;
 
 // Comparability check and warn-only regression rule (task 50), linked from benches/EmlExtraction.Bench/Sweep.
 [Collection("NonParallel")]
