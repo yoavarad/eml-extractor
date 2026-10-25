@@ -48,6 +48,7 @@ Package licenses were read from each package's `.nuspec`; licenses for packages 
 | Microsoft.Extensions.Primitives | 6.0.0 | MIT | (c) Microsoft Corporation. All rights reserved. |
 | Microsoft.TestPlatform.ObjectModel | 17.14.1 | MIT | (c) Microsoft Corporation. All rights reserved. |
 | Microsoft.TestPlatform.TestHost | 17.14.1 | MIT | (c) Microsoft Corporation. All rights reserved. |
+| Microsoft.VisualStudio.Threading.Analyzers | 17.14.15 | MIT | (c) Microsoft Corporation. All rights reserved. |
 | Newtonsoft.Json | 13.0.3 | MIT | Copyright (c) James Newton-King 2008 |
 | Perfolizer | 0.6.1 | MIT | Copyright (C) 2020-2025 Andrey Akinshin |
 | Pragmastat | 3.2.4 | MIT | Copyright (C) 2025 Andrey Akinshin |
