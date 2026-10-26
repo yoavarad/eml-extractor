@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using EmlExtraction.Exceptions;
 
 namespace EmlExtraction.Logics;
@@ -32,6 +33,7 @@ internal sealed class LimitedReadStream(Stream inner, long maxBytes) : Stream
         return Read(buffer.AsSpan(offset, count));
     }
 
+    [SuppressMessage("Usage", "CA2208:Instantiate argument exceptions correctly", Justification = "ParamName names the caller's Extract(request) argument, matching the bytes path (ADR-024); it is not a parameter of Read.")]
     public override int Read(Span<byte> buffer)
     {
         if (buffer.IsEmpty)

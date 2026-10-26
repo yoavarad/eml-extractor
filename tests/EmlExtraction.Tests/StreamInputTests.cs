@@ -1,5 +1,4 @@
 using System.Text;
-using EmlExtraction.Abstractions;
 using EmlExtraction.Exceptions;
 using EmlExtraction.Logics;
 using EmlExtraction.Models;
@@ -12,7 +11,7 @@ public sealed class StreamInputTests
     private const string Eml = "From: Alice <alice@example.com>\r\nTo: Bob <bob@example.com>\r\nSubject: hello\r\n\r\nbody text\r\n";
     private const string MboxFrom = "From alice@example.com Mon Sep 15 07:00:00 2026\r\n";
 
-    private readonly IEmlExtractor _extractor = new CheckedExtractor();
+    private readonly CheckedExtractor _extractor = new();
 
     [Fact]
     public void StreamPathsEqualBytesPathOnEveryGoldenInput()
