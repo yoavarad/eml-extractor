@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using EmlExtraction.Abstractions;
 using EmlExtraction.Exceptions;
 using EmlExtraction.Models;
@@ -26,6 +27,7 @@ public sealed class EmlDetector : IEmlDetector
 
     /// <summary>Detects whether <paramref name="data"/> is a mail message; input that is not a message gives an unsupported result.</summary>
     /// <exception cref="EmlExtractionException">An unexpected exception (library bug) occurred during detection; stage <c>detect</c>.</exception>
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Public instance API alongside IsEml; making it static would break callers.")]
     public EmlDetectionResult Detect(ReadOnlySpan<byte> data)
         => Counted(data) ? Supported : Unsupported;
 

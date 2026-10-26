@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Metrics;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
@@ -22,6 +23,7 @@ public enum ListenerMode
 [SimpleJob(RuntimeMoniker.Net80)]
 [SimpleJob(RuntimeMoniker.Net10_0)]
 [MemoryDiagnoser]
+[SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "BenchmarkDotNet owns the lifetime: listeners are created in [GlobalSetup] and disposed in [GlobalCleanup].")]
 public class OverheadBenchmarks
 {
     private readonly EmlDetector _detector = new();

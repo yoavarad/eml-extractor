@@ -18,7 +18,7 @@ public sealed class GoldenTests
     };
 
     private readonly EmlDetector _detector = new();
-    private readonly IEmlExtractor _extractor = new CheckedExtractor();
+    private readonly CheckedExtractor _extractor = new();
 
     public static TheoryData<string> Cases()
     {

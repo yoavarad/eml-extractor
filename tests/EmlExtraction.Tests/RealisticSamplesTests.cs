@@ -8,6 +8,8 @@ namespace EmlExtraction.Tests;
 /// <summary>Generator self-check and manifest schema for corpus/realistic (ADR-018). Extraction assertions live elsewhere.</summary>
 public class RealisticSamplesTests
 {
+    private static readonly string[] AllowedSourceLicenses = ["Apache-2.0", "MIT", "BSD-3-Clause", "CC0-1.0", "CC-BY-4.0"];
+
     static string RepoRoot()
     {
         var d = new DirectoryInfo(AppContext.BaseDirectory);
@@ -26,7 +28,7 @@ public class RealisticSamplesTests
     }
 
     [Fact]
-    public void Generator_IsByteIdenticalAcrossRunsAndMatchesCommitted()
+    public void GeneratorIsByteIdenticalAcrossRunsAndMatchesCommitted()
     {
         var a = Gen();
         var b = Gen();
@@ -45,7 +47,7 @@ public class RealisticSamplesTests
     }
 
     [Fact]
-    public void Manifest_HasRequiredFieldsAndCoversAllKinds()
+    public void ManifestHasRequiredFieldsAndCoversAllKinds()
     {
         using var doc = JsonDocument.Parse(File.ReadAllText(Path.Combine(Committed, "manifest.json")));
         var samples = doc.RootElement.GetProperty("samples").EnumerateArray().ToList();
@@ -61,7 +63,7 @@ public class RealisticSamplesTests
                 foreach (var k in new[] { "url", "commit", "license", "licenseUrl", "file", "sha256" })
                     Assert.False(string.IsNullOrWhiteSpace(src.GetProperty(k).GetString()), $"source.{k} empty");
                 Assert.Contains(src.GetProperty("commit").GetString()!, src.GetProperty("url").GetString());
-                Assert.Contains(src.GetProperty("license").GetString()!, new[] { "Apache-2.0", "MIT", "BSD-3-Clause", "CC0-1.0", "CC-BY-4.0" });
+                Assert.Contains(src.GetProperty("license").GetString()!, AllowedSourceLicenses);
                 var raw = File.ReadAllBytes(Path.Combine(Committed, src.GetProperty("file").GetString()!));
                 Assert.Equal(src.GetProperty("sha256").GetString(), SampleGenerator.Sha(raw));
                 var att = s.GetProperty("expected").GetProperty("attachments")[0];
@@ -74,7 +76,7 @@ public class RealisticSamplesTests
     }
 
     [Fact]
-    public void Expected_MatchesIndependentParseOfSampleFiles()
+    public void ExpectedMatchesIndependentParseOfSampleFiles()
     {
         using var doc = JsonDocument.Parse(File.ReadAllText(Path.Combine(Committed, "manifest.json")));
         foreach (var s in doc.RootElement.GetProperty("samples").EnumerateArray())
@@ -88,7 +90,7 @@ public class RealisticSamplesTests
                     var data = Find(msg, name, a.GetProperty("fullPath").GetString()!);
                     Assert.Equal(a.GetProperty("sizeInBytes").GetInt64(), data.Length);
                     Assert.Equal(a.GetProperty("sha256").GetString(), SampleGenerator.Sha(data));
-                    if (name.EndsWith(".docx") || name.EndsWith(".xlsx") || name.EndsWith(".pptx")) AssertValidZip(data);
+                    if (name.EndsWith(".docx", StringComparison.Ordinal) || name.EndsWith(".xlsx", StringComparison.Ordinal) || name.EndsWith(".pptx", StringComparison.Ordinal)) AssertValidZip(data);
                 }
             if (exp.TryGetProperty("inlineImages", out var imgs))
                 foreach (var i in imgs.EnumerateArray())
@@ -118,7 +120,7 @@ public class RealisticSamplesTests
 
     static byte[] Find(MimeMessage msg, string name, string fullPath)
     {
-        if (fullPath.StartsWith("winmail.dat/"))
+        if (fullPath.StartsWith("winmail.dat/", StringComparison.Ordinal))
         {
             var tp = msg.BodyParts.OfType<TnefPart>().Single();
             var inner = tp.ExtractAttachments().OfType<MimePart>().Single(p => p.FileName == name);

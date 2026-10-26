@@ -7,7 +7,7 @@ using EmlExtraction.Models;
 namespace EmlExtraction.Tests;
 
 /// <summary>ydk:nfr:observability/metrics-overhead: with no MeterListener and no ActivityListener the telemetry hooks allocate nothing (ADR-021).</summary>
-[Collection(TelemetryCollection.Name)]
+[Collection(TelemetryCollectionDefinition.Name)]
 public sealed class TelemetryNoListenerAllocationTests
 {
     private const int Iterations = 1000;
@@ -15,7 +15,7 @@ public sealed class TelemetryNoListenerAllocationTests
     private static readonly byte[] Tiny = "From: a@example.com\r\nTo: b@example.com\r\nSubject: s\r\nDate: Tue, 15 Sep 2026 07:00:00 +0000\r\nMIME-Version: 1.0\r\nContent-Type: text/plain\r\n\r\nx\r\n"u8.ToArray();
 
     [SkippableFact]
-    public void Telemetry_hooks_allocate_zero_bytes_without_listener()
+    public void TelemetryHooksAllocateZeroBytesWithoutListener()
     {
         // net8.0 BCL quirk: once any MeterListener has been attached, Instrument.Enabled stays true after the listener is
         // disposed (fixed in later runtimes), so earlier tests in this process can make the no-listener state unreachable.

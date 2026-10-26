@@ -6,8 +6,7 @@ internal static class SweepMath
     /// <summary>Scaling efficiency E(n) = T(n) / (n x T(1)).</summary>
     public static double Efficiency(double throughput, int dop, double throughputAtOne)
     {
-        if (dop < 1)
-            throw new ArgumentOutOfRangeException(nameof(dop));
+        ArgumentOutOfRangeException.ThrowIfLessThan(dop, 1);
         return throughputAtOne <= 0 ? 0 : throughput / (dop * throughputAtOne);
     }
 

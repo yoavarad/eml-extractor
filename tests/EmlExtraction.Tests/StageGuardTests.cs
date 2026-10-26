@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using EmlExtraction.Exceptions;
 using EmlExtraction.Logics;
 using EmlExtraction.Models;
@@ -96,6 +97,7 @@ public sealed class StageGuardTests
     [InlineData("metadata")]
     [InlineData("body")]
     [InlineData("attachments")]
+    [SuppressMessage("Usage", "CA2201:Do not raise reserved exception types", Justification = "The test injects a runtime-reserved OutOfMemoryException to prove it is not wrapped.")]
     public void OutOfMemoryIsNotWrapped(string stage)
     {
         var bytes = SampleFactory.ToBytes(Sample());

@@ -7,6 +7,8 @@ internal static class Catalog
 {
     public const int ExpectedCount = 1200;
 
+    private static readonly string[] Utf8AddressTags = ["rfc6532", "unicode"];
+
     public static List<CaseDef> All()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -445,7 +447,7 @@ internal static class Catalog
                 m.Body = new TextPart("plain") { Text = $"hello {p.Name}" };
                 var expect = PlainExpect($"utf8-{n}", $"hello {p.Name}");
                 expect.Metadata["from"] = MimeBuild.Contains(p.Addr);
-                var tags = new[] { "rfc6532", "unicode" }.Concat(p.Extra).ToArray();
+                var tags = Utf8AddressTags.Concat(p.Extra).ToArray();
                 list.Add(MimeBuild.FromMessage($"S{n:D3}", tags, m, expect));
             }
         }

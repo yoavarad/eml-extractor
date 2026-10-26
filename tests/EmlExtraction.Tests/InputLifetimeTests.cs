@@ -14,7 +14,7 @@ namespace EmlExtraction.Tests;
 /// </summary>
 public sealed class InputLifetimeTests
 {
-    private readonly IEmlExtractor _extractor = new CheckedExtractor();
+    private readonly CheckedExtractor _extractor = new();
 
     private static readonly string RealisticDir = FindDir();
 
@@ -160,7 +160,7 @@ public sealed class InputLifetimeTests
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static (EmlExtractionResult Result, WeakReference Input) ExtractAndForget(IEmlExtractor extractor)
+    private static (EmlExtractionResult Result, WeakReference Input) ExtractAndForget(CheckedExtractor extractor)
     {
         var bytes = MultiPart();
         return (extractor.Extract(bytes), new WeakReference(bytes));

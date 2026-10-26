@@ -50,7 +50,7 @@ public sealed class ExceptionTypeTests
     [InlineData("bogus")]
     public void ExtractionExceptionRejectsUnknownStage(string? stage)
     {
-        var ex = Assert.ThrowsAny<ArgumentException>(() => new EmlExtractionException(stage!, new Exception()));
+        var ex = Assert.ThrowsAny<ArgumentException>(() => new EmlExtractionException(stage!, new InvalidOperationException()));
 
         Assert.Equal("stage", ex.ParamName);
         if (stage is { Length: > 0 })

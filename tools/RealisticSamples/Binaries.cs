@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO.Compression;
 using System.Text;
 using DocumentFormat.OpenXml;
@@ -55,7 +56,7 @@ internal static class Binaries
     {
         var sb = new StringBuilder("%PDF-1.4\n");
         var offs = new List<int>();
-        void Obj(string body) { offs.Add(sb.Length); sb.Append($"{offs.Count} 0 obj\n{body}\nendobj\n"); }
+        void Obj(string body) { offs.Add(sb.Length); sb.Append(CultureInfo.InvariantCulture, $"{offs.Count} 0 obj\n{body}\nendobj\n"); }
         Obj("<< /Type /Catalog /Pages 2 0 R >>");
         Obj("<< /Type /Pages /Kids [3 0 R] /Count 1 >>");
         Obj("<< /Type /Page /Parent 2 0 R /MediaBox [0 0 200 100] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>");
@@ -63,9 +64,9 @@ internal static class Binaries
         Obj($"<< /Length {content.Length} >>\nstream\n{content}\nendstream");
         Obj("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");
         var xref = sb.Length;
-        sb.Append($"xref\n0 {offs.Count + 1}\n0000000000 65535 f \n");
-        foreach (var o in offs) sb.Append($"{o:D10} 00000 n \n");
-        sb.Append($"trailer\n<< /Size {offs.Count + 1} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n");
+        sb.Append(CultureInfo.InvariantCulture, $"xref\n0 {offs.Count + 1}\n0000000000 65535 f \n");
+        foreach (var o in offs) sb.Append(CultureInfo.InvariantCulture, $"{o:D10} 00000 n \n");
+        sb.Append(CultureInfo.InvariantCulture, $"trailer\n<< /Size {offs.Count + 1} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n");
         return Encoding.ASCII.GetBytes(sb.ToString());
     }
 

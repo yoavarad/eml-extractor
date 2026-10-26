@@ -4,7 +4,7 @@ namespace EmlExtraction.Tests;
 
 public sealed class InternalCorpusTests
 {
-    private readonly IEmlExtractor _extractor = new CheckedExtractor();
+    private readonly CheckedExtractor _extractor = new();
 
     [SkippableFact]
     public void ZimbraOutlookTnefUnpacksGifAttachments()
@@ -46,7 +46,7 @@ public sealed class InternalCorpusTests
         var bytes = Load(["gaps", "shift-jis.eml"]);
 
         var result = _extractor.Extract(bytes);
-        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed") || w.StartsWith("body_decode_failed"));
+        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed", StringComparison.Ordinal) || w.StartsWith("body_decode_failed", StringComparison.Ordinal));
         Assert.Contains("あいうえお", result.MainContent);
     }
 
@@ -56,7 +56,7 @@ public sealed class InternalCorpusTests
         var bytes = Load(["gaps", "iso2022jp.eml"]);
 
         var result = _extractor.Extract(bytes);
-        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed"));
+        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed", StringComparison.Ordinal));
         Assert.False(string.IsNullOrWhiteSpace(result.Metadata.GetValueOrDefault("subject")));
         Assert.False(string.IsNullOrWhiteSpace(result.MainContent));
         Assert.Contains("テスト", result.MainContent);
@@ -68,7 +68,7 @@ public sealed class InternalCorpusTests
         var bytes = Load(["gaps", "gb2312.eml"]);
 
         var result = _extractor.Extract(bytes);
-        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed"));
+        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed", StringComparison.Ordinal));
         Assert.False(string.IsNullOrWhiteSpace(result.MainContent));
         Assert.DoesNotContain('\uFFFD', result.MainContent);
     }
@@ -79,7 +79,7 @@ public sealed class InternalCorpusTests
         var bytes = Load(["gaps", "dsn-report.eml"]);
 
         var result = _extractor.Extract(bytes);
-        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed"));
+        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed", StringComparison.Ordinal));
         Assert.False(string.IsNullOrWhiteSpace(result.MainContent));
         Assert.Contains(result.Attachments, a =>
             a.FileName.Contains("delivery-status", StringComparison.OrdinalIgnoreCase)
@@ -92,7 +92,7 @@ public sealed class InternalCorpusTests
         var bytes = Load(["gaps", "smime-signed.eml"]);
 
         var result = _extractor.Extract(bytes);
-        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed"));
+        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed", StringComparison.Ordinal));
         Assert.Contains("signed by Thunderbird", result.MainContent);
         Assert.Contains(result.Attachments, a => a.FileName.Contains("signed.jpg", StringComparison.OrdinalIgnoreCase) && a.SizeInBytes > 100);
         Assert.Contains(result.Attachments, a =>

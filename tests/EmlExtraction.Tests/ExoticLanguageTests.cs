@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using EmlExtraction.Abstractions;
 using MimeKit;
@@ -6,7 +7,7 @@ namespace EmlExtraction.Tests;
 
 public sealed class ExoticLanguageTests
 {
-    private readonly IEmlExtractor _extractor = new CheckedExtractor();
+    private readonly CheckedExtractor _extractor = new();
 
     [Theory]
     [InlineData("עברית", "שלום עולם")]
@@ -169,7 +170,7 @@ public sealed class ExoticLanguageTests
     {
         var name = seq + ".txt";
         var encodedWord = "=?UTF-8?B?" + B64(name) + "?=";
-        var rfc2231 = "UTF-8''" + string.Concat(Encoding.UTF8.GetBytes(name).Select(b => "%" + b.ToString("X2")));
+        var rfc2231 = "UTF-8''" + string.Concat(Encoding.UTF8.GetBytes(name).Select(b => "%" + b.ToString("X2", CultureInfo.InvariantCulture)));
         foreach (var disposition in new[]
                  {
                      "attachment; filename=\"" + encodedWord + "\"",
@@ -219,7 +220,7 @@ public sealed class ExoticLanguageTests
 
     // Every byte outside [A-Za-z0-9] as =XX (valid for QP bodies and RFC 2047 Q words).
     private static string Qp(string s) => string.Concat(Encoding.UTF8.GetBytes(s)
-        .Select(b => char.IsAsciiLetterOrDigit((char)b) ? ((char)b).ToString() : "=" + b.ToString("X2")));
+        .Select(b => char.IsAsciiLetterOrDigit((char)b) ? ((char)b).ToString() : "=" + b.ToString("X2", CultureInfo.InvariantCulture)));
 
     private static MimeMessage Html(string subject, string html)
     {
