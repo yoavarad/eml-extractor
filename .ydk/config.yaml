@@ -1,5 +1,5 @@
 project:
-  name: eml-extraction
+  name: eml-extractor
   spec_location: docs/specs
   adrs_location: docs/adrs
   research_location: docs/research
