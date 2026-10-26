@@ -219,7 +219,7 @@ Clone and restore:
 
 ```bash
 git clone https://github.com/yoavarad/eml-extractor.git
-cd eml-extraction
+cd eml-extractor
 dotnet restore
 ```
 
