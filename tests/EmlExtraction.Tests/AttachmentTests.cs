@@ -1,4 +1,5 @@
 using System.Text;
+using EmlExtraction.Abstractions;
 using MimeKit;
 
 namespace EmlExtraction.Tests;

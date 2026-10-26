@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using EmlExtraction;
+using EmlExtraction.Logics;
 
 namespace EmlExtraction.Bench;
 

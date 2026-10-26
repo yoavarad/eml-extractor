@@ -1,4 +1,6 @@
 using BenchmarkDotNet.Attributes;
+using EmlExtraction.Logics;
+using EmlExtraction.Models;
 using MimeKit;
 
 namespace EmlExtraction.Bench.Profile;

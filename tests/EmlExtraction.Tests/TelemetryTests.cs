@@ -2,6 +2,9 @@ using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Reflection;
 using System.Text;
+using EmlExtraction.Exceptions;
+using EmlExtraction.Logics;
+using EmlExtraction.Models;
 using MimeKit;
 
 namespace EmlExtraction.Tests;
@@ -99,6 +102,36 @@ public sealed class TelemetryTests
         Assert.Empty(rec.Of(Warnings));
         Assert.Empty(rec.Of(InternalErrors));
         Assert.Empty(rec.Of(InputTooLarge));
+    }
+
+    [Fact]
+    public void StreamInputRecordsBytesRead()
+    {
+        var bytes = SampleFactory.ToBytes(SampleFactory.Plain("s", "t"));
+
+        using var rec = new Recorder();
+        using var stream = new MemoryStream(bytes);
+        var result = _extractor.Extract(stream);
+
+        Assert.Empty(result.Warnings);
+        Assert.Equal((double)bytes.Length, Assert.Single(rec.Of(InputSize)).Value);
+        Assert.Equal(Tag("eml_extraction.outcome", "clean"), Assert.Single(rec.Of(Duration)).Tags.Single());
+    }
+
+    [Fact]
+    public void StreamInputOverLimitRecordsRefusal()
+    {
+        var bytes = SampleFactory.ToBytes(SampleFactory.Plain("s", new string('x', 4096)));
+
+        using var rec = new Recorder();
+        using var stream = new MemoryStream(bytes);
+        Assert.Throws<EmlInputTooLargeException>(() => new EmlExtractor(1024).Extract(stream));
+
+        Assert.Equal(1025d, Assert.Single(rec.Of(InputSize)).Value);
+        Assert.Equal(1d, Assert.Single(rec.Of(InputTooLarge)).Value);
+        Assert.Equal(Tag("eml_extraction.outcome", "input_too_large"), Assert.Single(rec.Of(Duration)).Tags.Single());
+        Assert.Empty(rec.Of(Warnings));
+        Assert.Empty(rec.Of(InternalErrors));
     }
 
     [Fact]

@@ -8,7 +8,7 @@ EML has adopted the proposal below and asks the team to make it the contract for
 
 | Concept | EML (target) | OLE (today) | Question |
 | --- | --- | --- | --- |
-| Extraction input | `EmlExtractionRequest { FileBytes, FileName }` | `ExtractionRequest { FileBytes, InputStream, FilePath, FileName, DetectedMimeType }` | Agree on `FileBytes` + `FileName` as the common core? Should stream and file-path sources be in the shared contract? |
+| Extraction input | `EmlExtractionRequest { FileBytes, InputStream, FileName }` (exactly one of the two sources, ADR-024) | `ExtractionRequest { FileBytes, InputStream, FilePath, FileName, DetectedMimeType }` | Agree on `FileBytes` + `FileName` as the common core? Should stream and file-path sources be in the shared contract? |
 | Detection input | bytes | `MimeDetectionRequest { FileBytes, FileName }` | Request object or bytes? EML uses bytes because the brief says "bytes in" and the file name must not affect detection |
 | Detection output | `EmlDetectionResult { IsSupported, MimeType }` + `IsEml` bool | `MimeDetectionResult { DetectedFormat, MimeType, IsSupported }` | Agree on `IsSupported` + `MimeType` as the common core? |
 | Sub-file fields | `FileName`, `SizeInBytes`, `FullPath`, `BinaryData` | `FileName`, `SizeInBytes`, `PackagePath`, `BinaryData` | Rename OLE `PackagePath` to `FullPath` (the brief's term)? |

@@ -1,3 +1,8 @@
+using EmlExtraction.Abstractions;
+using EmlExtraction.Exceptions;
+using EmlExtraction.Logics;
+using EmlExtraction.Models;
+
 namespace EmlExtraction.Tests;
 
 /// <summary>
@@ -12,6 +17,8 @@ internal sealed class CheckedExtractor : IEmlExtractor
     private readonly EmlExtractor _inner = new();
 
     public EmlExtractionResult Extract(ReadOnlyMemory<byte> eml) => Check(_inner.Extract(eml));
+
+    public EmlExtractionResult Extract(Stream eml) => Check(_inner.Extract(eml));
 
     public EmlExtractionResult Extract(EmlExtractionRequest request) => Check(_inner.Extract(request));
 

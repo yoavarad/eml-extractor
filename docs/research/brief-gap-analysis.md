@@ -47,7 +47,7 @@ What the sibling extractor does, and whether this repo adopts it.
 
 | OLE practice | Adopted as |
 | --- | --- |
-| Request classes so fields can be added later | `EmlExtractionRequest { FileBytes, FileName }` (ADR-012) |
+| Request classes so fields can be added later | `EmlExtractionRequest { FileBytes, InputStream, FileName }` (ADR-012, ADR-024) |
 | Typed detection result | `EmlDetectionResult { IsSupported, MimeType }`; `IsEml` kept (ADR-012) |
 | Sub-file record `{ BinaryData, FileName, PackagePath, SizeInBytes }` with location inside the container | Shared names `FileName`, `SizeInBytes`, `FullPath`, `BinaryData`; `FullPath` = container path (ADR-012, ADR-013) |
 | BenchmarkDotNet P50/P95 and alloc-bytes-per-input-byte | P50/P95 and alloc bytes per input byte reported per DOP in the sweep (ADR-015) |

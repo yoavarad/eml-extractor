@@ -1,3 +1,4 @@
+using EmlExtraction.Logics;
 using GoldenKit;
 
 var repo = FindRepo(AppContext.BaseDirectory) ?? Directory.GetCurrentDirectory();
@@ -12,7 +13,7 @@ if (fault >= 0)
 
     // ADR-023 fault seam: proves score/probe exit non-zero when extraction throws.
     var stage = args[fault + 1];
-    EmlExtraction.EmlExtractor.StageFault = s =>
+    EmlExtractor.StageFault = s =>
     {
         if (s == stage)
             throw new InvalidCastException("GoldenKit --inject-fault");

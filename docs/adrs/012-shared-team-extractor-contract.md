@@ -1,7 +1,7 @@
 # ADR-012: Shared team extractor contract (request, detection result, subfile names)
 
 ## Status
-Accepted for EML; proposed to team (per project owner, 2026-10-17; bytes overload and batch API settled by the owner on 2026-10-18). Implemented. Amended by ADR-023 (2026-10-18): the error model is now exceptions for misuse, limits and bugs, warnings for content.
+Accepted for EML; proposed to team (per project owner, 2026-10-17; bytes overload and batch API settled by the owner on 2026-10-18). Implemented. Amended by ADR-023 (2026-10-18): the error model is now exceptions for misuse, limits and bugs, warnings for content. Extended by ADR-024 (2026-10-23): the request gains `InputStream`, and `Extract(Stream)` is added. Amended by the namespace layout (2026-10-23, task #149): see "Amendment: source layout and namespaces".
 
 ## Context
 The team brief gives two functions per extractor: a detection function (bytes in, "is this the format?") and an extraction function (metadata, main content, sub-files with name, size, full path if it exists, and the binary). The extracted component goes into the team's extraction template, and the team wires it into the factory.
@@ -23,7 +23,7 @@ Per project owner, 2026-10-17. EML adopts the following now (implemented in Stag
 - Extraction input is a request record, `EmlExtractionRequest`:
   - `FileBytes` - `ReadOnlyMemory<byte>`, required, the whole message. A `byte[]` converts implicitly, so callers holding an array pass it unchanged.
   - `FileName` - `string?`, optional, for traceability only. It never changes the result (detection and extraction stay content-only).
-  - Room for later fields: a stream or file-path source (as OLE has) may be added as new optional members without breaking callers. None is added now.
+  - Room for later fields: a stream or file-path source (as OLE has) may be added as new optional members without breaking callers. None is added now. (ADR-024 adds `InputStream`; `FileBytes` is then no longer required, and exactly one of the two must be set. A file-path source is still not added.)
 - `EmlExtractor.Extract(EmlExtractionRequest)` is the primary public extraction method. A null request throws `ArgumentNullException` (programmer misuse, ADR-004).
 - Per project owner (2026-10-18), `Extract(ReadOnlyMemory<byte>)` stays public as a thin convenience wrapper: it builds a request with those bytes and no `FileName` and calls the primary method, so both give identical results, warnings, and size-limit behaviour. It holds no logic of its own.
 - `Extract(MimeMessage)` becomes `internal`. Tests and tools that need it use `InternalsVisibleTo`.
@@ -76,3 +76,19 @@ The record and list names are not part of this decision. EML keeps `ExtractedAtt
 
 ## Evidence
 Team brief (`docs/requirements.md`), `yoavarad/ole-extractor` DTOs (`ExtractorOLE/DTOs/ExtractionRequest.cs`, `MimeDetectionRequest.cs`, `MimeDetectionResult.cs`, `DocumentExtractionResult.cs`), `src/EmlExtraction/Models.cs`, `docs/research/brief-gap-analysis.md`. Project owner decision, 2026-10-17.
+
+## Amendment: source layout and namespaces (2026-10-23, task #149)
+Owner decision 2026-10-23 (reviewer issue #141): `src/EmlExtraction` is split into four folders, each with a matching sub-namespace. No `.cs` file stays at the project root.
+
+| Folder / namespace | Types |
+| --- | --- |
+| `Abstractions` / `EmlExtraction.Abstractions` | `IEmlExtractor`, `IEmlDetector` |
+| `Models` / `EmlExtraction.Models` | `EmlExtractionRequest`, `EmlExtractionResult`, `EmlDetectionResult`, `ExtractedAttachment` |
+| `Exceptions` / `EmlExtraction.Exceptions` | `EmlExtractionException`, `EmlInputTooLargeException` |
+| `Logics` / `EmlExtraction.Logics` | `EmlExtractor`, `EmlDetector` and every internal type (parser, body/part/header stages, text direction, encoding cache, telemetry, stream wrappers) |
+
+Consequences:
+- Breaking change: callers replace `using EmlExtraction;` with the sub-namespaces they use. Accepted because there are no external consumers yet.
+- Unchanged: assembly name, package id, `InternalsVisibleTo`, Meter and ActivitySource name `EmlExtraction` (ADR-021), instrument names, behaviour.
+- The `error.type` telemetry tag carries the exception type's full name, so for the library's own exceptions it now reads `EmlExtraction.Exceptions.EmlExtractionException` / `EmlExtraction.Exceptions.EmlInputTooLargeException`.
+- `NamespaceLayoutTests` pins the public layout and fails if any type lands outside the four namespaces.

@@ -1,7 +1,7 @@
 $schema: ydk:schema:entity
 id: ydk:entity:extraction/EmlExtractionResult
 description: >-
-  Immutable record returned by every Extract call. Source: src/EmlExtraction/Models.cs
+  Immutable record returned by every Extract call. Source: src/EmlExtraction/Models/EmlExtractionResult.cs
   (public sealed record EmlExtractionResult). In-memory value object, not persisted.
   Target change (ADR-014; not implemented, Stage 02): the XFields property is removed and its value lives only in
   Metadata["xfields"].

@@ -2,7 +2,8 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
-using EmlExtraction;
+using EmlExtraction.Logics;
+using EmlExtraction.Models;
 using MimeKit;
 
 namespace GoldenKit;

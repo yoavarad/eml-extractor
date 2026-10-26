@@ -1,3 +1,7 @@
+using EmlExtraction.Exceptions;
+using EmlExtraction.Logics;
+using EmlExtraction.Models;
+
 namespace EmlExtraction.Tests;
 
 /// <summary>Error-model types and misuse messages (ADR-023).</summary>

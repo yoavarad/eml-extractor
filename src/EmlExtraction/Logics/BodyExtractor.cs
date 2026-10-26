@@ -1,7 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
+using EmlExtraction.Models;
 using MimeKit;
 
-namespace EmlExtraction;
+namespace EmlExtraction.Logics;
 
 /// <summary>Body and attachments stage bodies (ADR-004), without their wrappers; the profiling harness (ADR-020) calls them directly.</summary>
 internal sealed class BodyExtractor

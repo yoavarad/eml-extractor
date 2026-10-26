@@ -1,4 +1,4 @@
-namespace EmlExtraction;
+namespace EmlExtraction.Models;
 
 /// <summary>Immutable result of one extraction.</summary>
 /// <param name="Metadata">Header map (from, to, cc, bcc, subject, date and related keys).</param>

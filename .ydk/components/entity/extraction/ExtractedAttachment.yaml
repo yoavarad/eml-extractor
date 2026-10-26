@@ -2,7 +2,7 @@ $schema: ydk:schema:entity
 id: ydk:entity:extraction/ExtractedAttachment
 description: >-
   One collected MIME part (attachment, inline image, nested message, TNEF-unpacked file, or
-  non-selected body-like part). Source: src/EmlExtraction/Models.cs (public sealed record
+  non-selected body-like part). Source: src/EmlExtraction/Models/ExtractedAttachment.cs (public sealed record
   ExtractedAttachment), built by PartCollector. In-memory value object, not persisted.
   Target field names and meanings follow the shared team contract (ADR-012) and the container-path rule (ADR-013);
   not implemented (Stage 02). Today the fields are Name, Size, FullPath (raw path-bearing filename or null), Data,

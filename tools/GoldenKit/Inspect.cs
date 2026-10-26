@@ -1,4 +1,4 @@
-using EmlExtraction;
+using EmlExtraction.Logics;
 
 namespace GoldenKit;
 

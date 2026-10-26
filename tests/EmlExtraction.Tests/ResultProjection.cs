@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using EmlExtraction.Models;
 
 namespace EmlExtraction.Tests;
 

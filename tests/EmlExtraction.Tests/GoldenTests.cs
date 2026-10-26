@@ -1,6 +1,9 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using EmlExtraction.Abstractions;
+using EmlExtraction.Logics;
+using EmlExtraction.Models;
 
 namespace EmlExtraction.Tests;
 

@@ -1,8 +1,9 @@
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Reflection;
+using EmlExtraction.Models;
 
-namespace EmlExtraction;
+namespace EmlExtraction.Logics;
 
 /// <summary>
 /// Runtime metrics and activities (ADR-021, ydk:req:observability/runtime-telemetry). BCL only. Every tag value is a constant from a
