@@ -1,0 +1,3 @@
+# Keep graph focused on code: skip YAML config/schemas/workflows
+*.yaml
+*.yml

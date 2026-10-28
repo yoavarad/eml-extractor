@@ -4,83 +4,82 @@
 - cluster-only mode — file stats not available
 
 ## Summary
-- 2138 nodes · 4228 edges · 159 communities (121 shown, 38 thin omitted)
-- Extraction: 89% EXTRACTED · 11% INFERRED · 0% AMBIGUOUS · INFERRED: 454 edges (avg confidence: 0.87)
+- 1908 nodes · 4296 edges · 161 communities (104 shown, 57 thin omitted)
+- Extraction: 88% EXTRACTED · 12% INFERRED · 0% AMBIGUOUS · INFERRED: 496 edges (avg confidence: 0.88)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a396e5cc`
+- Built from commit: `e559f909`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- Golden Case Catalog Builder
+- Extraction Request and Result Models
 - Stage Fault Wrapping Tests
-- Sweep Report and Baseline Compare
+- Baseline Comparison Tests
 - Detector Legacy Equivalence Tests
-- Sweep Hardware and Math Tests
+- Sweep Math and CPU Parsing
 - Realistic Sample Generator
 - Attachment Part Collection
 - Text Direction Detection
 - Telemetry Behavior Tests
-- Profile Copy Factor Command
+- Caching Encoding Provider
 - Content Catch Site Tests
 - Internal Corpus Tests
-- Golden Spec Schema
+- Golden Case Catalog Builder
 - Header and Body Extraction Tests
-- Benchmark Corpus and Throughput Runner
-- Attachment Extraction Tests
+- Test Project File Imports
+- Attachment Naming Tests
 - Input Lifetime Tests
 - Bench Sweep Namespace Imports
 - Per-Stage Profiling Benchmarks
-- Cached Encoding Provider
+- Theory Data-Driven Tests
 - Exotic Language Round-Trip Tests
 - Project Files and Packages
 - CSharp Capability Assessment ADR
 - GoldenKit Corpus Probe Stats
 - Header Metadata Mapping
-- GoldenKit Namespace Imports
-- Profile Report Oct 18 and Body Selection
-- Profile Trace Command
+- GoldenKit Tool Entry Points
+- README Overview
+- Input Size Limiting Stream
 - License Audit and Guard Scripts
-- README and Input Size Limit
+- Non-Seekable Stream Test Double
 - Benchmark and Telemetry Imports
 - Core Library Namespaces
 - Test Project Namespace Imports
-- Exception Type Tests
+- Throwing Stream Test Double
 - ADR Data-Driven Optimization
 - Body Extractor Tests
-- Golden Set Test Runner
+- Golden Requirements Checks
 - Golden Score Evaluator
 - ADR Load Test Method
 - ADR Profiling Method
 - ADR Runtime Metrics and Tracing
+- Spec Documents Index
 - Attachment Decoding Tests
-- Profile Sample Loader
+- Mbox Splitting and Sample Loading
 - Realistic Sample Manifest Tests
 - MIME Message Parser
 - ADR MimeKit Parser Choice
 - Large File Sizing Math
 - CSharp Best Practices Skill
-- Extraction Exception Policy
+- Extraction Exception Types
 - Profile Report Oct 23 Closing
 - Extraction Spec
-- GoldenKit Inspect Command
+- ADR Warnings Not Exceptions
 - Large File Load Command
-- Large File Math Tests
+- Test Input Discovery
 - Async and Concurrency Guidelines
 - EF Core Data Access Guidelines
-- Read-Ahead and Limited Streams
-- Parse and Attachments Stage Benchmarks
-- Body and Attachment Extraction Core
-- Realistic Samples JSON and OpenXML
+- Read-Ahead Peek Stream
+- ADR Stream Input
 - ADR Prefer HTML Main Content
-- ADR Warnings Not Exceptions
+- Tracking Memory Stream Double
 - ADR Text Direction Reporting
 - ADR Multi-Target Net8 Net10
 - Project Rules and Testing Strategy
 - Attachments Spec
-- Extractor Entry and Size Limit
+- Baseline Compare Command
 - Retrospective Task 12
 - Retrospective Task 8
 - CSharp Playbook Overview
@@ -91,7 +90,7 @@
 - ADR Canonical Metadata Keys
 - ADR MIT License
 - Golden Set Plan
-- Requirements Coverage Checklist
+- Task 32 PR Body
 - Project Overview Spec
 - Open Team Questions
 - Public API Parity Tests
@@ -102,22 +101,18 @@
 - Retrospective Task 15
 - Pull Request Checklist Guidelines
 - ADR Custom Component Schemas
-- Stream Input Tests
+- Extractor Entry and Stream Input
 - Cross-Cutting Concerns Spec
 - Quality Evidence Spec
 - Third-Party Notices
-- Stream Test Doubles
-- Trace GC Support Helpers
+- Failing Stream Test Double
 - Testing Guidelines
 - Naming and Maintainability Guidelines
 - Security Baseline Guidelines
 - Logging and Observability Guidelines
 - Configuration and DI Guidelines
-- Extraction Request Model
 - Detection Spec
-- README Usage Interface
 - Task 146 Progress Log
-- Task 32 PR Body
 - Nullability and Validation Guidelines
 - API Contract Guidelines
 - JSON Serialization Guidelines
@@ -125,17 +120,12 @@
 - Scope Spec
 - Task Issue Template
 - Pull Request Template
-- Extraction Result and Benchmarks
 - Retrospective Task 64
 - Epic Issue Template
 - Task Completion Hook
 - Realistic Corpus Manifest
-- Glossary
 - Story Issue Template
 - Profile Corpus Shell Script
-- Commit Message Hook
-- Pre-Commit Hook
-- Pre-Push Hook
 - Task 106 Progress Log
 - Task 32 Progress Log
 - Task 68 Progress Log
@@ -143,128 +133,103 @@
 - Task 72 Progress Log
 - Task 75 Progress Log
 - EML Format Detector
-- Telemetry Overhead Benchmarks
+- Throughput and Overhead Benchmarks
 - ADR Shared Extractor Contract
-- Detector Accept Reject Tests
-- Legacy Detector Reference
-- Namespace Layout Tests
-- ADR Stream Input
 - Task 149 Progress Log
 - Detector Interface
-- Activity Listener Exception Test
+- DOP Sweep Command
+- Hardware Probe and Profiling
+- Sweep Report and Runner
+- ADR FullPath Container Path
+- Profile Sample Selection Math
+- Throughput Results Doc
+- Detector and Layout Facts
+- Error Handling Guidelines
+- ADR Xfields Metadata
+- Brief Gap Analysis
+- Baseline Regression Checks
+- Throughput Runner
 
 ## God Nodes (most connected - your core abstractions)
-1. `EmlExtractor` - 67 edges
-2. `EmlExtraction.Logics` - 43 edges
-3. `EmlDetector` - 41 edges
-4. `CaseDef` - 36 edges
-5. `EmlExtractionResult` - 32 edges
-6. `EmlInputTooLargeException` - 32 edges
-7. `EmlExtractionRequest` - 31 edges
+1. `EmlExtractor` - 80 edges
+2. `EmlDetector` - 45 edges
+3. `EmlExtraction.Logics` - 43 edges
+4. `EmlExtractionResult` - 40 edges
+5. `CaseDef` - 36 edges
+6. `EmlExtractionRequest` - 33 edges
+7. `EmlInputTooLargeException` - 32 edges
 8. `EmlExtractionException` - 31 edges
 9. `EmlExtraction.Tests` - 31 edges
-10. `TelemetryTests` - 28 edges
+10. `InternalCorpusTests` - 28 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Context` --references--> `EmlExtractionRequest`  [INFERRED]
   docs/adrs/024-stream-input.md → src/EmlExtraction/Models/EmlExtractionRequest.cs
-- `1. Load — max files per second on this hardware` --references--> `ThroughputRunner`  [INFERRED]
-  docs/requirements.md → benches/EmlExtraction.Bench/ThroughputRunner.cs
+- `Real-world tests` --references--> `InternalCorpusTests`  [INFERRED]
+  README.md → tests/EmlExtraction.Tests/InternalCorpusTests.cs
 - `Detection (is this an EML)` --references--> `EmlDetector`  [INFERRED]
   docs/research/csharp-capability-assessment.md → src/EmlExtraction/Logics/EmlDetector.cs
-- `GC, pause and LOH (sweep traces, synthetic set, 2 phases of about 1.5 s each)` --references--> `EmlInputTooLargeException`  [INFERRED]
-  docs/perf/profile-2026-10-18.md → src/EmlExtraction/Exceptions/EmlInputTooLargeException.cs
-- `Large-file pass (net10.0 unless noted, Workstation, DOP 1, 524,288,000)` --references--> `EmlInputTooLargeException`  [INFERRED]
-  docs/perf/profile-2026-10-23.md → src/EmlExtraction/Exceptions/EmlInputTooLargeException.cs
+- `1. Load — max files per second on this hardware` --references--> `ThroughputRunner`  [INFERRED]
+  docs/requirements.md → benches/EmlExtraction.Bench/ThroughputRunner.cs
+- `Status` --references--> `EmlExtractionException`  [INFERRED]
+  docs/adrs/020-profiling-method.md → src/EmlExtraction/Exceptions/EmlExtractionException.cs
 
 ## Import Cycles
 - None detected.
 
-## Communities (159 total, 38 thin omitted)
+## Communities (161 total, 57 thin omitted)
 
-### Community 0 - "Golden Case Catalog Builder"
-Cohesion: 0.07
-Nodes (49): Disposition, ADR-014: xfields joins literal `X_` headers and lives in the metadata, Alternatives, Consequences, Context, Decision, Evidence, Status (+41 more)
+### Community 0 - "Extraction Request and Result Models"
+Cohesion: 0.15
+Nodes (13): Amendment: source layout and namespaces (2026-10-23, task #149), IEmlExtractor, EmlExtractionRequest, FileBytes, FileName, HasFileBytes, InputStream, EmlExtractionResult (+5 more)
 
-### Community 1 - "Stage Fault Wrapping Tests"
-Cohesion: 0.20
-Nodes (10): Func, OutOfMemoryException, ArgumentNullException, Exception, Fact, InlineData, MimeMessage, SuppressMessage (+2 more)
-
-### Community 2 - "Sweep Report and Baseline Compare"
-Cohesion: 0.05
-Nodes (36): GeneratedRegex, IReadOnlyList, List, Regex, BaselineCompare, CompareResult, CompareCommand, Action (+28 more)
-
-### Community 3 - "Detector Legacy Equivalence Tests"
-Cohesion: 0.24
-Nodes (6): Fact, IEnumerable, MemberData, Theory, TheoryData, DetectorEquivalenceTests
-
-### Community 4 - "Sweep Hardware and Math Tests"
-Cohesion: 0.06
-Nodes (21): IEnumerable, CpuInfoParser, HardwareProbe, HardwareProbeException, List, ReadOnlySpan, MboxSplitter, From (+13 more)
+### Community 4 - "Sweep Math and CPU Parsing"
+Cohesion: 0.13
+Nodes (3): CpuInfoParser, SweepMath, SweepPureTests
 
 ### Community 5 - "Realistic Sample Generator"
-Cohesion: 0.06
-Nodes (28): Data, Dir, Eml, Multipart, Sha, Fact, MimeMessage, MimePart (+20 more)
+Cohesion: 0.09
+Nodes (4): RealisticSamplesTests, Committed, Binaries, SampleGenerator
 
 ### Community 6 - "Attachment Part Collection"
 Cohesion: 0.06
-Nodes (37): Additional location info, ADR-013: FullPath is the container path; nested messages stay opaque, Alternatives, Consequences, Context, Decision, Evidence, FullPath (+29 more)
+Nodes (32): AttachmentsStage, Attachment copy factor, Comparison with `docs/perf-baseline.json`, Data caveats (read first), GC, pause and LOH (sweep traces, synthetic set, 2 phases of about 1.5 s each), Hardware and runs, Inputs, Per-stage allocation share (BDN MemoryDiagnoser, exact, TFM-independent) (+24 more)
 
 ### Community 7 - "Text Direction Detection"
-Cohesion: 0.05
-Nodes (36): Committed baseline and regression rule (ADR-015), DOP sweep (ADR-015), DOP sweep JSON schema (v1), Files / second (1 thread), Hardware, How to scale resources, Large-file pass and sizing formula (ADR-015), Nightly synthetic job (+28 more)
+Cohesion: 0.11
+Nodes (10): Confidence and caveats, Hotspots not taken, Optimization triage 2026-10-18, Owner decisions requested, Provisional targets (traced to report rows), Ranked tasks, Rationale per task, Rules applied (owner decision 2026-10-18, on #74) (+2 more)
 
 ### Community 8 - "Telemetry Behavior Tests"
 Cohesion: 0.13
-Nodes (20): AssemblyInformationalVersionAttribute, IDisposable, KeyValuePair, Measurement, Activity, ActivityListener, Dictionary, Fact (+12 more)
+Nodes (7): Measurement, Recorder, Instruments, Measurements, SpanRecorder, All, TelemetryTests
 
-### Community 9 - "Profile Copy Factor Command"
-Cohesion: 0.06
-Nodes (29): ConcurrentDictionary, CopyFactorColumn, AlwaysShow, Category, ColumnName, Id, IsNumeric, Legend (+21 more)
+### Community 9 - "Caching Encoding Provider"
+Cohesion: 0.08
+Nodes (15): CopyFactorColumn, AlwaysShow, Category, ColumnName, Id, IsNumeric, Legend, PriorityInCategory (+7 more)
 
 ### Community 10 - "Content Catch Site Tests"
-Cohesion: 0.15
-Nodes (12): MimeContent, Exception, Fact, MimeMessage, SeekOrigin, ContentCatchSiteTests, ThrowingStream, CanRead (+4 more)
+Cohesion: 0.12
+Nodes (8): Corpus, ContentCatchSiteTests, ThrowingStream, CanRead, CanSeek, CanWrite, Length, Position
 
 ### Community 11 - "Internal Corpus Tests"
-Cohesion: 0.10
-Nodes (18): ADR-008: Flat, opaque attachments — no recursion, TNEF unwrapped, Alternatives, Consequences, Context, Decision, Evidence, Open questions, Status (+10 more)
+Cohesion: 0.09
+Nodes (20): ADR-008: Flat, opaque attachments — no recursion, TNEF unwrapped, Alternatives, Consequences, Context, Decision, Evidence, Open questions, Status (+12 more)
 
-### Community 12 - "Golden Spec Schema"
-Cohesion: 0.06
-Nodes (30): GoldenKit.Schema, JsonConverter, system_text_json_serialization, Generator, Dictionary, List, GoldenExpect, AttachmentCount (+22 more)
-
-### Community 13 - "Header and Body Extraction Tests"
-Cohesion: 0.14
-Nodes (12): Evidence, As many headers as possible, Classic fields (To, From, etc.), Metadata fields, `X_` fields concatenated into `xfields`, ReadOnlyMemory, Stream, ArgumentNullException (+4 more)
-
-### Community 14 - "Benchmark Corpus and Throughput Runner"
-Cohesion: 0.24
-Nodes (6): MimeMessage, Corpus, Sample, GlobalSetup, GlobalSetup, ThroughputRunner
-
-### Community 15 - "Attachment Extraction Tests"
-Cohesion: 0.15
-Nodes (8): 3. Correctness B — attachment variety, BinaryWriter, Fact, InlineData, MimePart, Theory, AttachmentTests, SampleFactory
-
-### Community 16 - "Input Lifetime Tests"
-Cohesion: 0.13
-Nodes (11): Input, MethodImpl, Result, Fact, MemberData, MimePart, Theory, TheoryData (+3 more)
+### Community 12 - "Golden Case Catalog Builder"
+Cohesion: 0.08
+Nodes (36): GoldenKit.Schema, CaseDef, Eml, Expect, Id, IsEml, Tags, Catalog (+28 more)
 
 ### Community 17 - "Bench Sweep Namespace Imports"
-Cohesion: 0.09
-Nodes (16): benchmarkdotnet_columns, benchmarkdotnet_configs, benchmarkdotnet_diagnosers, benchmarkdotnet_environments, benchmarkdotnet_exporters_json, benchmarkdotnet_reports, benchmarkdotnet_running, EmlExtraction.Bench.Profile (+8 more)
+Cohesion: 0.12
+Nodes (3): EmlExtraction.Bench.Profile, EmlExtraction.Bench.Sweep, NonParallelCollectionDefinition
 
 ### Community 18 - "Per-Stage Profiling Benchmarks"
-Cohesion: 0.11
-Nodes (15): Benchmark, Dictionary, GlobalCleanup, MemoryStream, MimeMessage, DetectStage, MetadataStage, ParseStage (+7 more)
-
-### Community 19 - "Cached Encoding Provider"
-Cohesion: 0.13
-Nodes (18): DecoderExceptionFallback, DecoderReplacementFallback, EncoderExceptionFallback, EncodingInfo, EncodingProvider, ConcurrentDictionary, Encoding, IEnumerable (+10 more)
+Cohesion: 0.17
+Nodes (8): BodyStage, MetadataStage, ParseStage, RequestStage, StageBenchmark, Bytes, Message, Sample
 
 ### Community 20 - "Exotic Language Round-Trip Tests"
-Cohesion: 0.16
-Nodes (10): Edge cases catalog, Public sources used, Fact, InlineData, MemberData, MimeMessage, Theory, TheoryData (+2 more)
+Cohesion: 0.22
+Nodes (4): Edge cases catalog, Public sources used, ExoticLanguageTests, Sequences
 
 ### Community 21 - "Project Files and Packages"
 Cohesion: 0.09
@@ -275,64 +240,64 @@ Cohesion: 0.08
 Nodes (22): ADR-001: C# / .NET 10 class library stack, Alternatives, Consequences, Context, Decision, Evidence, Status, C# capability assessment - MimeKit on .NET vs Python, Java, Go (+14 more)
 
 ### Community 23 - "GoldenKit Corpus Probe Stats"
-Cohesion: 0.17
-Nodes (11): HashSet, IEnumerable, MimeMessage, Probe, ConcurrentDictionary, JsonSerializerOptions, List, TimeSpan (+3 more)
+Cohesion: 0.29
+Nodes (4): Probe, Stats, Counts, Samples
 
 ### Community 24 - "Header Metadata Mapping"
-Cohesion: 0.11
-Nodes (14): Subject, BodyStage, Content, ADR-005: Always emit from, to, cc, and bcc metadata keys, Alternatives, Consequences, Context, Decision (+6 more)
+Cohesion: 0.09
+Nodes (12): GcStats, Manifest, ProfileTraceCommand, RunRecord, ADR-005: Always emit from, to, cc, and bcc metadata keys, Alternatives, Consequences, Context (+4 more)
 
-### Community 25 - "GoldenKit Namespace Imports"
+### Community 25 - "GoldenKit Tool Entry Points"
+Cohesion: 0.14
+Nodes (4): GoldenKit, Generator, Inspect, Json
+
+### Community 26 - "README Overview"
+Cohesion: 0.14
+Nodes (14): 1. Load — max files per second, 2. Correctness A — emoji and exotic languages, 3. Correctness B — attachment mix, EML extraction, Errors, Golden set, Layout, Migrating from the pre-0.1 API (+6 more)
+
+### Community 27 - "Input Size Limiting Stream"
 Cohesion: 0.17
-Nodes (4): GoldenKit, system, system_collections_concurrent, system_text
-
-### Community 26 - "Profile Report Oct 18 and Body Selection"
-Cohesion: 0.12
-Nodes (17): Attachment copy factor, Comparison with `docs/perf-baseline.json`, Data caveats (read first), GC, pause and LOH (sweep traces, synthetic set, 2 phases of about 1.5 s each), Hardware and runs, Inputs, Per-stage CPU share (share of extraction CPU, `Extract(Request)` = 100%), Profile report 2026-10-18 (+9 more)
-
-### Community 27 - "Profile Trace Command"
-Cohesion: 0.21
-Nodes (11): Dictionary, List, TimeSpan, GcStats, Manifest, ProfileTraceCommand, RunRecord, HardwareBlock (+3 more)
+Nodes (7): LimitedReadStream, BytesRead, CanRead, CanSeek, CanWrite, Length, Position
 
 ### Community 28 - "License Audit and Guard Scripts"
-Cohesion: 0.11
-Nodes (18): YDK unified guard hook — all guard checks in one script., _read_stdin(), glob, os, pathlib, re, subprocess, sys (+10 more)
+Cohesion: 0.13
+Nodes (8): _read_stdin(), graph_packages(), load_graph(), main(), notices(), nuspec_license(), Skip-rule probe (plugin check.py fed changed_files via stdin; not committed), Task 6: adopt ydk 1.8.0
 
-### Community 29 - "README and Input Size Limit"
-Cohesion: 0.12
-Nodes (17): ArgumentException, 1. Load — max files per second, 2. Correctness A — emoji and exotic languages, 3. Correctness B — attachment mix, EML extraction, Errors, Golden set, Layout (+9 more)
+### Community 29 - "Non-Seekable Stream Test Double"
+Cohesion: 0.15
+Nodes (8): NonSeekableStream, BytesRead, CanRead, CanSeek, CanWrite, Disposed, Length, Position
 
 ### Community 30 - "Benchmark and Telemetry Imports"
-Cohesion: 0.17
-Nodes (8): benchmarkdotnet_attributes, benchmarkdotnet_jobs, EmlExtraction.Bench, system_diagnostics, system_diagnostics_metrics, system_reflection, system_runtime_interopservices, TelemetryCollectionDefinition
+Cohesion: 0.13
+Nodes (7): Sample, ListenerMode, Activity, Meter, None, EmlExtraction.Bench, TelemetryCollectionDefinition
 
 ### Community 31 - "Core Library Namespaces"
-Cohesion: 0.30
-Nodes (4): EmlExtraction.Exceptions, EmlExtraction.Logics, EmlExtraction.Models, system_diagnostics_codeanalysis
+Cohesion: 0.21
+Nodes (3): EmlExtraction.Exceptions, EmlExtraction.Logics, EmlExtraction.Models
 
 ### Community 32 - "Test Project Namespace Imports"
 Cohesion: 0.14
-Nodes (7): EmlExtraction.Tests, EmlExtraction.Abstractions, mimekit, mimekit_tnef, mimekit_utils, system_runtime_compilerservices, system_security_cryptography
+Nodes (3): RealisticSamples, ResultProjection, ExpectedFile
 
-### Community 33 - "Exception Type Tests"
-Cohesion: 0.22
-Nodes (7): ArgumentException, ArgumentNullException, ArgumentOutOfRangeException, Fact, InlineData, Theory, ExceptionTypeTests
+### Community 33 - "Throwing Stream Test Double"
+Cohesion: 0.20
+Nodes (6): ThrowingStream, CanRead, CanSeek, CanWrite, Length, Position
 
 ### Community 34 - "ADR Data-Driven Optimization"
 Cohesion: 0.13
 Nodes (14): ADR-022: Data-driven optimization process, Alternatives, Candidate areas (hypotheses only, not commitments), Closing, Consequences, Context, Decision, Evidence (+6 more)
 
 ### Community 35 - "Body Extractor Tests"
-Cohesion: 0.27
-Nodes (7): BodyExtractor, Exception, Fact, InvalidCastException, Span, BodyExtractorTests, ThrowingStream
+Cohesion: 0.33
+Nodes (4): BodyContent, BodyExtractor, BodyExtractorTests, ThrowingStream
 
-### Community 36 - "Golden Set Test Runner"
-Cohesion: 0.14
-Nodes (11): Fact, GoldenAttachment, GoldenExpect, GoldenField, GoldenSpecFile, IEnumerable, JsonSerializerOptions, MemberData (+3 more)
+### Community 36 - "Golden Requirements Checks"
+Cohesion: 0.17
+Nodes (8): As many headers as possible, Classic fields (To, From, etc.), Content, Metadata fields, Out of original spec (implemented anyway), Requirements (English) — coverage checklist, `X_` fields concatenated into `xfields`, GoldenTests
 
 ### Community 37 - "Golden Score Evaluator"
-Cohesion: 0.16
-Nodes (14): CaseScore, GoldenExpect, GoldenField, GoldenSpecFile, IEnumerable, JsonSerializerOptions, List, CaseScore (+6 more)
+Cohesion: 0.23
+Nodes (7): CaseScore, Earned, Failed, Id, Possible, Tags, Scorer
 
 ### Community 38 - "ADR Load Test Method"
 Cohesion: 0.14
@@ -346,53 +311,37 @@ Nodes (13): ADR-020: Profiling method - per-stage CPU, allocation, and GC hotspo
 Cohesion: 0.14
 Nodes (13): Activities (tracing), ADR-021: Runtime metrics and tracing with BCL Meter and ActivitySource, Alternatives, Consequences, Context, Decision, Evidence, Instruments (+5 more)
 
-### Community 42 - "Attachment Decoding Tests"
-Cohesion: 0.33
-Nodes (5): Fact, InlineData, IReadOnlyList, Theory, AttachmentDecodeTests
-
-### Community 43 - "Profile Sample Loader"
-Cohesion: 0.23
-Nodes (7): IEnumerable, IReadOnlyList, List, Name, TnefPart, ProfileSamples, Bytes
-
-### Community 44 - "Realistic Sample Manifest Tests"
-Cohesion: 0.21
-Nodes (6): JsonElement, Fact, IEnumerable, MemberData, Theory, RealisticSampleExtractionTests
-
-### Community 45 - "MIME Message Parser"
-Cohesion: 0.22
-Nodes (7): MemoryStream, ParserOptions, ReadOnlyMemory, MimeMessageParser, Fact, ParserOptions, MimeMessageParserTests
+### Community 43 - "Mbox Splitting and Sample Loading"
+Cohesion: 0.20
+Nodes (3): ProfileSamples, MboxSplitter, From
 
 ### Community 46 - "ADR MimeKit Parser Choice"
-Cohesion: 0.20
-Nodes (9): ADR-002: MimeKit as the MIME parser, configured leniently, Alternatives, Consequences, Context, Decision, Evidence, Open questions, Status (+1 more)
-
-### Community 47 - "Large File Sizing Math"
-Cohesion: 0.28
-Nodes (3): IReadOnlyList, LargeFileMath, MinMessageBytes
+Cohesion: 0.22
+Nodes (8): ADR-002: MimeKit as the MIME parser, configured leniently, Alternatives, Consequences, Context, Decision, Evidence, Open questions, Status
 
 ### Community 48 - "CSharp Best Practices Skill"
 Cohesion: 0.18
 Nodes (10): Authorship and license, C# Development Best Practices, C#/.NET guardrails, Definition of done, Required operating procedure, Source of truth, Workflow: fix a bug, Workflow: implement a feature (+2 more)
 
-### Community 49 - "Extraction Exception Policy"
-Cohesion: 0.13
+### Community 49 - "Extraction Exception Types"
+Cohesion: 0.10
 Nodes (15): ADR-023: Throw for misuse, limits, and library bugs; warn for content, Alternatives, Consequences, Context, Decision, Detection, Evidence, New exception types (+7 more)
 
 ### Community 50 - "Profile Report Oct 23 Closing"
-Cohesion: 0.18
-Nodes (10): ADR-022 targets, Comparison with `docs/perf-baseline.json`, Delta table per optimization, GC pause (profile-trace, synthetic set, pause ms over the whole run; run 1 / run 2), Hardware and runs, Large-file pass (net10.0 unless noted, Workstation, DOP 1, 524,288,000), Leftovers for the owner, Limits re-check (#51) (+2 more)
+Cohesion: 0.14
+Nodes (12): ADR-022 targets, Comparison with `docs/perf-baseline.json`, Data caveats (read first), Delta table per optimization, GC pause (profile-trace, synthetic set, pause ms over the whole run; run 1 / run 2), Hardware and runs, Large-file pass (net10.0 unless noted, Workstation, DOP 1, 524,288,000), Leftovers for the owner (+4 more)
 
 ### Community 51 - "Extraction Spec"
 Cohesion: 0.18
 Nodes (11): Custom headers, Evidence, Exotic languages and emoji, Extraction - metadata, main content, direction, Failure handling, Input size, Main content, Metadata (+3 more)
 
-### Community 53 - "Large File Load Command"
-Cohesion: 0.36
-Nodes (4): LargeFileCommand, Pass, M, Pass
+### Community 52 - "ADR Warnings Not Exceptions"
+Cohesion: 0.22
+Nodes (8): ADR-004: Record warnings instead of throwing on malformed MIME, Alternatives, Consequences, Context, Decision, Evidence, Rationale, Status
 
-### Community 54 - "Large File Math Tests"
-Cohesion: 0.27
-Nodes (6): ArgumentException, ArgumentOutOfRangeException, Fact, InlineData, Theory, LargeFileMathTests
+### Community 53 - "Large File Load Command"
+Cohesion: 0.23
+Nodes (4): TraceSupport, LargeFileCommand, Pass, M
 
 ### Community 55 - "Async and Concurrency Guidelines"
 Cohesion: 0.20
@@ -402,29 +351,21 @@ Nodes (10): 4.1 Keep asynchronous code asynchronous, 4.2 Pass cancellation token
 Cohesion: 0.20
 Nodes (10): 9.1 Prevent N+1 queries, 9.2 Paginate collection endpoints and queries, 9.3 Parameterize SQL, 9.4 Keep transactions short and database-focused, 9.5 Use `AsNoTracking()` for read-only EF Core queries, 9.6 Save once per unit of work, not once per row, 9.7 Understand deferred execution and enumeration, 9.8 Keep `IQueryable` inside the data-access boundary (+2 more)
 
-### Community 57 - "Read-Ahead and Limited Streams"
-Cohesion: 0.05
-Nodes (28): SeekOrigin, Span, SuppressMessage, LimitedReadStream, BytesRead, CanRead, CanSeek, CanWrite (+20 more)
-
-### Community 58 - "Parse and Attachments Stage Benchmarks"
-Cohesion: 0.22
-Nodes (6): GlobalSetup, TextPart, AttachmentsStage, MimeMessage, ReadOnlySpan, Stream
-
-### Community 59 - "Body and Attachment Extraction Core"
-Cohesion: 0.24
-Nodes (8): IReadOnlyList, BodyContent, IReadOnlyList, List, MimeMessage, SuppressMessage, TextPart, BodyContent
-
-### Community 60 - "Realistic Samples JSON and OpenXML"
+### Community 57 - "Read-Ahead Peek Stream"
 Cohesion: 0.14
-Nodes (10): RealisticSamples, documentformat_openxml, documentformat_openxml_packaging, documentformat_openxml_presentation, documentformat_openxml_spreadsheet, documentformat_openxml_wordprocessing, system_io_compression, system_text_json (+2 more)
+Nodes (7): ReadAheadStream, CanRead, CanSeek, CanWrite, Head, Length, Position
+
+### Community 59 - "ADR Stream Input"
+Cohesion: 0.29
+Nodes (6): ADR-024: Stream input, parsed straight from the caller's stream, Consequences, Context, Decision, Status, What streaming saves and what it does not
 
 ### Community 61 - "ADR Prefer HTML Main Content"
 Cohesion: 0.22
 Nodes (8): ADR-003: Prefer HTML as main content in multipart/alternative, Alternatives, Consequences, Context, Decision, Evidence, Rationale, Status
 
-### Community 62 - "ADR Warnings Not Exceptions"
-Cohesion: 0.22
-Nodes (8): ADR-004: Record warnings instead of throwing on malformed MIME, Alternatives, Consequences, Context, Decision, Evidence, Rationale, Status
+### Community 62 - "Tracking Memory Stream Double"
+Cohesion: 0.33
+Nodes (3): TrackingMemoryStream, Disposed, Seeked
 
 ### Community 63 - "ADR Text Direction Reporting"
 Cohesion: 0.22
@@ -435,16 +376,12 @@ Cohesion: 0.22
 Nodes (8): ADR-019: Multi-target net8.0 and net10.0, Alternatives, Consequences, Context, Decision, Evidence, Risks the Stage 02 task must verify, Status
 
 ### Community 65 - "Project Rules and Testing Strategy"
-Cohesion: 0.22
-Nodes (7): Known Gotchas, Product Context, Project Rules, Layers, Rules, Testing strategy, What is real and what is stubbed
+Cohesion: 0.25
+Nodes (6): Product Context, Project Rules, Layers, Rules, Testing strategy, What is real and what is stubbed
 
 ### Community 66 - "Attachments Spec"
 Cohesion: 0.22
 Nodes (9): Attachments, Evidence, Failures, Full path: where the file sat in the message, Naming rules, Outlook TNEF wrappers, Pasted images, What the caller gets (+1 more)
-
-### Community 67 - "Extractor Entry and Size Limit"
-Cohesion: 0.17
-Nodes (13): AsyncLocal, Decision, Conventions, IEmlExtractor, Action, EmlExtractor, StageFault, CheckedExtractor (+5 more)
 
 ### Community 68 - "Retrospective Task 12"
 Cohesion: 0.22
@@ -460,7 +397,7 @@ Nodes (9): 14. Performance principles, 15. Tooling and automated enforcement, 17
 
 ### Community 71 - "Extraction Telemetry Pipeline"
 Cohesion: 0.14
-Nodes (14): ActivitySource, Counter, Histogram, Meter, Activity, Exception, EmlExtractionTelemetry, ExtractScope (+6 more)
+Nodes (4): Telemetry overhead (#73), EmlExtractionTelemetry, ExtractScope, TelemetryNoListenerAllocationTests
 
 ### Community 72 - "ADR Authored Golden Set"
 Cohesion: 0.25
@@ -486,9 +423,9 @@ Nodes (7): ADR-017: MIT license with a third-party notices file, Alternatives, C
 Cohesion: 0.25
 Nodes (8): 1,000 core (original plan), +200 optional RFC extras, File types that must appear (attachments), Golden set plan — 1,000 core + 200 RFC extras, Tag vocabulary (scorer slices), Tooling, What we will not gold, Why 1,200
 
-### Community 78 - "Requirements Coverage Checklist"
-Cohesion: 0.33
-Nodes (6): 1. Load — max files per second on this hardware, 2. Correctness A — emoji and exotic languages, Content, Out of original spec (implemented anyway), Requirements (English) — coverage checklist, Tests
+### Community 78 - "Task 32 PR Body"
+Cohesion: 0.50
+Nodes (3): Test Plan, Verification Plugins, Verification Results
 
 ### Community 79 - "Project Overview Spec"
 Cohesion: 0.25
@@ -497,10 +434,6 @@ Nodes (8): Dependencies and licensing, EML Extraction - Overview, End-to-end flo
 ### Community 80 - "Open Team Questions"
 Cohesion: 0.25
 Nodes (8): 1. Shared extractor contract (ADR-012), 2. Template and factory integration, 3. Target framework, 4. License, 5. `X_` headers in internal mail, 6. Telemetry naming conventions (ADR-021), Error model divergence, Open questions for the team
-
-### Community 81 - "Public API Parity Tests"
-Cohesion: 0.39
-Nodes (4): MemberInfo, Fact, List, PublicApiTests
 
 ### Community 82 - "Retrospective Task 102"
 Cohesion: 0.25
@@ -530,9 +463,9 @@ Nodes (7): 16. Pull request checklist, Async and concurrency, Configuration and 
 Cohesion: 0.29
 Nodes (6): ADR-010: Custom `library` and `warning` component schemas, Alternatives, Consequences, Context, Decision, Status
 
-### Community 89 - "Stream Input Tests"
-Cohesion: 0.13
-Nodes (11): ArgumentNullException, Fact, NonSeekableStream, BytesRead, CanRead, CanSeek, CanWrite, Disposed (+3 more)
+### Community 89 - "Extractor Entry and Stream Input"
+Cohesion: 0.16
+Nodes (8): Conventions, EmlInputTooLargeException, InputLength, MaxInputBytes, EmlExtractor, StageFault, MaxInputBytesTests, StreamInputTests
 
 ### Community 90 - "Cross-Cutting Concerns Spec"
 Cohesion: 0.29
@@ -546,9 +479,9 @@ Nodes (7): Authored golden set, Correctness A - emoji and exotic languages, Corr
 Cohesion: 0.29
 Nodes (6): Apache POI NOTICE, Apache POI test data (Apache-2.0), Committed samples (ADR-018), Runtime packages (shipped with the library), Test, bench and tooling packages (not shipped), Third-party notices
 
-### Community 93 - "Stream Test Doubles"
-Cohesion: 0.11
-Nodes (11): MemoryStream, SeekOrigin, FailingStream, CanRead, CanSeek, CanWrite, Length, Position (+3 more)
+### Community 93 - "Failing Stream Test Double"
+Cohesion: 0.20
+Nodes (6): FailingStream, CanRead, CanSeek, CanWrite, Length, Position
 
 ### Community 95 - "Testing Guidelines"
 Cohesion: 0.33
@@ -570,25 +503,13 @@ Nodes (6): 3.1 Use structured logging, 3.2 Choose log levels deliberately, 3.3 N
 Cohesion: 0.33
 Nodes (6): 7.1 Keep environment-specific values out of code, 7.2 Never commit secrets, 7.3 Validate configuration at startup, 7.4 Use dependency injection correctly, 7.5 Reuse HTTP clients safely, 7. Configuration, dependency injection, and secrets
 
-### Community 100 - "Extraction Request Model"
-Cohesion: 0.12
-Nodes (12): ReadOnlyMemory, Stream, EmlExtractionRequest, FileBytes, FileName, HasFileBytes, InputStream, IReadOnlyList (+4 more)
-
 ### Community 101 - "Detection Spec"
 Cohesion: 0.33
 Nodes (6): Detection, Evidence, How it decides, What it does not do, What it returns, Why it exists
 
-### Community 102 - "README Usage Interface"
-Cohesion: 0.33
-Nodes (6): 1. Detect, 2. Extract, Content, Interface, Metadata, Nested files (attachments)
-
 ### Community 103 - "Task 146 Progress Log"
 Cohesion: 0.33
 Nodes (5): Build (done), Follow-up: instance classes (done), Plan (done), Review (done, 1 round), Task 146 orchestrator progress
-
-### Community 104 - "Task 32 PR Body"
-Cohesion: 0.33
-Nodes (5): Reviewer leftovers (not fixed), Summary, Test Plan, Verification Plugins, Verification Results
 
 ### Community 105 - "Nullability and Validation Guidelines"
 Cohesion: 0.40
@@ -618,41 +539,17 @@ Nodes (3): Acceptance Criteria, Description, Test Strategy
 Cohesion: 0.50
 Nodes (3): Summary, Test Plan, Verification Results
 
-### Community 112 - "Extraction Result and Benchmarks"
-Cohesion: 0.16
-Nodes (10): Benchmark, EmlBenchmarks, 2. Extract function, IReadOnlyDictionary, ReadOnlyMemory, Stream, IReadOnlyList, EmlExtractionResult (+2 more)
-
 ### Community 113 - "Retrospective Task 64"
 Cohesion: 0.50
 Nodes (3): AI Analysis, Retrospective: 64, Shipped
 
-### Community 142 - "EML Format Detector"
-Cohesion: 0.32
-Nodes (3): ReadOnlySpan, SuppressMessage, EmlDetector
-
-### Community 143 - "Telemetry Overhead Benchmarks"
-Cohesion: 0.16
-Nodes (10): ActivityListener, Benchmark, GlobalCleanup, MeterListener, ListenerMode, Activity, Meter, None (+2 more)
+### Community 143 - "Throughput and Overhead Benchmarks"
+Cohesion: 0.15
+Nodes (4): EmlBenchmarks, OverheadBenchmarks, Mode, DetectStage
 
 ### Community 144 - "ADR Shared Extractor Contract"
-Cohesion: 0.15
-Nodes (13): ADR-012: Shared team extractor contract (request, detection result, subfile names), Alternatives, Amendment: source layout and namespaces (2026-10-23, task #149), Consequences, Context, Decision, Detection, Error model (+5 more)
-
-### Community 145 - "Detector Accept Reject Tests"
-Cohesion: 0.42
-Nodes (3): Fact, ReadOnlySpan, DetectorTests
-
-### Community 146 - "Legacy Detector Reference"
-Cohesion: 0.52
-Nodes (3): HashSet, ReadOnlySpan, Legacy
-
-### Community 147 - "Namespace Layout Tests"
-Cohesion: 0.43
-Nodes (3): Dictionary, Fact, NamespaceLayoutTests
-
-### Community 148 - "ADR Stream Input"
-Cohesion: 0.33
-Nodes (5): ADR-024: Stream input, parsed straight from the caller's stream, Consequences, Context, Status, What streaming saves and what it does not
+Cohesion: 0.17
+Nodes (12): ADR-012: Shared team extractor contract (request, detection result, subfile names), Alternatives, Consequences, Context, Decision, Detection, Error model, Evidence (+4 more)
 
 ### Community 149 - "Task 149 Progress Log"
 Cohesion: 0.33
@@ -660,31 +557,63 @@ Nodes (5): Build (done), Leftover fixes (done), Plan (done), Review round 1 (don
 
 ### Community 150 - "Detector Interface"
 Cohesion: 0.40
-Nodes (4): 1. Detect function, Interface, ReadOnlySpan, IEmlDetector
+Nodes (3): 1. Detect function, Interface, IEmlDetector
 
-### Community 151 - "Activity Listener Exception Test"
-Cohesion: 0.50
-Nodes (3): InlineData, InvalidCastException, Theory
+### Community 179 - "DOP Sweep Command"
+Cohesion: 0.20
+Nodes (5): Options, SweepCommand, RepoRoot, SweepInputs, SweepParameters
+
+### Community 180 - "Hardware Probe and Profiling"
+Cohesion: 0.10
+Nodes (4): ProfileCommand, HardwareProbe, HardwareProbeException, StringOrListConverter
+
+### Community 182 - "Sweep Report and Runner"
+Cohesion: 0.18
+Nodes (6): GcRun, HardwareBlock, SetResult, SweepPoint, SweepReport, SweepRunner
+
+### Community 185 - "ADR FullPath Container Path"
+Cohesion: 0.13
+Nodes (14): Additional location info, ADR-013: FullPath is the container path; nested messages stay opaque, Alternatives, Consequences, Context, Decision, Evidence, FullPath (+6 more)
+
+### Community 195 - "Profile Sample Selection Math"
+Cohesion: 0.23
+Nodes (3): ProfileMath, SampleFeatures, ProfilePureTests
+
+### Community 199 - "Throughput Results Doc"
+Cohesion: 0.17
+Nodes (12): Committed baseline and regression rule (ADR-015), DOP sweep (ADR-015), DOP sweep JSON schema (v1), Files / second (1 thread), Hardware, How to scale resources, Large-file pass and sizing formula (ADR-015), Nightly synthetic job (+4 more)
+
+### Community 255 - "Error Handling Guidelines"
+Cohesion: 0.25
+Nodes (8): 2.1 Never swallow an exception, 2.2 Catch only exceptions you can handle, 2.3 Preserve stack traces and causes, 2.4 Log an unhandled failure once, at the boundary, 2.5 Do not use exceptions as normal control flow, 2.6 Fail fast with guard clauses, 2.7 Use one consistent global error response, 2. Error handling and exceptions
+
+### Community 256 - "ADR Xfields Metadata"
+Cohesion: 0.25
+Nodes (7): ADR-014: xfields joins literal `X_` headers and lives in the metadata, Alternatives, Consequences, Context, Decision, Evidence, Status
+
+### Community 258 - "Brief Gap Analysis"
+Cohesion: 0.25
+Nodes (8): Adopt, Avoid, Breaking API change summary (Stage 02), Brief gap analysis - EML extraction vs the team brief, Brief item to status, Not adopted, OLE lessons, Other gaps found (not brief items)
 
 ## Knowledge Gaps
-- **552 isolated node(s):** `NonParallelCollectionDefinition`, `TelemetryCollectionDefinition`, `Eml`, `Expect`, `Id` (+547 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 917 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **38 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **132 isolated node(s):** `FileBytes`, `FileName`, `HasFileBytes`, `InputStream`, `ContentDirection` (+127 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 739 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **57 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `EmlExtractor` connect `Extractor Entry and Size Limit` to `Stage Fault Wrapping Tests`, `Sweep Report and Baseline Compare`, `Attachment Part Collection`, `Text Direction Detection`, `Telemetry Behavior Tests`, `Content Catch Site Tests`, `Benchmark Corpus and Throughput Runner`, `Telemetry Overhead Benchmarks`, `ADR Shared Extractor Contract`, `Per-Stage Profiling Benchmarks`, `GoldenKit Corpus Probe Stats`, `README and Input Size Limit`, `Core Library Namespaces`, `Exception Type Tests`, `Body Extractor Tests`, `Golden Score Evaluator`, `ADR Runtime Metrics and Tracing`, `MIME Message Parser`, `GoldenKit Inspect Command`, `Large File Load Command`, `Large File Math Tests`, `ADR Warnings Not Exceptions`, `Extraction Telemetry Pipeline`, `ADR Authored Golden Set`, `Golden Set Plan`, `Stream Input Tests`, `Extraction Request Model`, `Extraction Result and Benchmarks`?**
-  _High betweenness centrality (0.168) - this node is a cross-community bridge._
-- **Why does `2. Error handling and exceptions` connect `Sweep Report and Baseline Compare` to `CSharp Playbook Overview`?**
-  _High betweenness centrality (0.071) - this node is a cross-community bridge._
-- **Are the 35 inferred relationships involving `EmlExtractor` (e.g. with `Consequences` and `Decision`) actually correct?**
-  _`EmlExtractor` has 35 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 13 inferred relationships involving `EmlDetector` (e.g. with `Amendment: source layout and namespaces (2026-10-23, task #149)` and `Consequences`) actually correct?**
-  _`EmlDetector` has 13 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 2 inferred relationships involving `EmlExtractionResult` (e.g. with `Amendment: source layout and namespaces (2026-10-23, task #149)` and `2. Extract function`) actually correct?**
-  _`EmlExtractionResult` has 2 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `NonParallelCollectionDefinition`, `TelemetryCollectionDefinition`, `Eml` to the rest of the system?**
-  _552 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Golden Case Catalog Builder` be split into smaller, more focused modules?**
-  _Cohesion score 0.06763717805151176 - nodes in this community are weakly interconnected._
+- **Why does `EmlExtractor` connect `Extractor Entry and Stream Input` to `Extraction Request and Result Models`, `Stage Fault Wrapping Tests`, `Attachment Part Collection`, `Text Direction Detection`, `Telemetry Behavior Tests`, `Content Catch Site Tests`, `Throughput and Overhead Benchmarks`, `ADR Shared Extractor Contract`, `Per-Stage Profiling Benchmarks`, `Theory Data-Driven Tests`, `GoldenKit Corpus Probe Stats`, `README Overview`, `Core Library Namespaces`, `Throughput Runner`, `Body Extractor Tests`, `Golden Score Evaluator`, `ADR Runtime Metrics and Tracing`, `MIME Message Parser`, `Profile Report Oct 23 Closing`, `DOP Sweep Command`, `ADR Warnings Not Exceptions`, `Large File Load Command`, `Sweep Report and Runner`, `ADR Stream Input`, `Extraction Telemetry Pipeline`, `ADR Authored Golden Set`, `Golden Set Plan`?**
+  _High betweenness centrality (0.116) - this node is a cross-community bridge._
+- **Are the 43 inferred relationships involving `EmlExtractor` (e.g. with `.Run()` and `.Child()`) actually correct?**
+  _`EmlExtractor` has 43 INFERRED edges - model-reasoned connections that need verification._
+- **What connects `FileBytes`, `FileName`, `HasFileBytes` to the rest of the system?**
+  _132 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Sweep Math and CPU Parsing` be split into smaller, more focused modules?**
+  _Cohesion score 0.13333333333333333 - nodes in this community are weakly interconnected._
+- **Why does `EmlDetector` connect `EML Format Detector` to `Extraction Request and Result Models`, `Stage Fault Wrapping Tests`, `Detector Legacy Equivalence Tests`, `Telemetry Behavior Tests`, `Throughput and Overhead Benchmarks`, `ADR Shared Extractor Contract`, `CSharp Capability Assessment ADR`, `GoldenKit Corpus Probe Stats`, `Detector Interface`, `README Overview`, `Core Library Namespaces`, `Throughput Runner`, `Golden Requirements Checks`, `Golden Score Evaluator`, `ADR Runtime Metrics and Tracing`, `Realistic Sample Manifest Tests`, `DOP Sweep Command`, `Extractor Entry and Stream Input`, `Detector and Layout Facts`?**
+  _High betweenness centrality (0.044) - this node is a cross-community bridge._
+- **Are the 17 inferred relationships involving `EmlDetector` (e.g. with `.Child()` and `.Run()`) actually correct?**
+  _`EmlDetector` has 17 INFERRED edges - model-reasoned connections that need verification._
+- **Should `Realistic Sample Generator` be split into smaller, more focused modules?**
+  _Cohesion score 0.09175377468060394 - nodes in this community are weakly interconnected._
