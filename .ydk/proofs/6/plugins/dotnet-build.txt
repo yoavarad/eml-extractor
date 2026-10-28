@@ -1,0 +1,21 @@
+Determining projects to restore...
+  Restored C:\Users\yoava\Projects\eml-extraction\.ydk\worktrees\6\src\EmlExtraction\EmlExtraction.csproj (in 1.04 sec).
+  Restored C:\Users\yoava\Projects\eml-extraction\.ydk\worktrees\6\tools\RealisticSamples\RealisticSamples.csproj (in 1.04 sec).
+  Restored C:\Users\yoava\Projects\eml-extraction\.ydk\worktrees\6\tools\GoldenKit\GoldenKit.csproj (in 1.04 sec).
+  Restored C:\Users\yoava\Projects\eml-extraction\.ydk\worktrees\6\tests\EmlExtraction.Tests\EmlExtraction.Tests.csproj (in 1.06 sec).
+  Restored C:\Users\yoava\Projects\eml-extraction\.ydk\worktrees\6\benches\EmlExtraction.Bench\EmlExtraction.Bench.csproj (in 1.1 sec).
+  EmlExtraction -> C:\Users\yoava\Projects\eml-extraction\.ydk\worktrees\6\src\EmlExtraction\bin\Debug\net8.0\EmlExtraction.dll
+  EmlExtraction -> C:\Users\yoava\Projects\eml-extraction\.ydk\worktrees\6\src\EmlExtraction\bin\Debug\net10.0\EmlExtraction.dll
+  RealisticSamples -> C:\Users\yoava\Projects\eml-extraction\.ydk\worktrees\6\tools\RealisticSamples\bin\Debug\net8.0\RealisticSamples.dll
+  RealisticSamples -> C:\Users\yoava\Projects\eml-extraction\.ydk\worktrees\6\tools\RealisticSamples\bin\Debug\net10.0\RealisticSamples.dll
+  GoldenKit -> C:\Users\yoava\Projects\eml-extraction\.ydk\worktrees\6\tools\GoldenKit\bin\Debug\net10.0\GoldenKit.dll
+  EmlExtraction.Bench -> C:\Users\yoava\Projects\eml-extraction\.ydk\worktrees\6\benches\EmlExtraction.Bench\bin\Debug\net10.0\EmlExtraction.Bench.dll
+  EmlExtraction.Tests -> C:\Users\yoava\Projects\eml-extraction\.ydk\worktrees\6\tests\EmlExtraction.Tests\bin\Debug\net10.0\EmlExtraction.Tests.dll
+  EmlExtraction.Bench -> C:\Users\yoava\Projects\eml-extraction\.ydk\worktrees\6\benches\EmlExtraction.Bench\bin\Debug\net8.0\EmlExtraction.Bench.dll
+  EmlExtraction.Tests -> C:\Users\yoava\Projects\eml-extraction\.ydk\worktrees\6\tests\EmlExtraction.Tests\bin\Debug\net8.0\EmlExtraction.Tests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:11.16

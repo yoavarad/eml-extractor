@@ -1,0 +1,1 @@
+PASS: all staged source files have test files
