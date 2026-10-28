@@ -6,11 +6,9 @@
 - `ydk verify run --no-cache --save-proof --task-id 6`: dotnet-build, dotnet-format, dotnet-test pass; detail.target = EmlExtraction.slnx for all three (proof: verification.json).
 
 ## Skip-rule probe (plugin check.py fed changed_files via stdin; not committed)
-Plugins skip unless a changed file endswith (.cs, .csproj, .sln).
+ydk 1.8.0 plugins share `_dotnet_target.affects_dotnet_build`: runs on .cs/.csproj/.fsproj/.sln/.slnx/.props/.targets/.editorconfig, global.json, nuget.config.
 - README.md only: SKIP (expected)
-- .editorconfig only: SKIP  (does NOT run; format-affecting file missed)
-- EmlExtraction.slnx only: SKIP (.slnx does not match ".sln" suffix)
-- Directory.Build.props only: SKIP
-- a.cs: runs
-Note: `ydk verify run` diffs against local `main` (stale here vs origin/main), so end-to-end probe was confounded by .ydk/config.yaml in diff; direct plugin probe is authoritative.
-Upstream ydk gap: _DOTNET_EXTENSIONS should include .slnx, .editorconfig, .props/.targets, global.json.
+- .editorconfig only: build PASS, format PASS (target EmlExtraction.slnx)
+- EmlExtraction.slnx only: build PASS, format PASS
+- Directory.Build.props only: build PASS, format PASS
+Note: `ydk verify run` diffs against local `main` (stale here vs origin/main), so the direct plugin probe is authoritative.
