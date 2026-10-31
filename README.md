@@ -67,6 +67,17 @@ Pass a stream when the message is on disk or the network: it saves the whole-inp
 - `xfields`: headers whose name starts with the literal `X_` (capital X, underscore) are concatenated into `Metadata["xfields"]`, one `Name: value` line per header joined by `\n`; `""` when none. `X-` headers are not in it; they stay under their own key. A real header named `xfields` is stored as `header:xfields`.
 - The text directions are not metadata keys: read `result.SubjectDirection` and `result.ContentDirection` (`ltr` or `rtl`).
 
+#### Participants
+
+`result.Participants` gives the same headers as structured entries (ADR-025). Keys `from`, `to`, `cc`, `bcc`, `reply-to`, `sender` (use the `MetadataKeys` constants) are always present; each holds an `IReadOnlyList<EmailParticipant>`, empty when the header is absent or unparseable. Group members are flattened in order.
+
+```csharp
+foreach (var p in result.Participants[MetadataKeys.To])
+    Console.WriteLine($"{p.Nickname} | {p.Address} | {p.User} | {p.Domain}");
+```
+
+`Address` is split at its last `@` into `User` and `Domain`; with no `@`, `User` = `Address` and `Domain` = `""`. `Nickname` is `""` when the mailbox has no display name. The metadata strings are unchanged.
+
 #### Content
 
 `result.MainContent` is the main body of the mail (`result.MainContentMimeType` is its media type). If both HTML and plain exist (`multipart/alternative`), HTML is used.

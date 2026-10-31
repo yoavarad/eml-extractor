@@ -7,6 +7,10 @@ namespace EmlExtraction.Logics;
 internal static class HeaderMapper
 {
     public static Dictionary<string, string> Map(MimeMessage message)
+        => Map(message, out _);
+
+    /// <summary>Header map plus structured participants built from the same effective address lists (ADR-025).</summary>
+    public static Dictionary<string, string> Map(MimeMessage message, out Dictionary<string, IReadOnlyList<EmailParticipant>> participants)
     {
         var metadata = new Dictionary<string, string>(StringComparer.Ordinal);
         var xLines = new List<string>();
@@ -24,15 +28,23 @@ internal static class HeaderMapper
             foreach (var header in message.Body.Headers.Where(h => h.Field.StartsWith("Content-", StringComparison.OrdinalIgnoreCase)))
                 Append(metadata, NormalizeKey(header.Field), header.Value ?? "");
 
-        EnsureAddress(metadata, MetadataKeys.From, Effective(message, message.From, HeaderId.From));
-        EnsureAddress(metadata, MetadataKeys.To, Effective(message, message.To, HeaderId.To));
-        EnsureAddress(metadata, MetadataKeys.Cc, Effective(message, message.Cc, HeaderId.Cc));
-        EnsureAddress(metadata, MetadataKeys.Bcc, Effective(message, message.Bcc, HeaderId.Bcc));
-        Set(metadata, MetadataKeys.ReplyTo, Effective(message, message.ReplyTo, HeaderId.ReplyTo));
-        Set(metadata, MetadataKeys.Sender, (message.Sender is null || message.Sender.Address.Contains("=?", StringComparison.Ordinal))
-            && message.Headers.Any(h => h.Id == HeaderId.Sender && h.RawValue.AsSpan().IndexOf("=?"u8) >= 0)
-            ? Effective(message, message.Sender is null ? [] : [message.Sender], HeaderId.Sender)
-            : message.Sender?.ToString());
+        participants = EmptyParticipants();
+        EnsureAddress(metadata, MetadataKeys.From, Effective(message, message.From, HeaderId.From, participants, MetadataKeys.From));
+        EnsureAddress(metadata, MetadataKeys.To, Effective(message, message.To, HeaderId.To, participants, MetadataKeys.To));
+        EnsureAddress(metadata, MetadataKeys.Cc, Effective(message, message.Cc, HeaderId.Cc, participants, MetadataKeys.Cc));
+        EnsureAddress(metadata, MetadataKeys.Bcc, Effective(message, message.Bcc, HeaderId.Bcc, participants, MetadataKeys.Bcc));
+        Set(metadata, MetadataKeys.ReplyTo, Effective(message, message.ReplyTo, HeaderId.ReplyTo, participants, MetadataKeys.ReplyTo));
+        if ((message.Sender is null || message.Sender.Address.Contains("=?", StringComparison.Ordinal))
+            && message.Headers.Any(h => h.Id == HeaderId.Sender && h.RawValue.AsSpan().IndexOf("=?"u8) >= 0))
+        {
+            Set(metadata, MetadataKeys.Sender, Effective(message, message.Sender is null ? [] : [message.Sender], HeaderId.Sender, participants, MetadataKeys.Sender));
+        }
+        else
+        {
+            Set(metadata, MetadataKeys.Sender, message.Sender?.ToString());
+            if (message.Sender is not null)
+                participants[MetadataKeys.Sender] = [ToParticipant(message.Sender)];
+        }
         Set(metadata, MetadataKeys.Subject, message.Subject);
         if (message.Date != DateTimeOffset.MinValue)
             Set(metadata, MetadataKeys.Date, message.Date.ToString("o"));
@@ -52,6 +64,17 @@ internal static class HeaderMapper
         [MetadataKeys.Cc] = "",
         [MetadataKeys.Bcc] = "",
         [MetadataKeys.XFields] = ""
+    };
+
+    /// <summary>All six participant keys with empty lists (parse_failed, absent headers).</summary>
+    internal static Dictionary<string, IReadOnlyList<EmailParticipant>> EmptyParticipants() => new(StringComparer.Ordinal)
+    {
+        [MetadataKeys.From] = [],
+        [MetadataKeys.To] = [],
+        [MetadataKeys.Cc] = [],
+        [MetadataKeys.Bcc] = [],
+        [MetadataKeys.ReplyTo] = [],
+        [MetadataKeys.Sender] = []
     };
 
     private static string NormalizeKey(string field)
@@ -100,19 +123,36 @@ internal static class HeaderMapper
     /// <summary>
     /// Effective address text for a participant header. If the raw value holds an encoded-word that MimeKit
     /// could not resolve (empty list or an address still containing "=?"), decode the raw value and re-parse it.
-    /// Falls back to the decoded text when no mailbox results.
+    /// Falls back to the decoded text when no mailbox results. The list used is also stored as participants.
     /// </summary>
-    private static string? Effective(MimeMessage message, InternetAddressList list, HeaderId id)
+    private static string? Effective(MimeMessage message, InternetAddressList list, HeaderId id,
+        Dictionary<string, IReadOnlyList<EmailParticipant>> participants, string key)
     {
         var rawValues = message.Headers.Where(h => h.Id == id).Select(h => h.RawValue).ToList();
         var encoded = rawValues.Any(r => r.AsSpan().IndexOf("=?"u8) >= 0);
         if (!encoded || (list.Count > 0 && !list.Mailboxes.Any(m => m.Address?.Contains("=?", StringComparison.Ordinal) == true)))
-            return Join(list);
+            return JoinAndStore(list, participants, key);
 
         var decoded = string.Join(", ", rawValues.Select(r => Rfc2047.DecodeText(LooseOptions, r).Trim()).Where(t => t.Length > 0));
         if (InternetAddressList.TryParse(LooseOptions, decoded, out var reparsed) && reparsed.Mailboxes.Any())
-            return Join(reparsed);
-        return string.IsNullOrWhiteSpace(decoded) ? Join(list) : decoded;
+            return JoinAndStore(reparsed, participants, key);
+        return string.IsNullOrWhiteSpace(decoded) ? JoinAndStore(list, participants, key) : decoded;
+    }
+
+    private static string? JoinAndStore(InternetAddressList list, Dictionary<string, IReadOnlyList<EmailParticipant>> participants, string key)
+    {
+        participants[key] = list.Mailboxes.Select(ToParticipant).ToList();
+        return Join(list);
+    }
+
+    /// <summary>Split at the last <c>@</c>; no <c>@</c> gives User = Address and Domain = "". No case or IDN change.</summary>
+    private static EmailParticipant ToParticipant(MailboxAddress mailbox)
+    {
+        var address = mailbox.Address ?? "";
+        var at = address.LastIndexOf('@');
+        return at < 0
+            ? new EmailParticipant(mailbox.Name ?? "", address, address, "")
+            : new EmailParticipant(mailbox.Name ?? "", address, address[..at], address[(at + 1)..]);
     }
 
     private static string? Join(InternetAddressList list)

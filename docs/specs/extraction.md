@@ -28,6 +28,8 @@ The keying rule is in [ydk:req:metadata/canonical-keys] (ADR-016). A key is the 
 
 The code keeps dashes and underscores as written, writes one key per header, keeps the two direction values out of the map, and returns the fixed keys on parse failure. The README migration table lists the old behaviour. The exact key names and value formats are in [ydk:entity:extraction/Metadata].
 
+Beside the map, the result carries structured participants (ADR-025): for each of from, to, cc, bcc, reply-to and sender, the list of mailboxes, each with nickname, address, user and domain. They come from the same effective address list as the metadata string, so encoded-word fallbacks apply to both. Group members are flattened in order. All six keys are always present; a list is empty when the header is absent, unparseable, or the message could not be parsed. The metadata strings do not change.
+
 ## Custom headers
 
 The original specification asks for all fields starting with a capital X and an underscore to be joined into one long string in a metadata field. Per the project owner (ADR-014), the rule is applied literally: only header names that begin with exactly those two characters count. Headers that begin with an X and a dash, the usual internet form, are not part of the string; they stay in the general metadata under their own keys. Each matching header becomes one "name: value" line in header order, and the lines are joined into one string held in the metadata map ([ydk:req:metadata/xfields]). Authentication headers such as DKIM signatures never appear in it.

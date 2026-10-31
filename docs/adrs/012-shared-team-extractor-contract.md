@@ -1,7 +1,7 @@
 # ADR-012: Shared team extractor contract (request, detection result, subfile names)
 
 ## Status
-Accepted for EML; proposed to team (per project owner, 2026-10-17; bytes overload and batch API settled by the owner on 2026-10-18). Implemented. Amended by ADR-023 (2026-10-18): the error model is now exceptions for misuse, limits and bugs, warnings for content. Extended by ADR-024 (2026-10-23): the request gains `InputStream`, and `Extract(Stream)` is added. Amended by the namespace layout (2026-10-23, task #149): see "Amendment: source layout and namespaces".
+Accepted for EML; proposed to team (per project owner, 2026-10-17; bytes overload and batch API settled by the owner on 2026-10-18). Implemented. Amended by ADR-023 (2026-10-18): the error model is now exceptions for misuse, limits and bugs, warnings for content. Extended by ADR-024 (2026-10-23): the request gains `InputStream`, and `Extract(Stream)` is added. Amended by the namespace layout (2026-10-23, task #149): see "Amendment: source layout and namespaces". Extended by ADR-025 (2026-10-31): the result gains the init-only `Participants` property and the `EmailParticipant` record; the result constructor is unchanged.
 
 ## Context
 The team brief gives two functions per extractor: a detection function (bytes in, "is this the format?") and an extraction function (metadata, main content, sub-files with name, size, full path if it exists, and the binary). The extracted component goes into the team's extraction template, and the team wires it into the factory.
@@ -83,7 +83,7 @@ Owner decision 2026-10-23 (reviewer issue #141): `src/EmlExtraction` is split in
 | Folder / namespace | Types |
 | --- | --- |
 | `Abstractions` / `EmlExtraction.Abstractions` | `IEmlExtractor`, `IEmlDetector` |
-| `Models` / `EmlExtraction.Models` | `EmlExtractionRequest`, `EmlExtractionResult`, `EmlDetectionResult`, `ExtractedAttachment` |
+| `Models` / `EmlExtraction.Models` | `EmlExtractionRequest`, `EmlExtractionResult`, `EmlDetectionResult`, `ExtractedAttachment`, `EmailParticipant` (ADR-025) |
 | `Exceptions` / `EmlExtraction.Exceptions` | `EmlExtractionException`, `EmlInputTooLargeException` |
 | `Logics` / `EmlExtraction.Logics` | `EmlExtractor`, `EmlDetector` and every internal type (parser, body/part/header stages, text direction, encoding cache, telemetry, stream wrappers) |
 
