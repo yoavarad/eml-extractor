@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using EmlExtraction.Models;
 using MimeKit;
 using MimeKit.Utils;
@@ -43,7 +44,7 @@ internal static class HeaderMapper
         {
             Set(metadata, MetadataKeys.Sender, message.Sender?.ToString());
             if (message.Sender is not null)
-                participants[MetadataKeys.Sender] = [ToParticipant(message.Sender)];
+                participants[MetadataKeys.Sender] = new ReadOnlyCollection<EmailParticipant>([ToParticipant(message.Sender)]);
         }
         Set(metadata, MetadataKeys.Subject, message.Subject);
         if (message.Date != DateTimeOffset.MinValue)
@@ -67,14 +68,14 @@ internal static class HeaderMapper
     };
 
     /// <summary>All six participant keys with empty lists (parse_failed, absent headers).</summary>
-    internal static Dictionary<string, IReadOnlyList<EmailParticipant>> EmptyParticipants() => new(StringComparer.Ordinal)
+    internal static Dictionary<string, IReadOnlyList<EmailParticipant>> EmptyParticipants() => new(6, StringComparer.Ordinal)
     {
-        [MetadataKeys.From] = [],
-        [MetadataKeys.To] = [],
-        [MetadataKeys.Cc] = [],
-        [MetadataKeys.Bcc] = [],
-        [MetadataKeys.ReplyTo] = [],
-        [MetadataKeys.Sender] = []
+        [MetadataKeys.From] = ReadOnlyCollection<EmailParticipant>.Empty,
+        [MetadataKeys.To] = ReadOnlyCollection<EmailParticipant>.Empty,
+        [MetadataKeys.Cc] = ReadOnlyCollection<EmailParticipant>.Empty,
+        [MetadataKeys.Bcc] = ReadOnlyCollection<EmailParticipant>.Empty,
+        [MetadataKeys.ReplyTo] = ReadOnlyCollection<EmailParticipant>.Empty,
+        [MetadataKeys.Sender] = ReadOnlyCollection<EmailParticipant>.Empty
     };
 
     private static string NormalizeKey(string field)
@@ -141,8 +142,45 @@ internal static class HeaderMapper
 
     private static string? JoinAndStore(InternetAddressList list, Dictionary<string, IReadOnlyList<EmailParticipant>> participants, string key)
     {
-        participants[key] = list.Mailboxes.Select(ToParticipant).ToList();
+        if (list.Count > 0)
+        {
+            var found = ToReadOnly(list);
+            if (found.Count > 0)
+                participants[key] = found;
+        }
+
         return Join(list);
+    }
+
+    /// <summary>Common case (no groups): fill one array and wrap it, skipping the intermediate List.</summary>
+    private static ReadOnlyCollection<EmailParticipant> ToReadOnly(InternetAddressList list)
+    {
+        var flat = true;
+        for (var i = 0; i < list.Count && flat; i++)
+            flat = list[i] is MailboxAddress;
+        if (flat)
+        {
+            var array = new EmailParticipant[list.Count];
+            for (var i = 0; i < array.Length; i++)
+                array[i] = ToParticipant((MailboxAddress)list[i]);
+            return new ReadOnlyCollection<EmailParticipant>(array);
+        }
+
+        var found = new List<EmailParticipant>(list.Count);
+        AddMailboxes(list, found);
+        return found.AsReadOnly();
+    }
+
+    /// <summary>Mailboxes in order, group members flattened (group name dropped). Index loop: no LINQ/iterator allocation.</summary>
+    private static void AddMailboxes(InternetAddressList list, List<EmailParticipant> found)
+    {
+        for (var i = 0; i < list.Count; i++)
+        {
+            if (list[i] is MailboxAddress mailbox)
+                found.Add(ToParticipant(mailbox));
+            else if (list[i] is GroupAddress group)
+                AddMailboxes(group.Members, found);
+        }
     }
 
     /// <summary>Split at the last <c>@</c>; no <c>@</c> gives User = Address and Domain = "". No case or IDN change.</summary>
