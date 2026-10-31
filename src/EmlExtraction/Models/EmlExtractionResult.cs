@@ -18,4 +18,13 @@ public sealed record EmlExtractionResult(
 
     /// <summary>Paragraph direction of <c>MainContent</c>: <c>ltr</c> or <c>rtl</c>.</summary>
     public string ContentDirection { get; init; } = "ltr";
+
+    /// <summary>
+    /// Mailboxes per participant header, keyed by <see cref="MetadataKeys.From"/>, <see cref="MetadataKeys.To"/>,
+    /// <see cref="MetadataKeys.Cc"/>, <see cref="MetadataKeys.Bcc"/>, <see cref="MetadataKeys.ReplyTo"/> and
+    /// <see cref="MetadataKeys.Sender"/>. The extractor always emits all six keys; a list is empty when the header
+    /// is absent or unparseable. Group members are flattened in order.
+    /// </summary>
+    public IReadOnlyDictionary<string, IReadOnlyList<EmailParticipant>> Participants { get; init; }
+        = new Dictionary<string, IReadOnlyList<EmailParticipant>>(StringComparer.Ordinal);
 }

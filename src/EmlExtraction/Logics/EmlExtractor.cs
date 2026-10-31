@@ -203,13 +203,15 @@ public sealed class EmlExtractor : IEmlExtractor
     private EmlExtractionResult Extract(MimeMessage message, List<string> warnings, long start, Activity? activity)
     {
         IReadOnlyDictionary<string, string> metadata;
+        IReadOnlyDictionary<string, IReadOnlyList<EmailParticipant>> participants;
         var stage = EmlExtractionTelemetry.StartStage(activity, "eml_extraction.metadata");
         try
         {
             try
             {
                 StageFault?.Invoke("metadata");
-                metadata = HeaderMapper.Map(message);
+                metadata = HeaderMapper.Map(message, out var mapped);
+                participants = mapped;
             }
             catch (Exception ex) when (IsWrapped(ex))
             {
@@ -262,10 +264,11 @@ public sealed class EmlExtractor : IEmlExtractor
         return new EmlExtractionResult(metadata, body.Content, body.ContentType, attachments, warnings)
         {
             SubjectDirection = body.SubjectDirection,
-            ContentDirection = body.ContentDirection
+            ContentDirection = body.ContentDirection,
+            Participants = participants
         };
     }
 
     private static EmlExtractionResult Empty(List<string> warnings)
-        => new(HeaderMapper.EmptyMetadata(), null, null, [], warnings);
+        => new(HeaderMapper.EmptyMetadata(), null, null, [], warnings) { Participants = HeaderMapper.EmptyParticipants() };
 }
