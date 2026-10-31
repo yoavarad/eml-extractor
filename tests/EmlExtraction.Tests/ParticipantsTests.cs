@@ -144,6 +144,23 @@ public sealed class ParticipantsTests
     }
 
     [Fact]
+    public void ParticipantListsCannotBeMutatedByCasting()
+    {
+        var result = Extract("From: a@x.org", "To: b@y.com, c@z.org", "Sender: S <s@x.org>");
+        var intruder = new EmailParticipant("", "evil@x.org", "evil", "x.org");
+
+        Assert.All(result.Participants.Values, list =>
+        {
+            Assert.IsNotType<List<EmailParticipant>>(list);
+            Assert.IsNotType<EmailParticipant[]>(list);
+            var mutable = Assert.IsAssignableFrom<IList<EmailParticipant>>(list);
+            Assert.True(mutable.IsReadOnly);
+            Assert.Throws<NotSupportedException>(() => mutable.Add(intruder));
+            Assert.Throws<NotSupportedException>(() => mutable[0] = intruder);
+        });
+    }
+
+    [Fact]
     public void MetadataStringsAreUnchanged()
     {
         var result = Extract("From: =?utf-8?B?15nXldeQ15E=?= <yoav@example.com>", "To: a@x.org, B <b@y.com>");
