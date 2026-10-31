@@ -22,6 +22,10 @@
     <!-- Single golden schema, shared with GoldenKit. -->
     <Compile Include="..\..\tools\GoldenKit\Schema\*.cs" Link="GoldenSchema\%(Filename)%(Extension)" />
     <Using Include="GoldenKit.Schema" />
+    <!-- Catalog and MimeBuild are unit-tested from source: GoldenKit is an exe and net10.0 only. -->
+    <Compile Include="..\..\tools\GoldenKit\CaseDef.cs" Link="GoldenKit\CaseDef.cs" />
+    <Compile Include="..\..\tools\GoldenKit\Catalog.cs" Link="GoldenKit\Catalog.cs" />
+    <Compile Include="..\..\tools\GoldenKit\MimeBuild.cs" Link="GoldenKit\MimeBuild.cs" />
   </ItemGroup>
   <ItemGroup>
     <!-- Pure parts of the bench DOP sweep (ADR-015), unit-tested without referencing the bench exe. -->

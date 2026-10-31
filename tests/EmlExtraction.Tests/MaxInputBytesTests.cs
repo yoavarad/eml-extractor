@@ -47,7 +47,7 @@ public sealed class MaxInputBytesTests
         var result = new EmlExtractor(1024).Extract(Message(1024));
 
         Assert.Empty(result.Warnings);
-        Assert.Equal("a@b.com", result.Metadata["from"]);
+        Assert.Equal("a@b.com", result.Metadata[MetadataKeys.From]);
         Assert.NotNull(result.MainContent);
     }
 

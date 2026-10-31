@@ -1,4 +1,5 @@
 using System.Text;
+using EmlExtraction.Models;
 using MimeKit;
 
 namespace GoldenKit;
@@ -92,10 +93,10 @@ internal static class Catalog
             if (i % 7 == 0) m.Bcc.Add(MailboxAddress.Parse("hidden@example.com"));
             m.Body = new TextPart("plain") { Text = $"hbody-{i}" };
             var expect = PlainExpect($"classic-{i}", $"hbody-{i}");
-            if (i % 2 == 0) expect.Metadata["cc"] = MimeBuild.Contains("carol@example.com");
-            if (i % 3 == 0) expect.Metadata["reply-to"] = MimeBuild.Contains("reply@example.com");
-            if (i % 5 == 0) expect.Metadata["sender"] = MimeBuild.Contains("sender@example.com");
-            if (i % 7 == 0) expect.Metadata["bcc"] = MimeBuild.Contains("hidden@example.com");
+            if (i % 2 == 0) expect.Metadata[MetadataKeys.Cc] = MimeBuild.Contains("carol@example.com");
+            if (i % 3 == 0) expect.Metadata[MetadataKeys.ReplyTo] = MimeBuild.Contains("reply@example.com");
+            if (i % 5 == 0) expect.Metadata[MetadataKeys.Sender] = MimeBuild.Contains("sender@example.com");
+            if (i % 7 == 0) expect.Metadata[MetadataKeys.Bcc] = MimeBuild.Contains("hidden@example.com");
             list.Add(MimeBuild.FromMessage($"H{i:D3}", tags, m, expect));
         }
 
@@ -110,7 +111,7 @@ internal static class Catalog
             var expect = PlainExpect($"received-{i}", "recv");
             expect.Metadata["received"] = MimeBuild.Contains("example.net");
             expect.Metadata["return-path"] = MimeBuild.Contains("bounce@example.com");
-            expect.Metadata["in-reply-to"] = MimeBuild.Contains("prev@example.com");
+            expect.Metadata[MetadataKeys.InReplyTo] = MimeBuild.Contains("prev@example.com");
             list.Add(MimeBuild.FromMessage($"H{i:D3}", tags, m, expect));
         }
 
@@ -446,7 +447,7 @@ internal static class Catalog
                 m.From.Add(new MailboxAddress(p.Name, p.Addr));
                 m.Body = new TextPart("plain") { Text = $"hello {p.Name}" };
                 var expect = PlainExpect($"utf8-{n}", $"hello {p.Name}");
-                expect.Metadata["from"] = MimeBuild.Contains(p.Addr);
+                expect.Metadata[MetadataKeys.From] = MimeBuild.Contains(p.Addr);
                 var tags = Utf8AddressTags.Concat(p.Extra).ToArray();
                 list.Add(MimeBuild.FromMessage($"S{n:D3}", tags, m, expect));
             }
@@ -605,7 +606,7 @@ internal static class Catalog
                 """;
             list.Add(MimeBuild.RawEml($"Z{i:D3}", ["folded-header", "rfc5322"], raw, new GoldenExpect
             {
-                Metadata = new Dictionary<string, GoldenField> { ["subject"] = MimeBuild.Contains("hello", $"folded-{i}") },
+                Metadata = new Dictionary<string, GoldenField> { [MetadataKeys.Subject] = MimeBuild.Contains("hello", $"folded-{i}") },
                 MainContent = MimeBuild.Eq($"folded-body-{i}"),
                 AttachmentCount = 0
             }));
@@ -767,8 +768,8 @@ internal static class Catalog
             {
                 Metadata =
                 {
-                    ["subject"] = MimeBuild.Contains("עברית גולמית"),
-                    ["from"] = MimeBuild.Contains("yossi@example.com")
+                    [MetadataKeys.Subject] = MimeBuild.Contains("עברית גולמית"),
+                    [MetadataKeys.From] = MimeBuild.Contains("yossi@example.com")
                 },
                 MainContent = MimeBuild.Contains("גוף"),
                 MainContentMimeType = "text/plain",

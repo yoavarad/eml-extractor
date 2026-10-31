@@ -26,10 +26,10 @@ public sealed class ExtractionTests
             body
             """;
         var result = _extractor.Extract(Encoding.ASCII.GetBytes(raw.ReplaceLineEndings("\r\n")));
-        Assert.Equal("alice@example.com", result.Metadata["from"].Trim());
-        Assert.Contains("bob@example.com", result.Metadata["to"]);
-        Assert.Equal("", result.Metadata["cc"]);
-        Assert.Equal("", result.Metadata["bcc"]);
+        Assert.Equal("alice@example.com", result.Metadata[MetadataKeys.From].Trim());
+        Assert.Contains("bob@example.com", result.Metadata[MetadataKeys.To]);
+        Assert.Equal("", result.Metadata[MetadataKeys.Cc]);
+        Assert.Equal("", result.Metadata[MetadataKeys.Bcc]);
     }
 
     [Fact]
@@ -47,16 +47,16 @@ public sealed class ExtractionTests
         message.Bcc.Add(new MailboxAddress("סודי", "secret@example.com"));
 
         var result = _extractor.Extract(SampleFactory.ToBytes(message));
-        Assert.Contains("yossi@example.com", result.Metadata["from"]);
-        Assert.Contains("יוסי", result.Metadata["from"]);
-        Assert.Contains("alice@example.com", result.Metadata["from"]);
-        Assert.Contains("fatima@example.com", result.Metadata["to"]);
-        Assert.Contains("فاطمة", result.Metadata["to"]);
-        Assert.Contains("carol@example.com", result.Metadata["cc"]);
-        Assert.Contains("dave@example.com", result.Metadata["cc"]);
-        Assert.Contains("hidden@example.com", result.Metadata["bcc"]);
-        Assert.Contains("secret@example.com", result.Metadata["bcc"]);
-        Assert.Contains("סודי", result.Metadata["bcc"]);
+        Assert.Contains("yossi@example.com", result.Metadata[MetadataKeys.From]);
+        Assert.Contains("יוסי", result.Metadata[MetadataKeys.From]);
+        Assert.Contains("alice@example.com", result.Metadata[MetadataKeys.From]);
+        Assert.Contains("fatima@example.com", result.Metadata[MetadataKeys.To]);
+        Assert.Contains("فاطمة", result.Metadata[MetadataKeys.To]);
+        Assert.Contains("carol@example.com", result.Metadata[MetadataKeys.Cc]);
+        Assert.Contains("dave@example.com", result.Metadata[MetadataKeys.Cc]);
+        Assert.Contains("hidden@example.com", result.Metadata[MetadataKeys.Bcc]);
+        Assert.Contains("secret@example.com", result.Metadata[MetadataKeys.Bcc]);
+        Assert.Contains("סודי", result.Metadata[MetadataKeys.Bcc]);
     }
 
     [Fact]
@@ -76,12 +76,12 @@ public sealed class ExtractionTests
             body
             """;
         var result = _extractor.Extract(Encoding.UTF8.GetBytes(raw.ReplaceLineEndings("\r\n")));
-        Assert.Contains("alice@example.com", result.Metadata["from"]);
-        Assert.Contains("bob@example.com", result.Metadata["to"]);
-        Assert.Contains("carol@example.com", result.Metadata["cc"]);
-        Assert.Contains("dave@example.com", result.Metadata["cc"]);
-        Assert.Contains("hidden@example.com", result.Metadata["bcc"]);
-        Assert.Contains("secret@example.com", result.Metadata["bcc"]);
+        Assert.Contains("alice@example.com", result.Metadata[MetadataKeys.From]);
+        Assert.Contains("bob@example.com", result.Metadata[MetadataKeys.To]);
+        Assert.Contains("carol@example.com", result.Metadata[MetadataKeys.Cc]);
+        Assert.Contains("dave@example.com", result.Metadata[MetadataKeys.Cc]);
+        Assert.Contains("hidden@example.com", result.Metadata[MetadataKeys.Bcc]);
+        Assert.Contains("secret@example.com", result.Metadata[MetadataKeys.Bcc]);
     }
 
     [Fact]
@@ -96,13 +96,13 @@ public sealed class ExtractionTests
         message.Headers.Add("DKIM-Signature", "v=1; a=rsa-sha256; dummy");
 
         var result = _extractor.Extract(SampleFactory.ToBytes(message));
-        Assert.Contains("alice@example.com", result.Metadata["from"]);
-        Assert.Contains("bob@example.com", result.Metadata["to"]);
-        Assert.Contains("carol@example.com", result.Metadata["cc"]);
-        Assert.Equal("שלום 😀 中文 हिंदी", result.Metadata["subject"]);
-        Assert.True(result.Metadata.ContainsKey("message-id"));
+        Assert.Contains("alice@example.com", result.Metadata[MetadataKeys.From]);
+        Assert.Contains("bob@example.com", result.Metadata[MetadataKeys.To]);
+        Assert.Contains("carol@example.com", result.Metadata[MetadataKeys.Cc]);
+        Assert.Equal("שלום 😀 中文 हिंदी", result.Metadata[MetadataKeys.Subject]);
+        Assert.True(result.Metadata.ContainsKey(MetadataKeys.MessageId));
         Assert.True(result.Metadata.ContainsKey("dkim-signature"));
-        Assert.Equal("X_Custom_Field: team-value", result.Metadata["xfields"]);
+        Assert.Equal("X_Custom_Field: team-value", result.Metadata[MetadataKeys.XFields]);
         Assert.Equal("SandboxMail", result.Metadata["x-mailer"]);
         Assert.Equal("1.2", result.Metadata["x-spam-score"]);
         Assert.Equal("hello", result.MainContent);
@@ -134,7 +134,7 @@ public sealed class ExtractionTests
             .Concat(inner)
             .ToArray();
         var result = _extractor.Extract(raw);
-        Assert.Equal("mbox-subject", result.Metadata["subject"]);
+        Assert.Equal("mbox-subject", result.Metadata[MetadataKeys.Subject]);
         Assert.Equal("mbox-body", result.MainContent);
         Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed", StringComparison.Ordinal));
         Assert.DoesNotContain(result.Metadata, kv => kv.Value.Contains("Tue Sep 15 07:00:00", StringComparison.Ordinal));
@@ -153,7 +153,7 @@ public sealed class ExtractionTests
 
             """;
         var result = _extractor.Extract(Encoding.ASCII.GetBytes(raw));
-        Assert.Equal("empty", result.Metadata["subject"]);
+        Assert.Equal("empty", result.Metadata[MetadataKeys.Subject]);
         Assert.True(string.IsNullOrEmpty(result.MainContent));
         Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed", StringComparison.Ordinal));
     }
@@ -174,8 +174,8 @@ public sealed class ExtractionTests
             body
             """;
         var result = _extractor.Extract(Encoding.ASCII.GetBytes(raw.ReplaceLineEndings("\r\n")));
-        Assert.Contains("hello", result.Metadata["subject"]);
-        Assert.Contains("world", result.Metadata["subject"]);
+        Assert.Contains("hello", result.Metadata[MetadataKeys.Subject]);
+        Assert.Contains("world", result.Metadata[MetadataKeys.Subject]);
     }
 
     [Fact]
@@ -198,7 +198,7 @@ public sealed class ExtractionTests
             {b64}
             """;
         var result = _extractor.Extract(Encoding.ASCII.GetBytes(raw.ReplaceLineEndings("\r\n")));
-        Assert.Equal(hebrew, result.Metadata["subject"]);
+        Assert.Equal(hebrew, result.Metadata[MetadataKeys.Subject]);
         Assert.Equal(hebrew, result.MainContent);
     }
 
@@ -212,8 +212,8 @@ public sealed class ExtractionTests
         message.Date = new DateTimeOffset(2026, 9, 15, 7, 0, 0, TimeSpan.Zero);
         message.Body = new TextPart("plain") { Text = "x" };
         var result = _extractor.Extract(SampleFactory.ToBytes(message));
-        Assert.Contains("יוסי", result.Metadata["from"]);
-        Assert.Contains("li@example.com", result.Metadata["to"]);
+        Assert.Contains("יוסי", result.Metadata[MetadataKeys.From]);
+        Assert.Contains("li@example.com", result.Metadata[MetadataKeys.To]);
     }
 
     [Fact]
@@ -234,9 +234,9 @@ public sealed class ExtractionTests
         message.ReplyTo.Add(MailboxAddress.Parse("reply@example.com"));
         message.Headers.Add("DKIM-Signature", "v=1");
         var result = _extractor.Extract(SampleFactory.ToBytes(message));
-        Assert.Contains("reply@example.com", result.Metadata["reply-to"]);
-        Assert.True(result.Metadata.ContainsKey("message-id"));
-        Assert.DoesNotContain("<", result.Metadata["message-id"]);
+        Assert.Contains("reply@example.com", result.Metadata[MetadataKeys.ReplyTo]);
+        Assert.True(result.Metadata.ContainsKey(MetadataKeys.MessageId));
+        Assert.DoesNotContain("<", result.Metadata[MetadataKeys.MessageId]);
         Assert.True(result.Metadata.ContainsKey("dkim-signature"));
         Assert.True(result.Metadata.ContainsKey("content-type"));
         foreach (var gone in new[] { "messageid", "replyto", "dkim_signature", "contenttype", "subject_direction", "content_direction", "mimeversion", "returnpath", "deliveredto", "inreplyto", "reply_to", "message_id" })
@@ -252,7 +252,7 @@ public sealed class ExtractionTests
         message.Headers.Add("x_c", "3");
         message.Headers.Add("X_A", "4");
         var result = _extractor.Extract(SampleFactory.ToBytes(message));
-        Assert.Equal("X_A: 1\nX_A: 4", result.Metadata["xfields"]);
+        Assert.Equal("X_A: 1\nX_A: 4", result.Metadata[MetadataKeys.XFields]);
         Assert.Equal("2", result.Metadata["x-b"]);
         Assert.Equal("3", result.Metadata["x_c"]);
     }
@@ -263,7 +263,7 @@ public sealed class ExtractionTests
         var message = SampleFactory.Plain("x", "b");
         message.Headers.Add("X-Mailer", "m");
         var result = _extractor.Extract(SampleFactory.ToBytes(message));
-        Assert.Equal("", result.Metadata["xfields"]);
+        Assert.Equal("", result.Metadata[MetadataKeys.XFields]);
     }
 
     [Fact]
@@ -273,7 +273,7 @@ public sealed class ExtractionTests
         message.Headers.Add("XFields", "q");
         var result = _extractor.Extract(SampleFactory.ToBytes(message));
         Assert.Equal("q", result.Metadata["header:xfields"]);
-        Assert.True(result.Metadata.ContainsKey("xfields"));
+        Assert.True(result.Metadata.ContainsKey(MetadataKeys.XFields));
     }
 
     [Fact]
@@ -281,7 +281,7 @@ public sealed class ExtractionTests
     {
         var result = _extractor.Extract(Array.Empty<byte>());
         Assert.Contains(result.Warnings, w => w.StartsWith("parse_failed", StringComparison.Ordinal));
-        Assert.Equal(["bcc", "cc", "from", "to", "xfields"], result.Metadata.Keys.Order(StringComparer.Ordinal).ToArray());
+        Assert.Equal([MetadataKeys.Bcc, MetadataKeys.Cc, MetadataKeys.From, MetadataKeys.To, MetadataKeys.XFields], result.Metadata.Keys.Order(StringComparer.Ordinal).ToArray());
         Assert.All(result.Metadata.Values, v => Assert.Equal("", v));
     }
 
@@ -312,7 +312,7 @@ public sealed class ExtractionTests
             %%%%not-base64%%%%
             """;
         var result = _extractor.Extract(Encoding.ASCII.GetBytes(raw.ReplaceLineEndings("\r\n")));
-        Assert.Equal("corrupt", result.Metadata["subject"]);
+        Assert.Equal("corrupt", result.Metadata[MetadataKeys.Subject]);
     }
 
     [Fact]
@@ -369,7 +369,7 @@ public sealed class ExtractionTests
             .Concat(inner)
             .ToArray();
         var result = _extractor.Extract(new EmlExtractionRequest { FileBytes = raw, FileName = "a.mbox" });
-        Assert.Equal("mbox-subject", result.Metadata["subject"]);
+        Assert.Equal("mbox-subject", result.Metadata[MetadataKeys.Subject]);
         Assert.Equal("mbox-body", result.MainContent);
         Assert.DoesNotContain(result.Warnings, w => w.StartsWith("parse_failed", StringComparison.Ordinal));
     }
