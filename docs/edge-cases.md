@@ -38,6 +38,7 @@ Added this pass (all public, gitignored): Apache POI HMEF TNEF (real `.doc` + `.
 | E28 | encrypted PGP `multipart/encrypted` | **internal-missing** | 98 `pgp-signature` parts found; no `multipart/encrypted` payload in this harvest |
 | E29 | nameless part (no filename, no cid) | tested indirectly | fallback `part-{n}.{subtype}` |
 | E30 | 50MB+ single part | **internal-missing** | probe skips files >40 MB; no such public sample fetched |
+| E31 | RFC 2047 encoded-word covering an address or whole mailbox in participant headers | tested | `HeaderMapperTests` |
 
 When adding a sample, drop it under local `corpus/internal/` (gitignored). `InternalCorpusTests` and `golden probe` run only if the files exist.
 
