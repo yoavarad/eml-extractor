@@ -1,3 +1,4 @@
+using EmlExtraction.Models;
 using MimeKit;
 
 namespace EmlExtraction.Logics;
@@ -22,31 +23,31 @@ internal static class HeaderMapper
             foreach (var header in message.Body.Headers.Where(h => h.Field.StartsWith("Content-", StringComparison.OrdinalIgnoreCase)))
                 Append(metadata, NormalizeKey(header.Field), header.Value ?? "");
 
-        EnsureAddress(metadata, "from", Join(message.From));
-        EnsureAddress(metadata, "to", Join(message.To));
-        EnsureAddress(metadata, "cc", Join(message.Cc));
-        EnsureAddress(metadata, "bcc", Join(message.Bcc));
-        Set(metadata, "reply-to", Join(message.ReplyTo));
-        Set(metadata, "sender", message.Sender?.ToString());
-        Set(metadata, "subject", message.Subject);
+        EnsureAddress(metadata, MetadataKeys.From, Join(message.From));
+        EnsureAddress(metadata, MetadataKeys.To, Join(message.To));
+        EnsureAddress(metadata, MetadataKeys.Cc, Join(message.Cc));
+        EnsureAddress(metadata, MetadataKeys.Bcc, Join(message.Bcc));
+        Set(metadata, MetadataKeys.ReplyTo, Join(message.ReplyTo));
+        Set(metadata, MetadataKeys.Sender, message.Sender?.ToString());
+        Set(metadata, MetadataKeys.Subject, message.Subject);
         if (message.Date != DateTimeOffset.MinValue)
-            Set(metadata, "date", message.Date.ToString("o"));
-        Set(metadata, "message-id", message.MessageId);
-        Set(metadata, "in-reply-to", message.InReplyTo);
-        Set(metadata, "references", message.References.Count == 0 ? null : string.Join(" ", message.References));
+            Set(metadata, MetadataKeys.Date, message.Date.ToString("o"));
+        Set(metadata, MetadataKeys.MessageId, message.MessageId);
+        Set(metadata, MetadataKeys.InReplyTo, message.InReplyTo);
+        Set(metadata, MetadataKeys.References, message.References.Count == 0 ? null : string.Join(" ", message.References));
 
-        metadata["xfields"] = string.Join("\n", xLines);
+        metadata[MetadataKeys.XFields] = string.Join("\n", xLines);
         return metadata;
     }
 
     /// <summary>Fixed always-present keys with empty values (parse_failed, ...).</summary>
     internal static Dictionary<string, string> EmptyMetadata() => new(StringComparer.Ordinal)
     {
-        ["from"] = "",
-        ["to"] = "",
-        ["cc"] = "",
-        ["bcc"] = "",
-        ["xfields"] = ""
+        [MetadataKeys.From] = "",
+        [MetadataKeys.To] = "",
+        [MetadataKeys.Cc] = "",
+        [MetadataKeys.Bcc] = "",
+        [MetadataKeys.XFields] = ""
     };
 
     private static string NormalizeKey(string field)

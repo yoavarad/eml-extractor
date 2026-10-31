@@ -13,6 +13,7 @@ public sealed class NamespaceLayoutTests
         ["EmlExtractionResult"] = "EmlExtraction.Models",
         ["EmlDetectionResult"] = "EmlExtraction.Models",
         ["ExtractedAttachment"] = "EmlExtraction.Models",
+        ["MetadataKeys"] = "EmlExtraction.Models",
         ["EmlExtractionException"] = "EmlExtraction.Exceptions",
         ["EmlInputTooLargeException"] = "EmlExtraction.Exceptions",
         ["EmlExtractor"] = "EmlExtraction.Logics",
