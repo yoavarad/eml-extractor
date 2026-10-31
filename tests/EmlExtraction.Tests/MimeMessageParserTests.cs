@@ -1,5 +1,6 @@
 using System.Text;
 using EmlExtraction.Logics;
+using EmlExtraction.Models;
 
 namespace EmlExtraction.Tests;
 
@@ -73,8 +74,8 @@ public sealed class MimeMessageParserTests
         var lenient = new EmlExtractor().Extract(bytes);
         var strict = new EmlExtractor(EmlExtractor.DefaultMaxInputBytes, StrictOptions()).Extract(bytes);
 
-        Assert.Contains("Doe, John", lenient.Metadata["to"]);
-        Assert.NotEqual(lenient.Metadata["to"], strict.Metadata["to"]);
+        Assert.Contains("Doe, John", lenient.Metadata[MetadataKeys.To]);
+        Assert.NotEqual(lenient.Metadata[MetadataKeys.To], strict.Metadata[MetadataKeys.To]);
     }
 
     [Fact]

@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using EmlExtraction.Models;
 using MimeKit;
 
 namespace GoldenKit;
@@ -187,8 +188,8 @@ internal static class MimeBuild
 
     public static CaseDef FromMessage(string id, string[] tags, MimeMessage message, GoldenExpect expect)
     {
-        expect.Metadata.TryAdd("from", new GoldenField { Contains = ["alice@example.com"] });
-        expect.Metadata.TryAdd("to", new GoldenField { Contains = ["bob@example.com"] });
+        expect.Metadata.TryAdd(MetadataKeys.From, new GoldenField { Contains = ["alice@example.com"] });
+        expect.Metadata.TryAdd(MetadataKeys.To, new GoldenField { Contains = ["bob@example.com"] });
         return new CaseDef { Id = id, Tags = tags, Eml = ToBytes(message), IsEml = true, Expect = WithFullPaths(expect) };
     }
 
@@ -218,7 +219,7 @@ internal static class MimeBuild
         => new() { Id = id, Tags = tags, Eml = data, IsEml = isEml, Expect = expect ?? new GoldenExpect() };
 
     public static Dictionary<string, GoldenField> Meta(string subject)
-        => new(StringComparer.OrdinalIgnoreCase) { ["subject"] = Eq(subject)! };
+        => new(StringComparer.OrdinalIgnoreCase) { [MetadataKeys.Subject] = Eq(subject)! };
 
     public static GoldenField Eq(string value) => new() { Eq = value };
 

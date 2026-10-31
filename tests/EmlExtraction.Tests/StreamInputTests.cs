@@ -51,8 +51,8 @@ public sealed class StreamInputTests
         var result = _extractor.Extract(stream);
 
         Assert.Empty(result.Warnings);
-        Assert.Equal("hello", result.Metadata["subject"]);
-        Assert.Contains("alice@example.com", result.Metadata["from"]);
+        Assert.Equal("hello", result.Metadata[MetadataKeys.Subject]);
+        Assert.Contains("alice@example.com", result.Metadata[MetadataKeys.From]);
         Assert.Equal(ResultProjection.Of(_extractor.Extract(bytes)), ResultProjection.Of(result));
     }
 
@@ -86,7 +86,7 @@ public sealed class StreamInputTests
         var result = new EmlExtractor(1024).Extract(stream);
 
         Assert.Empty(result.Warnings);
-        Assert.Equal("a@b.com", result.Metadata["from"]);
+        Assert.Equal("a@b.com", result.Metadata[MetadataKeys.From]);
     }
 
     [Fact]
@@ -129,7 +129,7 @@ public sealed class StreamInputTests
 
         var result = _extractor.Extract(stream);
 
-        Assert.Equal("hello", result.Metadata["subject"]);
+        Assert.Equal("hello", result.Metadata[MetadataKeys.Subject]);
         Assert.False(stream.Disposed);
         Assert.False(stream.Seeked);
         Assert.Equal(stream.Length, stream.Position);
