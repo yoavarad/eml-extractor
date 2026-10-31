@@ -1,5 +1,6 @@
 using EmlExtraction.Models;
 using MimeKit;
+using MimeKit.Utils;
 
 namespace EmlExtraction.Logics;
 
@@ -23,12 +24,15 @@ internal static class HeaderMapper
             foreach (var header in message.Body.Headers.Where(h => h.Field.StartsWith("Content-", StringComparison.OrdinalIgnoreCase)))
                 Append(metadata, NormalizeKey(header.Field), header.Value ?? "");
 
-        EnsureAddress(metadata, MetadataKeys.From, Join(message.From));
-        EnsureAddress(metadata, MetadataKeys.To, Join(message.To));
-        EnsureAddress(metadata, MetadataKeys.Cc, Join(message.Cc));
-        EnsureAddress(metadata, MetadataKeys.Bcc, Join(message.Bcc));
-        Set(metadata, MetadataKeys.ReplyTo, Join(message.ReplyTo));
-        Set(metadata, MetadataKeys.Sender, message.Sender?.ToString());
+        EnsureAddress(metadata, MetadataKeys.From, Effective(message, message.From, HeaderId.From));
+        EnsureAddress(metadata, MetadataKeys.To, Effective(message, message.To, HeaderId.To));
+        EnsureAddress(metadata, MetadataKeys.Cc, Effective(message, message.Cc, HeaderId.Cc));
+        EnsureAddress(metadata, MetadataKeys.Bcc, Effective(message, message.Bcc, HeaderId.Bcc));
+        Set(metadata, MetadataKeys.ReplyTo, Effective(message, message.ReplyTo, HeaderId.ReplyTo));
+        Set(metadata, MetadataKeys.Sender, (message.Sender is null || message.Sender.Address.Contains("=?", StringComparison.Ordinal))
+            && message.Headers.Any(h => h.Id == HeaderId.Sender && h.RawValue.AsSpan().IndexOf("=?"u8) >= 0)
+            ? Effective(message, message.Sender is null ? [] : [message.Sender], HeaderId.Sender)
+            : message.Sender?.ToString());
         Set(metadata, MetadataKeys.Subject, message.Subject);
         if (message.Date != DateTimeOffset.MinValue)
             Set(metadata, MetadataKeys.Date, message.Date.ToString("o"));
@@ -82,6 +86,33 @@ internal static class HeaderMapper
 
         if (!map.ContainsKey(key))
             map[key] = "";
+    }
+
+    private static readonly ParserOptions LooseOptions = CreateLooseOptions();
+
+    private static ParserOptions CreateLooseOptions()
+    {
+        var options = ParserOptions.Default.Clone();
+        options.Rfc2047ComplianceMode = RfcComplianceMode.Loose;
+        return options;
+    }
+
+    /// <summary>
+    /// Effective address text for a participant header. If the raw value holds an encoded-word that MimeKit
+    /// could not resolve (empty list or an address still containing "=?"), decode the raw value and re-parse it.
+    /// Falls back to the decoded text when no mailbox results.
+    /// </summary>
+    private static string? Effective(MimeMessage message, InternetAddressList list, HeaderId id)
+    {
+        var rawValues = message.Headers.Where(h => h.Id == id).Select(h => h.RawValue).ToList();
+        var encoded = rawValues.Any(r => r.AsSpan().IndexOf("=?"u8) >= 0);
+        if (!encoded || (list.Count > 0 && !list.Mailboxes.Any(m => m.Address?.Contains("=?", StringComparison.Ordinal) == true)))
+            return Join(list);
+
+        var decoded = string.Join(", ", rawValues.Select(r => Rfc2047.DecodeText(LooseOptions, r).Trim()).Where(t => t.Length > 0));
+        if (InternetAddressList.TryParse(LooseOptions, decoded, out var reparsed) && reparsed.Mailboxes.Any())
+            return Join(reparsed);
+        return string.IsNullOrWhiteSpace(decoded) ? Join(list) : decoded;
     }
 
     private static string? Join(InternetAddressList list)

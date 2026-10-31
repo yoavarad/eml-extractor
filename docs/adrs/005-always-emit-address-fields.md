@@ -18,3 +18,6 @@ Callers can index these keys without a missing-key check. An empty string means 
 
 ## Evidence
 Commit `c3b39bb`, `src/EmlExtraction/HeaderMapper.cs`, tests `ExtractionTests.FromToCcBccAreAlwaysPresent`, `ExtractsFromToCcBccIncludingMultiplesAndRtlNames`, `RawBccHeaderIsExtracted`.
+
+## Amendment
+When MimeKit finds no mailbox, or an address that still contains `=?` (an RFC 2047 encoded-word over the address or whole mailbox), the raw header is decoded leniently and re-parsed. If that yields mailboxes they are used; otherwise the decoded text is the value. Headers without `=?` are unchanged.
