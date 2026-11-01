@@ -178,6 +178,9 @@ internal static class HeaderMapper
     /// </summary>
     private static bool RecoverItem(string item, InternetAddressList target)
     {
+        if (IsCommentOnly(item))
+            return false;
+
         if (TrySplitGroup(item, out var name, out var members))
         {
             var group = ParseGroupHead(name);
@@ -214,6 +217,29 @@ internal static class HeaderMapper
         }
 
         return false;
+    }
+
+    /// <summary>True when the item is only whitespace and comments, e.g. the CFWS after a group's closing semicolon.</summary>
+    private static bool IsCommentOnly(string item)
+    {
+        var comment = 0;
+        for (var i = 0; i < item.Length; i++)
+        {
+            var c = item[i];
+            if (comment > 0)
+            {
+                if (c == '\\')
+                    i++;
+                else
+                    comment += c == '(' ? 1 : c == ')' ? -1 : 0;
+            }
+            else if (c == '(')
+                comment = 1;
+            else if (!char.IsWhiteSpace(c))
+                return false;
+        }
+
+        return true;
     }
 
     private static GroupAddress ParseGroupHead(string name)

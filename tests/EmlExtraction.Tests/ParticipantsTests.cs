@@ -215,6 +215,51 @@ public sealed class ParticipantsTests
             result.Participants[MetadataKeys.To]);
     }
 
+    [Theory]
+    [InlineData("G: a@x.org, {Bad}; (c)")]
+    [InlineData("G: a@x.org, {Bad};   (c) ")]
+    [InlineData("G: a@x.org, {Bad}; (c (nested))")]
+    [InlineData("G: a@x.org,\r\n {Bad}; \r\n (c)")]
+    [InlineData("G: a@x.org, {Bad} (c);")]
+    [InlineData("G: a@x.org, {Bad} (d) ;")]
+    public void GroupWithCommentsKeepsBadMemberAndNoCommentParticipant(string value)
+    {
+        var result = Extract($"To: {value.Replace("{Bad}", Bad)}");
+
+        Assert.Equal([new EmailParticipant("", "a@x.org", "a", "x.org"), Raw(Bad)], result.Participants[MetadataKeys.To]);
+    }
+
+    [Fact]
+    public void GroupWithTrailingCommentThenMoreItemsKeepsOrder()
+    {
+        var result = Extract($"To: G: a@x.org, {Bad}; (c), b@y.com, {Bad}");
+
+        Assert.Equal(
+            [new EmailParticipant("", "a@x.org", "a", "x.org"), Raw(Bad), new EmailParticipant("", "b@y.com", "b", "y.com"), Raw(Bad)],
+            result.Participants[MetadataKeys.To]);
+    }
+
+    [Theory]
+    [InlineData("G: a@x.org, {Bad}; (=?utf-8?B?!!bad?=)")]
+    [InlineData("G: a@x.org, {Bad}; (=?utf-8?B?!!bad?=), b@y.com")]
+    [InlineData("G: a@x.org, {Bad}; (c), (=?utf-8?B?!!bad?=)")]
+    public void UndecodableTokenInCommentAfterGroupIsNotAParticipant(string value)
+    {
+        var result = Extract($"To: {value.Replace("{Bad}", Bad)}");
+
+        Assert.Equal(["a@x.org", Bad], result.Participants[MetadataKeys.To].Take(2).Select(p => p.Address));
+        Assert.DoesNotContain(result.Participants[MetadataKeys.To].Skip(2), p => p.Address.Contains("=?"));
+        Assert.Equal(value.Contains("b@y.com") ? 3 : 2, result.Participants[MetadataKeys.To].Count);
+    }
+
+    [Fact]
+    public void GroupWithTrailingCommentKeepsMetadataWithoutComment()
+    {
+        var result = Extract($"To: G: a@x.org, {Bad}; (c)");
+
+        Assert.Equal($"G: a@x.org; {Bad};", result.Metadata[MetadataKeys.To]);
+    }
+
     [Fact]
     public void EmptyGroupBesideEncodedWordStaysEmpty()
     {
