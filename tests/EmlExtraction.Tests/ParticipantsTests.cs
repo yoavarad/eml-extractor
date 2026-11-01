@@ -131,16 +131,61 @@ public sealed class ParticipantsTests
 
         Assert.Equal("a@x.org; =?utf-8?B?!!bad?=", result.Metadata[MetadataKeys.To]);
         Assert.Equal(
-            [new EmailParticipant("", "a@x.org", "a", "x.org"), new EmailParticipant("", "=?utf-8?B?!!bad?=", "=?utf-8?B?!!bad?=", "")],
+            [new EmailParticipant("", "a@x.org", "a", "x.org"), Raw("=?utf-8?B?!!bad?=")],
+            result.Participants[MetadataKeys.To]);
+    }
+
+    private const string Bad = "=?utf-8?B?!!bad?=";
+
+    private static EmailParticipant Raw(string token) => new("", token, "", "");
+
+    [Fact]
+    public void UndecodableTokenAloneIsKeptAsRawParticipant()
+    {
+        var result = Extract($"To: {Bad}");
+
+        Assert.Equal(Bad, result.Metadata[MetadataKeys.To]);
+        Assert.Equal([Raw(Bad)], result.Participants[MetadataKeys.To]);
+    }
+
+    [Fact]
+    public void DuplicateUndecodableTokensAreAllKept()
+    {
+        var result = Extract($"To: {Bad}, {Bad}");
+
+        Assert.Equal($"{Bad}; {Bad}", result.Metadata[MetadataKeys.To]);
+        Assert.Equal([Raw(Bad), Raw(Bad)], result.Participants[MetadataKeys.To]);
+    }
+
+    [Fact]
+    public void UndecodableTokenKeepsItsPosition()
+    {
+        var result = Extract($"To: {Bad}, a@x.org, {Bad}, b@y.com");
+
+        Assert.Equal($"{Bad}; a@x.org; {Bad}; b@y.com", result.Metadata[MetadataKeys.To]);
+        Assert.Equal(
+            [Raw(Bad), new EmailParticipant("", "a@x.org", "a", "x.org"), Raw(Bad), new EmailParticipant("", "b@y.com", "b", "y.com")],
             result.Participants[MetadataKeys.To]);
     }
 
     [Fact]
-    public void UndecodableTokenAloneKeepsRawMetadata()
+    public void UnquotedBadPhraseBeforeValidAddressKeepsTheAddressAndEncodedPhraseStaysIntact()
     {
-        var result = Extract("To: =?utf-8?B?!!bad?=");
+        var result = Extract($"To: {Bad} <a@x.org>, =?utf-8?Q?Doe=2C_John?= <b@y.com>, {Bad}");
 
-        Assert.Contains("!!bad", result.Metadata[MetadataKeys.To]);
+        Assert.Equal(["a@x.org", "b@y.com", Bad], result.Participants[MetadataKeys.To].Select(p => p.Address));
+        Assert.Equal("Doe, John", result.Participants[MetadataKeys.To][1].Nickname);
+    }
+
+    [Theory]
+    [InlineData("a@x.org (=?utf-8?B?!!bad?=)")]
+    [InlineData("\"=?utf-8?B?!!bad?=\" <a@x.org>")]
+    public void UndecodableTokenInsideCommentOrQuotedNameIsNotAParticipant(string value)
+    {
+        var result = Extract($"To: {value}");
+
+        Assert.Single(result.Participants[MetadataKeys.To]);
+        Assert.Equal("a@x.org", result.Participants[MetadataKeys.To][0].Address);
     }
 
     [Fact]
