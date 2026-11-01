@@ -184,7 +184,7 @@ internal static class HeaderMapper
             foreach (Match m in EncodedWord.Matches(raw))
             {
                 var decoded = Rfc2047.DecodeText(LooseOptions, System.Text.Encoding.ASCII.GetBytes(m.Value));
-                if (decoded.Length > 0 && !decoded.Contains("=?", StringComparison.Ordinal))
+                if ((decoded.Length > 0 || m.Value.EndsWith("??=", StringComparison.Ordinal)) && !decoded.Contains("=?", StringComparison.Ordinal))
                     continue;
                 joined ??= Join(list) ?? "";
                 if (!joined.Contains(m.Value, StringComparison.Ordinal) && !lost.Contains(m.Value))
