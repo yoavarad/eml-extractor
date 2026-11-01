@@ -177,6 +177,52 @@ public sealed class ParticipantsTests
         Assert.Equal("Doe, John", result.Participants[MetadataKeys.To][1].Nickname);
     }
 
+    [Fact]
+    public void UndecodableMemberInsideGroupIsKeptBetweenValidMembers()
+    {
+        var result = Extract($"To: G: a@x.org, {Bad}, b@y.com, {Bad};");
+
+        Assert.Equal(
+            [new EmailParticipant("", "a@x.org", "a", "x.org"), Raw(Bad), new EmailParticipant("", "b@y.com", "b", "y.com"), Raw(Bad)],
+            result.Participants[MetadataKeys.To]);
+        Assert.Equal($"G: a@x.org; {Bad}; b@y.com; {Bad};", result.Metadata[MetadataKeys.To]);
+    }
+
+    [Fact]
+    public void GroupWithOnlyUndecodableMemberKeepsIt()
+    {
+        var result = Extract($"To: G: {Bad};");
+
+        Assert.Equal([Raw(Bad)], result.Participants[MetadataKeys.To]);
+        Assert.Equal($"G: {Bad};", result.Metadata[MetadataKeys.To]);
+    }
+
+    [Fact]
+    public void UndecodableTokenInGroupNameIsNotAParticipant()
+    {
+        var result = Extract($"To: {Bad}: a@x.org, {Bad};");
+
+        Assert.Equal([new EmailParticipant("", "a@x.org", "a", "x.org"), Raw(Bad)], result.Participants[MetadataKeys.To]);
+    }
+
+    [Fact]
+    public void GroupNextToTopLevelUndecodableItemKeepsOrder()
+    {
+        var result = Extract($"To: {Bad}, G: a@x.org, {Bad};, c@z.com, {Bad}");
+
+        Assert.Equal(
+            [Raw(Bad), new EmailParticipant("", "a@x.org", "a", "x.org"), Raw(Bad), new EmailParticipant("", "c@z.com", "c", "z.com"), Raw(Bad)],
+            result.Participants[MetadataKeys.To]);
+    }
+
+    [Fact]
+    public void EmptyGroupBesideEncodedWordStaysEmpty()
+    {
+        var result = Extract("To: G:;, =?utf-8?B?am9obkB4Lm9yZw==?=");
+
+        Assert.Equal(["john@x.org"], result.Participants[MetadataKeys.To].Select(p => p.Address));
+    }
+
     [Theory]
     [InlineData("a@x.org (=?utf-8?B?!!bad?=)")]
     [InlineData("\"=?utf-8?B?!!bad?=\" <a@x.org>")]

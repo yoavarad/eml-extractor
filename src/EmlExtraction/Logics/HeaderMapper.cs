@@ -166,32 +166,100 @@ internal static class HeaderMapper
         foreach (var bytes in rawValues)
         {
             foreach (var item in SplitItems(System.Text.Encoding.Latin1.GetString(bytes)))
-            {
-                var itemBytes = System.Text.Encoding.Latin1.GetBytes(item);
-                if (InternetAddressList.TryParse(LooseOptions, itemBytes, out var direct) && direct.Count > 0
-                    && !direct.Mailboxes.Any(m => m.Address?.Contains("=?", StringComparison.Ordinal) == true))
-                {
-                    merged.AddRange(direct);
-                    continue;
-                }
-
-                var decoded = Rfc2047.DecodeText(LooseOptions, itemBytes).Trim();
-                if (decoded.Length > 0 && !decoded.Contains("=?", StringComparison.Ordinal)
-                    && InternetAddressList.TryParse(LooseOptions, decoded, out var parsed) && parsed.Count > 0)
-                {
-                    merged.AddRange(parsed);
-                    continue;
-                }
-
-                if (item.Contains("=?", StringComparison.Ordinal))
-                {
-                    anyRaw = true;
-                    merged.Add(new RawMailbox(item.Replace("\r", "").Replace("\n", " ").Trim()));
-                }
-            }
+                anyRaw |= RecoverItem(item, merged);
         }
 
         return anyRaw ? merged : null;
+    }
+
+    /// <summary>
+    /// Parses one top-level item into target, or keeps it raw. A group is first split member by member (MimeKit silently drops a bad member)
+    /// so a bad member stays a raw mailbox in place, and used only when one was kept; its display name never becomes a participant. True when a raw token was kept.
+    /// </summary>
+    private static bool RecoverItem(string item, InternetAddressList target)
+    {
+        if (TrySplitGroup(item, out var name, out var members))
+        {
+            var group = ParseGroupHead(name);
+            var anyRaw = false;
+            foreach (var member in SplitItems(members))
+                anyRaw |= RecoverItem(member, group.Members);
+            if (anyRaw)
+            {
+                target.Add(group);
+                return true;
+            }
+        }
+
+        var itemBytes = System.Text.Encoding.Latin1.GetBytes(item);
+        if (InternetAddressList.TryParse(LooseOptions, itemBytes, out var direct) && direct.Count > 0
+            && !direct.Mailboxes.Any(m => m.Address?.Contains("=?", StringComparison.Ordinal) == true))
+        {
+            target.AddRange(direct);
+            return false;
+        }
+
+        var decoded = Rfc2047.DecodeText(LooseOptions, itemBytes).Trim();
+        if (decoded.Length > 0 && !decoded.Contains("=?", StringComparison.Ordinal)
+            && InternetAddressList.TryParse(LooseOptions, decoded, out var parsed) && parsed.Count > 0)
+        {
+            target.AddRange(parsed);
+            return false;
+        }
+
+        if (item.Contains("=?", StringComparison.Ordinal))
+        {
+            target.Add(new RawMailbox(item.Replace("\r", "").Replace("\n", " ").Trim()));
+            return true;
+        }
+
+        return false;
+    }
+
+    private static GroupAddress ParseGroupHead(string name)
+    {
+        var head = System.Text.Encoding.Latin1.GetBytes(name + ":;");
+        if (InternetAddressList.TryParse(LooseOptions, head, out var list) && list.Count == 1 && list[0] is GroupAddress g)
+            return g;
+        return new GroupAddress(Rfc2047.DecodeText(LooseOptions, System.Text.Encoding.Latin1.GetBytes(name)).Trim());
+    }
+
+    /// <summary>Splits "name: members;" at the first top-level colon (not in quotes, comments or angle brackets).</summary>
+    private static bool TrySplitGroup(string item, out string name, out string members)
+    {
+        name = members = "";
+        var trimmed = item.TrimEnd();
+        if (!trimmed.EndsWith(';'))
+            return false;
+        var quoted = false;
+        var comment = 0;
+        var angle = false;
+        for (var i = 0; i < trimmed.Length; i++)
+        {
+            var c = trimmed[i];
+            if (c == '\\' && (quoted || comment > 0))
+                i++;
+            else if (quoted)
+                quoted = c != '"';
+            else if (comment > 0)
+                comment += c == '(' ? 1 : c == ')' ? -1 : 0;
+            else if (c == '"')
+                quoted = true;
+            else if (c == '(')
+                comment = 1;
+            else if (c == '<')
+                angle = true;
+            else if (c == '>')
+                angle = false;
+            else if (c == ':' && !angle)
+            {
+                name = trimmed[..i];
+                members = trimmed[(i + 1)..^1];
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>Marks an undecodable raw item kept as a mailbox: participant has Address only.</summary>
