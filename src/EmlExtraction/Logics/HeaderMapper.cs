@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using System.Collections.ObjectModel;
 using EmlExtraction.Models;
 using MimeKit;
@@ -132,16 +133,29 @@ internal static class HeaderMapper
         var rawValues = message.Headers.Where(h => h.Id == id).Select(h => h.RawValue).ToList();
         var encoded = rawValues.Any(r => r.AsSpan().IndexOf("=?"u8) >= 0);
         if (!encoded || (list.Count > 0 && !list.Mailboxes.Any(m => m.Address?.Contains("=?", StringComparison.Ordinal) == true)))
-            return JoinAndStore(list, participants, key);
+            return JoinAndStore(list, participants, key, LostTokens(rawValues, list));
 
         var decoded = string.Join(", ", rawValues.Select(r => Rfc2047.DecodeText(LooseOptions, r).Trim()).Where(t => t.Length > 0));
         if (InternetAddressList.TryParse(LooseOptions, decoded, out var reparsed) && reparsed.Mailboxes.Any())
-            return JoinAndStore(reparsed, participants, key);
+            return JoinAndStore(reparsed, participants, key, LostTokens(rawValues, reparsed));
         return string.IsNullOrWhiteSpace(decoded) ? JoinAndStore(list, participants, key) : decoded;
     }
 
-    private static string? JoinAndStore(InternetAddressList list, Dictionary<string, IReadOnlyList<EmailParticipant>> participants, string key)
+    private static string? JoinAndStore(InternetAddressList list, Dictionary<string, IReadOnlyList<EmailParticipant>> participants, string key,
+        IReadOnlyList<string>? lost = null)
     {
+        var joined = Join(list);
+        if (lost is { Count: > 0 })
+        {
+            // Undecodable encoded-word the parser dropped: keep raw text, and as a participant (Address = raw token).
+            joined = joined is null ? string.Join("; ", lost) : joined + "; " + string.Join("; ", lost);
+            var all = new List<EmailParticipant>();
+            AddMailboxes(list, all);
+            all.AddRange(lost.Select(t => new EmailParticipant("", t, t, "")));
+            participants[key] = all.AsReadOnly();
+            return joined;
+        }
+
         if (list.Count > 0)
         {
             var found = ToReadOnly(list);
@@ -149,7 +163,36 @@ internal static class HeaderMapper
                 participants[key] = found;
         }
 
-        return Join(list);
+        return joined;
+    }
+
+    private static readonly Regex EncodedWord = new(@"=\?[^?\s]+\?[bBqQ]\?[^?\s]*\?=", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    /// <summary>
+    /// Encoded-word tokens in the raw header that do not decode (decoding gives nothing or leaves "=?") and that the parsed
+    /// list does not already carry in a name or address. Only valid mailboxes were kept otherwise; these would be lost.
+    /// </summary>
+    private static List<string> LostTokens(List<byte[]> rawValues, InternetAddressList list)
+    {
+        var lost = new List<string>();
+        string? joined = null;
+        foreach (var bytes in rawValues)
+        {
+            var raw = System.Text.Encoding.Latin1.GetString(bytes);
+            if (raw.IndexOf("=?", StringComparison.Ordinal) < 0)
+                continue;
+            foreach (Match m in EncodedWord.Matches(raw))
+            {
+                var decoded = Rfc2047.DecodeText(LooseOptions, System.Text.Encoding.ASCII.GetBytes(m.Value));
+                if (decoded.Length > 0 && !decoded.Contains("=?", StringComparison.Ordinal))
+                    continue;
+                joined ??= Join(list) ?? "";
+                if (!joined.Contains(m.Value, StringComparison.Ordinal) && !lost.Contains(m.Value))
+                    lost.Add(m.Value);
+            }
+        }
+
+        return lost;
     }
 
     /// <summary>Common case (no groups): fill one array and wrap it, skipping the intermediate List.</summary>

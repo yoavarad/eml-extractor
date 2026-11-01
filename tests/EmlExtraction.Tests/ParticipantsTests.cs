@@ -125,6 +125,25 @@ public sealed class ParticipantsTests
     }
 
     [Fact]
+    public void UndecodableTokenNextToValidMailboxIsKept()
+    {
+        var result = Extract("To: a@x.org, =?utf-8?B?!!bad?=");
+
+        Assert.Equal("a@x.org; =?utf-8?B?!!bad?=", result.Metadata[MetadataKeys.To]);
+        Assert.Equal(
+            [new EmailParticipant("", "a@x.org", "a", "x.org"), new EmailParticipant("", "=?utf-8?B?!!bad?=", "=?utf-8?B?!!bad?=", "")],
+            result.Participants[MetadataKeys.To]);
+    }
+
+    [Fact]
+    public void UndecodableTokenAloneKeepsRawMetadata()
+    {
+        var result = Extract("To: =?utf-8?B?!!bad?=");
+
+        Assert.Contains("!!bad", result.Metadata[MetadataKeys.To]);
+    }
+
+    [Fact]
     public void AllKeysPresentWithEmptyListsWhenHeadersAbsent()
     {
         var result = Extract("X_Note: none");
