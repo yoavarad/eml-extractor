@@ -131,6 +131,8 @@ internal static class HeaderMapper
     {
         var rawValues = message.Headers.Where(h => h.Id == id).Select(h => h.RawValue).ToList();
         var encoded = rawValues.Any(r => r.AsSpan().IndexOf("=?"u8) >= 0);
+        if (encoded && RecoverItems(rawValues) is { } recovered)
+            return JoinAndStore(recovered, participants, key);
         if (!encoded || (list.Count > 0 && !list.Mailboxes.Any(m => m.Address?.Contains("=?", StringComparison.Ordinal) == true)))
             return JoinAndStore(list, participants, key);
 
@@ -150,6 +152,97 @@ internal static class HeaderMapper
         }
 
         return Join(list);
+    }
+
+    /// <summary>
+    /// Only for headers holding an encoded-word. Splits the raw value into top-level address items (commas inside quotes,
+    /// comments, angle brackets and groups do not split), decodes and parses each, and keeps an item that yields nothing
+    /// as a raw mailbox (Address = raw item) in its original position. Returns null when every item parsed.
+    /// </summary>
+    private static InternetAddressList? RecoverItems(List<byte[]> rawValues)
+    {
+        var merged = new InternetAddressList();
+        var anyRaw = false;
+        foreach (var bytes in rawValues)
+        {
+            foreach (var item in SplitItems(System.Text.Encoding.Latin1.GetString(bytes)))
+            {
+                var itemBytes = System.Text.Encoding.Latin1.GetBytes(item);
+                if (InternetAddressList.TryParse(LooseOptions, itemBytes, out var direct) && direct.Count > 0
+                    && !direct.Mailboxes.Any(m => m.Address?.Contains("=?", StringComparison.Ordinal) == true))
+                {
+                    merged.AddRange(direct);
+                    continue;
+                }
+
+                var decoded = Rfc2047.DecodeText(LooseOptions, itemBytes).Trim();
+                if (decoded.Length > 0 && !decoded.Contains("=?", StringComparison.Ordinal)
+                    && InternetAddressList.TryParse(LooseOptions, decoded, out var parsed) && parsed.Count > 0)
+                {
+                    merged.AddRange(parsed);
+                    continue;
+                }
+
+                if (item.Contains("=?", StringComparison.Ordinal))
+                {
+                    anyRaw = true;
+                    merged.Add(new RawMailbox(item.Replace("\r", "").Replace("\n", " ").Trim()));
+                }
+            }
+        }
+
+        return anyRaw ? merged : null;
+    }
+
+    /// <summary>Marks an undecodable raw item kept as a mailbox: participant has Address only.</summary>
+    private sealed class RawMailbox(string raw) : MailboxAddress("", raw);
+
+    private static IEnumerable<string> SplitItems(string raw)
+    {
+        var start = 0;
+        var quoted = false;
+        var comment = 0;
+        var angle = false;
+        var group = false;
+        for (var i = 0; i < raw.Length; i++)
+        {
+            var c = raw[i];
+            if (c == '\\' && (quoted || comment > 0))
+                i++;
+            else if (quoted)
+                quoted = c != '"';
+            else if (comment > 0)
+                comment += c == '(' ? 1 : c == ')' ? -1 : 0;
+            else if (c == '"')
+                quoted = true;
+            else if (c == '(')
+                comment = 1;
+            else if (c == '<')
+                angle = true;
+            else if (c == '>')
+                angle = false;
+            else if (angle)
+            {
+            }
+            else if (c == ':')
+                group = true;
+            else if (c == ';' && group)
+            {
+                group = false;
+                if (raw[start..(i + 1)].Trim() is { Length: > 0 } g)
+                    yield return g;
+                start = i + 1;
+            }
+            else if (c == ',' && !group)
+            {
+                if (raw[start..i].Trim() is { Length: > 0 } item)
+                    yield return item;
+                start = i + 1;
+            }
+        }
+
+        if (raw[start..].Trim().Trim(',') is { Length: > 0 } last)
+            yield return last;
     }
 
     /// <summary>Common case (no groups): fill one array and wrap it, skipping the intermediate List.</summary>
@@ -188,6 +281,8 @@ internal static class HeaderMapper
     {
         var address = mailbox.Address ?? "";
         var at = address.LastIndexOf('@');
+        if (mailbox is RawMailbox)
+            return new EmailParticipant("", address, "", "");
         return at < 0
             ? new EmailParticipant(mailbox.Name ?? "", address, address, "")
             : new EmailParticipant(mailbox.Name ?? "", address, address[..at], address[(at + 1)..]);
