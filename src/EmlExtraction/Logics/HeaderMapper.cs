@@ -1,5 +1,5 @@
-using System.Text.RegularExpressions;
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 using EmlExtraction.Models;
 using MimeKit;
 using MimeKit.Utils;
