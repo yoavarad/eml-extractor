@@ -2,15 +2,14 @@ $schema: ydk:schema:req
 id: ydk:req:metadata/all-headers
 description: >-
   Original spec "As many headers as possible" - every header, not only the classic set. Keying per ADR-016
-  (ydk:req:metadata/canonical-keys); the key change is target, not implemented (Stage 02). Today the key folds "-"
-  to "_", so X-Foo and X_Foo collide on x_foo and their values merge.
+  (ydk:req:metadata/canonical-keys).
 type: business-rule
 priority: high
 rule: >-
   For every header in the top-level message header block, Metadata holds an entry whose key is the field name
   trimmed and lower-cased (invariant culture), with "-" and "_" kept, and whose value is the decoded, unfolded header
   value. Repeated headers sharing a key are concatenated with \n in order. Distinct field names that differ only by
-  "-" versus "_" keep separate keys. Headers of nested parts are not included.
+  "-" versus "_" keep separate keys, except a reply_to header, which folds into reply-to (ADR-025). Headers of nested parts are not included.
 failure_behavior: >-
   Not a failure path. On ydk:warning:extraction/parse-failed the map holds only the fixed keys
   (ydk:req:metadata/canonical-keys).

@@ -2,15 +2,12 @@ $schema: ydk:schema:entity
 id: ydk:entity:extraction/Metadata
 description: >-
   The header map exposed as EmlExtractionResult.Metadata. Built by HeaderMapper.Map (src/EmlExtraction/Logics/HeaderMapper.cs).
-  Keys are ordinal (case-sensitive) strings. This manifest describes the target per ADR-014 and ADR-016
-  (ydk:req:metadata/canonical-keys); not implemented (Stage 02).
-  Target construction order: (1) every top-level header copied under its canonical key; (2) the classic overlay
+  Keys are ordinal (case-sensitive) strings. This manifest describes the map per ADR-014 and ADR-016
+  (ydk:req:metadata/canonical-keys).
+  Construction order: (1) every top-level header copied under its canonical key; (2) the classic overlay
   rewrites the value of its own key; (3) xfields computed; (4) any missing fixed key (from, to, cc, bcc, xfields)
   added with "". On ydk:warning:extraction/parse-failed (oversized input throws, ADR-023, so it has no map) the map holds only
   the five fixed keys with "".
-  Today (differences): raw keys fold "-" to "_" (x_mailer, reply_to); the overlay adds second punctuation-free keys
-  (replyto, sender, messageid, inreplyto, mimeversion, contenttype = top-level MIME type, returnpath, deliveredto);
-  subject_direction and content_direction are added last; there is no xfields key; the map is empty on parse_failed.
 fields:
   "<canonical header name>":
     type: string
@@ -18,7 +15,7 @@ fields:
     nullable: false
     constraints: >-
       Key = header field name trimmed and lower-cased (invariant); "-" and "_" kept (DKIM-Signature -> dkim-signature,
-      X-Mailer -> x-mailer, X_Custom -> x_custom). Value = MimeKit-decoded header value (RFC 2047 decoded, unfolded).
+      X-Mailer -> x-mailer, X_Custom -> x_custom), except a reply_to header, which folds into reply-to (ADR-025). Value = MimeKit-decoded header value (RFC 2047 decoded, unfolded).
       Repeated headers with the same key are joined with \n in order. A header named xfields (any case) is stored
       under "header:xfields".
     description: Generic entry for every header present in the message (ydk:req:metadata/all-headers).
@@ -65,7 +62,7 @@ fields:
     type: string
     required: false
     constraints: Formatted like from when the parsed list is non-empty; otherwise the raw value. Present only when the header is.
-    description: Reply-To overlay (today key replyto, plus raw reply_to).
+    description: Reply-To overlay; a reply_to header (any case) folds into this key (ADR-025).
   sender:
     type: string
     required: false
@@ -85,12 +82,12 @@ fields:
     type: string
     required: false
     constraints: Message-ID without angle brackets (MimeKit MessageId); the raw value when it does not parse.
-    description: Message-ID overlay (today key messageid, plus raw message_id).
+    description: Message-ID overlay.
   in-reply-to:
     type: string
     required: false
     constraints: MimeKit InReplyTo without angle brackets; the raw value when it does not parse.
-    description: In-Reply-To overlay (today key inreplyto, plus raw in_reply_to).
+    description: In-Reply-To overlay.
   references:
     type: string
     required: false

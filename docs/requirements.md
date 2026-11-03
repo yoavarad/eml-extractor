@@ -49,9 +49,9 @@ Legend: **Done** · **Partial** (category covered, not production samples) · **
 **Requirement:** Capture as many headers as possible, not only the classic set.
 
 - **Done**
-- Every MIME header is copied into `Metadata` with a normalized key (`lowercase`, `-` → `_`)
+- Every MIME header is copied into `Metadata` with a normalized key (trimmed, lower-cased; `-` and `_` kept; a `reply_to` header folds into `reply-to`)
 - File: `src/EmlExtraction/HeaderMapper.cs`
-- Tests: `ExtractionTests.ExtractsClassicHeadersAndUnicodeSubject` (`dkim_signature`), golden `E10-xfields`
+- Tests: `ExtractionTests.ExtractsClassicHeadersAndUnicodeSubject` (`dkim-signature`), golden `E10-xfields`
 
 ### `X_` fields concatenated into `xfields`
 
