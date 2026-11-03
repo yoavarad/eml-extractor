@@ -69,7 +69,7 @@ Pass a stream when the message is on disk or the network: it saves the whole-inp
 
 #### Participants
 
-`result.Participants` gives the same headers as structured entries (ADR-025). Keys `from`, `to`, `cc`, `bcc`, `reply-to`, `sender` (use the `MetadataKeys` constants) are always present; each holds an `IReadOnlyList<EmailParticipant>`, empty when the header is absent or unparseable. Group members are flattened in order.
+`result.Participants` gives the same headers as structured entries (ADR-025). Keys `from`, `to`, `cc`, `bcc`, `reply-to`, `sender`, `rcptto`, `mailfrom` (use the `MetadataKeys` constants) are always present; each holds an `IReadOnlyList<EmailParticipant>`, empty when the header is absent or unparseable. Group members are flattened in order. `rcptto` comes from `RcptTo` / `Rcpt-To` / `Rcpt_To` headers and `mailfrom` from `MailFrom` / `Mail-From` / `Mail_From` (any case; their metadata keys stay raw). A `Reply_To` header (any case) joins `Reply-To`: both feed the `reply-to` participants and metadata key, in header order.
 
 ```csharp
 foreach (var p in result.Participants[MetadataKeys.To])

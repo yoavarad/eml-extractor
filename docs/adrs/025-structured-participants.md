@@ -9,7 +9,7 @@ Metadata holds each participant header (from, to, cc, bcc, reply-to, sender) as 
 ## Decision
 - New public sealed record `EmailParticipant(string Nickname, string Address, string User, string Domain)` in `EmlExtraction.Models`.
 - New init-only property `EmlExtractionResult.Participants`: `IReadOnlyDictionary<string, IReadOnlyList<EmailParticipant>>`. It is not positional, so the record constructor is unchanged (ADR-012).
-- Keys `from`, `to`, `cc`, `bcc`, `reply-to`, `sender` (the `MetadataKeys` constants) are always present in an extractor result; a list is empty when the header is absent, unparseable, or the message failed to parse (`parse_failed`).
+- Keys `from`, `to`, `cc`, `bcc`, `reply-to`, `sender`, `rcptto`, `mailfrom` (the `MetadataKeys` constants; `rcptto` / `mailfrom` added later, from `rcptto|rcpt-to|rcpt_to` and `mailfrom|mail-from|mail_from` headers, any case; a `reply_to` header joins `reply-to`) are always present in an extractor result; a list is empty when the header is absent, unparseable, or the message failed to parse (`parse_failed`).
 - Nickname = the mailbox display name as decoded by MimeKit, `""` when none. Address = the mailbox address. It is split at the last `@`: User before, Domain after. No `@`: User = Address, Domain = `""`. No case change, no IDN/punycode conversion.
 - Built in `HeaderMapper` from the same effective address list that formats the metadata string, including the decoded re-parse of encoded-words (one parse, shared). Group members are flattened in order and the group name is dropped. Text that never parses as a mailbox gives no entry; Metadata still keeps the text.
 - Metadata strings stay exactly as before.

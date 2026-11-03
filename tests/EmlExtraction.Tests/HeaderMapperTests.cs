@@ -35,6 +35,35 @@ public sealed class HeaderMapperTests
     }
 
     [Fact]
+    public void UnderscoreReplyToFoldsIntoReplyToMetadata()
+    {
+        var map = Extract("Reply-To: a@x.org\nreply_to: b@y.com");
+
+        Assert.Equal("a@x.org; b@y.com", map[MetadataKeys.ReplyTo]);
+        Assert.False(map.ContainsKey("reply_to"));
+    }
+
+    [Fact]
+    public void UnderscoreReplyToAloneSetsReplyToMetadata()
+    {
+        var map = Extract("REPLY_TO: b@y.com");
+
+        Assert.Equal("b@y.com", map[MetadataKeys.ReplyTo]);
+        Assert.False(map.ContainsKey("reply_to"));
+    }
+
+    [Fact]
+    public void EnvelopeHeaderMetadataStaysRaw()
+    {
+        var map = Extract("Rcpt-To: A <a@x.org>\nrcpt_to: b@y.com\nMAILFROM: m@x.org");
+
+        Assert.Equal("A <a@x.org>", map["rcpt-to"]);
+        Assert.Equal("b@y.com", map["rcpt_to"]);
+        Assert.Equal("m@x.org", map["mailfrom"]);
+        Assert.False(map.ContainsKey(MetadataKeys.RcptTo));
+    }
+
+    [Fact]
     public void EncodedAddressOnlyDecodes()
         => Assert.Equal("john@x.org", Extract("Cc: =?utf-8?B?am9obkB4Lm9yZw==?=")[MetadataKeys.Cc]);
 

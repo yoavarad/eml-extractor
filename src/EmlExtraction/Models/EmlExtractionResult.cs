@@ -21,9 +21,9 @@ public sealed record EmlExtractionResult(
 
     /// <summary>
     /// Mailboxes per participant header, keyed by <see cref="MetadataKeys.From"/>, <see cref="MetadataKeys.To"/>,
-    /// <see cref="MetadataKeys.Cc"/>, <see cref="MetadataKeys.Bcc"/>, <see cref="MetadataKeys.ReplyTo"/> and
-    /// <see cref="MetadataKeys.Sender"/>. The extractor always emits all six keys; a list is empty when the header
-    /// is absent or unparseable. Group members are flattened in order.
+    /// <see cref="MetadataKeys.Cc"/>, <see cref="MetadataKeys.Bcc"/>, <see cref="MetadataKeys.ReplyTo"/>,
+    /// <see cref="MetadataKeys.Sender"/>, <see cref="MetadataKeys.RcptTo"/> and <see cref="MetadataKeys.MailFrom"/>.
+    /// The extractor always emits all eight keys; a list is empty when the header is absent or unparseable. Group members are flattened in order.
     /// </summary>
     public IReadOnlyDictionary<string, IReadOnlyList<EmailParticipant>> Participants { get; init; }
         = new Dictionary<string, IReadOnlyList<EmailParticipant>>(StringComparer.Ordinal);

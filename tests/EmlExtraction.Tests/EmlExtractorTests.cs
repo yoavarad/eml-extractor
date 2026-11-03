@@ -7,7 +7,7 @@ namespace EmlExtraction.Tests;
 public sealed class EmlExtractorTests
 {
     private static readonly string[] ParticipantKeys =
-        [MetadataKeys.From, MetadataKeys.To, MetadataKeys.Cc, MetadataKeys.Bcc, MetadataKeys.ReplyTo, MetadataKeys.Sender];
+        [MetadataKeys.From, MetadataKeys.To, MetadataKeys.Cc, MetadataKeys.Bcc, MetadataKeys.ReplyTo, MetadataKeys.Sender, MetadataKeys.RcptTo, MetadataKeys.MailFrom];
 
     [Fact]
     public void ParseFailedResultCarriesAllParticipantKeysEmpty()

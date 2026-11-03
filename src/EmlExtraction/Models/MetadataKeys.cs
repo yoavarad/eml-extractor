@@ -21,6 +21,12 @@ public static class MetadataKeys
     /// <summary>Actual sender mailbox (<c>Sender</c> header).</summary>
     public const string Sender = "sender";
 
+    /// <summary>Envelope recipients (<c>RcptTo</c>, <c>Rcpt-To</c> or <c>Rcpt_To</c> header, any case).</summary>
+    public const string RcptTo = "rcptto";
+
+    /// <summary>Envelope sender (<c>MailFrom</c>, <c>Mail-From</c> or <c>Mail_From</c> header, any case).</summary>
+    public const string MailFrom = "mailfrom";
+
     /// <summary>Message subject (<c>Subject</c> header).</summary>
     public const string Subject = "subject";
 

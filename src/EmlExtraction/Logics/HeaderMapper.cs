@@ -30,15 +30,21 @@ internal static class HeaderMapper
                 Append(metadata, NormalizeKey(header.Field), header.Value ?? "");
 
         participants = EmptyParticipants();
-        EnsureAddress(metadata, MetadataKeys.From, Effective(message, message.From, HeaderId.From, participants, MetadataKeys.From));
-        EnsureAddress(metadata, MetadataKeys.To, Effective(message, message.To, HeaderId.To, participants, MetadataKeys.To));
-        EnsureAddress(metadata, MetadataKeys.Cc, Effective(message, message.Cc, HeaderId.Cc, participants, MetadataKeys.Cc));
-        EnsureAddress(metadata, MetadataKeys.Bcc, Effective(message, message.Bcc, HeaderId.Bcc, participants, MetadataKeys.Bcc));
-        Set(metadata, MetadataKeys.ReplyTo, Effective(message, message.ReplyTo, HeaderId.ReplyTo, participants, MetadataKeys.ReplyTo));
+        EnsureAddress(metadata, MetadataKeys.From, Effective(message, message.From, h => h.Id == HeaderId.From, participants, MetadataKeys.From));
+        EnsureAddress(metadata, MetadataKeys.To, Effective(message, message.To, h => h.Id == HeaderId.To, participants, MetadataKeys.To));
+        EnsureAddress(metadata, MetadataKeys.Cc, Effective(message, message.Cc, h => h.Id == HeaderId.Cc, participants, MetadataKeys.Cc));
+        EnsureAddress(metadata, MetadataKeys.Bcc, Effective(message, message.Bcc, h => h.Id == HeaderId.Bcc, participants, MetadataKeys.Bcc));
+        Func<Header, bool> isReplyTo = h => h.Id == HeaderId.ReplyTo || NormalizeKey(h.Field) == MetadataKeys.ReplyTo;
+        var replyTo = message.Headers.Any(h => h.Id != HeaderId.ReplyTo && isReplyTo(h)) ? ParseHeaders(message, isReplyTo) : message.ReplyTo;
+        Set(metadata, MetadataKeys.ReplyTo, Effective(message, replyTo, isReplyTo, participants, MetadataKeys.ReplyTo));
+        Func<Header, bool> isRcptTo = h => RcptToNames.Contains(NormalizeKey(h.Field));
+        Func<Header, bool> isMailFrom = h => MailFromNames.Contains(NormalizeKey(h.Field));
+        Effective(message, ParseHeaders(message, isRcptTo), isRcptTo, participants, MetadataKeys.RcptTo);
+        Effective(message, ParseHeaders(message, isMailFrom), isMailFrom, participants, MetadataKeys.MailFrom);
         if ((message.Sender is null || message.Sender.Address.Contains("=?", StringComparison.Ordinal))
             && message.Headers.Any(h => h.Id == HeaderId.Sender && h.RawValue.AsSpan().IndexOf("=?"u8) >= 0))
         {
-            Set(metadata, MetadataKeys.Sender, Effective(message, message.Sender is null ? [] : [message.Sender], HeaderId.Sender, participants, MetadataKeys.Sender));
+            Set(metadata, MetadataKeys.Sender, Effective(message, message.Sender is null ? [] : [message.Sender], h => h.Id == HeaderId.Sender, participants, MetadataKeys.Sender));
         }
         else
         {
@@ -67,21 +73,42 @@ internal static class HeaderMapper
         [MetadataKeys.XFields] = ""
     };
 
-    /// <summary>All six participant keys with empty lists (parse_failed, absent headers).</summary>
-    internal static Dictionary<string, IReadOnlyList<EmailParticipant>> EmptyParticipants() => new(6, StringComparer.Ordinal)
+    /// <summary>All eight participant keys with empty lists (parse_failed, absent headers).</summary>
+    internal static Dictionary<string, IReadOnlyList<EmailParticipant>> EmptyParticipants() => new(8, StringComparer.Ordinal)
     {
         [MetadataKeys.From] = ReadOnlyCollection<EmailParticipant>.Empty,
         [MetadataKeys.To] = ReadOnlyCollection<EmailParticipant>.Empty,
         [MetadataKeys.Cc] = ReadOnlyCollection<EmailParticipant>.Empty,
         [MetadataKeys.Bcc] = ReadOnlyCollection<EmailParticipant>.Empty,
         [MetadataKeys.ReplyTo] = ReadOnlyCollection<EmailParticipant>.Empty,
-        [MetadataKeys.Sender] = ReadOnlyCollection<EmailParticipant>.Empty
+        [MetadataKeys.Sender] = ReadOnlyCollection<EmailParticipant>.Empty,
+        [MetadataKeys.RcptTo] = ReadOnlyCollection<EmailParticipant>.Empty,
+        [MetadataKeys.MailFrom] = ReadOnlyCollection<EmailParticipant>.Empty
     };
+
+    /// <summary>Envelope header names (after <see cref="NormalizeKey"/>) that feed the rcptto / mailfrom participants.</summary>
+    private static readonly string[] RcptToNames = ["rcptto", "rcpt-to", "rcpt_to"];
+    private static readonly string[] MailFromNames = ["mailfrom", "mail-from", "mail_from"];
+
+    /// <summary>Addresses of the matching headers in header order (for headers MimeKit does not parse itself).</summary>
+    private static InternetAddressList ParseHeaders(MimeMessage message, Func<Header, bool> match)
+    {
+        var list = new InternetAddressList();
+        foreach (var header in message.Headers.Where(match))
+            if (InternetAddressList.TryParse(ParserOptions.Default, header.RawValue, out var parsed))
+                list.AddRange(parsed);
+        return list;
+    }
 
     private static string NormalizeKey(string field)
     {
         var key = field.Trim().ToLowerInvariant();
-        return key == "xfields" ? "header:xfields" : key;
+        return key switch
+        {
+            "xfields" => "header:xfields",
+            "reply_to" => MetadataKeys.ReplyTo,
+            _ => key
+        };
     }
 
     private static bool IsXHeader(string field)
@@ -126,10 +153,10 @@ internal static class HeaderMapper
     /// could not resolve (empty list or an address still containing "=?"), decode the raw value and re-parse it.
     /// Falls back to the decoded text when no mailbox results. The list used is also stored as participants.
     /// </summary>
-    private static string? Effective(MimeMessage message, InternetAddressList list, HeaderId id,
+    private static string? Effective(MimeMessage message, InternetAddressList list, Func<Header, bool> match,
         Dictionary<string, IReadOnlyList<EmailParticipant>> participants, string key)
     {
-        var rawValues = message.Headers.Where(h => h.Id == id).Select(h => h.RawValue).ToList();
+        var rawValues = message.Headers.Where(match).Select(h => h.RawValue).ToList();
         var encoded = rawValues.Any(r => r.AsSpan().IndexOf("=?"u8) >= 0);
         if (encoded && RecoverItems(rawValues) is { } recovered)
             return JoinAndStore(recovered, participants, key);

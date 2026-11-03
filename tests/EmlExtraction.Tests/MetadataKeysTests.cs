@@ -12,6 +12,8 @@ public sealed class MetadataKeysTests
     [InlineData(MetadataKeys.Bcc, "bcc")]
     [InlineData(MetadataKeys.ReplyTo, "reply-to")]
     [InlineData(MetadataKeys.Sender, "sender")]
+    [InlineData(MetadataKeys.RcptTo, "rcptto")]
+    [InlineData(MetadataKeys.MailFrom, "mailfrom")]
     [InlineData(MetadataKeys.Subject, "subject")]
     [InlineData(MetadataKeys.Date, "date")]
     [InlineData(MetadataKeys.MessageId, "message-id")]
