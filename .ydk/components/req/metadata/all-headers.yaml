@@ -21,4 +21,4 @@ acceptance_criteria:
   - A DKIM-Signature header appears under dkim-signature (ExtractionTests.ExtractsClassicHeadersAndUnicodeSubject; golden seed E10-xfields)
   - X-Foo and X_Foo keep separate keys x-foo and x_foo
   - A folded Subject is unfolded into one value containing both halves (FoldedSubjectIsJoined)
-  - An Exchange O365 header dump yields at least 50 metadata keys (InternalCorpusTests.ExchangeMegaHeadersLandInXFields, renamed ExchangeMegaHeadersLandInMetadata in Stage 02; skipped visibly when the sample is absent)
+  - An Exchange O365 header dump yields at least 50 metadata keys (InternalCorpusTests.ExchangeMegaHeadersLandInMetadata; skipped visibly when the sample is absent)

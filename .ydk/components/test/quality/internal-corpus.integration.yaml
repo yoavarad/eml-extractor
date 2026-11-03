@@ -15,14 +15,13 @@ cases:
     given: corpus/internal/tnef/zimbra-tnef.msg
     when: Extract is called
     then: No warnings; no winmail.dat attachment; a non-empty "upload" file exists
-  - name: ExchangeMegaHeadersLandInXFields
+  - name: ExchangeMegaHeadersLandInMetadata
     description: Large Exchange header block
     given: corpus/internal/exchange/leeholmes-o365-megaheaders.eml
     when: Extract is called
     then: >-
-      At least 50 metadata keys. Today - X-MS-Exchange-Organization-Network-Message-Id and
-      X-Microsoft-Antispam-Message-Info lines in XFields. Target (ADR-014) - those X- headers are under their own
-      metadata keys and not in xfields; test renamed ExchangeMegaHeadersLandInMetadata
+      At least 50 metadata keys; X-MS-Exchange-Organization-Network-Message-Id and X-Microsoft-Antispam-Message-Info
+      are under their own metadata keys and xfields is "" (ADR-014)
   - name: OutlookShapedCidPasteIsExtracted
     description: Chatwoot Outlook CID fixture
     given: corpus/internal/cid/chatwoot-outlook-cid.eml
