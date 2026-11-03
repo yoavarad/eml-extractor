@@ -210,7 +210,7 @@ public sealed class EmlExtractor : IEmlExtractor
             try
             {
                 StageFault?.Invoke("metadata");
-                metadata = HeaderMapper.Map(message, out var mapped);
+                metadata = HeaderMapper.Map(message, _parser.Options, out var mapped);
                 participants = mapped;
             }
             catch (Exception ex) when (IsWrapped(ex))

@@ -8,10 +8,13 @@ namespace EmlExtraction.Logics;
 internal static class HeaderMapper
 {
     public static Dictionary<string, string> Map(MimeMessage message)
-        => Map(message, out _);
+        => Map(message, ParserOptions.Default, out _);
 
-    /// <summary>Header map plus structured participants built from the same effective address lists (ADR-025).</summary>
-    public static Dictionary<string, string> Map(MimeMessage message, out Dictionary<string, IReadOnlyList<EmailParticipant>> participants)
+    /// <summary>
+    /// Header map plus structured participants built from the same effective address lists (ADR-025).
+    /// <paramref name="options"/> are the options the message was parsed with; headers MimeKit does not parse itself use them too.
+    /// </summary>
+    public static Dictionary<string, string> Map(MimeMessage message, ParserOptions options, out Dictionary<string, IReadOnlyList<EmailParticipant>> participants)
     {
         var metadata = new Dictionary<string, string>(StringComparer.Ordinal);
         var xLines = new List<string>();
@@ -35,12 +38,14 @@ internal static class HeaderMapper
         EnsureAddress(metadata, MetadataKeys.Cc, Effective(message, message.Cc, h => h.Id == HeaderId.Cc, participants, MetadataKeys.Cc));
         EnsureAddress(metadata, MetadataKeys.Bcc, Effective(message, message.Bcc, h => h.Id == HeaderId.Bcc, participants, MetadataKeys.Bcc));
         Func<Header, bool> isReplyTo = h => h.Id == HeaderId.ReplyTo || NormalizeKey(h.Field) == MetadataKeys.ReplyTo;
-        var replyTo = message.Headers.Any(h => h.Id != HeaderId.ReplyTo && isReplyTo(h)) ? ParseHeaders(message, isReplyTo) : message.ReplyTo;
+        var replyTo = message.Headers.Any(h => h.Id != HeaderId.ReplyTo && isReplyTo(h)) ? ParseHeaders(message, options, isReplyTo) : message.ReplyTo;
         Set(metadata, MetadataKeys.ReplyTo, Effective(message, replyTo, isReplyTo, participants, MetadataKeys.ReplyTo));
         Func<Header, bool> isRcptTo = h => RcptToNames.Contains(NormalizeKey(h.Field));
         Func<Header, bool> isMailFrom = h => MailFromNames.Contains(NormalizeKey(h.Field));
-        Effective(message, ParseHeaders(message, isRcptTo), isRcptTo, participants, MetadataKeys.RcptTo);
-        Effective(message, ParseHeaders(message, isMailFrom), isMailFrom, participants, MetadataKeys.MailFrom);
+        if (message.Headers.Any(isRcptTo))
+            Effective(message, ParseHeaders(message, options, isRcptTo), isRcptTo, participants, MetadataKeys.RcptTo);
+        if (message.Headers.Any(isMailFrom))
+            Effective(message, ParseHeaders(message, options, isMailFrom), isMailFrom, participants, MetadataKeys.MailFrom);
         if ((message.Sender is null || message.Sender.Address.Contains("=?", StringComparison.Ordinal))
             && message.Headers.Any(h => h.Id == HeaderId.Sender && h.RawValue.AsSpan().IndexOf("=?"u8) >= 0))
         {
@@ -90,14 +95,31 @@ internal static class HeaderMapper
     private static readonly string[] RcptToNames = ["rcptto", "rcpt-to", "rcpt_to"];
     private static readonly string[] MailFromNames = ["mailfrom", "mail-from", "mail_from"];
 
-    /// <summary>Addresses of the matching headers in header order (for headers MimeKit does not parse itself).</summary>
-    private static InternetAddressList ParseHeaders(MimeMessage message, Func<Header, bool> match)
+    /// <summary>
+    /// Addresses of the matching headers in header order, for headers MimeKit does not parse itself. Each raw value is
+    /// re-read as a To header under <paramref name="options"/>, so it gets exactly MimeKit's To result (partial lists kept).
+    /// </summary>
+    private static InternetAddressList ParseHeaders(MimeMessage message, ParserOptions options, Func<Header, bool> match)
     {
-        var list = new InternetAddressList();
+        using var block = new MemoryStream();
         foreach (var header in message.Headers.Where(match))
-            if (InternetAddressList.TryParse(ParserOptions.Default, header.RawValue, out var parsed))
-                list.AddRange(parsed);
-        return list;
+        {
+            block.Write("To:"u8);
+            block.Write(header.RawValue);
+            if (header.RawValue is not [.., (byte)'\n'])
+                block.Write("\r\n"u8);
+        }
+
+        block.Write("\r\n"u8);
+        block.Position = 0;
+        try
+        {
+            return MimeMessage.Load(options, block).To;
+        }
+        catch (FormatException)
+        {
+            return [];
+        }
     }
 
     private static string NormalizeKey(string field)
