@@ -4,7 +4,8 @@ description: >-
   The header map exposed as EmlExtractionResult.Metadata. Built by HeaderMapper.Map (src/EmlExtraction/Logics/HeaderMapper.cs).
   Keys are ordinal (case-sensitive) strings. This manifest describes the map per ADR-014 and ADR-016
   (ydk:req:metadata/canonical-keys).
-  Construction order: (1) every top-level header copied under its canonical key; (2) the classic overlay
+  Construction order: (1) every top-level header copied under its canonical key, plus, for a single-part message, the Content-* headers
+  MimeKit moved onto the body (Body.Headers); (2) the classic overlay
   rewrites the value of its own key; (3) xfields computed; (4) any missing fixed key (from, to, cc, bcc, xfields)
   added with "". On ydk:warning:extraction/parse-failed (oversized input throws, ADR-023, so it has no map) the map holds only
   the five fixed keys with "".
@@ -15,7 +16,7 @@ fields:
     nullable: false
     constraints: >-
       Key = header field name trimmed and lower-cased (invariant); "-" and "_" kept (DKIM-Signature -> dkim-signature,
-      X-Mailer -> x-mailer, X_Custom -> x_custom), except a reply_to header, which folds into reply-to (ADR-025). Value = MimeKit-decoded header value (RFC 2047 decoded, unfolded).
+      X-Mailer -> x-mailer, X_Custom -> x_custom), except reply_to -> reply-to (ADR-025) and xfields -> header:xfields. Value = MimeKit-decoded header value (RFC 2047 decoded, unfolded).
       Repeated headers with the same key are joined with \n in order. A header named xfields (any case) is stored
       under "header:xfields".
     description: Generic entry for every header present in the message (ydk:req:metadata/all-headers).

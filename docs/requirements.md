@@ -40,8 +40,8 @@ Legend: **Done** · **Partial** (category covered, not production samples) · **
 **Requirement:** Classic envelope/header fields.
 
 - **Done**
-- `HeaderMapper.Map` overlays: `from`, `to`, `cc`, `bcc` (always present; empty if missing), `replyto`, `sender`, `subject`, `date`, `messageid`, `inreplyto`, `references`, `mimeversion`, `contenttype`, `returnpath`, `deliveredto`, `received`
-- File: `src/EmlExtraction/HeaderMapper.cs`
+- `HeaderMapper.Map` overlays: `from`, `to`, `cc`, `bcc` (always present; empty if missing), `reply-to`, `sender`, `subject`, `date`, `message-id`, `in-reply-to`, `references`
+- File: `src/EmlExtraction/Logics/HeaderMapper.cs`
 - Tests: `ExtractionTests.ExtractsClassicHeadersAndUnicodeSubject`, `ExtractionTests.ExtractsFromToCcBccIncludingMultiplesAndRtlNames`, `ExtractionTests.RawBccHeaderIsExtracted`
 
 ### As many headers as possible
@@ -50,7 +50,7 @@ Legend: **Done** · **Partial** (category covered, not production samples) · **
 
 - **Done**
 - Every MIME header is copied into `Metadata` with a normalized key (trimmed, lower-cased; `-` and `_` kept; a `reply_to` header folds into `reply-to`)
-- File: `src/EmlExtraction/HeaderMapper.cs`
+- File: `src/EmlExtraction/Logics/HeaderMapper.cs`
 - Tests: `ExtractionTests.ExtractsClassicHeadersAndUnicodeSubject` (`dkim-signature`), golden `E10-xfields`
 
 ### `X_` fields concatenated into `xfields`
@@ -60,7 +60,7 @@ Legend: **Done** · **Partial** (category covered, not production samples) · **
 - **Done (current code)** (also `X-`, the usual RFC custom-header form)
 - `IsXHeader` matches `X-` or `X_`; lines joined with `\n` into `EmlExtractionResult.XFields`
 - **Superseded by ADR-014 (target; not implemented, Stage 02):** only names starting with exactly `X_` (case-sensitive) count; the string lives in `Metadata["xfields"]`; `X-` headers stay in the general metadata only. See `ydk:req:metadata/xfields` and `docs/research/brief-gap-analysis.md`.
-- File: `src/EmlExtraction/HeaderMapper.cs`
+- File: `src/EmlExtraction/Logics/HeaderMapper.cs`
 - Tests: `ExtractionTests.ExtractsClassicHeadersAndUnicodeSubject`, golden `corpus/golden/seed/E10-xfields/`
 
 ---

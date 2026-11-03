@@ -9,7 +9,7 @@ rule: >-
   For every header in the top-level message header block, Metadata holds an entry whose key is the field name
   trimmed and lower-cased (invariant culture), with "-" and "_" kept, and whose value is the decoded, unfolded header
   value. Repeated headers sharing a key are concatenated with \n in order. Distinct field names that differ only by
-  "-" versus "_" keep separate keys, except a reply_to header, which folds into reply-to (ADR-025). Headers of nested parts are not included.
+  "-" versus "_" keep separate keys, except reply_to -> reply-to (ADR-025); a header named xfields is stored as header:xfields. Headers of nested parts are not included.
 failure_behavior: >-
   Not a failure path. On ydk:warning:extraction/parse-failed the map holds only the fixed keys
   (ydk:req:metadata/canonical-keys).

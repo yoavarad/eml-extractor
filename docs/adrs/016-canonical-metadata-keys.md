@@ -1,22 +1,23 @@
 # ADR-016: One canonical metadata key per header
 
 ## Status
-Accepted (per project owner, 2026-10-17). Implemented. Amends ADR-005 and ADR-006. Amended by ADR-023 (2026-10-18): oversized input throws, so there is no `input_too_large` result.
+Accepted (per project owner, 2026-10-17). Implemented. Amends ADR-005 and ADR-006. Amended by ADR-023 (2026-10-18): oversized input throws, so there is no `input_too_large` result. Amended by ADR-025 (2026-10-31): a `reply_to` header folds into `reply-to`.
 
 ## Context
-Before this decision, the metadata map had three problems:
-- Duplicate keys for one header. Every header was copied under its name lower-cased with `-` replaced by `_` (`reply_to`, `message_id`), and the classic overlay added a second, punctuation-free key (`replyto`, `messageid`) for the same header.
-- Collisions. Folding `-` into `_` mapped `X-Foo` and `X_Foo` to the same key `x_foo`, and their values were merged.
-- Computed values mixed into the header map. `subject_direction` and `content_direction` were in the map but are not headers; a message with a header named `Subject-Direction` would collide.
+The metadata map has three problems:
+- Duplicate keys for one header. Every header is copied under its name lower-cased with `-` replaced by `_` (`reply_to`, `message_id`), and the classic overlay adds a second, punctuation-free key (`replyto`, `messageid`) for the same header.
+- Collisions. Folding `-` into `_` maps `X-Foo` and `X_Foo` to the same key `x_foo`, and their values are merged.
+- Computed values mixed into the header map. `subject_direction` and `content_direction` are not headers; a message with a header named `Subject-Direction` would collide.
 
-In addition, on `parse_failed` the map was empty, so the "always present" address keys of ADR-005 were not always present.
+In addition, on `parse_failed` the map is empty, so the "always present" address keys of ADR-005 are not always present.
 
 ## Decision
 Per project owner, 2026-10-17:
 - **Key = header field name, trimmed and lower-cased (invariant culture). Nothing else is changed.** `-` and `_` are kept: `X-Foo` gives `x-foo`, `X_Foo` gives `x_foo`, `Message-ID` gives `message-id`. Header names are case-insensitive in RFC 5322, so lower-casing never merges two distinct headers.
 - One key per header. Repeated headers with the same key are joined with `\n` in order.
-- The classic overlay writes its parsed form into the header's own canonical key and adds no second key. Overlaid keys: `from`, `to`, `cc`, `bcc`, `reply-to` (later, ADR-025: a `reply_to` header also folds into this key), `sender` (formatted mailbox lists), `date` (ISO 8601 round-trip when it parses, otherwise the raw value), `message-id`, `in-reply-to` (angle brackets removed), `references` (ids joined by one space). Every other header keeps its decoded, unfolded raw value, including `content-type`, `mime-version`, `return-path`, `delivered-to`, and `received`.
+- The classic overlay writes its parsed form into the header's own canonical key and adds no second key. Overlaid keys: `from`, `to`, `cc`, `bcc`, `reply-to`, `sender` (formatted mailbox lists), `date` (ISO 8601 round-trip when it parses, otherwise the raw value), `message-id`, `in-reply-to` (angle brackets removed), `references` (ids joined by one space). Every other header keeps its decoded, unfolded raw value, including `content-type`, `mime-version`, `return-path`, `delivered-to`, and `received`.
 - Reserved computed key: `xfields` only (ADR-014). A header whose name is `xfields` in any case is stored under `header:xfields`. RFC 5322 field names cannot contain `:`, so that key never collides.
+- Amendment (ADR-025): besides `xfields` → `header:xfields` below, a `reply_to` header (any case) is keyed `reply-to`; these are the only exceptions to "Nothing else is changed".
 - Direction values leave the map. They are only on the result's `SubjectDirection` and `ContentDirection` properties.
 - Always-present keys: `from`, `to`, `cc`, `bcc`, `xfields`. They are present in every result, including `parse_failed` and `input_too_large` (value `""` when unknown).
 
