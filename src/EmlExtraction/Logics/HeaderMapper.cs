@@ -205,8 +205,8 @@ internal static class HeaderMapper
 
     /// <summary>
     /// Only for headers holding an encoded-word. Splits the raw value into top-level address items (commas inside quotes,
-    /// comments, angle brackets and groups do not split), decodes and parses each, and keeps an item that yields nothing
-    /// as a raw mailbox (Address = raw item) in its original position. Returns null when every item parsed.
+    /// comments, angle brackets, groups and encoded-words do not split), decodes and parses each, and keeps an item that yields nothing
+    /// as a raw mailbox (Address = the item's addr-spec, or the item text when it is none) in its original position. Returns null when MimeKit parsed every item itself.
     /// </summary>
     private static InternetAddressList? RecoverItems(List<byte[]> rawValues)
     {
@@ -223,7 +223,7 @@ internal static class HeaderMapper
 
     /// <summary>
     /// Parses one top-level item into target, or keeps it raw. A group is first split member by member (MimeKit silently drops a bad member)
-    /// so a bad member stays a raw mailbox in place, and used only when one was kept; its display name never becomes a participant. True when a raw token was kept.
+    /// so a bad member stays a raw mailbox in place, and used only when one was kept; its display name never becomes a participant. True when a raw token was kept or the item needed recovery MimeKit does not do.
     /// </summary>
     private static bool RecoverItem(string item, InternetAddressList target)
     {
@@ -261,7 +261,17 @@ internal static class HeaderMapper
 
         if (item.Contains("=?", StringComparison.Ordinal))
         {
-            target.Add(new RawMailbox(item.Replace("\r", "").Replace("\n", " ").Trim()));
+            // An encoded name before a bare addr-spec ("=?..?= a@x.org"): MimeKit parses neither form, so split at the last space.
+            var space = decoded.LastIndexOfAny([' ', '\t']);
+            if (space > 0 && !decoded.Contains("=?", StringComparison.Ordinal)
+                && InternetAddressList.TryParse(LooseOptions, decoded[(space + 1)..], out var bare)
+                && bare is [MailboxAddress { Name: null or "" } spec])
+            {
+                target.Add(new MailboxAddress(decoded[..space].Trim(), spec.Address));
+                return true;
+            }
+
+            target.Add(RawMailbox.Create(item.Replace("\r", "").Replace("\n", " ").Trim()));
             return true;
         }
 
@@ -337,8 +347,27 @@ internal static class HeaderMapper
         return false;
     }
 
-    /// <summary>Marks an undecodable raw item kept as a mailbox: participant has Address only.</summary>
-    private sealed class RawMailbox(string raw) : MailboxAddress("", raw);
+    /// <summary>
+    /// Marks an undecodable raw item kept as a mailbox: participant has Address only. <see cref="Raw"/> holds the text, so an
+    /// item that is no addr-spec (MimeKit's constructor throws on it) is kept as is instead of throwing.
+    /// </summary>
+    private sealed class RawMailbox(string raw) : MailboxAddress("", "")
+    {
+        public string Raw { get; } = raw;
+
+        /// <summary>MimeKit's addr-spec of the item (comments dropped) when it is one, else the item text.</summary>
+        public static RawMailbox Create(string item)
+        {
+            try
+            {
+                return new RawMailbox(new MailboxAddress("", item).Address);
+            }
+            catch (Exception ex) when (EmlExtractor.IsContentFailure(ex))
+            {
+                return new RawMailbox(item);
+            }
+        }
+    }
 
     private static IEnumerable<string> SplitItems(string raw)
     {
@@ -347,6 +376,7 @@ internal static class HeaderMapper
         var comment = 0;
         var angle = false;
         var group = false;
+        var stray = false;
         for (var i = 0; i < raw.Length; i++)
         {
             var c = raw[i];
@@ -356,6 +386,8 @@ internal static class HeaderMapper
                 quoted = c != '"';
             else if (comment > 0)
                 comment += c == '(' ? 1 : c == ')' ? -1 : 0;
+            else if (c == '=' && EncodedWordEnd(raw, i) is var end and > 0)
+                i = end;
             else if (c == '"')
                 quoted = true;
             else if (c == '(')
@@ -367,7 +399,7 @@ internal static class HeaderMapper
             else if (angle)
             {
             }
-            else if (c == ':')
+            else if (c == ':' && !stray)
                 group = true;
             else if (c == ';' && group)
             {
@@ -376,16 +408,45 @@ internal static class HeaderMapper
                     yield return g;
                 start = i + 1;
             }
+            else if (c == ';')
+            {
+                // Stray ';' outside a group: like MimeKit's To parse, keep the item before it and drop the rest up to the
+                // next ',' (a group start in the dropped part is ignored too).
+                if (!stray && raw[start..i].Trim() is { Length: > 0 } item)
+                    yield return item;
+                stray = true;
+                start = i + 1;
+            }
             else if (c == ',' && !group)
             {
-                if (raw[start..i].Trim() is { Length: > 0 } item)
+                if (!stray && raw[start..i].Trim() is { Length: > 0 } item)
                     yield return item;
+                stray = false;
                 start = i + 1;
             }
         }
 
-        if (raw[start..].Trim().Trim(',') is { Length: > 0 } last)
+        if (!stray && raw[start..].Trim().Trim(',') is { Length: > 0 } last)
             yield return last;
+    }
+
+    /// <summary>Index of the closing '=' when an <c>=?charset?enc?text?=</c> token starts at <paramref name="i"/>, else -1.</summary>
+    private static int EncodedWordEnd(string raw, int i)
+    {
+        if (i + 1 >= raw.Length || raw[i + 1] != '?')
+            return -1;
+        var marks = 0;
+        for (var j = i + 2; j < raw.Length && !char.IsWhiteSpace(raw[j]); j++)
+        {
+            if (raw[j] != '?')
+                continue;
+            if (marks == 2 && j + 1 < raw.Length && raw[j + 1] == '=')
+                return j + 1;
+            if (++marks > 2)
+                return -1;
+        }
+
+        return -1;
     }
 
     /// <summary>Common case (no groups): fill one array and wrap it, skipping the intermediate List.</summary>
@@ -424,8 +485,8 @@ internal static class HeaderMapper
     {
         var address = mailbox.Address ?? "";
         var at = address.LastIndexOf('@');
-        if (mailbox is RawMailbox)
-            return new EmailParticipant("", address, "", "");
+        if (mailbox is RawMailbox raw)
+            return new EmailParticipant("", raw.Raw, "", "");
         return at < 0
             ? new EmailParticipant(mailbox.Name ?? "", address, address, "")
             : new EmailParticipant(mailbox.Name ?? "", address, address[..at], address[(at + 1)..]);
@@ -436,6 +497,7 @@ internal static class HeaderMapper
 
     private static string FormatAddress(InternetAddress address) => address switch
     {
+        RawMailbox raw => raw.Raw,
         MailboxAddress mailbox => string.IsNullOrEmpty(mailbox.Name)
             ? (mailbox.Address ?? "")
             : $"{mailbox.Name} <{mailbox.Address}>",
