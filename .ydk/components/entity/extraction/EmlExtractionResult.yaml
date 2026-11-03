@@ -3,26 +3,16 @@ id: ydk:entity:extraction/EmlExtractionResult
 description: >-
   Immutable record returned by every Extract call. Source: src/EmlExtraction/Models/EmlExtractionResult.cs
   (public sealed record EmlExtractionResult). In-memory value object, not persisted.
-  Target change (ADR-014; not implemented, Stage 02): the XFields property is removed and its value lives only in
-  Metadata["xfields"].
+  Per ADR-014 there is no XFields property; the value lives only in Metadata["xfields"].
 fields:
   Metadata:
     type: IReadOnlyDictionary<string, string>
     required: true
     nullable: false
     description: >-
-      Header map; key set and value formats defined by ydk:entity:extraction/Metadata . Target: always holds
+      Header map; key set and value formats defined by ydk:entity:extraction/Metadata . Always holds
       from, to, cc, bcc, xfields, also on ydk:warning:extraction/parse-failed (ydk:req:metadata/canonical-keys).
       Oversized input throws ydk:entity:extraction/EmlInputTooLargeException , so no result exists for it (ADR-023).
-  XFields:
-    type: string
-    required: true
-    nullable: false
-    default: ""
-    constraints: >-
-      Current code only; removed by ADR-014 (Stage 02). Lines 'Field: value' joined by \n, in header order,
-      for X- and X_ headers; target value and rule are Metadata["xfields"] per ydk:req:metadata/xfields .
-    description: Concatenation of every X- / X_ header line (current behaviour).
   MainContent:
     type: string
     required: true

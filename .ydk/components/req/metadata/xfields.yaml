@@ -2,9 +2,7 @@ $schema: ydk:schema:req
 id: ydk:req:metadata/xfields
 description: >-
   Original spec: all metadata fields that start with "X_" (capital X then underscore) are joined into one long string
-  in the field "xfields". Rule per ADR-014 (supersedes the earlier X-/X_ case-insensitive rule). Target; not
-  implemented (Stage 02). Today the code matches X- or X_ case-insensitively and exposes the string as the separate
-  EmlExtractionResult.XFields property.
+  in the field "xfields". Rule per ADR-014 (supersedes the earlier X-/X_ case-insensitive rule). Implemented.
 type: business-rule
 priority: high
 rule: >-
