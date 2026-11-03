@@ -6,7 +6,7 @@ description: >-
 type: business-rule
 priority: high
 rule: >-
-  In multipart/related, non-root image parts are attachments like any other leaf: BinaryData (today Data) = decoded image bytes,
+  In multipart/related, non-root image parts are attachments like any other leaf: BinaryData = decoded image bytes,
   ContentId = the part's Content-ID, Disposition = its Content-Disposition value (e.g. inline) or null. A nameless
   image takes the fallback name "<content-id>.<subtype>". The HTML main content keeps its cid: references unchanged.
 failure_behavior: Decode failure skips the image with ydk:warning:extraction/part-decode-failed .

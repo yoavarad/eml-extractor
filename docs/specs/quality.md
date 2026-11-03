@@ -15,7 +15,7 @@ The bar is that every case passes: [ydk:nfr:reliability/golden-pass-rate]. The l
 
 The target is that CI runs the full score, all 1,200 bulk cases plus the 12 seed cases, on every change and fails when the result drops below the 1212 of 1212 baseline (ADR-011). This is not wired up yet: today CI runs only the seed cases, as part of the normal test run, and the bulk score is run by hand. Wiring it is Stage 02 work. Once the library also targets .NET 8 (ADR-019), the gate runs on .NET 10, with a .NET 8 run optional.
 
-The decisions of ADR-012 to ADR-016 change field names, metadata keys, the custom-header rule, and the meaning of the full path. The affected golden cases are regenerated from the catalog in Stage 02, never re-recorded from extractor output.
+The decisions of ADR-012 to ADR-016 change field names, metadata keys, the custom-header rule, and the meaning of the full path. The affected golden cases were regenerated from the catalog in Stage 02, never re-recorded from extractor output.
 
 ## Correctness A - emoji and exotic languages
 

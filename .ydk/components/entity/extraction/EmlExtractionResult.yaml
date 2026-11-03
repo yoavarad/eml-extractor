@@ -50,7 +50,7 @@ fields:
     required: false
     default: ltr
     description: >-
-      Paragraph direction of the subject (init-only property); see ydk:req:content/text-direction . Target: the only
+      Paragraph direction of the subject (init-only property); see ydk:req:content/text-direction . The only
       place this value is reported (no metadata key, ADR-016).
   ContentDirection:
     type: enum
@@ -58,7 +58,7 @@ fields:
     required: false
     default: ltr
     description: >-
-      Paragraph direction of MainContent (init-only property); see ydk:req:content/text-direction . Target: the only
+      Paragraph direction of MainContent (init-only property); see ydk:req:content/text-direction . The only
       place this value is reported (no metadata key, ADR-016).
 state_transitions: {}
 relationships:
