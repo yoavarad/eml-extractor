@@ -15,7 +15,7 @@ One name per concept. Use the canonical term in specs, code comments, and review
 | Canonical key | The one metadata key of a header: its name in lower case, nothing else changed ([ydk:req:metadata/canonical-keys]) | normalised name, snake key |
 | Classic fields | The envelope headers exposed under fixed keys ([ydk:req:metadata/classic-fields]) | standard headers, core headers |
 | Address keys | The four classic fields for sender and recipients that are always present | participants (that term means the structured entries) |
-| Participant | One mailbox from a participant header (from, to, cc, bcc, reply-to, sender) as nickname, address, user and domain, on `EmlExtractionResult.Participants` (ADR-025) | contact, recipient object |
+| Participant | One mailbox from a participant header (from, to, cc, bcc, reply-to, sender, rcptto, mailfrom) as nickname, address, user and domain, on `EmlExtractionResult.Participants` (ADR-025) | contact, recipient object |
 | xfields | The metadata field that joins, one line each, every header whose name starts with exactly capital X and underscore ([ydk:req:metadata/xfields], ADR-014) | x-headers blob, custom metadata, X-headers (for the dash form, which is not in xfields) |
 | Main content | The one body part chosen as the message body ([ydk:req:content/main-content-selection]) | body text, message text |
 | Direction | Left-to-right or right-to-left paragraph direction of the subject or main content ([ydk:req:content/text-direction]) | RTL flag, bidi mode |

@@ -17,6 +17,9 @@ internal sealed class MimeMessageParser
     internal MimeMessageParser(ParserOptions? options = null)
         => _options = options?.Clone() ?? CreateOptions();
 
+    /// <summary>The options messages are parsed with.</summary>
+    internal ParserOptions Options => _options;
+
     /// <summary>Read-only stream over <paramref name="eml"/>; wraps the caller's array when it spans the whole array, else copies.</summary>
     internal static MemoryStream Open(ReadOnlyMemory<byte> eml)
     {

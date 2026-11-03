@@ -1,4 +1,5 @@
 using System.Text;
+using EmlExtraction.Logics;
 using EmlExtraction.Models;
 
 namespace EmlExtraction.Tests;
@@ -7,7 +8,7 @@ namespace EmlExtraction.Tests;
 public sealed class ParticipantsTests
 {
     private static readonly string[] ParticipantKeys =
-        [MetadataKeys.From, MetadataKeys.To, MetadataKeys.Cc, MetadataKeys.Bcc, MetadataKeys.ReplyTo, MetadataKeys.Sender];
+        [MetadataKeys.From, MetadataKeys.To, MetadataKeys.Cc, MetadataKeys.Bcc, MetadataKeys.ReplyTo, MetadataKeys.Sender, MetadataKeys.RcptTo, MetadataKeys.MailFrom];
 
     private readonly CheckedExtractor _extractor = new();
 
@@ -279,6 +280,145 @@ public sealed class ParticipantsTests
         Assert.Equal("a@x.org", result.Participants[MetadataKeys.To][0].Address);
     }
 
+    [Theory]
+    [InlineData("rcptto", MetadataKeys.RcptTo)]
+    [InlineData("RCPT-TO", MetadataKeys.RcptTo)]
+    [InlineData("Rcpt_To", MetadataKeys.RcptTo)]
+    [InlineData("mailfrom", MetadataKeys.MailFrom)]
+    [InlineData("Mail-From", MetadataKeys.MailFrom)]
+    [InlineData("MAIL_FROM", MetadataKeys.MailFrom)]
+    public void EnvelopeHeaderVariantsAreParticipants(string name, string key)
+    {
+        var result = Extract($"{name}: A <a@x.org>, b@y.com");
+
+        Assert.Equal(
+            [new EmailParticipant("A", "a@x.org", "a", "x.org"), new EmailParticipant("", "b@y.com", "b", "y.com")],
+            result.Participants[key]);
+    }
+
+    [Fact]
+    public void EnvelopeHeaderOccurrencesAppendInHeaderOrder()
+    {
+        var result = Extract("rcpt-to: a@x.org", "RcptTo: Team: b@y.com;", "rcpt_to: c@z.org");
+
+        Assert.Equal(["a@x.org", "b@y.com", "c@z.org"], result.Participants[MetadataKeys.RcptTo].Select(p => p.Address));
+    }
+
+    [Fact]
+    public void EnvelopeHeaderKeepsUndecodableTokenAsRawParticipant()
+    {
+        var result = Extract($"mailfrom: a@x.org, {Bad}");
+
+        Assert.Equal([new EmailParticipant("", "a@x.org", "a", "x.org"), Raw(Bad)], result.Participants[MetadataKeys.MailFrom]);
+    }
+
+    [Fact]
+    public void EnvelopeHeaderDecodesEncodedNickname()
+    {
+        var result = Extract("MailFrom: =?utf-8?B?15nXldeQ15E=?= <yoav@example.com>");
+
+        Assert.Equal([new EmailParticipant("יואב", "yoav@example.com", "yoav", "example.com")], result.Participants[MetadataKeys.MailFrom]);
+    }
+
+    [Fact]
+    public void UnderscoreReplyToJoinsReplyToInHeaderOrder()
+    {
+        var result = Extract("reply_to: a@x.org", "Reply-To: B <b@y.com>", "REPLY_TO: c@z.org");
+
+        Assert.Equal(["a@x.org", "b@y.com", "c@z.org"], result.Participants[MetadataKeys.ReplyTo].Select(p => p.Address));
+    }
+
+    [Fact]
+    public void UnderscoreReplyToAloneIsReplyToParticipant()
+    {
+        var result = Extract("Reply_To: R <r@x.org>");
+
+        Assert.Equal([new EmailParticipant("R", "r@x.org", "r", "x.org")], result.Participants[MetadataKeys.ReplyTo]);
+    }
+
+    public static TheoryData<string, string> SameAsToCases()
+    {
+        string[] names = ["rcptto", "Mail-From", "reply_to"];
+        string[] values =
+        [
+            "Doe, John <john@x.org>",
+            "a@x.org, <>, b@y.com",
+            "a@x.org, @@@, b@y.com",
+            "a@x.org, \"unterminated",
+            "a@x.org, b@",
+            "G: =?utf-8?B?am9obkB4Lm9yZw==?=, b@y.com;",
+            "G: a@x.org, " + Bad + ", b@y.com;",
+            Bad + ", G: =?utf-8?B?am9obkB4Lm9yZw==?=, " + Bad + ";, c@z.com",
+        ];
+        var data = new TheoryData<string, string>();
+        foreach (var name in names)
+            foreach (var value in values)
+                data.Add(name, value);
+        return data;
+    }
+
+    [Theory]
+    [MemberData(nameof(SameAsToCases))]
+    public void EnvelopeAndUnderscoreReplyToParseLikeTo(string name, string value)
+    {
+        var key = name switch { "rcptto" => MetadataKeys.RcptTo, "reply_to" => MetadataKeys.ReplyTo, _ => MetadataKeys.MailFrom };
+        var expected = Extract($"To: {value}");
+        var actual = Extract($"{name}: {value}");
+
+        Assert.NotEmpty(expected.Participants[MetadataKeys.To]);
+        Assert.Equal(expected.Participants[MetadataKeys.To], actual.Participants[key]);
+        if (key == MetadataKeys.ReplyTo)
+            Assert.Equal(expected.Metadata[MetadataKeys.To], actual.Metadata[MetadataKeys.ReplyTo]);
+    }
+
+    [Theory]
+    [InlineData("Doe, John <john@x.org>")]
+    [InlineData("a@x.org, <>, b@y.com")]
+    [InlineData("=?utf-8?B?15nXldeQ15E=?= <yoav@example.com>, =?utf-8?B?!!bad?=")]
+    public void ReplyToParticipantsUnchangedByUnderscoreReplyTo(string value)
+    {
+        var alone = Extract($"Reply-To: {value}").Participants[MetadataKeys.ReplyTo];
+        var before = Extract("reply_to: c@z.org", $"Reply-To: {value}").Participants[MetadataKeys.ReplyTo];
+        var after = Extract($"Reply-To: {value}", "reply_to: c@z.org").Participants[MetadataKeys.ReplyTo];
+
+        Assert.NotEmpty(alone);
+        Assert.Equal(alone, after.Take(alone.Count));
+        Assert.Equal("c@z.org", after[^1].Address);
+        Assert.Equal(alone.Count + 1, after.Count);
+        Assert.Equal("c@z.org", before[0].Address);
+        Assert.Equal(alone, before.Skip(1));
+    }
+
+    [Theory]
+    [InlineData("rcptto", MetadataKeys.RcptTo)]
+    [InlineData("mail_from", MetadataKeys.MailFrom)]
+    [InlineData("reply_to", MetadataKeys.ReplyTo)]
+    public void NameMatchedHeadersUseTheExtractorParserOptions(string name, string key)
+    {
+        // ParserOptions.Default keeps "Doe, John" as one display name; without unquoted commas it splits in two.
+        var options = MimeKit.ParserOptions.Default.Clone();
+        options.AllowUnquotedCommasInAddresses = false;
+        var extractor = new EmlExtractor(EmlExtractor.DefaultMaxInputBytes, options);
+        var raw = $"To: Doe, John <john@x.org>\r\n{name}: Doe, John <john@x.org>\r\nSubject: s\r\n\r\nbody\r\n";
+        var result = extractor.Extract(Encoding.UTF8.GetBytes(raw));
+
+        EmailParticipant[] expected = [new("", "Doe", "Doe", ""), new("John", "john@x.org", "john", "x.org")];
+        Assert.Equal(expected, result.Participants[MetadataKeys.To]);
+        Assert.Equal(expected, result.Participants[key]);
+    }
+
+    [Fact]
+    public void EncodedReplyToAndUnderscoreReplyToMerge()
+    {
+        string[] lines = ["=?utf-8?B?15nXldeQ15E=?= <yoav@example.com>", $"a@x.org, {Bad}", "G: =?utf-8?B?am9obkB4Lm9yZw==?=;"];
+        var expected = Extract(lines.Select(l => $"To: {l}").ToArray());
+        var actual = Extract($"Reply-To: {lines[0]}", $"REPLY_TO: {lines[1]}", $"Reply-To: {lines[2]}");
+
+        Assert.Equal(4, expected.Participants[MetadataKeys.To].Count);
+        Assert.Equal(expected.Participants[MetadataKeys.To], actual.Participants[MetadataKeys.ReplyTo]);
+        Assert.Equal(expected.Metadata[MetadataKeys.To], actual.Metadata[MetadataKeys.ReplyTo]);
+    }
+
     [Fact]
     public void AllKeysPresentWithEmptyListsWhenHeadersAbsent()
     {
@@ -296,6 +436,16 @@ public sealed class ParticipantsTests
         Assert.Contains(result.Warnings, w => w.StartsWith("parse_failed", StringComparison.Ordinal));
         Assert.Equal(ParticipantKeys.Order(StringComparer.Ordinal), result.Participants.Keys.Order(StringComparer.Ordinal));
         Assert.All(result.Participants.Values, Assert.Empty);
+    }
+
+    [Fact]
+    public void ParseFailedMetadataHasNoUnderscoreReplyToKey()
+    {
+        var result = _extractor.Extract(Array.Empty<byte>());
+
+        Assert.Contains(result.Warnings, w => w.StartsWith("parse_failed", StringComparison.Ordinal));
+        Assert.False(result.Metadata.ContainsKey("reply_to"));
+        Assert.Empty(result.Participants[MetadataKeys.ReplyTo]);
     }
 
     [Fact]
