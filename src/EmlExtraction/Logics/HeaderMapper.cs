@@ -116,7 +116,7 @@ internal static class HeaderMapper
         {
             return MimeMessage.Load(options, block).To;
         }
-        catch (FormatException)
+        catch (Exception ex) when (EmlExtractor.IsContentFailure(ex))
         {
             return [];
         }

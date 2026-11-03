@@ -390,20 +390,21 @@ public sealed class ParticipantsTests
     }
 
     [Theory]
-    [InlineData("rcptto", MetadataKeys.RcptTo, "postmaster")]
-    [InlineData("mail_from", MetadataKeys.MailFrom, "Doe, John <john@x.org>")]
-    [InlineData("reply_to", MetadataKeys.ReplyTo, "<a@x.org")]
-    public void NameMatchedHeadersUseTheExtractorParserOptions(string name, string key, string value)
+    [InlineData("rcptto", MetadataKeys.RcptTo)]
+    [InlineData("mail_from", MetadataKeys.MailFrom)]
+    [InlineData("reply_to", MetadataKeys.ReplyTo)]
+    public void NameMatchedHeadersUseTheExtractorParserOptions(string name, string key)
     {
+        // ParserOptions.Default keeps "Doe, John" as one display name; without unquoted commas it splits in two.
         var options = MimeKit.ParserOptions.Default.Clone();
-        options.AllowAddressesWithoutDomain = false;
         options.AllowUnquotedCommasInAddresses = false;
-        options.AddressParserComplianceMode = MimeKit.RfcComplianceMode.Strict;
         var extractor = new EmlExtractor(EmlExtractor.DefaultMaxInputBytes, options);
-        var raw = $"To: {value}\r\n{name}: {value}\r\nSubject: s\r\n\r\nbody\r\n";
+        var raw = $"To: Doe, John <john@x.org>\r\n{name}: Doe, John <john@x.org>\r\nSubject: s\r\n\r\nbody\r\n";
         var result = extractor.Extract(Encoding.UTF8.GetBytes(raw));
 
-        Assert.Equal(result.Participants[MetadataKeys.To], result.Participants[key]);
+        EmailParticipant[] expected = [new("", "Doe", "Doe", ""), new("John", "john@x.org", "john", "x.org")];
+        Assert.Equal(expected, result.Participants[MetadataKeys.To]);
+        Assert.Equal(expected, result.Participants[key]);
     }
 
     [Fact]
