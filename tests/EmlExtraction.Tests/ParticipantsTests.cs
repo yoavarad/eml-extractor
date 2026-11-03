@@ -293,6 +293,9 @@ public sealed class ParticipantsTests
     [Theory]
     [InlineData("A <a@x.com>; B <b@x.com>", "=?utf-8?Q?A?= <a@x.com>; =?utf-8?Q?B?= <b@x.com>")]
     [InlineData("a@x.org, B <b@y.com>; c@z.org, d@w.org", "a@x.org, =?utf-8?Q?B?= <b@y.com>; c@z.org, d@w.org")]
+    [InlineData("A <a@x.com>; G: b@y.com;", "=?utf-8?Q?A?= <a@x.com>; G: =?utf-8?B?!!bad?=;")]
+    [InlineData("A <a@x.com>; G: b@y.com;, c@z.com", "=?utf-8?Q?A?= <a@x.com>; G: =?utf-8?B?!!bad?=;, c@z.com")]
+    [InlineData("A <a@x.com>; G: b@y.com, c@z.com;, d@w.com", "=?utf-8?Q?A?= <a@x.com>; G: =?utf-8?B?!!bad?=, c@z.com;, d@w.com")]
     public void StraySemicolonInEncodedListParsesLikeUnencoded(string plain, string encoded)
     {
         var expected = Extract($"To: {plain}");
@@ -334,6 +337,15 @@ public sealed class ParticipantsTests
 
         Assert.Equal([Raw(item)], result.Participants[MetadataKeys.To]);
         Assert.Equal(item, result.Metadata[MetadataKeys.To]);
+    }
+
+    [Fact]
+    public void UndecodableAddrSpecWithCommentIsKeptWithoutTheComment()
+    {
+        var result = Extract($"To: {Bad} (c)");
+
+        Assert.Equal([Raw(Bad)], result.Participants[MetadataKeys.To]);
+        Assert.Equal(Bad, result.Metadata[MetadataKeys.To]);
     }
 
     [Theory]

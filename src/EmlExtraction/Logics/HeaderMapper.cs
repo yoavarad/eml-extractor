@@ -206,7 +206,7 @@ internal static class HeaderMapper
     /// <summary>
     /// Only for headers holding an encoded-word. Splits the raw value into top-level address items (commas inside quotes,
     /// comments, angle brackets, groups and encoded-words do not split), decodes and parses each, and keeps an item that yields nothing
-    /// as a raw mailbox (Address = raw item) in its original position. Returns null when MimeKit parsed every item itself.
+    /// as a raw mailbox (Address = the item's addr-spec, or the item text when it is none) in its original position. Returns null when MimeKit parsed every item itself.
     /// </summary>
     private static InternetAddressList? RecoverItems(List<byte[]> rawValues)
     {
@@ -362,7 +362,7 @@ internal static class HeaderMapper
             {
                 return new RawMailbox(new MailboxAddress("", item).Address);
             }
-            catch (ParseException)
+            catch (Exception ex) when (EmlExtractor.IsContentFailure(ex))
             {
                 return new RawMailbox(item);
             }
@@ -399,7 +399,7 @@ internal static class HeaderMapper
             else if (angle)
             {
             }
-            else if (c == ':')
+            else if (c == ':' && !stray)
                 group = true;
             else if (c == ';' && group)
             {
@@ -410,10 +410,12 @@ internal static class HeaderMapper
             }
             else if (c == ';')
             {
-                // Stray ';' outside a group: like MimeKit's To parse, keep the item before it and drop the rest up to the next ','.
+                // Stray ';' outside a group: like MimeKit's To parse, keep the item before it and drop the rest up to the
+                // next ',' (a group start in the dropped part is ignored too).
                 if (!stray && raw[start..i].Trim() is { Length: > 0 } item)
                     yield return item;
                 stray = true;
+                start = i + 1;
             }
             else if (c == ',' && !group)
             {
