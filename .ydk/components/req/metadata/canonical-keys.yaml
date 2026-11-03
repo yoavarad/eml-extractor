@@ -2,9 +2,7 @@ $schema: ydk:schema:req
 id: ydk:req:metadata/canonical-keys
 description: >-
   Metadata cleanup (ADR-016): one canonical key per header, computed values separated from header keys, fixed keys
-  present in every result. Target; not implemented (Stage 02). Today raw keys fold "-" to "_", the classic overlay adds
-  second punctuation-free keys (replyto beside reply_to), X-Foo and X_Foo collide on x_foo, direction keys sit in the
-  map, and the map is empty on parse_failed.
+  present in every result. A reply_to header folds into the reply-to key (ADR-025).
 type: business-rule
 priority: critical
 rule: >-

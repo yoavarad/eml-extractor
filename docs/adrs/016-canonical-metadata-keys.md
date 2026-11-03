@@ -1,7 +1,7 @@
 # ADR-016: One canonical metadata key per header
 
 ## Status
-Accepted (per project owner, 2026-10-17). Implemented. Amends ADR-005 and ADR-006. Amended by ADR-023 (2026-10-18): oversized input throws, so there is no `input_too_large` result.
+Accepted (per project owner, 2026-10-17). Implemented. Amends ADR-005 and ADR-006. Amended by ADR-023 (2026-10-18): oversized input throws, so there is no `input_too_large` result. Amended by ADR-025 (2026-10-31): a `reply_to` header folds into `reply-to`.
 
 ## Context
 The metadata map has three problems:
@@ -17,6 +17,7 @@ Per project owner, 2026-10-17:
 - One key per header. Repeated headers with the same key are joined with `\n` in order.
 - The classic overlay writes its parsed form into the header's own canonical key and adds no second key. Overlaid keys: `from`, `to`, `cc`, `bcc`, `reply-to`, `sender` (formatted mailbox lists), `date` (ISO 8601 round-trip when it parses, otherwise the raw value), `message-id`, `in-reply-to` (angle brackets removed), `references` (ids joined by one space). Every other header keeps its decoded, unfolded raw value, including `content-type`, `mime-version`, `return-path`, `delivered-to`, and `received`.
 - Reserved computed key: `xfields` only (ADR-014). A header whose name is `xfields` in any case is stored under `header:xfields`. RFC 5322 field names cannot contain `:`, so that key never collides.
+- Amendment (ADR-025): besides `xfields` → `header:xfields` below, a `reply_to` header (any case) is keyed `reply-to`; these are the only exceptions to "Nothing else is changed".
 - Direction values leave the map. They are only on the result's `SubjectDirection` and `ContentDirection` properties.
 - Always-present keys: `from`, `to`, `cc`, `bcc`, `xfields`. They are present in every result, including `parse_failed` and `input_too_large` (value `""` when unknown).
 

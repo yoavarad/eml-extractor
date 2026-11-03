@@ -27,9 +27,8 @@ cases:
     given: Message with mixed-script subject, DKIM-Signature, X-Mailer, X_Custom_Field, X-Spam-Score, plain body "hello"
     when: Extract is called
     then: >-
-      subject exact, messageid and dkim_signature keys present, three X lines in XFields, MainContent "hello", type
-      text/plain, no attachments. Target (ADR-014, ADR-016; Stage 02) - message-id and dkim-signature keys present,
-      Metadata["xfields"] is exactly the X_Custom_Field line, x-mailer and x-spam-score keys hold their values
+      subject exact, message-id and dkim-signature keys present, Metadata["xfields"] is exactly the X_Custom_Field
+      line, x-mailer and x-spam-score keys hold their values, MainContent "hello", type text/plain, no attachments
   - name: PrefersHtmlOverPlain
     description: HTML wins in multipart/alternative
     given: multipart/alternative with "plain version" and "<p>html version</p>"

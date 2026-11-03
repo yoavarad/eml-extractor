@@ -2,9 +2,8 @@ $schema: ydk:schema:req
 id: ydk:req:metadata/classic-fields
 description: >-
   Original spec "Classic fields (To, From, etc.)". The classic envelope headers are exposed in parsed form, and the
-  four address keys are always present (ADR-005, amended by ADR-016). Target (not implemented, Stage 02): the overlay
-  writes into each header's own canonical key and the address keys are present even on parse_failed. Today the
-  overlay adds second punctuation-free keys (replyto, messageid, ...) and the map is empty on parse_failed.
+  four address keys are always present (ADR-005, amended by ADR-016). The overlay writes into each header's own
+  canonical key and the address keys are present even on parse_failed.
 type: business-rule
 priority: critical
 rule: >-

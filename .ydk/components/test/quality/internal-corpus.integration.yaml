@@ -2,9 +2,8 @@ $schema: ydk:schema:test
 id: ydk:test:quality/internal-corpus.integration
 description: >-
   Targeted asserts over real public mail, tests/EmlExtraction.Tests/InternalCorpusTests.cs (17 facts). Samples live
-  under the gitignored corpus/internal/. Today each test returns early (passes vacuously) when its file is missing.
-  Target (ADR-018; not implemented, Stage 02): a missing sample makes the test report Skipped with the missing path,
-  never Passed. CI coverage of real attachments comes from ydk:test:quality/realistic-samples.integration .
+  under the gitignored corpus/internal/. A missing sample makes the test report Skipped with the missing path,
+  never Passed ([SkippableFact] + Skip.If, ADR-018). CI coverage of real attachments comes from ydk:test:quality/realistic-samples.integration .
   Complements ydk:nfr:reliability/real-world-harvest-no-throw . Real content never throws (ADR-023); an exception
   from any case fails the test.
 level: integration
@@ -15,14 +14,13 @@ cases:
     given: corpus/internal/tnef/zimbra-tnef.msg
     when: Extract is called
     then: No warnings; no winmail.dat attachment; a non-empty "upload" file exists
-  - name: ExchangeMegaHeadersLandInXFields
+  - name: ExchangeMegaHeadersLandInMetadata
     description: Large Exchange header block
     given: corpus/internal/exchange/leeholmes-o365-megaheaders.eml
     when: Extract is called
     then: >-
-      At least 50 metadata keys. Today - X-MS-Exchange-Organization-Network-Message-Id and
-      X-Microsoft-Antispam-Message-Info lines in XFields. Target (ADR-014) - those X- headers are under their own
-      metadata keys and not in xfields; test renamed ExchangeMegaHeadersLandInMetadata
+      At least 50 metadata keys; X-MS-Exchange-Organization-Network-Message-Id and X-Microsoft-Antispam-Message-Info
+      are under their own metadata keys and xfields is "" (ADR-014)
   - name: OutlookShapedCidPasteIsExtracted
     description: Chatwoot Outlook CID fixture
     given: corpus/internal/cid/chatwoot-outlook-cid.eml
@@ -56,4 +54,4 @@ cases:
 stubs: []
 never_mock:
   - EmlExtractor
-  - Real sample files (never synthesised; tests report Skipped, not Passed, when absent - target)
+  - Real sample files (never synthesised; tests report Skipped, not Passed, when absent)

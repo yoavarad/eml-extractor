@@ -1,7 +1,7 @@
 # ADR-025: Structured participants on a new result property
 
 ## Status
-Accepted by owner 2026-10-31 (#14, story #12, source issue yoavarad/eml-extractor#10). Implemented. Extends ADR-012 (result contract) and ADR-005; ADR-005 and ADR-016 stand unchanged.
+Accepted by owner 2026-10-31 (#14, story #12, source issue yoavarad/eml-extractor#10). Implemented. Extends ADR-012 (result contract) and ADR-005; ADR-005 stands unchanged. Amends ADR-016: a `reply_to` header folds into `reply-to`.
 
 ## Context
 Metadata holds each participant header (from, to, cc, bcc, reply-to, sender) as one string, `Name <addr>` joined by `; ` (ADR-005, ADR-016). Callers that need the display name, the address, or its user and domain parts had to re-parse that string. Issue #10 asks for four fields per participant.
