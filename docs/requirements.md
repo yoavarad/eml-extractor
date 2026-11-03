@@ -70,9 +70,9 @@ Legend: **Done** · **Partial** (category covered, not production samples) · **
 
 - **Done**
 - `BodySelector.Select` prefers HTML over plain in `multipart/alternative`; result is `MainContent`
-- Direction: `TextDirection.Detect` → `subject_direction` / `content_direction` and `EmlExtractionResult.SubjectDirection` / `ContentDirection` (`ltr` or `rtl`)
+- Direction: `TextDirection.Detect` → `EmlExtractionResult.SubjectDirection` / `ContentDirection` (`ltr` or `rtl`); no metadata key (ADR-016)
 - HTML `dir` / CSS `direction` wins over letter script; otherwise Unicode first-strong. Bidi marks are kept.
-- File: `src/EmlExtraction/BodySelector.cs`, `src/EmlExtraction/TextDirection.cs`
+- File: `src/EmlExtraction/Logics/BodySelector.cs`, `src/EmlExtraction/Logics/TextDirection.cs`
 - Tests: `ExtractionTests.PrefersHtmlOverPlain`, `ExoticLanguageTests` (Hebrew/Arabic RTL, HTML dir, RLM/LRM), golden `E03-html-alt`, `E01-emoji`, `E02-hebrew`, `E13-empty`
 
 ---
@@ -82,8 +82,8 @@ Legend: **Done** · **Partial** (category covered, not production samples) · **
 **Requirement:** For every attachment: name, size, full path if present, and the binary itself. Do not extract further (no file-type detection, no nested content extraction).
 
 - **Done**
-- `ExtractedAttachment`: `Name`, `Size`, `FullPath`, `Data` in `src/EmlExtraction/Models.cs`
-- Decode + collect: `PartCollector` in `src/EmlExtraction/PartCollector.cs`
+- `ExtractedAttachment`: `FileName`, `SizeInBytes`, `FullPath` (container path, ADR-013), `BinaryData`, plus `ContentId`, `Disposition`, `OriginalPath`, `ContentLocation` in `src/EmlExtraction/Models/ExtractedAttachment.cs` (ADR-012)
+- Decode + collect: `PartCollector` in `src/EmlExtraction/Logics/PartCollector.cs`
 - Nested `message/rfc822` is one opaque `.eml` blob (`AttachmentTests.NestedEmlIsOpaqueBinaryAndNotRecursed`, golden `E06-nested`)
 - Path in filename: `ExtractionTests.PathInFileNameIsPreservedSeparately`
 - No Office/PDF inner parse in this component

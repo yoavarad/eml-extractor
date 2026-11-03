@@ -70,11 +70,10 @@ cases:
     when: Extract is called
     then: No exception; subject = "corrupt"
   - name: PathInFileNameIsPreservedSeparately
-    description: Path-bearing filenames split into name and full path
+    description: Path-bearing filenames split into name and original path
     given: Attachment named "../../etc/passwd.txt"
     when: Extract is called
     then: >-
-      Name "passwd.txt", FullPath "../../etc/passwd.txt", Data equals payload. Target (ADR-012, ADR-013; Stage 02) -
       FileName "passwd.txt", FullPath "passwd.txt", OriginalPath "../../etc/passwd.txt", BinaryData equals payload
 stubs: []
 never_mock:

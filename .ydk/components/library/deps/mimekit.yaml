@@ -20,7 +20,7 @@ features_used:
   - MimeMessage header list, From/To/Cc/Bcc/ReplyTo/Sender/Subject/Date/MessageId/InReplyTo/References
   - TextPart.Text, IsHtml, IsPlain, IsAttachment; MultipartAlternative; MultipartRelated.Root
   - MimePart.Content.DecodeTo, FileName, ContentId, ContentDisposition
-  - MimeEntity.ContentLocation (target, ADR-013, Stage 02)
+  - MimeEntity.ContentLocation for ExtractedAttachment.ContentLocation (ADR-013)
   - MessagePart.Message.WriteTo for opaque nested messages
   - MimeKit.Tnef.TnefPart.ExtractAttachments
 configuration:

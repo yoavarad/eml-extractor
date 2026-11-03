@@ -4,9 +4,8 @@ description: >-
   One collected MIME part (attachment, inline image, nested message, TNEF-unpacked file, or
   non-selected body-like part). Source: src/EmlExtraction/Models/ExtractedAttachment.cs (public sealed record
   ExtractedAttachment), built by PartCollector. In-memory value object, not persisted.
-  Target field names and meanings follow the shared team contract (ADR-012) and the container-path rule (ADR-013);
-  not implemented (Stage 02). Today the fields are Name, Size, FullPath (raw path-bearing filename or null), Data,
-  ContentId, Disposition. Shared fields: FileName, SizeInBytes, FullPath, BinaryData. EML-only fields: ContentId,
+  Field names and meanings follow the shared team contract (ADR-012) and the container-path rule (ADR-013).
+  Shared fields: FileName, SizeInBytes, FullPath, BinaryData. EML-only fields: ContentId,
   Disposition, OriginalPath, ContentLocation.
 fields:
   FileName:
@@ -21,13 +20,13 @@ fields:
       before this part in the processing order of ydk:req:attachments/container-path , from 0; subtype "bin" if
       empty); nested message/rfc822 without a name -> "attached.eml". In a fallback name every character of
       / \ : * ? " < > | and every control character is replaced by "_". Not filesystem-safe (reserved device names,
-      ":" streams, trailing dots/spaces possible); consumers sanitise before writing files. Today this field is named Name.
+      ":" streams, trailing dots/spaces possible); consumers sanitise before writing files.
     description: File name to present for this part.
   SizeInBytes:
     type: long
     required: true
     nullable: false
-    constraints: "Equals BinaryData.Length (decoded byte count, not encoded size). Today this field is named Size."
+    constraints: "Equals BinaryData.Length (decoded byte count, not encoded size)."
     description: Decoded size in bytes.
   FullPath:
     type: string
@@ -36,8 +35,7 @@ fields:
     constraints: >-
       Container path per ydk:req:attachments/container-path : container segments (TNEF wrapper name) then FileName,
       joined by "/"; equals FileName for parts outside any container; unique within the result (ordinal
-      case-insensitive, two-pass "~<n>" suffix on collision). A key, not a filesystem-safe path. Today: the raw
-      trimmed filename only when it contains / or \, otherwise null.
+      case-insensitive, two-pass "~<n>" suffix on collision). A key, not a filesystem-safe path.
     description: Position of the subfile inside the message (brief "full path").
   BinaryData:
     type: byte[]
@@ -46,7 +44,6 @@ fields:
     constraints: >-
       Transfer-decoded bytes (base64 / quoted-printable undone). For message/rfc822 parts: the inner message
       re-serialised by MimeKit (opaque .eml bytes, not recursed). Empty array when the part has no content.
-      Today this field is named Data.
     description: Binary payload.
   ContentId:
     type: string
@@ -66,15 +63,15 @@ fields:
     nullable: true
     constraints: >-
       Raw trimmed sender filename when it contains / or \, otherwise null. Not resolved or sanitised; never used to
-      build FullPath. Target (ADR-013); today this value is reported as FullPath.
+      build FullPath (ADR-013).
     description: Path-bearing filename as the sender wrote it (kept, not trusted).
   ContentLocation:
     type: string
     required: true
     nullable: true
     constraints: >-
-      Decoded, trimmed Content-Location header value of the part, else null. Not used to build FullPath.
-      Target (ADR-013); today Content-Location is ignored.
+      Decoded, trimmed Content-Location header value of the part, else null. Not used to build FullPath
+      (ADR-013).
     description: Location the sender declared for this part (often a URL).
 state_transitions: {}
 relationships: []

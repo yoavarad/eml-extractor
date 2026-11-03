@@ -8,8 +8,8 @@ priority: medium
 rule: >-
   A part MimeKit recognises as TNEF is replaced by the files returned from TnefPart.ExtractAttachments, each walked with
   the same rules as top-level parts; the TNEF container itself is not reported. Requires CodePagesEncodingProvider
-  (registered by the extractor's static constructor). Target (ADR-013; not implemented, Stage 02): each unpacked file's
-  FullPath is the wrapper's FileName + "/" + the file's FileName (ydk:req:attachments/container-path).
+  (registered by the extractor's static constructor). Each unpacked file's
+  FullPath (ADR-013) is the wrapper's FileName + "/" + the file's FileName (ydk:req:attachments/container-path).
 failure_behavior: >-
   Unpack failure records ydk:warning:extraction/tnef-extract-failed and reports the raw TNEF part as one attachment
   whose FullPath is its own FileName.
