@@ -280,6 +280,62 @@ public sealed class ParticipantsTests
         Assert.Equal("a@x.org", result.Participants[MetadataKeys.To][0].Address);
     }
 
+    [Fact]
+    public void EncodedNameBeforeBareAddrSpecIsTheNickname()
+    {
+        var result = Extract("To: =?utf-8?Q?A?= a@x.com, =?utf-8?Q?B?= b@x.com");
+
+        Assert.Equal(
+            [new EmailParticipant("A", "a@x.com", "a", "x.com"), new EmailParticipant("B", "b@x.com", "b", "x.com")],
+            result.Participants[MetadataKeys.To]);
+    }
+
+    [Theory]
+    [InlineData("A <a@x.com>; B <b@x.com>", "=?utf-8?Q?A?= <a@x.com>; =?utf-8?Q?B?= <b@x.com>")]
+    [InlineData("a@x.org, B <b@y.com>; c@z.org, d@w.org", "a@x.org, =?utf-8?Q?B?= <b@y.com>; c@z.org, d@w.org")]
+    public void StraySemicolonInEncodedListParsesLikeUnencoded(string plain, string encoded)
+    {
+        var expected = Extract($"To: {plain}");
+        var actual = Extract($"To: {encoded}");
+
+        Assert.NotEmpty(expected.Participants[MetadataKeys.To]);
+        Assert.Equal(expected.Participants[MetadataKeys.To], actual.Participants[MetadataKeys.To]);
+        Assert.Equal(expected.Metadata[MetadataKeys.To], actual.Metadata[MetadataKeys.To]);
+    }
+
+    [Theory]
+    [InlineData("a@x.org; {Bad}", new[] { "a@x.org" })]
+    [InlineData("{Bad}; a@x.org, b@y.com", new[] { Bad, "b@y.com" })]
+    public void StraySemicolonNextToUndecodableTokenDoesNotThrow(string value, string[] addresses)
+    {
+        var result = Extract($"To: {value.Replace("{Bad}", Bad)}");
+
+        Assert.Equal(addresses, result.Participants[MetadataKeys.To].Select(p => p.Address));
+    }
+
+    [Fact]
+    public void CommaInsideEncodedWordDoesNotSplitTheItem()
+    {
+        var result = Extract("To: =?utf-8?Q?A=22,?= <a@x.com>, =?utf-8?Q?B?= <b@x.com>");
+
+        Assert.Equal(
+            [new EmailParticipant("A\",", "a@x.com", "a", "x.com"), new EmailParticipant("B", "b@x.com", "b", "x.com")],
+            result.Participants[MetadataKeys.To]);
+    }
+
+    [Theory]
+    [InlineData("{Bad} {Bad}")]
+    [InlineData("{Bad}<")]
+    [InlineData("=?utf-8?Q?A?= <>")]
+    public void UnparseableEncodedItemThatIsNoAddrSpecIsKeptRaw(string value)
+    {
+        var item = value.Replace("{Bad}", Bad);
+        var result = Extract($"To: {item}");
+
+        Assert.Equal([Raw(item)], result.Participants[MetadataKeys.To]);
+        Assert.Equal(item, result.Metadata[MetadataKeys.To]);
+    }
+
     [Theory]
     [InlineData("rcptto", MetadataKeys.RcptTo)]
     [InlineData("RCPT-TO", MetadataKeys.RcptTo)]
@@ -349,6 +405,7 @@ public sealed class ParticipantsTests
             "G: =?utf-8?B?am9obkB4Lm9yZw==?=, b@y.com;",
             "G: a@x.org, " + Bad + ", b@y.com;",
             Bad + ", G: =?utf-8?B?am9obkB4Lm9yZw==?=, " + Bad + ";, c@z.com",
+            "=?utf-8?Q?A?= a@x.com, =?utf-8?Q?A=22,?= <b@x.com>; =?utf-8?Q?C?= <c@x.com>, d@x.com",
         ];
         var data = new TheoryData<string, string>();
         foreach (var name in names)
