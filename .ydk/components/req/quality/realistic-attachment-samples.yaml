@@ -2,8 +2,8 @@ $schema: ydk:schema:req
 id: ydk:req:quality/realistic-attachment-samples
 description: >-
   Brief correctness B (Office files, other emails, attached and pasted images) proven in CI on realistic samples
-  (ADR-018). Target; not implemented (Stage 02). Today CI uses typed stubs and the real samples sit only in the
-  gitignored corpus/internal/, where absent-sample tests pass vacuously.
+  (ADR-018). Implemented: corpus/realistic/ is committed and runs in CI; the internal-corpus tests use
+  SkippableFact so absent samples report Skipped.
 type: policy
 priority: critical
 rule: >-

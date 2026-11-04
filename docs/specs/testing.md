@@ -6,22 +6,22 @@
 | --- | --- | --- |
 | Unit | Each rule of detection, metadata, body choice, direction, unicode fidelity, and attachment collection, on messages built in code | Yes |
 | Seed golden | Authored end-to-end expectations on 12 committed messages | Yes |
-| Realistic samples | Correctness B on committed, licensed Office, Outlook item, mail, TNEF, and pasted-image samples | Target: yes, always (ADR-018, Stage 02) |
-| Internal corpus | Behaviour on specific real public samples | Only when the samples are present locally; target is a visible skip otherwise |
-| Bulk golden score | 1,200 authored cases across 48 tags | Not yet. Target is a CI gate at the 1212 of 1212 baseline (ADR-011); today it is run by hand |
+| Realistic samples | Correctness B on committed, licensed Office, Outlook item, mail, TNEF, and pasted-image samples | Yes, always (ADR-018) |
+| Internal corpus | Behaviour on specific real public samples | Only when the samples are present locally; a visible skip otherwise |
+| Bulk golden score | 1,200 authored cases across 48 tags | Yes, a CI gate at the 1212 of 1212 baseline on .NET 10 (ADR-011) |
 | Harvest probe | No exception and no internal error warning on any local public sample (ADR-023, ADR-026) | No, run by hand |
 | Load test | Throughput, latency, and memory across every degree of parallelism | By hand on the owner's machine; target is a nightly warn-only synthetic run (ADR-015) |
 | Telemetry | Every runtime measurement is emitted with its contracted name and labels, and no message content leaks into it | Yes, on both .NET versions (ADR-021; metrics #71, activities #72) |
-| Profiling | Where time and memory go per stage, and the cost of telemetry | No, run by hand on the owner's machine (ADR-020, Stage 02) |
+| Profiling | Where time and memory go per stage, and the cost of telemetry | No, run by hand on the owner's machine (ADR-020) |
 
 The unit layer is split by concern. [ydk:test:detection/detector.unit] covers detection, [ydk:test:extraction/extraction.unit] covers metadata and body, [ydk:test:extraction/exotic-language.unit] covers scripts, emoji, and direction, and [ydk:test:attachments/attachment.unit] covers attachments. The seed golden layer is [ydk:test:quality/seed-golden.integration], the realistic-sample layer is [ydk:test:quality/realistic-samples.integration], the internal corpus layer is [ydk:test:quality/internal-corpus.integration], and the telemetry layer is [ydk:test:observability/telemetry.unit], which checks [ydk:req:observability/runtime-telemetry] with the real .NET listeners. The bulk score, the harvest probe, and the load test feed [ydk:nfr:reliability/golden-pass-rate], [ydk:nfr:reliability/real-world-harvest-no-throw], [ydk:nfr:performance/throughput-dop-sweep], and [ydk:nfr:performance/memory-footprint]. Profiling feeds [ydk:req:quality/profiling-report], and the telemetry cost benchmark feeds [ydk:nfr:observability/metrics-overhead].
 
-Per the project owner (ADR-019), the unit, seed-golden, and realistic-sample layers run on both .NET 8 and .NET 10 in CI, and a failure on either fails the build ([ydk:req:quality/net8-multi-targeting]). The bulk golden gate runs on .NET 10; the developer tools stay on .NET 10 only. This is target behaviour for Stage 02.
+Per the project owner (ADR-019), the unit, seed-golden, and realistic-sample layers run on both .NET 8 and .NET 10 in CI, and a failure on either fails the build ([ydk:req:quality/net8-multi-targeting]). The bulk golden gate runs on .NET 10; the developer tools stay on .NET 10 only.
 
 ## What is real and what is stubbed
 
 - **Parser.** MimeKit is always real ([ydk:library:deps/mimekit]). Fixtures are written either by MimeKit's own message builder or as raw message text.
-- **Attachment payloads.** Unit and golden tests use small stub files with the correct leading bytes. Real documents appear in the committed realistic sample set (target) and in the internal corpus.
+- **Attachment payloads.** Unit and golden tests use small stub files with the correct leading bytes. Real documents appear in the committed realistic sample set and in the internal corpus.
 - **Storage and network.** The library uses neither, so there is nothing to stub. Golden fixtures and realistic samples are read from the test output folder. Internal samples are read from the gitignored corpus folder when present.
 
 ## Rules

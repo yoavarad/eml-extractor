@@ -1,6 +1,6 @@
 # Scope
 
-The original specification is translated in [docs/requirements.md](../requirements.md). This page fixes the boundary so nobody builds past it. Items marked "target" are decided but not yet in code; they are Stage 02 work. The public API, metadata, telemetry, exceptions and multi-targeting items below are implemented.
+The original specification is translated in [docs/requirements.md](../requirements.md). This page fixes the boundary so nobody builds past it. Items marked "target" are decided but not yet in code; they are Stage 02 work. The public API, metadata, telemetry, exceptions, multi-targeting, golden-gate, realistic-sample, profiling and optimization items below are implemented.
 
 ## IN scope
 
@@ -18,10 +18,10 @@ The original specification is translated in [docs/requirements.md](../requiremen
 - Returning every other MIME part as a flat attachment record with decoded bytes and its position in the message: [ydk:req:attachments/attachment-record], [ydk:req:attachments/container-path] (ADR-013), including pasted inline images [ydk:req:attachments/inline-cid-images] and the files inside Outlook TNEF wrappers [ydk:req:attachments/tnef-unwrap].
 - Never crashing the caller on malformed but readable MIME content, and reporting those problems as warnings: [ydk:req:extraction/no-throw-on-malformed]. The original spec did not ask for this; it was implemented anyway. Library bugs become `internal_error` warnings on a partial result (ADR-026); misuse and oversized input throw informative exceptions (ADR-023).
 - The authored golden set, the public-mail harvest tool, and the load test as developer tooling: [quality.md](quality.md).
-- A CI gate on the full golden score (1,200 bulk plus 12 seed cases), failing below the 1212 of 1212 baseline: [ydk:nfr:reliability/golden-pass-rate] (ADR-011). Accepted but not implemented yet; CI runs only the seed cases today.
-- A committed, licensed realistic sample set run in CI, and visible skips for absent samples (target, ADR-018): [ydk:req:quality/realistic-attachment-samples].
+- A CI gate on the full golden score (1,200 bulk plus 12 seed cases), failing below the 1212 of 1212 baseline: [ydk:nfr:reliability/golden-pass-rate] (ADR-011). Implemented in CI.
+- A committed, licensed realistic sample set run in CI, and visible skips for absent samples (ADR-018, implemented): [ydk:req:quality/realistic-attachment-samples].
 - A load test across every degree of parallelism with measured memory, a sizing formula, and a committed baseline with a warn-only regression rule (target, ADR-015): [ydk:nfr:performance/throughput-dop-sweep], [ydk:nfr:performance/memory-footprint].
-- Dev-time profiling per extraction stage with a committed hotspot report, then optimization only from that data, each change proven by its own before-and-after measurement (target, ADR-020, ADR-022): [ydk:req:quality/profiling-report], [ydk:req:quality/optimization-evidence].
+- Dev-time profiling per extraction stage with a committed hotspot report, then optimization only from that data, each change proven by its own before-and-after measurement (ADR-020, ADR-022, implemented): [ydk:req:quality/profiling-report], [ydk:req:quality/optimization-evidence].
 - Runtime metrics and tracing through the facilities built into .NET, with no telemetry package dependency, no message content in any label, and a measured cost budget (ADR-021; metrics and activities implemented): [ydk:crosscut:core/observability], [ydk:req:observability/runtime-telemetry], [ydk:nfr:observability/metrics-overhead].
 - A license file and third-party notices with a dependency license audit (ADR-017; MIT, accepted by the owner 2026-10-18): [ydk:req:quality/license-notices].
 - A written capability assessment of C# versus other languages for this job, as a Stage 02 research document: [ydk:req:research/capability-assessment].
