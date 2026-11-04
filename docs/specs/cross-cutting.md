@@ -20,7 +20,7 @@ There is one diagnostic channel: the ordered warnings list on [ydk:entity:extrac
 
 Two more kinds come from ADR-026 (owner decision 2026-11-04):
 
-- [ydk:warning:extraction/metadata-field-failed] - one metadata key could not be read and is left out, or left empty for a fixed key.
+- [ydk:warning:extraction/metadata-field-failed] - one metadata key could not be read and keeps its raw header value, only the derived value is skipped (owner decision 2026-11-04; absent stays absent, a fixed key stays "").
 - [ydk:warning:extraction/internal-error] - a library bug in one stage, key, or part; that piece gets its empty default and the rest is still returned. Tests and the golden scorer fail on it.
 
 A caller tells warnings apart by their leading code, never by the free text after it. The policy that turns content failures into warnings is [ydk:req:extraction/no-throw-on-malformed] (ADR-004, narrowed by ADR-023).

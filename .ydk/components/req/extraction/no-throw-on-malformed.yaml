@@ -18,7 +18,7 @@ rule: >-
   ydk:entity:extraction/EmlInputTooLargeException (ydk:req:extraction/max-input-size). ADR-026 (implemented):
   extraction returns as much as it could read and never fails the whole call for content or a library bug. Each metadata key and
   participant list is guarded separately: a content failure in one gives ydk:warning:extraction/metadata-field-failed
-  and loses only that key (fixed keys keep their empty default). A non-content exception in a stage, a field or one
+  and that key keeps the raw header value already mapped, only the derived value is skipped (owner decision 2026-11-04; absent stays absent, a fixed key stays ""). A non-content exception in a stage, a field or one
   attachment part gives ydk:warning:extraction/internal-error and that piece's empty default; stages that succeeded
   keep their output; a bug in parse gives the empty result. Extract never throws EmlExtractionException (detection
   still does). Misuse, input over maxInputBytes, host listener exceptions and OutOfMemoryException still throw. Tests,

@@ -14,7 +14,8 @@ triggers:
   - A content exception while reading, decoding or formatting one header value into its metadata key
   - A content exception while building one participant list (from, to, cc, bcc, reply-to, sender, rcptto, mailfrom)
 result_effect: >-
-  That key is omitted from Metadata. A fixed key keeps its default: from, to, cc, bcc and xfields stay "" (ADR-016),
+  The raw header value already mapped for that key stays in Metadata (owner decision 2026-11-04); only the derived
+  value is skipped. With no raw value the key stays absent; a fixed key (from, to, cc, bcc, xfields) stays "" (ADR-016),
   and a failed participant list stays empty (ADR-025). Every other key, the body and the attachments are extracted
   normally. The detail carries the metadata key and the exception type name only, never the exception message or
   the header value. One warning per failed key.
