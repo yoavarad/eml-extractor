@@ -1,0 +1,33 @@
+$schema: ydk:schema:warning
+id: ydk:warning:extraction/internal-error
+description: >-
+  Target, not yet implemented (ADR-026, owner decision 2026-11-04; details proposed, for owner review). Recorded when
+  an exception that is not one of the seven content exception types (EmlExtractor.IsContentFailure) is raised inside
+  Extract, in the parse, metadata, body or attachments stage, in one metadata field, or in one attachment part. It
+  signals a library bug, not bad input: tests, the GoldenKit score and the harvest probe fail on any internal_error
+  warning. Replaces the ADR-023 throw of ydk:entity:extraction/EmlExtractionException from Extract (detection still
+  throws it). OutOfMemoryException, misuse (ArgumentException family), EmlInputTooLargeException and host listener
+  exceptions are not caught and still propagate. Today (ADR-023) such a bug throws EmlExtractionException instead.
+code: internal_error
+message_template: "internal_error: ${Stage}: ${ExceptionTypeName}"
+triggers:
+  - "A non-content exception in the parse stage (detail: parse)"
+  - "A non-content exception in the metadata stage outside any field guard (detail: metadata)"
+  - "A non-content exception while mapping one metadata key or participant list (detail: metadata.<key>, e.g. metadata.date)"
+  - "A non-content exception in the body stage, including the body read catch site (detail: body)"
+  - "A non-content exception in the attachments stage or in one part at the part_decode_failed, rfc822_extract_failed or tnef_extract_failed catch site (detail: attachments)"
+result_effect: >-
+  Partial result. The failed piece gets its empty default and everything that succeeded keeps its output. Parse ->
+  the empty parse_failed result shape (fixed metadata keys from, to, cc, bcc, xfields each "", eight empty
+  participant lists, no content, no attachments, directions ltr), without a parse_failed warning. Metadata stage ->
+  only the fixed keys, each "", and empty participants. One metadata field -> that key omitted, or a fixed key left
+  "" / a participant list left empty. Body -> MainContent and MainContentMimeType null, both directions ltr.
+  Attachments stage -> no attachments; one part -> that part skipped (TNEF keeps its raw-part fallback), other parts
+  collected. The detail carries the exception type name only, never the exception message or any message content.
+  One warning per failed piece, in the order met.
+related:
+  - ydk:contract:api/eml-extractor
+  - ydk:entity:extraction/EmlExtractionResult
+  - ydk:crosscut:core/warning-format
+  - ydk:req:extraction/no-throw-on-malformed
+  - ydk:req:observability/runtime-telemetry

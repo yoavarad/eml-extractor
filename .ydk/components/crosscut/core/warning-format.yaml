@@ -15,6 +15,12 @@ specification: >-
   name and for part_decode_failed by the part's filename or MIME type). Consumers identify a warning by its prefix
   (string StartsWith "<code>"), never by the free-text detail. An empty list on a returned result means a clean
   extraction.
+  Target, not yet implemented (ADR-026, owner decision 2026-11-04; details proposed, for owner review): two more codes,
+  metadata_field_failed ("metadata_field_failed: <key>: <ExceptionType>", one metadata key could not be read) and
+  internal_error ("internal_error: <stage>[.<key>]: <ExceptionType>", a library bug in one stage, field or part).
+  Their detail carries the exception type name only, never the exception message. A library bug inside Extract then
+  becomes internal_error on a partial result instead of a thrown EmlExtractionException; a clean warnings list still
+  means a clean extraction.
 applies_to: ydk:contract:api/eml-extractor (both Extract overloads). The detector has no diagnostics.
 implementation_notes:
   - Warning strings are not golden-checked (docs/golden.md "What we will not gold"); tests assert only on prefixes.
@@ -25,5 +31,7 @@ related:
   - ydk:warning:extraction/part-decode-failed
   - ydk:warning:extraction/rfc822-extract-failed
   - ydk:warning:extraction/tnef-extract-failed
+  - ydk:warning:extraction/internal-error
+  - ydk:warning:extraction/metadata-field-failed
   - ydk:entity:extraction/EmlExtractionResult
   - ydk:crosscut:core/observability

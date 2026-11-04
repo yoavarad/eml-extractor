@@ -20,6 +20,12 @@ description: >-
   (OutOfMemoryException is not wrapped); an exception from a host callback (MeterListener, ActivityListener)
   propagates unchanged. Messages name the parameter and the bad value or limit and never quote message content.
   Implemented (#105 size guard, #106 stage wrappers).
+  Target, not yet implemented (ADR-026, owner decision 2026-11-04, supersedes ADR-023 in part; details proposed, for
+  owner review): an unexpected exception in a stage, one metadata field or one attachment part no longer throws; the
+  result is returned with ydk:warning:extraction/internal-error and that piece's empty default, and a content failure
+  in one metadata field records ydk:warning:extraction/metadata-field-failed . Extract then never throws
+  EmlExtractionException; misuse, EmlInputTooLargeException, OutOfMemoryException and host callback exceptions still
+  propagate.
 methods:
   Extract(EmlExtractionRequest):
     description: >-
@@ -45,6 +51,8 @@ methods:
       - ydk:warning:extraction/part-decode-failed
       - ydk:warning:extraction/rfc822-extract-failed
       - ydk:warning:extraction/tnef-extract-failed
+      - ydk:warning:extraction/internal-error
+      - ydk:warning:extraction/metadata-field-failed
   Extract(ReadOnlyMemory<byte>):
     description: >-
       Convenience overload, kept public (ADR-012, per project owner 2026-10-18): a thin wrapper
@@ -66,6 +74,8 @@ methods:
       - ydk:warning:extraction/part-decode-failed
       - ydk:warning:extraction/rfc822-extract-failed
       - ydk:warning:extraction/tnef-extract-failed
+      - ydk:warning:extraction/internal-error
+      - ydk:warning:extraction/metadata-field-failed
   Extract(MimeMessage):
     description: >-
       Same mapping as the byte path for an already-parsed MimeKit message; no parsing step, so parse-failed is never
@@ -84,3 +94,5 @@ methods:
       - ydk:warning:extraction/part-decode-failed
       - ydk:warning:extraction/rfc822-extract-failed
       - ydk:warning:extraction/tnef-extract-failed
+      - ydk:warning:extraction/internal-error
+      - ydk:warning:extraction/metadata-field-failed

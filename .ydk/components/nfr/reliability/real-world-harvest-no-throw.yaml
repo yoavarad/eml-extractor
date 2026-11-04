@@ -5,7 +5,9 @@ description: >-
   under the gitignored corpus/internal/ and no call throws (ADR-023: content problems are warnings; an exception on
   real mail means a library bug (EmlExtractionException); the probe skips files over 40 MB, below maxInputBytes).
   Last recorded harvest (2026-09-15, second pass): 12,853 detected messages, 0 throws, 0 parse_failed, 0 warnings,
-  ~3,500 extract/s (README, docs/edge-cases.md). Sources: SpamAssassin 2003/2005, Nazario phishing mboxes,
+  ~3,500 extract/s (README, docs/edge-cases.md). Target, not yet implemented (ADR-026, owner decision 2026-11-04):
+  a bug inside Extract returns a result with an internal_error warning instead of throwing, so the probe also counts
+  internal_error warnings and the target covers them too (0 exceptions and 0 internal_error warnings). Sources: SpamAssassin 2003/2005, Nazario phishing mboxes,
   cw-l/email-corpus, MimeKit TestData, Apache POI HMEF, php-mime-mail-parser, ProtonMail, Tika, GroupDocs, Chatwoot.
 category: reliability
 tags: [harvest, robustness]
@@ -14,7 +16,7 @@ unit: exceptions thrown per harvest run
 measurement: >-
   dotnet run --project tools/GoldenKit -c Release -- probe [dir]; Probe walks files (mbox files split per message),
   skips files larger than 40 MB, and tallies detected / throws (any exception, including EmlExtractionException) /
-  parse_failed / warnings.
+  parse_failed / warnings (target, ADR-026: plus internal_error warnings, counted as failures).
 test_method: >-
   Run probe after any change to the library or a MimeKit upgrade, with corpus/internal/ populated locally.
   Not runnable in CI (samples are not committed: licences and PII vary).
