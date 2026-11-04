@@ -1,7 +1,7 @@
 # ADR-015: Load-test method - DOP sweep on real mail, measured memory, committed baseline
 
 ## Status
-Accepted (per project owner, 2026-10-17). Implementation pending, tracked as Stage 02 work. Per project owner (2026-10-18), all numeric run parameters and thresholds below were checked against the first measurements in task #51 (synthetic set only, short windows, one Windows machine, 22 cores). They stay PROVISIONAL; values and sources are in `docs/perf-results.md`, section "Provisional limits (#51)". Streaming stays DEFERRED: measured M 1.3-4.2 is under the ceiling of 6.
+Implemented (accepted per project owner, 2026-10-17). Per project owner (2026-10-18), the memory ceiling, the A ceiling, the regression threshold and the sampling interval were checked against the first measurements in task #51 (synthetic set only, one Windows machine, 22 cores). They stay PROVISIONAL; values and sources are in `docs/perf-results.md`, section "Provisional limits (#51)". Run settings amended by the project owner on 2026-11-04 (see "What is run"). Streaming stays DEFERRED: M 1.75 at the 500 MiB default (large-file pass, 2026-11-04) is under the ceiling of 6.
 
 ## Context
 The brief's load test asks for the maximum files per second on the available hardware, so the team can derive resource needs. Today's figures (`docs/perf-results.md`):
@@ -23,7 +23,7 @@ Per project owner, 2026-10-17.
   - the synthetic set: the five existing bench messages plus the 1,212 golden inputs.
 - A separate large-file pass on one thread: generated messages at 25%, 50%, and 100% of the configured input limit (`ydk:req:extraction/max-input-size`), each holding one base64 attachment, plus one message one byte over the limit to confirm the guard. This pass feeds the memory ceiling (`ydk:nfr:performance/memory-footprint`) and is kept out of the DOP mix so a few huge files do not dominate throughput figures.
 - All inputs are loaded into memory before timing; no disk I/O is timed.
-- Per DOP (PROVISIONAL, kept in #51): 2 s warm-up, then a measured window of at least 10 s and at least 3 full passes over the set.
+- Per DOP: 300 ms warm-up, then a measured window of at least 1.5 s and at least 2 full passes over the set. Amended by the project owner, 2026-11-04: the short settings are kept for both the development baseline and the nightly CI job, replacing the earlier 2 s / 10 s / 3 passes. Reason: the nightly job stays at about one minute (run 41818826405 took 52 s), and the extra run-to-run noise is accepted because the regression rule is warn-only with a 20% threshold. T(1) and T(ProcessorCount) vary a lot between short runs (24-80% in #51), so a throughput warning is a prompt to re-run, not a verdict; longer windows (`--warmup-ms`, `--window-ms`, `--min-passes`) remain available for one-off runs.
 
 ### Garbage collector
 - Workstation GC is the .NET default for console and library hosts; Server GC must be opted into. The harness sets `ServerGarbageCollection` explicitly for each run, never relying on the default.
@@ -47,10 +47,10 @@ The team reruns the sweep on its own server class, in its GC mode, and applies:
 - ram_per_server = P(n_best) + n_best x max_input_bytes x M, with M the peak working-set growth per input byte from the large-file pass and max_input_bytes the configured input limit.
 
 ### Baseline and regression rule
-- The results of a sweep on the project owner's development machine are committed as `docs/perf-baseline.json`, with the hardware block.
+- The results of a sweep on the project owner's development machine, over all three sets (synthetic, public, mix) and both GC modes, are committed as `docs/perf-baseline.json`, with the hardware block.
 - Each run compares itself with the baseline when CPU model, logical core count, runtime major.minor, and GC mode all match. Otherwise it prints `baseline not comparable: <field>` and skips the comparison, so a retargeted runtime or new machine never compares against a stale baseline.
 - Warn-only rule (threshold 20%, PROVISIONAL, kept in #51: A and P run-to-run spread is 2-11%, T spread 24-80% at short windows): a warning is printed when T(1) or T(ProcessorCount) drops, or A or P(ProcessorCount) rises, by more than the threshold. It never fails a build.
-- A nightly CI job runs the synthetic set only (the public corpus is not in CI) against its own `docs/perf-baseline-ci.json`, with the same warn-only rule.
+- A nightly CI job runs the synthetic set only (the public corpus is not in CI) against its own `docs/perf-baseline-ci.json`, with the same warn-only rule. That file is the sweep JSON of a nightly run on the GitHub ubuntu runner (run 41818826405, 2026-11-04).
 - The baseline is refreshed, in the same commit, whenever the runtime, the parser library version, or the measuring machine changes.
 
 ## Alternatives
