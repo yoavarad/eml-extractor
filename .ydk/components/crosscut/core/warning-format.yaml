@@ -1,30 +1,29 @@
 $schema: ydk:schema:crosscut
 id: ydk:crosscut:core/warning-format
 description: >-
-  The single diagnostic format for content problems. This library has no HTTP error responses. (ADR-023, per
-  project owner 2026-10-18; supersedes the ADR-004 "never throws" rule): malformed-but-readable content is a warning
-  string on the result; misuse (ArgumentException family), input over maxInputBytes
-  (ydk:entity:extraction/EmlInputTooLargeException) and library bugs (ydk:entity:extraction/EmlExtractionException)
-  throw instead.
+  The single diagnostic format for content problems and library bugs. This library has no HTTP error responses.
+  (ADR-026, owner decision 2026-11-04; supersedes ADR-023 in part): malformed-but-readable content and library bugs
+  inside Extract are warning strings on the result; misuse (ArgumentException family) and input over maxInputBytes
+  (ydk:entity:extraction/EmlInputTooLargeException) throw instead, as does detection on a library bug
+  (ydk:entity:extraction/EmlExtractionException).
 kind: error-format
 specification: >-
   EmlExtractionResult.Warnings is an ordered list of strings, in the order problems were met during extraction.
   Each string is "<code>: <detail>" where <code> is one of parse_failed, body_decode_failed, part_decode_failed,
-  rfc822_extract_failed, tnef_extract_failed (lower snake_case, no spaces) and <detail> is the template defined on the
+  rfc822_extract_failed, tnef_extract_failed, metadata_field_failed, internal_error (lower snake_case, no spaces) and <detail> is the template defined on the
   matching warning component (typically the .NET exception message, prefixed for parse_failed by the exception type
   name and for part_decode_failed by the part's filename or MIME type). Consumers identify a warning by its prefix
   (string StartsWith "<code>"), never by the free-text detail. An empty list on a returned result means a clean
   extraction.
-  Target, not yet implemented (ADR-026, owner decision 2026-11-04; details proposed, for owner review): two more codes,
-  metadata_field_failed ("metadata_field_failed: <key>: <ExceptionType>", one metadata key could not be read) and
-  internal_error ("internal_error: <stage>[.<key>]: <ExceptionType>", a library bug in one stage, field or part).
-  Their detail carries the exception type name only, never the exception message. A library bug inside Extract then
-  becomes internal_error on a partial result instead of a thrown EmlExtractionException; a clean warnings list still
-  means a clean extraction.
+  Two codes carry the exception type name only, never the exception message: metadata_field_failed
+  ("metadata_field_failed: <key>: <ExceptionType>", content exception, one metadata key could not be read) and
+  internal_error ("internal_error: <stage>[.<key>]: <ExceptionType>", a library bug in one stage, field or part; a
+  metadata field bug is "internal_error: metadata.<key>: <ExceptionType>"). A library bug inside Extract is
+  internal_error on a partial result; a clean warnings list still means a clean extraction.
 applies_to: ydk:contract:api/eml-extractor (both Extract overloads). The detector has no diagnostics.
 implementation_notes:
   - Warning strings are not golden-checked (docs/golden.md "What we will not gold"); tests assert only on prefixes.
-  - No logging, tracing, or metrics are emitted today; warnings are the only diagnostic channel. Target (ADR-021, Stage 02): each warning also increments a counter tagged by its code, never by its detail (ydk:crosscut:core/observability).
+  - Warnings are the primary diagnostic channel. ADR-021: each warning also increments a counter tagged by its code, never by its detail (ydk:crosscut:core/observability).
 related:
   - ydk:warning:extraction/parse-failed
   - ydk:warning:extraction/body-decode-failed

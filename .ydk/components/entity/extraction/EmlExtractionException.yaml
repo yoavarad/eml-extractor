@@ -1,16 +1,14 @@
 $schema: ydk:schema:entity
 id: ydk:entity:extraction/EmlExtractionException
 description: >-
-  Exception thrown when an unexpected (non-content) exception occurs inside detection or extraction, i.e. a library
-  bug. ADR-023, per project owner 2026-10-18 (type #104; thrown by the stage wrappers since #106): public sealed class
-  EmlExtractionException : Exception, in src/EmlExtraction. Replaces the removed internal_error warning and the
-  per-stage partial-result defaults of ADR-004. Not used for misuse (ArgumentException family), for
+  Exception thrown when an unexpected (non-content) exception occurs inside detection, i.e. a library bug. ADR-023,
+  per project owner 2026-10-18 (type #104): public sealed class EmlExtractionException : Exception, in
+  src/EmlExtraction. Not used for misuse (ArgumentException family), for
   ydk:entity:extraction/EmlInputTooLargeException , for OutOfMemoryException, or for exceptions thrown by host
   callbacks (MeterListener, ActivityListener); those propagate unwrapped.
-  Target, not yet implemented (ADR-026, owner decision 2026-11-04; details proposed, for owner review): Extract no
-  longer throws this type; a bug inside extraction becomes ydk:warning:extraction/internal-error on a partial result.
-  Only EmlDetector.Detect / IsEml throw it (stage detect), unchanged. The type, its Stage values and its message
-  format stay as they are, so no public API is removed.
+  ADR-026 (owner decision 2026-11-04): Extract never throws this type; a bug inside extraction becomes
+  ydk:warning:extraction/internal-error on a partial result. Only EmlDetector.Detect / IsEml throw it (stage detect).
+  The type, its Stage values and its message format are unchanged, so no public API was removed.
 fields:
   Stage:
     type: enum

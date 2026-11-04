@@ -2,8 +2,9 @@ $schema: ydk:schema:req
 id: ydk:req:extraction/no-throw-on-malformed
 description: >-
   Malformed-but-readable email content never makes extraction throw; it is reported as warnings with a partial result
-  (ADR-004, narrowed by ADR-023 per project owner 2026-10-18). Misuse, oversized input and library bugs are NOT
-  covered by this rule: they throw (ADR-023, ydk:contract:api/eml-extractor).
+  (ADR-004, narrowed by ADR-023, widened by ADR-026 per owner decision 2026-11-04: library bugs inside Extract also
+  give a partial result). Misuse and oversized input are NOT covered by this rule: they throw
+  (ydk:contract:api/eml-extractor).
 type: policy
 priority: critical
 rule: >-
@@ -13,16 +14,13 @@ rule: >-
   ydk:warning:extraction/tnef-extract-failed and extraction continues with the other parts. Warnings never abort
   extraction of other parts. Every content catch site handles only content exception types (FormatException,
   ParseException, IOException, InvalidOperationException, ArgumentException, NotSupportedException,
-  DecoderFallbackException). ADR-023 (implemented, #105/#106): any other exception is a library bug and is thrown as
-  ydk:entity:extraction/EmlExtractionException naming the stage, with the original as InnerException; a null argument
-  throws ArgumentNullException; input over maxInputBytes throws ydk:entity:extraction/EmlInputTooLargeException
-  (ydk:req:extraction/max-input-size). Tests and GoldenKit fail when extraction throws on a golden or realistic input.
-  Target, not yet implemented (ADR-026, owner decision 2026-11-04; details proposed, for owner review): extraction
-  returns as much as it could read and never fails the whole call for content or a library bug. Each metadata key and
+  DecoderFallbackException). A null argument throws ArgumentNullException; input over maxInputBytes throws
+  ydk:entity:extraction/EmlInputTooLargeException (ydk:req:extraction/max-input-size). ADR-026 (implemented):
+  extraction returns as much as it could read and never fails the whole call for content or a library bug. Each metadata key and
   participant list is guarded separately: a content failure in one gives ydk:warning:extraction/metadata-field-failed
   and loses only that key (fixed keys keep their empty default). A non-content exception in a stage, a field or one
   attachment part gives ydk:warning:extraction/internal-error and that piece's empty default; stages that succeeded
-  keep their output; a bug in parse gives the empty result. Extract no longer throws EmlExtractionException (detection
+  keep their output; a bug in parse gives the empty result. Extract never throws EmlExtractionException (detection
   still does). Misuse, input over maxInputBytes, host listener exceptions and OutOfMemoryException still throw. Tests,
   GoldenKit and the harvest fail on any internal_error warning.
 failure_behavior: See the five content warning components; each defines the resulting partial result.
@@ -36,7 +34,6 @@ acceptance_criteria:
   - Corrupt base64 body extracts the subject without throwing (ExtractionTests.CorruptBase64DoesNotCrash; golden corrupt-transfer-encoding 10/10)
   - Headers-only message records no parse_failed warning (HeadersOnlyDoesNotThrow)
   - Public harvest of 12,853 detected messages records 0 exceptions, 0 parse_failed, 0 warnings (ydk:nfr:reliability/real-world-harvest-no-throw)
-  - A non-content exception injected into any stage throws EmlExtractionException with that stage and the injected exception as InnerException (StageGuardTests, ADR-023)
-  - A non-content exception inside a per-part catch site is wrapped by its stage, a content one stays its warning (ContentCatchSiteTests)
-  - "Target (ADR-026): a content exception in one metadata key records metadata_field_failed and every other key, the body and the attachments are still returned"
-  - "Target (ADR-026): a non-content exception injected into each of parse, metadata, one metadata key, body, attachments and one attachment part returns a result with internal_error naming that stage (and key), and Extract does not throw"
+  - "A content exception in one metadata key records metadata_field_failed and every other key, the body and the attachments are still returned (ADR-026)"
+  - "A non-content exception injected into each of parse, metadata, one metadata key, body, attachments and one attachment part returns a result with internal_error naming that stage (and key), and Extract does not throw (ADR-026)"
+  - A non-content exception inside a per-part catch site gives internal_error, a content one stays its warning (ContentCatchSiteTests)
