@@ -26,6 +26,12 @@
     <Compile Include="..\..\tools\GoldenKit\CaseDef.cs" Link="GoldenKit\CaseDef.cs" />
     <Compile Include="..\..\tools\GoldenKit\Catalog.cs" Link="GoldenKit\Catalog.cs" />
     <Compile Include="..\..\tools\GoldenKit\MimeBuild.cs" Link="GoldenKit\MimeBuild.cs" />
+    <!-- Score and probe, linked so GoldenKitGateTests prove they fail on internal_error (ADR-026). -->
+    <Compile Include="..\..\tools\GoldenKit\InternalErrors.cs" Link="GoldenKit\InternalErrors.cs" />
+    <Compile Include="..\..\tools\GoldenKit\Json.cs" Link="GoldenKit\Json.cs" />
+    <Compile Include="..\..\tools\GoldenKit\Probe.cs" Link="GoldenKit\Probe.cs" />
+    <Compile Include="..\..\tools\GoldenKit\Scorer.cs" Link="GoldenKit\Scorer.cs" />
+    <Compile Include="..\..\tools\GoldenKit\Stats.cs" Link="GoldenKit\Stats.cs" />
   </ItemGroup>
   <ItemGroup>
     <!-- Pure parts of the bench DOP sweep (ADR-015), unit-tested without referencing the bench exe. -->

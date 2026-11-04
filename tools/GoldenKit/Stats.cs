@@ -10,7 +10,7 @@ internal sealed class Stats
     private static readonly JsonSerializerOptions IndentedJson = new() { WriteIndented = true };
 
     public int Files, Messages, Detected, NotDetected, MboxFiles, EmptyFiles, SkippedLarge, ReadFail;
-    public int Warned, Thrown, ParseFailed, DetectedButParseFailed;
+    public int Warned, Thrown, InternalErrors, ParseFailed, DetectedButParseFailed;
     public int HasBody, EmptyBody, NoAttach, WithAttach, CidMessages, CidParts;
     public int TnefOpaque, TnefHeaders, TnefContentType, ExchangeHeaders, Office, NestedMail;
     public int Headers, XFields, AttachCount;
@@ -37,7 +37,7 @@ internal sealed class Stats
         var sb = new StringBuilder();
         sb.AppendLine(CultureInfo.InvariantCulture, $"root={root}");
         sb.AppendLine(CultureInfo.InvariantCulture, $"files_seen={fileCount} files_read={Files} mbox={MboxFiles} empty={EmptyFiles} skipped_large={SkippedLarge} read_fail={ReadFail}");
-        sb.AppendLine(CultureInfo.InvariantCulture, $"messages={Messages} detected={Detected} not_detected={NotDetected} parse_failed={ParseFailed} warned={Warned} thrown={Thrown} elapsed={elapsed:hh\\:mm\\:ss} rate={(elapsed.TotalSeconds > 0 ? Messages / elapsed.TotalSeconds : 0):F1}/s");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"messages={Messages} detected={Detected} not_detected={NotDetected} parse_failed={ParseFailed} warned={Warned} thrown={Thrown} internal_error={InternalErrors} elapsed={elapsed:hh\\:mm\\:ss} rate={(elapsed.TotalSeconds > 0 ? Messages / elapsed.TotalSeconds : 0):F1}/s");
         sb.AppendLine(CultureInfo.InvariantCulture, $"body={HasBody} empty_body={EmptyBody} with_attach={WithAttach} no_attach={NoAttach} cid_msgs={CidMessages} cid_parts={CidParts}");
         sb.AppendLine(CultureInfo.InvariantCulture, $"tnef_headers={TnefHeaders} tnef_left_as_winmail={TnefOpaque} exchange_hdr={ExchangeHeaders} office={Office} nested_rfc822={NestedMail}");
         sb.AppendLine(CultureInfo.InvariantCulture, $"max_headers={MaxHeaders} ({MaxHeadersLabel}) max_xfields={MaxXFields} ({MaxXFieldsLabel}) max_attach={MaxAttach} ({MaxAttachLabel})");
@@ -66,6 +66,7 @@ internal sealed class Stats
             MboxFiles,
             Warned,
             Thrown,
+            InternalErrors,
             ParseFailed,
             HasBody,
             EmptyBody,

@@ -106,13 +106,16 @@ internal static class Scorer
         return s;
     }
 
-    /// <summary>ADR-023: one "no_throw" check per extraction; a throw fails the case and skips the rest of its checks.</summary>
+    /// <summary>
+    /// ADR-023: one "no_throw" check per extraction; a throw fails the case and skips the rest of its checks.
+    /// ADR-026: an internal_error warning (a library bug) also fails that check.
+    /// </summary>
     private static void ScoreExtract(CaseScore s, byte[] eml, GoldenExpect expect, EmlExtractor extractor, int depth)
     {
         EmlExtractionResult result;
         try
         {
-            result = extractor.Extract(eml);
+            result = InternalErrors.Apply(extractor.Extract(eml));
         }
         catch (Exception ex)
         {
@@ -120,7 +123,8 @@ internal static class Scorer
             return;
         }
 
-        Check(s, "no_throw", true);
+        var bug = result.Warnings.FirstOrDefault(InternalErrors.Is);
+        Check(s, "no_throw", bug is null, bug);
         ScoreResult(s, result, expect, extractor, depth);
     }
 

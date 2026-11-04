@@ -5,19 +5,28 @@ var repo = FindRepo(AppContext.BaseDirectory) ?? Directory.GetCurrentDirectory()
 var fault = Array.IndexOf(args, "--inject-fault");
 if (fault >= 0)
 {
-    if (fault + 1 >= args.Length || args[fault + 1] is not ("parse" or "metadata" or "body" or "attachments"))
+    if (fault + 1 >= args.Length || args[fault + 1] is not ("parse" or "metadata" or "body" or "attachments" or InternalErrors.Code))
     {
-        Console.Error.WriteLine("--inject-fault needs one of: parse, metadata, body, attachments");
+        Console.Error.WriteLine("--inject-fault needs one of: parse, metadata, body, attachments, internal_error");
         return 2;
     }
 
     // ADR-023 fault seam: proves score/probe exit non-zero when extraction throws.
+    // ADR-026: "internal_error" instead adds an internal_error warning to every result.
     var stage = args[fault + 1];
-    EmlExtractor.StageFault = s =>
+    if (stage == InternalErrors.Code)
     {
-        if (s == stage)
-            throw new InvalidCastException("GoldenKit --inject-fault");
-    };
+        InternalErrors.Injected = "internal_error: metadata: InvalidCastException";
+    }
+    else
+    {
+        EmlExtractor.StageFault = s =>
+        {
+            if (s == stage)
+                throw new InvalidCastException("GoldenKit --inject-fault");
+        };
+    }
+
     args = args.Where((_, i) => i != fault && i != fault + 1).ToArray();
 }
 
