@@ -12,7 +12,7 @@ Two extractors were built against the same brief: this repo (EML) and `yoavarad/
 - OLE takes request classes (`ExtractionRequest` with `FileBytes` / `InputStream` / `FilePath` + `FileName`; `MimeDetectionRequest` with `FileBytes` + `FileName`) "so fields can be added later".
 - EML detection returns `bool`; OLE returns `MimeDetectionResult { DetectedFormat, MimeType, IsSupported }`.
 - Subfile records differ: EML `ExtractedAttachment { Name, Size, FullPath, Data, ContentId, Disposition }`; OLE `EmbeddedFileItem { BinaryData, FileName, PackagePath, SizeInBytes }`.
-- Error model differs: EML never throws on content and records warnings (ADR-004); OLE throws typed exceptions.
+- Error model differs: EML never throws on content and records warnings (ADR-004); OLE throws typed exceptions. (ADR-026 later extended the EML side: library bugs no longer throw either; they become `internal_error:` warnings on a partial result.)
 
 A template that hosts both extractors needs one shape. There are no consumers of the EML API yet, so a breaking change costs nothing now and more later.
 
@@ -56,7 +56,7 @@ Net effect: OLE renames one field (`PackagePath` to `FullPath`); EML renames thr
 The record and list names are not part of this decision. EML keeps `ExtractedAttachment` and `Attachments`; OLE keeps `EmbeddedFileItem` and `EmbeddedFiles`. Aligning them is a team question.
 
 ### Error model
-- EML keeps no-throw + warnings (ADR-004). The batch pipeline must not lose a batch to one bad message.
+- `Extract` never throws for content problems or library bugs. It returns a partial result with warnings: content codes per ADR-004, and library bugs as `internal_error: <stage>: <Type>` (ADR-026). It throws only `EmlInputTooLargeException` for oversized input (`OutOfMemoryException` propagates). Only `EmlDetector` throws `EmlExtractionException`. The batch pipeline must not lose a batch to one bad message.
 - OLE throws typed exceptions. This is a divergence the team must decide on (`docs/team-questions.md`). Until then the template adapter for each extractor maps its error model to whatever the template expects.
 
 ## Alternatives
