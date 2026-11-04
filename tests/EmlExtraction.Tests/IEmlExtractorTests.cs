@@ -13,7 +13,7 @@ public sealed class IEmlExtractorTests
     [Fact]
     public void UnreadableInputReturnsResultInsteadOfThrowing()
     {
-        IEmlExtractor extractor = new EmlExtractor();
+        var extractor = new EmlExtractor();
 
         var result = extractor.Extract(new byte[] { 0x00, 0x01, 0x02 });
 
