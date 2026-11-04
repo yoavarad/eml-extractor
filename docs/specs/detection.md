@@ -25,4 +25,4 @@ It does not validate MIME structure, decode anything, or guarantee that extracti
 
 ## Evidence
 
-The unit tests in [ydk:test:detection/detector.unit] cover the accept and reject paths. The golden detection slice (40 bulk cases plus the seed OLE case) and the public harvest, which detected all 12,853 sampled messages, are described in [quality.md](quality.md).
+The unit tests in [ydk:test:detection/detector.unit] cover the accept and reject paths. The golden detection slice (40 bulk cases plus the seed OLE case) and the public harvest, which detected all 12,853 messages in the 2026-09-15 harvest (2026-11-04 re-run: 13,999 detected), are described in [quality.md](quality.md).

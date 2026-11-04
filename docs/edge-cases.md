@@ -2,7 +2,7 @@
 
 Status: `tested` = generated unit tests. `public-sample` = real public mail under gitignored `corpus/internal/` (`InternalCorpusTests` + `golden probe`). `internal-missing` = still need a corp/team sample.
 
-Harvest (2026-09-15, second pass): **12,853** detected messages. **0 throws, 0 parse_failed, 0 warnings** on detected mail. ~3,500 extract/s.
+Harvest (2026-11-04, post-ADR-026, `scripts/fetch-public-corpus.sh`): **13,999** detected messages. **0 internal_error, 0 parse_failed, 0 warnings, 3 throws** (probe-side MimeKit mbox split `FormatException` in `nazario/phishing-2017.mbox#309`, `phishing-2019.mbox#156`, `phishing-2022.mbox#135`; not `EmlExtractor`; target stays failing). ~2,100 extract/s. Per-case counts below are from the earlier 2026-09-15 run (12,853 messages).
 
 Added this pass (all public, gitignored): Apache POI HMEF TNEF (real `.doc` + `.pdf`), php-mime-mail-parser issue mails (real OOXML/PDF/ODT + nested rfc822 + Gmail Hebrew), ProtonMail parser fixtures, GroupDocs/Chatwoot/Tika CID and attachment samples, Bellcore ISO-8859-8 Hebrew from `jwz.mbox`.
 
