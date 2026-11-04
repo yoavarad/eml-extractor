@@ -1,7 +1,7 @@
 # ADR-020: Profiling method - per-stage CPU, allocation, and GC hotspots on the load-test corpus
 
 ## Status
-Accepted (per project owner, 2026-10-18). Implemented: `profile` and `profile-trace` commands in `benches/EmlExtraction.Bench/Profile/`; reports `docs/perf/profile-2026-10-18.md` and `docs/perf/profile-2026-10-23.md`. Parameters set from the first profile (`docs/perf/profile-2026-10-18.md`, commit 6ccd29d, synthetic set only because `corpus/internal` was absent): top-N = 10 kept (the data gave about 7 distinct hotspots; the last rows are low-impact or hypotheses); corpus-trace run lengths = 300 ms warmup, 1,500 ms window per phase, min 2 passes; BDN job = `dry` for allocation only (CPU shares come from the traces; `short` was projected at about 40 minutes for 90 benchmarks). Re-confirm N and run lengths on the first profile that includes the public corpus. Amended by ADR-023 (2026-10-18): the stages are no longer guarded; a library bug throws `EmlExtractionException` naming the stage.
+Accepted (per project owner, 2026-10-18). Implemented: `profile` and `profile-trace` commands in `benches/EmlExtraction.Bench/Profile/`; reports `docs/perf/profile-2026-10-18.md` and `docs/perf/profile-2026-10-23.md`. Parameters set from the first profile (`docs/perf/profile-2026-10-18.md`, commit 6ccd29d, synthetic set only because `corpus/internal` was absent): top-N = 10 kept (the data gave about 7 distinct hotspots; the last rows are low-impact or hypotheses); corpus-trace run lengths = 300 ms warmup, 1,500 ms window per phase, min 2 passes; BDN job = `dry` for allocation only (CPU shares come from the traces; `short` was projected at about 40 minutes for 90 benchmarks). Re-confirm N and run lengths on the first profile that includes the public corpus. Amended by ADR-023 (2026-10-18): a library bug no longer throws from `Extract` (ADR-026); it becomes an `internal_error: <stage>: <Type>` warning on a partial result. Only `EmlDetector` throws `EmlExtractionException`.
 
 ## Context
 ADR-015 measures how fast the library is (throughput, latency, memory per degree of parallelism) but not where the time and memory go. Without that, any optimization is a guess. The owner decided (2026-10-18) to add dev-time profiling and runtime metrics (ADR-021), then optimize only from data (ADR-022).
@@ -26,7 +26,7 @@ Each stage is measured on its own and as a share of one whole extraction:
 | body | main-content selection and subject/body direction (ADR-003, ADR-006) |
 | attachments | attachment collection, TNEF unwrap, container path (ADR-008, ADR-013) |
 
-`request` and `detect` are profiling-only stages. `parse`, `metadata`, `body`, and `attachments` are the extraction stages and share their names with the `eml_extraction.stage` tag of ADR-021 (which keeps only those four values), so a hotspot in one of them maps to one `EmlExtractionException.Stage` value (ADR-023).
+`request` and `detect` are profiling-only stages. `parse`, `metadata`, `body`, and `attachments` are the extraction stages and share their names with the `eml_extraction.stage` tag of ADR-021 (which keeps only those four values), so a hotspot in one of them maps to one stage name in an `internal_error: <stage>: <Type>` warning (ADR-026).
 
 ### What is measured
 - CPU time per stage (inclusive and exclusive), from sampling.

@@ -1,7 +1,7 @@
 # ADR-021: Runtime metrics and tracing with BCL Meter and ActivitySource
 
 ## Status
-Accepted (per project owner, 2026-10-18). Implemented (metrics #71, activities #72). The overhead budget is set from the #73 measurement (`docs/perf-results.md`) and confirmed by the owner (2026-10-18). Instrument names may be renamed once if the team answers `docs/team-questions.md` question 6 before the first release that ships them. Amended by ADR-023 (2026-10-18): `internal_errors` and `input_too_large` count thrown exceptions, and those two codes leave the warning-code tag set.
+Accepted (per project owner, 2026-10-18). Implemented (metrics #71, activities #72). The overhead budget is set from the #73 measurement (`docs/perf-results.md`) and confirmed by the owner (2026-10-18). Instrument names may be renamed once if the team answers `docs/team-questions.md` question 6 before the first release that ships them. Amended by ADR-023 (2026-10-18): `internal_errors` and `input_too_large` count thrown exceptions, and those two codes leave the warning-code tag set. Amended by ADR-026 (2026-11-04): `Extract` no longer throws on a library bug; it returns a partial result with an `internal_error` warning. `internal_errors` counts once per `internal_error` warning, outcome `internal_error` means the call returned with that warning, and `eml_extraction.warning.code` gains `internal_error` and `metadata_field_failed`.
 
 ## Context
 Today the warnings list on the result is the only diagnostic channel; the library writes no logs, traces, or metrics (`ydk:crosscut:core/warning-format`). The factory sees each result, but it cannot see, without wrapping every call itself, how long extraction takes per message size, how often each warning kind fires across a fleet, how often the size guard refuses input, or which stage hit an `internal_error`. The owner decided (2026-10-18) to add runtime metrics in the library, next to dev-time profiling (ADR-020).
@@ -35,17 +35,17 @@ Per project owner, 2026-10-18.
 | `eml_extraction.extract.attachments` | Histogram<int> | `{attachment}` | - | once per Extract call that parsed, attachment count |
 | `eml_extraction.extract.warnings` | Counter<long> | `{warning}` | `eml_extraction.warning.code` | once per warning added to a result |
 | `eml_extraction.detect.calls` | Counter<long> | `{call}` | `eml_extraction.detect.result` | once per Detect or IsEml call |
-| `eml_extraction.extract.internal_errors` | Counter<long> | `{error}` | `eml_extraction.stage`, `error.type` | once per Extract call that threw `EmlExtractionException` (ADR-023) |
+| `eml_extraction.extract.internal_errors` | Counter<long> | `{error}` | `eml_extraction.stage`, `error.type` | once per `internal_error` warning added to a result (ADR-026); a call can count more than once |
 | `eml_extraction.extract.input_too_large` | Counter<long> | `{request}` | - | once per Extract call refused by the size guard |
 
 Tag values are closed sets:
-- `eml_extraction.outcome`: `clean` (no warnings), `warnings` (at least one warning, content returned), `parse_failed`, `input_too_large`, `internal_error` (the last two: the call threw, ADR-023).
-- `eml_extraction.warning.code`: the warning codes of `ydk:crosscut:core/warning-format` (`parse_failed`, `body_decode_failed`, `part_decode_failed`, `rfc822_extract_failed`, `tnef_extract_failed`).
+- `eml_extraction.outcome`: `clean` (no warnings), `warnings` (at least one warning, content returned), `parse_failed`, `input_too_large`, `internal_error` (the call returned a result with an `internal_error` warning, ADR-026; takes precedence over `warnings` and `parse_failed`). Only `input_too_large` means the call threw (ADR-023).
+- `eml_extraction.warning.code`: the warning codes of `ydk:crosscut:core/warning-format` (`parse_failed`, `body_decode_failed`, `part_decode_failed`, `rfc822_extract_failed`, `tnef_extract_failed`, plus `internal_error` and `metadata_field_failed` since ADR-026).
 - `eml_extraction.detect.result`: `supported`, `not_supported`.
 - `eml_extraction.stage`: `parse`, `metadata`, `body`, `attachments` (the ADR-004 guarded stages; ADR-020 profiles these four plus the profiling-only `request` and `detect`).
 - `error.type`: the .NET exception type's full name (bounded by the code, not by input).
 
-The `internal_errors` and `input_too_large` counters are separate from the warnings counter (both cases throw and record no warning): they are the two signals an operator alerts on, and the internal-error counter carries the stage.
+The `internal_errors` and `input_too_large` counters are separate from the warnings counter (`input_too_large` throws and records no warning; `internal_errors` counts the `internal_error` warnings, ADR-026): they are the two signals an operator alerts on, and the internal-error counter carries the stage.
 
 No histogram bucket advice is set: the API for it is not in the net8.0 BCL. Consumers configure buckets with views.
 
@@ -53,7 +53,7 @@ No histogram bucket advice is set: the API for it is not in the net8.0 BCL. Cons
 - One activity per Extract call, named `eml_extraction.extract`, kind Internal.
 - One child activity per guarded stage, named `eml_extraction.parse`, `eml_extraction.metadata`, `eml_extraction.body`, `eml_extraction.attachments`. Child activities are created only when a listener samples the parent; if the overhead benchmark shows they break the budget with a listener attached, they are dropped and only the parent activity stays.
 - No activity for Detect: it is too cheap for a span to be useful; the detect counter covers it.
-- Tags on `eml_extraction.extract`: `eml_extraction.input.size` (bytes), `eml_extraction.attachments.count`, `eml_extraction.warnings.count`, `eml_extraction.outcome`. On `internal_error` the stage activity gets status Error and `error.type`; the exception message is not recorded.
+- Tags on `eml_extraction.extract`: `eml_extraction.input.size` (bytes), `eml_extraction.attachments.count`, `eml_extraction.warnings.count`, `eml_extraction.outcome`. On an `internal_error` from a stage-level guard the stage activity gets status Error and `error.type` (ADR-026); per-part bugs, a body-read bug and per-field metadata bugs only increment the counter and set outcome `internal_error`; the exception message is not recorded.
 
 ### PII and cardinality (hard rule)
 - No tag, activity name, event, baggage, or status description may carry message content or anything derived from it: no subject, body, header value, address, display name, message ID, attachment file name, content ID, path, content type, or warning detail text.

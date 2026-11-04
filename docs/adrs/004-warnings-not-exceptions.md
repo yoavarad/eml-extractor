@@ -1,7 +1,7 @@
 # ADR-004: Record warnings instead of throwing on malformed MIME
 
 ## Status
-Accepted (recorded retroactively, Stage 01 Rewrite). Throw contract decided by the project owner on 2026-10-17. Contract implemented. Superseded in part by ADR-023 (2026-10-18): misuse, oversized input and library bugs now throw; `internal_error` is removed; only content failures stay warnings. ADR-026 (proposed, owner decision 2026-11-04; not yet implemented) restores the `internal_error` warning and the per-stage partial-result defaults for library bugs, and adds per-field metadata recovery.
+Accepted (recorded retroactively, Stage 01 Rewrite). Throw contract decided by the project owner on 2026-10-17. Contract implemented. Superseded in part by ADR-023 (2026-10-18): misuse, oversized input and library bugs now throw; `internal_error` is removed; only content failures stay warnings. ADR-026 (implemented, owner decision 2026-11-04) restores the `internal_error` warning and the per-stage partial-result defaults for library bugs, and adds per-field metadata recovery.
 
 ## Context
 `docs/requirements.md` lists "Parse does not crash the process" under "Out of original spec (implemented anyway)". The public-mail harvest of 12,853 messages is the evidence offered for 0 throws.
@@ -32,7 +32,7 @@ Per project owner, 2026-10-17: the downstream indexer / LLM pipeline extracts me
 - Callers must inspect the warnings list to tell a clean extraction from a degraded one.
 - An `internal_error` warning means a library bug, not bad input.
 - `docs/golden.md` ("What we will not gold") excludes warning text from golden tests. Tests assert on code prefixes only.
-- Implemented: `EmlExtractor` catches only content failures (`FormatException`, `ParseException`, `IOException`, `InvalidOperationException`, `ArgumentException`, `NotSupportedException`, `DecoderFallbackException`) as warnings; other exceptions surface as `EmlExtractionException` (ADR-023). No `internal_error` warning exists.
+- Implemented: `EmlExtractor` catches content failures as warnings. Since ADR-026 (2026-11-04) a library bug in `Extract` also becomes a warning, `internal_error: <stage>: <ExceptionType>`, on a partial result. Only `EmlDetector` throws `EmlExtractionException` (stage `detect`); `Extract` throws only for misuse, oversized input and `OutOfMemoryException` (ADR-023, ADR-026).
 
 ## Evidence
 `src/EmlExtraction/EmlExtractor.cs`, `src/EmlExtraction/PartCollector.cs`, `README.md`, `docs/requirements.md`, `docs/edge-cases.md`. Project owner decision, 2026-10-17.

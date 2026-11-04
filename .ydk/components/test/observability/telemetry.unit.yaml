@@ -26,12 +26,12 @@ cases:
     description: Size guard signal
     given: An extractor with a small maxInputBytes and a longer input
     when: Extract is called
-    then: Extract throws EmlInputTooLargeException; input_too_large gets +1, warnings gets nothing, duration tagged outcome=input_too_large, no attachments record (ADR-023)
+    then: Extract throws EmlInputTooLargeException; input_too_large gets +1, warnings gets nothing, duration tagged outcome=input_too_large, no attachments record
   - name: InternalErrorCountedByStage
     description: Library-bug signal carries the stage
     given: A test hook that throws an unexpected exception inside the attachments stage
     when: Extract is called
-    then: Extract throws EmlExtractionException (stage attachments); internal_errors gets +1 tagged stage=attachments and error.type with the inner exception type name; duration tagged outcome=internal_error; warnings gets nothing; the attachments stage activity has status Error and error.type with the inner exception type name, earlier stages Unset; the extract activity has status Error, error.type EmlExtractionException and outcome internal_error; no status description (ADR-023)
+    then: Extract returns a partial result with an internal_error warning (stage attachments) and does not throw; internal_errors gets +1 tagged stage=attachments and error.type with the exception type name; warnings gets +1 tagged warning.code=internal_error; duration tagged outcome=internal_error; attachments histogram is recorded; the attachments stage activity has status Error and error.type with the exception type name, earlier stages Unset; the extract activity has status Unset and outcome internal_error; no status description (ADR-026)
   - name: DetectCountedByResult
     description: Detection counter
     given: One mail buffer and one PDF buffer
@@ -41,7 +41,7 @@ cases:
     description: Host callbacks sit outside the stage wrappers
     given: A MeterListener whose measurement callback throws
     when: Extract and Detect are called
-    then: The host's exception propagates unchanged, not wrapped in EmlExtractionException (ADR-023)
+    then: The host's exception propagates unchanged, not wrapped in EmlExtractionException and not turned into an internal_error warning
   - name: ExtractActivityAndStageChildren
     description: Tracing shape
     given: An ActivityListener sampling AllData on source EmlExtraction
@@ -61,7 +61,7 @@ cases:
     description: Activity start and stop sit outside the stage wrappers
     given: An ActivityListener whose ActivityStarted or ActivityStopped callback throws for one of the extract or stage activities
     when: Extract is called
-    then: The host's exception propagates unchanged, not wrapped in EmlExtractionException (ADR-023), and Activity.Current is null afterwards
+    then: The host's exception propagates unchanged, not wrapped in EmlExtractionException and not turned into an internal_error warning, and Activity.Current is null afterwards
   - name: PropagationOnlySamplingStartsNoChildren
     description: Children and tags only when all data is requested
     given: An ActivityListener whose sampler returns PropagationData

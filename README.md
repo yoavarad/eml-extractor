@@ -105,7 +105,7 @@ No further extraction: no file-type detection, no parsing inside Office/PDF/imag
 
 ## Errors
 
-Malformed mail content never throws: it is recorded as a warning on `result.Warnings` and you get the partial result (ADR-023). Everything else throws.
+`Extract` returns a result for any input it can read: malformed mail content (ADR-023) and library bugs (ADR-026) are recorded as warnings on `result.Warnings` and you get the partial result. It throws only for misuse, oversized input and `OutOfMemoryException`. `EmlExtractionException` is thrown only by `EmlDetector` (stage `detect`).
 
 | Case | Exception | Properties |
 | --- | --- | --- |
@@ -113,15 +113,15 @@ Malformed mail content never throws: it is recorded as a warning on `result.Warn
 | Both or neither of `FileBytes` / `InputStream` set | `ArgumentException` | `ParamName` (`request`) |
 | `maxInputBytes <= 0` (constructor) | `ArgumentOutOfRangeException` | `ParamName`, `ActualValue` |
 | Input longer than `maxInputBytes` (default 500 MiB; an input of exactly the limit is parsed) | `EmlInputTooLargeException` (derives from `ArgumentException`) | `InputLength` (for a stream: bytes read, limit + 1), `MaxInputBytes`, `ParamName` (`request`) |
-| Unexpected exception in a stage (a library bug) | `EmlExtractionException` | `Stage` (`detect`, `parse`, `metadata`, `body` or `attachments`), `InnerException` (the original, with its stack trace) |
 
-- Checks for the first four rows run before any parsing, except the size check on a stream, which runs while it is read (reading stops at limit + 1 bytes). Read errors from your stream become a `parse_failed` warning. Messages name the parameter and the size or limit; they never quote message content.
+- Checks for the rows above run before any parsing, except the size check on a stream, which runs while it is read (reading stops at limit + 1 bytes). Read errors from your stream become a `parse_failed` warning. Messages name the parameter and the size or limit; they never quote message content.
+- A library bug in `Extract` (an unexpected exception in the parse, metadata, body or attachments stage, or in one part) is not thrown. It becomes the warning `internal_error: <stage>: <ExceptionType>` (the exception type name only, never its message) on a partial result: the failed stage gets its empty default and the later stages still run. A bug while reading one metadata field gives `internal_error: metadata.<key>: <ExceptionType>` and that key is removed (for `from`, `to`, `cc`, `bcc` and `xfields`, set to `""`). A content failure in a metadata field gives `metadata_field_failed: <key>: <ExceptionType>` with the same fallback. Known behavior: after a bug in the body stage, the text body part also comes back as an attachment.
+- `OutOfMemoryException` and exceptions thrown by your own `MeterListener` callbacks are not caught.
 - `EmlExtractionException.Message` names the stage and the inner exception's type only; read the details from `InnerException`.
-- `OutOfMemoryException` and exceptions thrown by your own `MeterListener` callbacks are not wrapped.
-- `EmlDetector.Detect` / `IsEml` return "not supported" / `false` for input that is not a message. That is a result, not an error. They throw only `EmlExtractionException` (stage `detect`) on a library bug.
-- These content warnings stay warnings (`"<code>: <detail>"`): `parse_failed`, `body_decode_failed`, `part_decode_failed`, `rfc822_extract_failed`, `tnef_extract_failed`. An empty `Warnings` list on a returned result means nothing was degraded.
+- `EmlDetector.Detect` / `IsEml` return "not supported" / `false` for input that is not a message. That is a result, not an error. They throw only `EmlExtractionException` (`Stage` is `detect`, `InnerException` holds the original) on a library bug.
+- These content warnings stay warnings (`"<code>: <detail>"`): `parse_failed`, `body_decode_failed`, `part_decode_failed`, `rfc822_extract_failed`, `tnef_extract_failed`, `metadata_field_failed`, `internal_error`. An empty `Warnings` list on a returned result means nothing was degraded; check for `internal_error` to find library bugs.
 
-Batch callers catch per item, so one bad file does not lose the batch:
+Batch callers handle each item on its own, so one bad file does not lose the batch:
 
 ```csharp
 var extractor = new EmlExtractor();
@@ -130,15 +130,13 @@ foreach (var (name, bytes) in files)
     try
     {
         var result = extractor.Extract(new EmlExtractionRequest { FileBytes = bytes, FileName = name });
+        if (result.Warnings.Any(w => w.StartsWith("internal_error:")))
+            ReportBug(name, result.Warnings); // library bug: the partial result is still usable
         Index(name, result); // result.Warnings lists any degraded content
     }
     catch (EmlInputTooLargeException ex)
     {
         Skip(name, $"{ex.InputLength} bytes exceeds the {ex.MaxInputBytes} byte limit");
-    }
-    catch (EmlExtractionException ex)
-    {
-        ReportBug(name, ex.Stage, ex.InnerException); // library bug: keep the inner exception for the report
     }
 }
 ```
@@ -147,7 +145,7 @@ Catch `EmlInputTooLargeException` before any `ArgumentException` handler, since 
 
 ## Migrating from the pre-0.1 API
 
-Every row is a public break (ADR-012, 013, 014, 016, 023). Code that uses none of the old members compiles unchanged except for the constructor row.
+Every row is a public break (ADR-012, 013, 014, 016, 023, 026). Code that uses none of the old members compiles unchanged except for the constructor row.
 
 | Old API / behavior | New API / behavior | What callers change |
 | --- | --- | --- |
@@ -167,7 +165,7 @@ Every row is a public break (ADR-012, 013, 014, 016, 023). Code that uses none o
 | `bool EmlDetector.IsEml(bytes)` only | `EmlDetectionResult Detect(bytes)` (`IsSupported`, `MimeType`) added; `IsEml` unchanged | Optional. |
 | `new EmlExtractor()` with an implicit parameterless constructor | `EmlExtractor(long maxInputBytes = 500 MiB)`; `maxInputBytes <= 0` throws `ArgumentOutOfRangeException` | Source compatible. A binary break: recompile everything that references the library. |
 | Oversized input: `input_too_large` warning and an empty result | Throws `EmlInputTooLargeException` (an `ArgumentException`; `InputLength`, `MaxInputBytes`) | Catch the exception, not the warning. |
-| A stage fault: `internal_error` warning and a partial result | Throws `EmlExtractionException` (`Stage`, `InnerException`) | Catch it per item in a batch. Stop checking for `internal_error`. |
+| A stage fault: `internal_error` warning and a partial result | Unchanged: `internal_error: <stage>: <ExceptionType>` warning (type name only) and a partial result; `Extract` never throws `EmlExtractionException` (ADR-026) | Keep checking for `internal_error`. |
 | Null request and other misuse had no defined behavior | `ArgumentNullException` for a null request; see Errors | Fix the call. |
 | Targets `net10.0` only | Targets `net8.0` and `net10.0` with identical behavior | None; a .NET 8 host can now reference it. |
 
@@ -184,20 +182,20 @@ The library publishes runtime metrics through the BCL `System.Diagnostics.Metric
 | `eml_extraction.extract.attachments` | Histogram<int> | `{attachment}` | - |
 | `eml_extraction.extract.warnings` | Counter<long> | `{warning}` | `eml_extraction.warning.code` |
 | `eml_extraction.detect.calls` | Counter<long> | `{call}` | `eml_extraction.detect.result` |
-| `eml_extraction.extract.internal_errors` | Counter<long> | `{error}` | `eml_extraction.stage`, `error.type` |
+| `eml_extraction.extract.internal_errors` | Counter<long> | `{error}` (one per `internal_error` warning) | `eml_extraction.stage`, `error.type` |
 | `eml_extraction.extract.input_too_large` | Counter<long> | `{request}` | - |
 
 Tag values (closed sets):
-- `eml_extraction.outcome`: `clean`, `warnings`, `parse_failed`, `input_too_large` (threw `EmlInputTooLargeException`), `internal_error` (threw `EmlExtractionException`)
-- `eml_extraction.warning.code`: `parse_failed`, `body_decode_failed`, `part_decode_failed`, `rfc822_extract_failed`, `tnef_extract_failed`
+- `eml_extraction.outcome`: `clean`, `warnings`, `parse_failed`, `input_too_large` (threw `EmlInputTooLargeException`), `internal_error` (returned a result with an `internal_error` warning; takes precedence over `warnings` and `parse_failed`)
+- `eml_extraction.warning.code`: `parse_failed`, `body_decode_failed`, `part_decode_failed`, `rfc822_extract_failed`, `tnef_extract_failed`, `internal_error`, `metadata_field_failed`
 - `eml_extraction.detect.result`: `supported`, `not_supported`
-- `eml_extraction.stage`: `parse`, `metadata`, `body`, `attachments`
+- `eml_extraction.stage`: `parse`, `metadata`, `body`, `attachments` (a metadata field bug counts under `metadata`)
 - `error.type`: the .NET exception type's full name
 
 Activities (all kind Internal; none for `Detect` / `IsEml`):
 - `eml_extraction.extract`, one per `Extract` call. Tags `eml_extraction.input.size` (bytes), `eml_extraction.attachments.count`, `eml_extraction.warnings.count` (the two counts only on a returned result), `eml_extraction.outcome`.
 - Children `eml_extraction.parse`, `eml_extraction.metadata`, `eml_extraction.body`, `eml_extraction.attachments`, created only when the parent is sampled with all data.
-- When `Extract` throws `EmlExtractionException`, the failing stage activity gets status Error and `error.type` (inner exception type), and `eml_extraction.extract` gets status Error, `error.type` `EmlExtraction.Exceptions.EmlExtractionException` and outcome `internal_error`. On `EmlInputTooLargeException` the parent gets status Error, its `error.type` and outcome `input_too_large`. No status description, event or exception message is recorded. Exceptions thrown by your own listener callbacks propagate unchanged.
+- On a library bug (an `internal_error` warning on a returned result), a stage-level guard bug sets status Error and `error.type` (the exception's full type name) on the failing stage activity, while per-part bugs, a body-read bug and per-field metadata bugs only increment the counter and set outcome `internal_error`; `eml_extraction.extract` keeps its normal status and gets outcome `internal_error`. On `EmlInputTooLargeException` the parent gets status Error, its `error.type` and outcome `input_too_large`. No status description, event or exception message is recorded. Exceptions thrown by your own listener callbacks propagate unchanged.
 
 PII: no tag, activity name, event, baggage or status description carries message content or anything derived from it (subject, body, headers, addresses, file names, content IDs), the request `FileName`, or exception messages. A unit test enforces this.
 

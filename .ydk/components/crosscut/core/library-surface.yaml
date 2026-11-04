@@ -10,7 +10,7 @@ specification: >-
   ydk:contract:api/eml-detector and ydk:contract:api/eml-extractor plus the records
   ydk:entity:extraction/EmlExtractionResult and ydk:entity:extraction/ExtractedAttachment , and
   (ADR-012) ydk:entity:extraction/EmlExtractionRequest and
-  ydk:entity:extraction/EmlDetectionResult . No MimeKit type appears in the public surface. Errors: misuse and oversized input throw argument exceptions (EmlInputTooLargeException), library bugs throw EmlExtractionException (ADR-023).
+  ydk:entity:extraction/EmlDetectionResult . No MimeKit type appears in the public surface. Errors: misuse and oversized input throw argument exceptions (EmlInputTooLargeException), library bugs inside Extract do not throw: they become an internal_error warning on a partial result (ADR-026); only detection throws EmlExtractionException.
   Not present, by design of the original spec and README: HTTP routes, authentication/authorisation, frontend pages,
   CORS, health checks, pagination, persistence, generated IDs, logging, configuration files, environment
   variables. ADR-021: BCL metrics (implemented, #71) and activities (implemented, #72) under the name EmlExtraction, with
