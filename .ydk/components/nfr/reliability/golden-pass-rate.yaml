@@ -12,11 +12,10 @@ measurement: >-
   main_content, main_content_mime, attachment_count, and per-attachment presence/size/sha/disposition/path checks;
   prints totals and per-tag pass rates; exits 1 when any case fails.
 test_method: >-
-  Target (ADR-011, accepted, implementation pending as Stage 02 work): CI runs the GoldenKit score (net10.0; net8.0
-  optional per ADR-019) over all
-  1200 bulk + 12 seed cases and fails when the result is below the 1212/1212 baseline. Current state: only the
-  seed set (12 cases) runs in CI, via dotnet test; the bulk set is run manually with the score command and the
-  report is committed to docs/golden-score.txt.
+  ADR-011, implemented: the CI step "GoldenKit score (1212/1212 gate, net10.0)" (.github/workflows/ci.yml) runs the
+  GoldenKit score (net10.0; net8.0 optional per ADR-019) over all 1200 bulk + 12 seed cases and fails when any case
+  fails (below the 1212/1212 baseline). The seed set (12 cases) also runs via dotnet test. The report is committed
+  to docs/golden-score.txt.
 monitoring: none (library; no runtime telemetry)
 applies_to:
   - ydk:contract:api/eml-detector

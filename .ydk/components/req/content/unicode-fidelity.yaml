@@ -1,9 +1,9 @@
 $schema: ydk:schema:req
 id: ydk:req:content/unicode-fidelity
 description: >-
-  Brief correctness A: emoji and exotic languages survive extraction exactly. Scripts are covered today; the emoji
-  sequence cases below (skin tone, flags, keycap, combining marks, split encoded-words) are target; not implemented
-  (Stage 02). Today only one ZWJ family row exists in ExoticLanguageTests.
+  Brief correctness A: emoji and exotic languages survive extraction exactly. Scripts and the emoji
+  sequence cases below (ZWJ family, skin tone, flags, keycap, combining marks, split encoded-words) are covered in
+  ExoticLanguageTests.
 type: business-rule
 priority: critical
 rule: >-

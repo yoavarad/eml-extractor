@@ -2,7 +2,7 @@ $schema: ydk:schema:req
 id: ydk:req:quality/profiling-report
 description: >-
   A committed per-stage profiling report exists before any optimization (ADR-020, per project owner 2026-10-18).
-  Target; not implemented (Stage 02). Top-N size and run lengths are provisional until the first profile.
+  Implemented (docs/perf/profile-2026-10-18.md, docs/perf/profile-2026-10-23.md). Top-N size and run lengths are provisional until the first profile.
 type: policy
 priority: medium
 rule: >-

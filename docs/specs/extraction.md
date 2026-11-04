@@ -49,7 +49,7 @@ HTML is returned as markup with its inline-image references and direction attrib
 
 ## Exotic languages and emoji
 
-The original correctness requirement covers emoji and exotic languages. Text comes back exactly as the sender wrote it: no normalisation and no stripping, whatever transfer or header encoding carried it ([ydk:req:content/unicode-fidelity]). Besides the seven scripts already tested, the requirement adds the emoji forms that break naive decoders: joined family sequences, skin-tone modifiers, national flags, keycaps, and letters with combining marks. Each is checked for exact equality. The added cases are target behaviour, tested from Stage 02.
+The original correctness requirement covers emoji and exotic languages. Text comes back exactly as the sender wrote it: no normalisation and no stripping, whatever transfer or header encoding carried it ([ydk:req:content/unicode-fidelity]). Besides the seven scripts already tested, the requirement adds the emoji forms that break naive decoders: joined family sequences, skin-tone modifiers, national flags, keycaps, and letters with combining marks. Each is checked for exact equality. The added cases are tested in `ExoticLanguageTests`.
 
 ## Text direction
 

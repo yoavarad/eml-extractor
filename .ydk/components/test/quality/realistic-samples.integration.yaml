@@ -2,7 +2,7 @@ $schema: ydk:schema:test
 id: ydk:test:quality/realistic-samples.integration
 description: >-
   Correctness B over the committed realistic samples (ydk:req:quality/realistic-attachment-samples , ADR-018).
-  Target; not implemented (Stage 02). Data-driven from corpus/realistic/manifest.json; runs in CI.
+  Implemented. Data-driven from corpus/realistic/manifest.json; runs in CI.
 level: integration
 target: ydk:contract:api/eml-extractor
 cases:

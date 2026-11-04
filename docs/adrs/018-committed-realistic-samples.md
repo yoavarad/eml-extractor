@@ -1,15 +1,15 @@
 # ADR-018: Committed realistic samples for correctness B; absent samples skip visibly
 
 ## Status
-Accepted (per project owner, 2026-10-17). Implementation pending, tracked as Stage 02 work. Amends ADR-007 (attachment quality bar) and the "pass vacuously" project rule.
+Accepted (per project owner, 2026-10-17). Implemented: `corpus/realistic/` and its manifest are committed and run by `RealisticSamplesTests` and `RealisticSampleExtractionTests`. Amends ADR-007 (attachment quality bar) and the "pass vacuously" project rule.
 
 ## Context
-Correctness B in the brief: Office files, other emails, attached images, and copy-paste inline images. In CI today:
+Correctness B in the brief: Office files, other emails, attached images, and copy-paste inline images. Before this decision, in CI:
 - unit and golden tests use tiny typed stubs (right leading bytes, no real content);
-- real Office, `.msg`, and TNEF samples sit only in the gitignored `corpus/internal/`;
-- `InternalCorpusTests` return early when a sample is missing, so they report Passed in CI without running anything.
+- real Office, `.msg`, and TNEF samples sat only in the gitignored `corpus/internal/`;
+- `InternalCorpusTests` returned early when a sample is missing, so they reported Passed in CI without running anything.
 
-A green CI run therefore says nothing about real attachments.
+A green CI run said nothing about real attachments.
 
 ## Decision
 Per project owner, 2026-10-17:

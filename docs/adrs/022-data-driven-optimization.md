@@ -1,7 +1,7 @@
 # ADR-022: Data-driven optimization process
 
 ## Status
-Accepted (per project owner, 2026-10-18). Target; not implemented (Stage 02). Performance targets live in the NFR component manifests; provisional targets were set by the triage (#74, `docs/perf/triage-2026-10-18.md`) from the first profile report (ADR-020) and are mirrored in the "Targets (provisional)" section below.
+Accepted (per project owner, 2026-10-18). Implemented: the optimization batch (#129 to #133) and the closing re-profile (#75, `docs/perf/profile-2026-10-23.md`) are done; the results table below marks each target met or not met. Targets stay provisional (synthetic set only). Performance targets live in the NFR component manifests; provisional targets were set by the triage (#74, `docs/perf/triage-2026-10-18.md`) from the first profile report (ADR-020) and are mirrored in the "Targets (provisional)" section below.
 
 ## Context
 ADR-015 gives a measured baseline and ADR-020 a hotspot report. The owner decided (2026-10-18) that optimization follows from those data, not from intuition. Optimizations in a parser library carry real risk: a faster path that changes a decoded byte breaks the golden set, and a wider public surface (for example span-returning attachment data) is a contract change.
