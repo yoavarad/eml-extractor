@@ -46,7 +46,7 @@ public sealed class TelemetryTests
     private static readonly Dictionary<string, HashSet<string>> AllowedSpanTags = new()
     {
         ["eml_extraction.outcome"] = AllowedTags["eml_extraction.outcome"],
-        ["error.type"] = [typeof(InvalidCastException).FullName!, typeof(EmlExtractionException).FullName!]
+        ["error.type"] = [typeof(InvalidCastException).FullName!]
     };
 
     private static readonly string[] StageSpans =
@@ -209,8 +209,8 @@ public sealed class TelemetryTests
         };
         try
         {
-            var ex = Assert.Throws<EmlExtractionException>(() => _extractor.Extract(bytes));
-            Assert.Equal("attachments", ex.Stage);
+            var result = _extractor.Extract(bytes);
+            Assert.Equal("internal_error: attachments: InvalidCastException", Assert.Single(result.Warnings));
         }
         finally
         {
@@ -234,16 +234,16 @@ public sealed class TelemetryTests
         foreach (var name in StageSpans[..3])
             Assert.Equal(ActivityStatusCode.Unset, Assert.Single(spans.Named(name)).Status);
 
+        // ADR-026: the call returned a result, so the extract activity is not set to Error.
         var extract = Assert.Single(spans.Named("eml_extraction.extract"));
-        Assert.Equal(ActivityStatusCode.Error, extract.Status);
-        Assert.Null(extract.StatusDescription);
-        Assert.Equal(typeof(EmlExtractionException).FullName, extract.GetTagItem("error.type"));
+        Assert.Equal(ActivityStatusCode.Unset, extract.Status);
+        Assert.Null(extract.GetTagItem("error.type"));
         Assert.Equal("internal_error", extract.GetTagItem("eml_extraction.outcome"));
         Assert.Equal((long)bytes.Length, extract.GetTagItem("eml_extraction.input.size"));
     }
 
     [Fact]
-    public void ParseStageInternalErrorCountedAndThrown()
+    public void ParseStageInternalErrorCountedAndReturned()
     {
         using var rec = new Recorder();
         EmlExtractor.StageFault = s =>
@@ -253,9 +253,8 @@ public sealed class TelemetryTests
         };
         try
         {
-            var ex = Assert.Throws<EmlExtractionException>(() =>
-                _extractor.Extract(new EmlExtractionRequest { FileBytes = SampleFactory.ToBytes(SampleFactory.Plain("s", "t")) }));
-            Assert.Equal("parse", ex.Stage);
+            var result = _extractor.Extract(new EmlExtractionRequest { FileBytes = SampleFactory.ToBytes(SampleFactory.Plain("s", "t")) });
+            Assert.Equal("internal_error: parse: InvalidCastException", Assert.Single(result.Warnings));
         }
         finally
         {
@@ -351,8 +350,8 @@ public sealed class TelemetryTests
         };
         try
         {
-            Assert.Throws<EmlExtractionException>(() =>
-                _extractor.Extract(new EmlExtractionRequest { FileBytes = bytes, FileName = $"{marker}.eml" }));
+            var faulted = _extractor.Extract(new EmlExtractionRequest { FileBytes = bytes, FileName = $"{marker}.eml" });
+            Assert.DoesNotContain(faulted.Warnings, w => w.Contains(marker, StringComparison.Ordinal));
         }
         finally
         {

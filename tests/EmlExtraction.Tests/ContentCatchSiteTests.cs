@@ -1,4 +1,3 @@
-using EmlExtraction.Exceptions;
 using EmlExtraction.Logics;
 using MimeKit;
 using MimeKit.Tnef;
@@ -6,8 +5,9 @@ using MimeKit.Tnef;
 namespace EmlExtraction.Tests;
 
 /// <summary>
-/// ADR-023 per-part catch sites: a content exception (one of the seven content types) stays its warning with a partial
-/// result; any other exception is wrapped as <see cref="EmlExtractionException"/> by the enclosing stage.
+/// Per-part catch sites: a content exception (one of the seven content types) stays its warning with a partial result
+/// (ADR-023); any other exception (library bug) records <c>internal_error: &lt;stage&gt;: &lt;Type&gt;</c> and skips only that
+/// part, so the other parts are still returned (ADR-026).
 /// </summary>
 public sealed class ContentCatchSiteTests
 {
@@ -24,10 +24,16 @@ public sealed class ContentCatchSiteTests
     }
 
     [Fact]
-    public void PartDecodeBugIsWrapped()
+    public void PartDecodeBugSkipsOnlyThatPart()
     {
-        var boom = new InvalidCastException("boom");
-        AssertWrapped("attachments", boom, WithAttachment(Throwing(boom)));
+        var message = WithAttachment(Throwing(new InvalidCastException("SECRET")));
+        AddGoodPart(message);
+
+        var result = _extractor.Extract(message);
+
+        Assert.Equal("internal_error: attachments: InvalidCastException", Assert.Single(result.Warnings));
+        Assert.Equal("hi", result.MainContent);
+        Assert.Equal("good.bin", Assert.Single(result.Attachments).FileName);
     }
 
     [Fact]
@@ -40,10 +46,16 @@ public sealed class ContentCatchSiteTests
     }
 
     [Fact]
-    public void BodyDecodeBugIsWrapped()
+    public void BodyDecodeBugGivesNullContent()
     {
-        var boom = new InvalidCastException("boom");
-        AssertWrapped("body", boom, WithBody(Throwing(boom)));
+        var result = _extractor.Extract(WithBody(Throwing(new InvalidCastException("SECRET"))));
+
+        Assert.Equal("internal_error: body: InvalidCastException", Assert.Single(result.Warnings));
+        Assert.Null(result.MainContent);
+        Assert.Null(result.MainContentMimeType);
+        Assert.Equal("ltr", result.ContentDirection);
+        Assert.Equal("s", result.Metadata["subject"]);
+        Assert.Empty(result.Attachments);
     }
 
     [Fact]
@@ -57,10 +69,16 @@ public sealed class ContentCatchSiteTests
     }
 
     [Fact]
-    public void Rfc822BugIsWrapped()
+    public void Rfc822BugSkipsOnlyThatPart()
     {
-        var boom = new InvalidCastException("boom");
-        AssertWrapped("attachments", boom, WithNested(Throwing(boom)));
+        var message = WithNested(Throwing(new InvalidCastException("SECRET")));
+        AddGoodPart(message);
+
+        var result = _extractor.Extract(message);
+
+        Assert.Equal("internal_error: attachments: InvalidCastException", Assert.Single(result.Warnings));
+        Assert.Equal("hi", result.MainContent);
+        Assert.Equal("good.bin", Assert.Single(result.Attachments).FileName);
     }
 
     [Fact]
@@ -75,18 +93,34 @@ public sealed class ContentCatchSiteTests
     }
 
     [Fact]
-    public void TnefBugIsWrapped()
+    public void TnefBugKeepsRawPartFallback()
     {
-        var boom = new InvalidCastException("boom");
-        AssertWrapped("attachments", boom, WithTnef(Throwing(boom)));
+        // The TNEF bug is recorded, then the raw winmail.dat fallback is tried; its decode hits the same bug.
+        var message = WithTnef(Throwing(new InvalidCastException("SECRET")));
+        AddGoodPart(message);
+
+        var result = _extractor.Extract(message);
+
+        Assert.Equal(
+            ["internal_error: attachments: InvalidCastException", "internal_error: attachments: InvalidCastException"],
+            result.Warnings);
+        Assert.Equal("hi", result.MainContent);
+        Assert.Equal("good.bin", Assert.Single(result.Attachments).FileName);
     }
 
-    private void AssertWrapped(string stage, Exception inner, MimeMessage message)
+    [Fact]
+    public void TnefBugFallsBackToRawPart()
     {
-        var ex = Assert.Throws<EmlExtractionException>(() => _extractor.Extract(message));
-        Assert.Equal(stage, ex.Stage);
-        Assert.Same(inner, ex.InnerException);
+        // The bug hits only the first read (TNEF extraction); the raw winmail.dat fallback then decodes.
+        var result = _extractor.Extract(WithTnef(new MimeContent(new ThrowOnceStream(new InvalidCastException("SECRET")))));
+
+        Assert.Equal("internal_error: attachments: InvalidCastException", Assert.Single(result.Warnings));
+        Assert.Equal("winmail.dat", Assert.Single(result.Attachments).FileName);
     }
+
+    private static void AddGoodPart(MimeMessage message)
+        => Assert.IsType<Multipart>(message.Body).Add(
+            new MimePart("application", "octet-stream") { FileName = "good.bin", Content = new MimeContent(new MemoryStream([1, 2, 3])) });
 
     private static MimeContent Throwing(Exception ex) => new(new ThrowingStream(ex));
 
@@ -130,6 +164,27 @@ public sealed class ContentCatchSiteTests
             new TnefPart { FileName = "winmail.dat", Content = content }
         };
         return message;
+    }
+
+    private sealed class ThrowOnceStream(Exception ex) : MemoryStream([1, 2, 3])
+    {
+        private bool _thrown;
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            if (_thrown)
+                return base.Read(buffer, offset, count);
+            _thrown = true;
+            throw ex;
+        }
+
+        public override int Read(Span<byte> buffer)
+        {
+            if (_thrown)
+                return base.Read(buffer);
+            _thrown = true;
+            throw ex;
+        }
     }
 
     private sealed class ThrowingStream(Exception ex) : Stream
