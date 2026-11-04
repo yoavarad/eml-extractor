@@ -43,7 +43,9 @@ fields:
     description: >-
       Non-fatal content diagnostics recorded during extraction (ydk:req:extraction/no-throw-on-malformed).
       (ADR-023): content problems only; misuse, oversized input and library bugs throw instead, so internal_error never
-      appears here.
+      appears here. Target, not yet implemented (ADR-026): library bugs inside Extract appear here as
+      ydk:warning:extraction/internal-error and one unreadable metadata key as
+      ydk:warning:extraction/metadata-field-failed .
   SubjectDirection:
     type: enum
     values: [ltr, rtl]

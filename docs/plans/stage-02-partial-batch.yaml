@@ -1,0 +1,250 @@
+# Stage 02 partial batch: return a partial result instead of failing the whole extraction (ADR-026).
+# Owner decision 2026-11-04: "When failing to parse a field the extraction should always aim to extract as many
+# fields/text/attachments as possible and never fail the whole extraction process. A partial result is much more
+# valuable than no result." A library bug inside Extract returns a partial result with an internal_error warning
+# instead of throwing EmlExtractionException (supersedes ADR-023 in part); metadata is recovered per field.
+# Misuse, input over maxInputBytes, host listener exceptions and OutOfMemoryException still throw. Detection keeps
+# throwing EmlExtractionException (stage detect). A whole-message parse failure stays an empty parse_failed result.
+# Validate:  PYTHONUTF8=1 ydk task create-batch --from docs/plans/stage-02-partial-batch.yaml --dry-run
+#
+# The ADR-023 epic (E-error-model, docs/plans/stage-02-throw-batch.yaml) is done, so this batch opens a new epic.
+# No open issue blocks this batch (gh issue list --state open was empty on 2026-11-04), so depends_on lists only
+# tasks in this file. No "related" links are used: `ydk task start` treats every dependency as blocking.
+#
+# Design details in ADR-026 are "proposed, for owner review" in the PR that adds this file. Do not run create-batch
+# until the owner has approved them.
+#
+# Planning conventions (those at the top of stage-02-batch.yaml all apply):
+# - TDD: failing test first, then code. Every code task ends with dotnet build -warnaserror, dotnet format
+#   --verify-no-changes, dotnet test on net8.0 and net10.0, GoldenKit score 1212/1212 (docs/golden-score.txt) with
+#   extraction never throwing and, once T-partial-gates has landed, no internal_error warning on any golden input.
+# - Warning details carry the exception type name only, never the exception message or any message content
+#   (MimeKit messages can quote input). Tests assert on warning code prefixes and the <stage>[.<key>] part, never on
+#   free text after it.
+# - Keep the internal StageFault test seam (EmlExtractor.StageFault); extend it with field names (metadata.<key>) and
+#   per-part points where a test needs to inject a bug.
+# - Attachments isolation is per part (the three PartCollector catch sites already exist), with the attachments stage
+#   guard as the backstop.
+
+epics:
+  - id: E-partial-results
+    title: "Partial results over failure: extract as much as possible, never fail the whole call (ADR-026)"
+    description: >-
+      Replace the ADR-023 throw for library bugs inside Extract with a partial result. Each metadata key and
+      participant list is guarded separately: a content failure gives metadata_field_failed and loses only that key;
+      a bug in a stage, field or attachment part gives internal_error and that piece's empty default, while stages
+      that succeeded keep their output. Parse failure stays an empty parse_failed result; a bug in parse gives the
+      same empty result with internal_error. Misuse, oversized input, host listener exceptions and
+      OutOfMemoryException still throw. Tests, GoldenKit and the harvest fail on any internal_error warning.
+    spec_refs:
+      - extraction.md
+      - cross-cutting.md
+      - testing.md
+      - docs/adrs/026-partial-results-over-failure.md
+
+stories:
+  - id: S-partial
+    title: "Caller always gets every field, text and attachment that could be read, with a warning for each piece that could not"
+    epic: E-partial-results
+    spec_refs:
+      - extraction.md
+      - cross-cutting.md
+      - testing.md
+      - docs/adrs/026-partial-results-over-failure.md
+    component_refs:
+      - ydk:req:extraction/no-throw-on-malformed
+      - ydk:warning:extraction/internal-error
+      - ydk:warning:extraction/metadata-field-failed
+      - ydk:contract:api/eml-extractor
+      - ydk:entity:extraction/EmlExtractionException
+      - ydk:crosscut:core/warning-format
+      - ydk:req:observability/runtime-telemetry
+      - ydk:nfr:reliability/real-world-harvest-no-throw
+    acceptance:
+      - "A content exception in one metadata key records metadata_field_failed: <key>: <Type>; every other key, the body and the attachments are returned"
+      - "An injected non-content exception in parse, metadata, one metadata key, body, attachments or one part returns a result with internal_error: <stage>[.<key>]: <Type>; Extract does not throw EmlExtractionException"
+      - "Misuse, maxInputBytes <= 0, oversized input, host listener exceptions and OutOfMemoryException still throw; detection still throws EmlExtractionException (stage detect)"
+      - "Tests, GoldenKit and the harvest probe fail on any internal_error warning; GoldenKit 1212/1212"
+
+tasks:
+  - id: T-partial-gates
+    title: "Tests, GoldenKit score and harvest probe fail on any internal_error warning"
+    story: S-partial
+    component_refs:
+      - ydk:warning:extraction/internal-error
+      - ydk:nfr:reliability/real-world-harvest-no-throw
+      - ydk:req:extraction/no-throw-on-malformed
+    spec_refs:
+      - testing.md
+      - docs/adrs/026-partial-results-over-failure.md
+    description: >-
+      Size S (complexity ~2). Lands first so the gate is in place before any bug is turned into a warning. GoldenKit
+      score: the per-case "extraction does not throw" check also fails a case whose result has a warning starting
+      with internal_error (the run exits non-zero). GoldenKit probe: count internal_error warnings separately and
+      report them as failures next to throws. Tests: the realistic-sample, internal-corpus and seed-golden layers
+      assert no internal_error warning on every extracted input (one shared helper). Extend the existing GoldenKit
+      fault seam (tools/GoldenKit/Program.cs) so a test proves score and probe exit non-zero on an internal_error
+      warning. No library behaviour changes: today no code path records internal_error, so everything stays green.
+    acceptance:
+      - "GoldenKit score fails a case and exits non-zero when its result carries an internal_error warning (proved through the fault seam)"
+      - "GoldenKit probe reports an internal_error count and exits non-zero when it is above 0"
+      - "Seed-golden, realistic-sample and internal-corpus tests fail on an internal_error warning"
+      - "Build, format and tests pass on net8.0 and net10.0; GoldenKit 1212/1212"
+    test_strategy: >-
+      TDD: a GoldenKit test that injects an internal_error warning through the fault seam and expects a non-zero exit
+      (red), implement, green. Run score and probe (pass --corpus to the main checkout's corpus/internal).
+    depends_on: []
+
+  - id: T-partial-stages
+    title: "Stage and per-part bugs return a partial result with internal_error instead of throwing EmlExtractionException"
+    story: S-partial
+    component_refs:
+      - ydk:warning:extraction/internal-error
+      - ydk:contract:api/eml-extractor
+      - ydk:entity:extraction/EmlExtractionException
+      - ydk:req:extraction/no-throw-on-malformed
+      - ydk:warning:extraction/parse-failed
+    spec_refs:
+      - extraction.md
+      - cross-cutting.md
+      - docs/adrs/026-partial-results-over-failure.md
+    description: >-
+      Size M (complexity ~5). In EmlExtractor, each stage guard (parse, metadata, body, attachments) stops wrapping
+      and instead catches every exception except OutOfMemoryException and EmlInputTooLargeException, records
+      "internal_error: <stage>: <ExceptionType.Name>" and uses the ADR-026 stage default: parse -> the Empty result
+      (fixed keys "", empty participants) without parse_failed; metadata -> HeaderMapper.EmptyMetadata() and
+      EmptyParticipants(); body -> null content and type, directions ltr, no body part; attachments -> no
+      attachments. Later stages still run. The parse stage keeps mapping the seven content types to parse_failed.
+      In PartCollector (part_decode_failed, rfc822_extract_failed, tnef_extract_failed) and BodyExtractor
+      (body_decode_failed), add a second catch per site for a non-content exception: record "internal_error:
+      attachments: <Type>" (or body) and skip only that part; TNEF keeps its raw-part fallback. Stage activities still
+      start and stop outside the guard, so host listener exceptions propagate. Telemetry stays correct with the
+      current recorder: RecordInternalError(stage, ex) per internal_error warning instead of per throw (outcome and
+      activity semantics are settled in T-partial-telemetry). EmlDetector is unchanged (still wraps with stage
+      detect). Remove Wrap's use from Extract and the <exception cref="EmlExtractionException"> tags on Extract.
+      Rewrite StageGuardTests and ContentCatchSiteTests to expect the result and the warning, not the throw.
+    acceptance:
+      - "An injected non-content exception in each of parse, metadata, body, attachments returns a result with internal_error: <stage>: <Type>; Extract does not throw"
+      - "Stages that ran before or after the failed stage keep their output (e.g. a body bug keeps metadata and attachments)"
+      - "A non-content exception at one part catch site skips only that part with internal_error: attachments; the other parts are returned"
+      - "Content exceptions at every catch site still give their own warning; parse_failed still gives the empty result"
+      - "OutOfMemoryException, EmlInputTooLargeException, misuse and host listener exceptions still propagate; EmlDetector still throws EmlExtractionException (stage detect)"
+      - "Warning details contain no exception message text; GoldenKit 1212/1212 with no internal_error"
+    test_strategy: >-
+      TDD: rewrite StageGuardTests (every stage, bytes, stream and internal MimeMessage paths) and the per-part cases
+      in ContentCatchSiteTests to expect a result with the warning (red), implement, green on net8.0 and net10.0. One
+      test per propagating case (OOM, too large, listener). Run GoldenKit score and probe.
+    depends_on:
+      - "T-partial-gates:blocks"
+
+  - id: T-partial-metadata-fields
+    title: "Per-field metadata guards: metadata_field_failed for content, internal_error: metadata.<key> for bugs"
+    story: S-partial
+    component_refs:
+      - ydk:warning:extraction/metadata-field-failed
+      - ydk:warning:extraction/internal-error
+      - ydk:entity:extraction/Metadata
+      - ydk:req:metadata/canonical-keys
+      - ydk:req:extraction/no-throw-on-malformed
+    spec_refs:
+      - extraction.md
+      - docs/adrs/026-partial-results-over-failure.md
+      - docs/adrs/016-canonical-metadata-keys.md
+      - docs/adrs/025-structured-participants.md
+    description: >-
+      Size M (complexity ~5). This closes the motivating gap: today one bad header throws from the metadata stage and
+      loses the whole message. In HeaderMapper.Map, guard each key separately: each raw header Append (and the
+      single-part Content-* headers), from, to, cc, bcc (string and participant list together), reply-to, rcptto,
+      mailfrom, sender, subject, date, message-id, in-reply-to, references, xfields. Pass the warnings list in. A
+      content exception (EmlExtractor.IsContentFailure) records "metadata_field_failed: <key>: <Type>"; any other
+      exception except OutOfMemoryException records "internal_error: metadata.<key>: <Type>". The key is omitted;
+      from, to, cc, bcc, xfields stay "" and a failed participant list stays empty. The metadata stage guard from
+      T-partial-stages stays as the backstop for a bug outside any field (detail "metadata"). Keep one pass over the
+      headers; no extra allocation on the clean path beyond the guards (check the existing metadata benchmark).
+      Extend StageFault with field points (metadata.<key>) so tests can inject a throw per key.
+    acceptance:
+      - "For each guarded key, an injected content exception gives metadata_field_failed: <key>: <Type>, that key is omitted or left at its fixed default, and every other key, the body and the attachments are returned"
+      - "For each guarded key, an injected non-content exception gives internal_error: metadata.<key>: <Type> with the same partial result"
+      - "A message whose date header makes the mapper throw still returns subject, addresses, body and attachments (a committed fixture or a built message, no mocks)"
+      - "Clean messages give exactly today's metadata; GoldenKit 1212/1212 with no internal_error; metadata benchmark shows no regression beyond noise"
+    test_strategy: >-
+      TDD: a theory over every guarded key, injecting content and non-content exceptions through the field seam (red),
+      implement, green on net8.0 and net10.0. One real-bytes test for a header that fails without injection, if one
+      can be found; otherwise note that in the PR. Run GoldenKit score and the metadata benchmark before and after.
+    depends_on:
+      - "T-partial-stages:blocks"
+
+  - id: T-partial-telemetry
+    title: "Telemetry for partial results: internal_error outcome, internal_errors per warning, new warning codes"
+    story: S-partial
+    component_refs:
+      - ydk:req:observability/runtime-telemetry
+      - ydk:crosscut:core/observability
+      - ydk:warning:extraction/internal-error
+      - ydk:warning:extraction/metadata-field-failed
+    spec_refs:
+      - cross-cutting.md
+      - docs/adrs/021-runtime-metrics-and-tracing.md
+      - docs/adrs/026-partial-results-over-failure.md
+    description: >-
+      Size S (complexity ~3). No instrument is renamed. Outcome internal_error means a result was returned with at
+      least one internal_error warning, and wins over warnings and parse_failed. eml_extraction.extract.internal_errors
+      gets +1 per internal_error warning, tagged eml_extraction.stage (the stage part only: parse, metadata, body,
+      attachments; never a metadata key) and error.type (the exception type full name). eml_extraction.warning.code
+      gains internal_error and metadata_field_failed (the code before the first colon, as today). The failed stage
+      activity gets status Error and error.type; the parent eml_extraction.extract activity is not set to Error. The
+      attachments histogram records on every call that parsed, including ones with internal_error. Update
+      TelemetryTests (InternalErrorCountedByStage and the activity status case) and the PII probe so no metadata key
+      or header name leaks into a tag.
+    acceptance:
+      - "An injected bug in each stage and in one metadata key gives internal_errors +1 with the right stage tag, outcome internal_error, and warnings +1 tagged internal_error"
+      - "A metadata_field_failed warning is counted under warning.code metadata_field_failed and leaves outcome warnings"
+      - "The failed stage activity has status Error and error.type; the extract activity has no Error status"
+      - "No tag value contains a header name, key, or exception message; tests pass on net8.0 and net10.0"
+    test_strategy: >-
+      TDD with the real MeterListener and ActivityListener (no mocks): change the expected values (red), implement,
+      green on net8.0 and net10.0.
+    depends_on:
+      - "T-partial-stages:blocks"
+      - "T-partial-metadata-fields:blocks"
+
+  - id: T-partial-docs
+    title: "README, XML docs and spec sync for ADR-026; drop the 'not yet implemented' notes"
+    story: S-partial
+    component_refs:
+      - ydk:contract:api/eml-extractor
+      - ydk:entity:extraction/EmlExtractionException
+      - ydk:crosscut:core/warning-format
+      - ydk:req:extraction/no-throw-on-malformed
+      - ydk:nfr:reliability/real-world-harvest-no-throw
+    spec_refs:
+      - overview.md
+      - scope.md
+      - glossary.md
+      - quality.md
+      - extraction.md
+      - cross-cutting.md
+      - testing.md
+      - docs/adrs/026-partial-results-over-failure.md
+    description: >-
+      Size S (complexity ~2). README Errors section: EmlExtractionException is thrown only by detection; a bug inside
+      Extract is an internal_error warning on a partial result; add internal_error and metadata_field_failed to the
+      warnings list; update the per-item catch example, the migration table row for "a stage fault", and the
+      telemetry section (outcome internal_error, internal_errors counter). XML docs: Extract overloads drop
+      EmlExtractionException; IEmlExtractor docs say a result is always returned except for misuse, oversized input
+      and OutOfMemoryException. In docs/specs (overview, scope, glossary, quality, extraction, cross-cutting,
+      testing), docs/project-rules.md, docs/team-questions.md Q1 and the manifests, drop the "Target, not yet
+      implemented (ADR-026)" notes that the code tasks made true and remove the superseded ADR-023 sentences; set the
+      ADR-026 status to implemented. Run the harvest probe and record its result.
+    acceptance:
+      - "README and XML docs match ADR-026: only detection throws EmlExtractionException; both new warning codes are documented"
+      - "No spec, rule or manifest still says Extract throws EmlExtractionException for a library bug or that ADR-026 is not implemented; ydk component validate passes"
+      - "Harvest probe over corpus/internal reports 0 throws and 0 internal_error warnings, recorded in README and the NFR manifest"
+    test_strategy: >-
+      Docs only: grep docs/, README.md and .ydk/components/ for EmlExtractionException, "not yet implemented
+      (ADR-026" and "throws ... library bug"; only ADR history and detection remain. ydk component validate; dotnet
+      build -warnaserror (XML doc warnings).
+    depends_on:
+      - "T-partial-stages:blocks"
+      - "T-partial-metadata-fields:blocks"
+      - "T-partial-telemetry:blocks"

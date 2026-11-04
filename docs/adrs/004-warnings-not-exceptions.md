@@ -1,7 +1,7 @@
 # ADR-004: Record warnings instead of throwing on malformed MIME
 
 ## Status
-Accepted (recorded retroactively, Stage 01 Rewrite). Throw contract decided by the project owner on 2026-10-17. Contract implemented. Superseded in part by ADR-023 (2026-10-18): misuse, oversized input and library bugs now throw; `internal_error` is removed; only content failures stay warnings.
+Accepted (recorded retroactively, Stage 01 Rewrite). Throw contract decided by the project owner on 2026-10-17. Contract implemented. Superseded in part by ADR-023 (2026-10-18): misuse, oversized input and library bugs now throw; `internal_error` is removed; only content failures stay warnings. ADR-026 (proposed, owner decision 2026-11-04; not yet implemented) restores the `internal_error` warning and the per-stage partial-result defaults for library bugs, and adds per-field metadata recovery.
 
 ## Context
 `docs/requirements.md` lists "Parse does not crash the process" under "Out of original spec (implemented anyway)". The public-mail harvest of 12,853 messages is the evidence offered for 0 throws.

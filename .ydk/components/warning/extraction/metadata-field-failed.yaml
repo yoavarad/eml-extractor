@@ -1,0 +1,27 @@
+$schema: ydk:schema:warning
+id: ydk:warning:extraction/metadata-field-failed
+description: >-
+  Target, not yet implemented (ADR-026, owner decision 2026-11-04; details proposed, for owner review). Recorded when
+  one of the seven content exception types (FormatException, MimeKit ParseException, IOException,
+  InvalidOperationException, ArgumentException, NotSupportedException, DecoderFallbackException) is raised while
+  mapping one metadata key or participant list. Each key (header keys, from, to, cc, bcc, reply-to, sender, rcptto,
+  mailfrom, subject, date, message-id, in-reply-to, references, xfields) is guarded separately. A content warning, not
+  a bug: it does not fail tests or GoldenKit by itself. Today (ADR-023) the metadata stage has no content catch, so
+  such an exception throws ydk:entity:extraction/EmlExtractionException with stage metadata and the whole result is
+  lost.
+code: metadata_field_failed
+message_template: "metadata_field_failed: ${Key}: ${ExceptionTypeName}"
+triggers:
+  - A content exception while reading, decoding or formatting one header value into its metadata key
+  - A content exception while building one participant list (from, to, cc, bcc, reply-to, sender, rcptto, mailfrom)
+result_effect: >-
+  That key is omitted from Metadata. A fixed key keeps its default: from, to, cc, bcc and xfields stay "" (ADR-016),
+  and a failed participant list stays empty (ADR-025). Every other key, the body and the attachments are extracted
+  normally. The detail carries the metadata key and the exception type name only, never the exception message or
+  the header value. One warning per failed key.
+related:
+  - ydk:contract:api/eml-extractor
+  - ydk:entity:extraction/Metadata
+  - ydk:entity:extraction/EmlExtractionResult
+  - ydk:crosscut:core/warning-format
+  - ydk:req:extraction/no-throw-on-malformed

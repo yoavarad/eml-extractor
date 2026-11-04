@@ -28,6 +28,12 @@ rule: >-
   and, when the parent is sampled, child activities eml_extraction.parse, eml_extraction.metadata, eml_extraction.body,
   eml_extraction.attachments. A stage that throws EmlExtractionException sets its activity status to Error with error.type (ADR-023). Exceptions
   thrown by the host's listener callbacks propagate and are not recorded.
+  Target, not yet implemented (ADR-026, owner decision 2026-11-04; details proposed, for owner review): no instrument
+  is renamed. Outcome internal_error means a result was returned with an internal_error warning (it wins over
+  warnings and parse_failed); input_too_large still means the call threw. internal_errors gets +1 per internal_error
+  warning, tagged eml_extraction.stage (stage only, never a metadata key) and error.type. eml_extraction.warning.code
+  gains internal_error and metadata_field_failed. The failed stage activity gets status Error with error.type; the
+  parent eml_extraction.extract activity is not set to Error because a result is returned.
   No activity for Detect. All tag rules of ydk:crosscut:core/observability apply. Identical on net8.0 and net10.0.
 failure_behavior: >-
   Not a runtime failure. A missing or renamed instrument, an unlisted tag key, an open-ended tag value, or any message

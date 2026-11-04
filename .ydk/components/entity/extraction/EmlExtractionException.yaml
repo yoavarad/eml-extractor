@@ -7,6 +7,10 @@ description: >-
   per-stage partial-result defaults of ADR-004. Not used for misuse (ArgumentException family), for
   ydk:entity:extraction/EmlInputTooLargeException , for OutOfMemoryException, or for exceptions thrown by host
   callbacks (MeterListener, ActivityListener); those propagate unwrapped.
+  Target, not yet implemented (ADR-026, owner decision 2026-11-04; details proposed, for owner review): Extract no
+  longer throws this type; a bug inside extraction becomes ydk:warning:extraction/internal-error on a partial result.
+  Only EmlDetector.Detect / IsEml throw it (stage detect), unchanged. The type, its Stage values and its message
+  format stay as they are, so no public API is removed.
 fields:
   Stage:
     type: enum

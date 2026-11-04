@@ -4,7 +4,10 @@ description: >-
   The whole-message parse, or the mapping that follows it, threw one of the caught exception types:
   FormatException, MimeKit ParseException, IOException, InvalidOperationException, ArgumentException,
   NotSupportedException, DecoderFallbackException. Any other exception type is a library bug and is thrown as
-  ydk:entity:extraction/EmlExtractionException with stage parse (ADR-023).
+  ydk:entity:extraction/EmlExtractionException with stage parse (ADR-023). Target, not yet implemented (ADR-026):
+  such a bug returns the same empty result with ydk:warning:extraction/internal-error (detail parse) instead, and a
+  content exception after parsing never gives parse_failed (one metadata key gives
+  ydk:warning:extraction/metadata-field-failed ).
 code: parse_failed
 message_template: "parse_failed: ${ExceptionTypeName}: ${ExceptionMessage}"
 triggers:

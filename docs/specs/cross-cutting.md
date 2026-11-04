@@ -18,6 +18,11 @@ There is one diagnostic channel: the ordered warnings list on [ydk:entity:extrac
 - [ydk:warning:extraction/rfc822-extract-failed] - one nested message could not be serialised and is skipped.
 - [ydk:warning:extraction/tnef-extract-failed] - an Outlook wrapper could not be unpacked and is kept whole.
 
+Two more kinds are proposed by ADR-026 (owner decision 2026-11-04; not yet implemented):
+
+- [ydk:warning:extraction/metadata-field-failed] - one metadata key could not be read and is left out, or left empty for a fixed key.
+- [ydk:warning:extraction/internal-error] - a library bug in one stage, key, or part; that piece gets its empty default and the rest is still returned. Tests and the golden scorer fail on it.
+
 A caller tells warnings apart by their leading code, never by the free text after it. The policy that turns content failures into warnings is [ydk:req:extraction/no-throw-on-malformed] (ADR-004, narrowed by ADR-023).
 
 ## Exceptions
@@ -26,7 +31,7 @@ Per the project owner (2026-10-18, ADR-023), warnings are only for mail content 
 
 - Programmer misuse: a missing argument or an invalid one, and invalid options such as a size limit of zero or less.
 - An input over the size limit: [ydk:entity:extraction/EmlInputTooLargeException], which carries the actual size and the limit.
-- A library bug: [ydk:entity:extraction/EmlExtractionException], which names the stage that failed and keeps the original failure attached.
+- A library bug: [ydk:entity:extraction/EmlExtractionException], which names the stage that failed and keeps the original failure attached. Target (ADR-026, proposed, not yet implemented): only detection throws this; a bug inside extraction becomes an internal error warning on a partial result.
 - A failure inside the host's own telemetry listener passes through unchanged.
 
 ## Observability
@@ -45,7 +50,7 @@ The message date is the only timestamp. It is re-emitted in ISO 8601 round-trip 
 
 Adversarial review of the fixed design. Each answer describes current behaviour, not a proposal.
 
-- **Malformed or hostile MIME.** The handled content failure kinds become [ydk:warning:extraction/parse-failed]. Per-part failures skip only that part. Any other failure is a library bug and throws [ydk:entity:extraction/EmlExtractionException] (ADR-023).
+- **Malformed or hostile MIME.** The handled content failure kinds become [ydk:warning:extraction/parse-failed]. Per-part failures skip only that part. Any other failure is a library bug and throws [ydk:entity:extraction/EmlExtractionException] (ADR-023). Target (ADR-026, not yet implemented): it becomes [ydk:warning:extraction/internal-error] on a partial result instead.
 - **Path traversal in attachment names.** The display name is reduced to its last path segment. The full path is built only from those reduced names, so it never contains a parent-directory step ([ydk:req:attachments/container-path]). The sender's raw path and declared content location are reported separately and untouched ([ydk:req:attachments/attachment-record]). Callers must not use either to write files.
 - **Disguised non-mail files.** Leading-byte checks reject OLE, PDF, PNG, JPEG, ZIP, JSON, and markup before any header sniffing ([ydk:req:detection/reject-non-email-magic]).
 - **Very large inputs.** Throughput falls roughly in proportion to decoded bytes, and memory grows with them. Inputs over the host-set limit are refused before parsing ([ydk:req:extraction/max-input-size]); the refusal is a thrown [ydk:entity:extraction/EmlInputTooLargeException], and the peak memory of a maximum-size input is measured against a fixed ceiling ([ydk:nfr:performance/memory-footprint]). No public sample of 50 MB or more has been tested ([scope.md](scope.md), DEFERRED).
