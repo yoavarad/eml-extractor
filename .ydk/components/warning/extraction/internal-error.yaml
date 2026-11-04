@@ -20,11 +20,11 @@ result_effect: >-
   Partial result. The failed piece gets its empty default and everything that succeeded keeps its output. Parse ->
   the empty parse_failed result shape (fixed metadata keys from, to, cc, bcc, xfields each "", eight empty
   participant lists, no content, no attachments, directions ltr), without a parse_failed warning. Metadata stage ->
-  only the fixed keys, each "", and empty participants. One metadata field -> that key omitted, or a fixed key left
-  "" / a participant list left empty. Body -> MainContent and MainContentMimeType null, both directions ltr.
+  only the fixed keys, each "", and empty participants. One metadata field -> the raw header value already mapped for that key is kept (owner decision 2026-11-04), only the
+  derived value is skipped; with no raw value the key stays absent, a fixed key "", a participant list empty. Body -> MainContent and MainContentMimeType null, both directions ltr.
   Attachments stage -> no attachments; one part -> that part skipped (TNEF keeps its raw-part fallback), other parts
   collected. The detail carries the exception type name only, never the exception message or any message content.
-  One warning per failed piece, in the order met. Known: on a body-stage bug the text body part also comes back as an attachment (ADR-026, owner to confirm). A metadata field bug is reported as metadata.<key>.
+  One warning per failed piece, in the order met. Known: on a body-stage bug the text body part also comes back as an attachment (ADR-026, confirmed by the project owner 2026-11-04: content is not lost, the caller still gets the bytes even though body text extraction failed). A metadata field bug is reported as metadata.<key>.
 related:
   - ydk:contract:api/eml-extractor
   - ydk:entity:extraction/EmlExtractionResult

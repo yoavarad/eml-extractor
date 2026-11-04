@@ -99,7 +99,7 @@ public sealed class HeaderMapperTests
     }
 
     // ADR-026 per-field guards, driven by the EmlExtractor.StageFault field points "metadata.<key>" and
-    // "metadata.header.<raw key>": one failing field loses only that field.
+    // "metadata.header.<raw key>": one failing field skips only its derived value and keeps the raw header value (owner decision 2026-11-04).
 
     private const string AllHeaders = """
         From: Alice <alice@example.com>
@@ -161,7 +161,7 @@ public sealed class HeaderMapperTests
         var result = WithFieldFault("metadata." + key, new FormatException("SECRET"), AllHeaders);
 
         Assert.Equal($"metadata_field_failed: {key}: FormatException", Assert.Single(result.Warnings));
-        AssertOnlyFieldLost(key, Clean(AllHeaders), result);
+        AssertOnlyDerivedValueLost(key, Clean(AllHeaders), result);
     }
 
     [Theory]
@@ -171,13 +171,13 @@ public sealed class HeaderMapperTests
         var result = WithFieldFault("metadata." + key, new InvalidCastException("SECRET"), AllHeaders);
 
         Assert.Equal($"internal_error: metadata.{key}: InvalidCastException", Assert.Single(result.Warnings));
-        AssertOnlyFieldLost(key, Clean(AllHeaders), result);
+        AssertOnlyDerivedValueLost(key, Clean(AllHeaders), result);
     }
 
     [Theory]
     [InlineData("x-custom", AllHeaders)]
     [InlineData("content-type", SinglePart)]
-    public void RawHeaderFailureLosesOnlyThatHeader(string key, string raw)
+    public void RawHeaderFailureKeepsTheRawValueAndRecordsTheWarning(string key, string raw)
     {
         var clean = Clean(raw);
         Assert.True(clean.Metadata.ContainsKey(key));
@@ -189,10 +189,41 @@ public sealed class HeaderMapperTests
         Assert.Equal($"internal_error: metadata.{key}: InvalidCastException", Assert.Single(bug.Warnings));
         foreach (var result in new[] { content, bug })
         {
-            Assert.False(result.Metadata.ContainsKey(key));
-            Assert.Equal(Sorted(clean.Metadata, key), Sorted(result.Metadata, key));
+            Assert.Equal(clean.Metadata, result.Metadata);
             Assert.Equal(clean.MainContent, result.MainContent);
         }
+    }
+
+    // Owner decision 2026-11-04: a failed key keeps the raw header value already mapped; only the derived value is skipped.
+    [Theory]
+    [InlineData(MetadataKeys.Date, "Tue, 15 Sep 2026 07:00:00 +0000")]
+    [InlineData(MetadataKeys.ReplyTo, "Erin <erin@example.com>")]
+    [InlineData(MetadataKeys.From, "Alice <alice@example.com>")]
+    [InlineData(MetadataKeys.Subject, "Hello")]
+    public void FailedKeyKeepsRawHeaderValue(string key, string raw)
+    {
+        foreach (Exception ex in new Exception[] { new FormatException("x"), new InvalidCastException("x") })
+        {
+            var result = WithFieldFault("metadata." + key, ex, AllHeaders);
+            Assert.Equal(raw, result.Metadata[key]);
+            Assert.Single(result.Warnings);
+        }
+    }
+
+    [Fact]
+    public void FailedXHeaderKeepsItsLineInXFields()
+    {
+        var result = WithFieldFault("metadata.header.x_trace", new InvalidCastException("x"), AllHeaders);
+        Assert.Equal("internal_error: metadata.x_trace: InvalidCastException", Assert.Single(result.Warnings));
+        Assert.Equal("X_Trace: abc", result.Metadata[MetadataKeys.XFields]);
+    }
+
+    [Fact]
+    public void ParticipantsAreEmptyAfterAFailedAddressKeyButRawStringIsKept()
+    {
+        var result = WithFieldFault("metadata.to", new FormatException("x"), AllHeaders);
+        Assert.Equal("Bob <bob@example.com>", result.Metadata[MetadataKeys.To]);
+        Assert.Empty(result.Participants[MetadataKeys.To]);
     }
 
     [Fact]
@@ -202,7 +233,7 @@ public sealed class HeaderMapperTests
         var result = WithFieldFault("metadata.date", new FormatException("bad date"), bytes);
 
         Assert.Equal("metadata_field_failed: date: FormatException", Assert.Single(result.Warnings));
-        Assert.False(result.Metadata.ContainsKey(MetadataKeys.Date));
+        Assert.False(string.IsNullOrEmpty(result.Metadata[MetadataKeys.Date])); // raw header value kept (owner decision 2026-11-04)
         Assert.Equal("Hello", result.Metadata[MetadataKeys.Subject]);
         Assert.Equal("alice@example.com", Assert.Single(result.Participants[MetadataKeys.From]).Address);
         Assert.Equal("bob@example.com", Assert.Single(result.Participants[MetadataKeys.To]).Address);
@@ -233,9 +264,18 @@ public sealed class HeaderMapperTests
     private static List<KeyValuePair<string, string>> Sorted(IReadOnlyDictionary<string, string> map, string except)
         => map.Where(p => p.Key != except).OrderBy(p => p.Key, StringComparer.Ordinal).ToList();
 
-    private static void AssertOnlyFieldLost(string key, EmlExtractionResult clean, EmlExtractionResult result)
+    /// <summary>
+    /// The raw header value already mapped for the key stays (a fixed key with no raw value is ""; a key with none is absent);
+    /// the participant list is empty; every other key, the body and the attachments are as in a clean run.
+    /// </summary>
+    private static void AssertOnlyDerivedValueLost(string key, EmlExtractionResult clean, EmlExtractionResult result)
     {
-        if (FixedKeys.Contains(key))
+        var raw = RawHeaders(AllHeaders);
+        if (key == MetadataKeys.XFields)
+            Assert.Equal(clean.Metadata[key], result.Metadata[key]);
+        else if (raw.TryGetValue(key, out var value))
+            Assert.Equal(value, result.Metadata[key]);
+        else if (FixedKeys.Contains(key))
             Assert.Equal("", result.Metadata[key]);
         else
             Assert.False(result.Metadata.ContainsKey(key));
@@ -248,6 +288,12 @@ public sealed class HeaderMapperTests
         Assert.Equal(clean.MainContent, result.MainContent);
         Assert.Equal(clean.Attachments.Select(a => a.FileName), result.Attachments.Select(a => a.FileName));
     }
+
+    /// <summary>Single-line top-level headers of <paramref name="raw"/> by lower-cased name (the raw value the mapper stores).</summary>
+    private static Dictionary<string, string> RawHeaders(string raw)
+        => raw.ReplaceLineEndings("\n").Split('\n').TakeWhile(l => l.Length > 0)
+            .Select(l => l.Split(": ", 2)).Where(p => p.Length == 2)
+            .ToDictionary(p => p[0].ToLowerInvariant(), p => p[1], StringComparer.Ordinal);
 
     private static byte[] Bytes(string raw) => Encoding.UTF8.GetBytes(raw.ReplaceLineEndings("\r\n"));
 

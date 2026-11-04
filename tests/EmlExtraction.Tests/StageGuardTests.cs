@@ -100,7 +100,7 @@ public sealed class StageGuardTests
         Assert.Null(result.MainContentMimeType);
         Assert.Equal("ltr", result.SubjectDirection);
         Assert.Equal("ltr", result.ContentDirection);
-        // ADR-026 stage default: no body part is known, so the text part is collected as an attachment (owner to confirm).
+        // ADR-026 stage default: no body part is known, so the text part is collected as an attachment (confirmed by project owner 2026-11-04: content is not lost, the caller still gets the bytes).
         Assert.Equal(2, result.Attachments.Count);
         Assert.Contains(result.Attachments, a => a.FileName == "data.bin");
         Assert.Contains(result.Attachments, a => a.FileName.EndsWith(".plain", StringComparison.Ordinal));

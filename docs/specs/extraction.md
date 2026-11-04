@@ -71,13 +71,13 @@ A whole-message parse failure returns an empty result with [ydk:warning:extracti
 
 Extraction always returns as much as it could read and never fails the whole call for a library bug (per the project owner, 2026-11-04, ADR-026, which supersedes the "bugs throw" part of ADR-023; ADR-023 still governs misuse and size). A partial result is much more valuable than no result.
 
-- Each metadata key and each participant list is read on its own. A content failure in one of them drops only that key, or leaves a fixed key at its empty default, and records [ydk:warning:extraction/metadata-field-failed] as `metadata_field_failed: <key>: <Type>`.
-- A library bug in a stage, in one metadata key, or in one attachment gives that stage, key, or part its empty default and records [ydk:warning:extraction/internal-error] as `internal_error: <stage>: <Type>` (`metadata.<key>` for a metadata key). The warning carries the exception type name only, never message content. Stages that worked keep their output.
+- Each metadata key and each participant list is read on its own. A content failure in one of them skips only that key's derived value and keeps the raw header value already mapped (owner decision 2026-11-04; a key with no raw value stays absent, a fixed key with none stays `""`, a participant list stays empty), and records [ydk:warning:extraction/metadata-field-failed] as `metadata_field_failed: <key>: <Type>`.
+- A library bug in a stage, in one metadata key, or in one attachment gives that stage or part its empty default (a key keeps its raw header value, as above) and records [ydk:warning:extraction/internal-error] as `internal_error: <stage>: <Type>` (`metadata.<key>` for a metadata key). The warning carries the exception type name only, never message content. Stages that worked keep their output.
 - A message the parser cannot read at all still returns the empty result with [ydk:warning:extraction/parse-failed]. A library bug in parsing returns the same empty result with an internal error warning instead.
 - Misuse, such as passing no request or an invalid size limit, throws an argument error naming the parameter and the bad value. An input over the size limit throws [ydk:entity:extraction/EmlInputTooLargeException]. A failure inside the host's own telemetry listener passes through unchanged, and so does running out of memory.
 - Detection keeps throwing [ydk:entity:extraction/EmlExtractionException] for a library bug (stage `detect`); extraction never throws it.
 - The tests, the golden scorer, and the harvest fail on any internal error warning, so bugs still surface.
-- Open point (owner to confirm): after a bug in the body stage no body part is known, so the text part that would have been the body also comes back as an attachment.
+- Known behavior, confirmed by the project owner 2026-11-04: content is not lost, the caller still gets the bytes even though body text extraction failed: after a bug in the body stage no body part is known, so the text part that would have been the body also comes back as an attachment.
 
 Both exceptions are implemented. The OLE extractor already throws typed exceptions, so the two error models now point the same way ([docs/team-questions.md](../team-questions.md)). The warning and exception rules are defined once in [cross-cutting.md](cross-cutting.md).
 

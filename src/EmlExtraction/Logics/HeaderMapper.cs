@@ -13,8 +13,9 @@ internal static class HeaderMapper
     /// <summary>
     /// Header map plus structured participants built from the same effective address lists (ADR-025).
     /// <paramref name="options"/> are the options the message was parsed with; headers MimeKit does not parse itself use them too.
-    /// Each raw header and each key is guarded on its own (ADR-026): a failure loses only that key and adds its warning to
-    /// <paramref name="warnings"/>; the fixed keys keep "" and a failed participant list stays empty.
+    /// Each raw header and each key is guarded on its own (ADR-026): a failure keeps the raw header value already mapped for that key
+    /// (owner decision 2026-11-04), skips only the derived value and adds its warning to <paramref name="warnings"/>;
+    /// a fixed key with no raw value keeps "" and a failed participant list stays empty.
     /// </summary>
     public static Dictionary<string, string> Map(MimeMessage message, ParserOptions options, List<string> warnings,
         out Dictionary<string, IReadOnlyList<EmailParticipant>> participants)
@@ -27,11 +28,11 @@ internal static class HeaderMapper
             var key = NormalizeKey(header.Field);
             try
             {
-                HeaderFault(key);
                 var value = header.Value ?? "";
                 Append(metadata, key, value);
                 if (IsXHeader(header.Field))
                     xLines.Add($"{header.Field}: {value}");
+                HeaderFault(key);
             }
             catch (Exception ex) when (EmlExtractor.IsBug(ex))
             {
@@ -47,8 +48,8 @@ internal static class HeaderMapper
                 var key = NormalizeKey(header.Field);
                 try
                 {
-                    HeaderFault(key);
                     Append(metadata, key, header.Value ?? "");
+                    HeaderFault(key);
                 }
                 catch (Exception ex) when (EmlExtractor.IsBug(ex))
                 {
@@ -172,8 +173,8 @@ internal static class HeaderMapper
 
         try
         {
-            FieldFault(MetadataKeys.XFields);
             metadata[MetadataKeys.XFields] = string.Join("\n", xLines);
+            FieldFault(MetadataKeys.XFields);
         }
         catch (Exception ex) when (EmlExtractor.IsBug(ex))
         {
@@ -205,7 +206,7 @@ internal static class HeaderMapper
             fault("metadata." + key);
     }
 
-    /// <summary>Test seam point <c>metadata.header.&lt;key&gt;</c> for one raw header append.</summary>
+    /// <summary>Test seam point <c>metadata.header.&lt;key&gt;</c> for one raw header append (hit after the raw value is stored).</summary>
     private static void HeaderFault(string key)
     {
         if (EmlExtractor.StageFault is { } fault)
@@ -224,15 +225,16 @@ internal static class HeaderMapper
             EmlExtractor.RecordBug("metadata." + key, "metadata", ex, warnings);
     }
 
-    /// <summary>Records a failed key and resets it: a fixed key keeps "", any other key is omitted, its participant list is empty.</summary>
+    /// <summary>
+    /// Records a failed key. The raw value already in <paramref name="metadata"/> stays; a fixed key with none is "", any other
+    /// key stays absent. Only the derived participant list is reset to empty.
+    /// </summary>
     private static void FieldFailed(string key, Exception ex, List<string> warnings, Dictionary<string, string> metadata,
         Dictionary<string, IReadOnlyList<EmailParticipant>> participants)
     {
         FieldFailed(key, ex, warnings);
         if (key is MetadataKeys.From or MetadataKeys.To or MetadataKeys.Cc or MetadataKeys.Bcc or MetadataKeys.XFields)
-            metadata[key] = "";
-        else
-            metadata.Remove(key);
+            metadata.TryAdd(key, "");
         if (participants.ContainsKey(key))
             participants[key] = ReadOnlyCollection<EmailParticipant>.Empty;
     }

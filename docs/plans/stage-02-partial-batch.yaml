@@ -31,7 +31,7 @@ epics:
     title: "Partial results over failure: extract as much as possible, never fail the whole call (ADR-026)"
     description: >-
       Replace the ADR-023 throw for library bugs inside Extract with a partial result. Each metadata key and
-      participant list is guarded separately: a content failure gives metadata_field_failed and loses only that key;
+      participant list is guarded separately: a content failure gives metadata_field_failed and loses only that key (superseded by owner decision 2026-11-04, see ADR-026: the raw header value is kept);
       a bug in a stage, field or attachment part gives internal_error and that piece's empty default, while stages
       that succeeded keep their output. Parse failure stays an empty parse_failed result; a bug in parse gives the
       same empty result with internal_error. Misuse, oversized input, host listener exceptions and
@@ -157,13 +157,13 @@ tasks:
       single-part Content-* headers), from, to, cc, bcc (string and participant list together), reply-to, rcptto,
       mailfrom, sender, subject, date, message-id, in-reply-to, references, xfields. Pass the warnings list in. A
       content exception (EmlExtractor.IsContentFailure) records "metadata_field_failed: <key>: <Type>"; any other
-      exception except OutOfMemoryException records "internal_error: metadata.<key>: <Type>". The key is omitted;
+      exception except OutOfMemoryException records "internal_error: metadata.<key>: <Type>". The key is omitted (superseded by owner decision 2026-11-04, see ADR-026: the raw header value is kept);
       from, to, cc, bcc, xfields stay "" and a failed participant list stays empty. The metadata stage guard from
       T-partial-stages stays as the backstop for a bug outside any field (detail "metadata"). Keep one pass over the
       headers; no extra allocation on the clean path beyond the guards (check the existing metadata benchmark).
       Extend StageFault with field points (metadata.<key>) so tests can inject a throw per key.
     acceptance:
-      - "For each guarded key, an injected content exception gives metadata_field_failed: <key>: <Type>, that key is omitted or left at its fixed default, and every other key, the body and the attachments are returned"
+      - "For each guarded key, an injected content exception gives metadata_field_failed: <key>: <Type>, that key is omitted or left at its fixed default (superseded by owner decision 2026-11-04, see ADR-026: the raw header value is kept), and every other key, the body and the attachments are returned"
       - "For each guarded key, an injected non-content exception gives internal_error: metadata.<key>: <Type> with the same partial result"
       - "A message whose date header makes the mapper throw still returns subject, addresses, body and attachments (a committed fixture or a built message, no mocks)"
       - "Clean messages give exactly today's metadata; GoldenKit 1212/1212 with no internal_error; metadata benchmark shows no regression beyond noise"
