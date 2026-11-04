@@ -489,7 +489,12 @@ public sealed class TelemetryTests
         Assert.Null(Activity.Current);
 
         var seen = new List<Activity?>();
-        EmlExtractor.StageFault = _ => seen.Add(Activity.Current);
+        // Stage points only; metadata field points ("metadata.<key>") also fire inside the metadata stage.
+        EmlExtractor.StageFault = s =>
+        {
+            if (!s.Contains('.', StringComparison.Ordinal))
+                seen.Add(Activity.Current);
+        };
         IReadOnlyList<string> without;
         try
         {

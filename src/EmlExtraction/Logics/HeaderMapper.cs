@@ -8,64 +8,233 @@ namespace EmlExtraction.Logics;
 internal static class HeaderMapper
 {
     public static Dictionary<string, string> Map(MimeMessage message)
-        => Map(message, ParserOptions.Default, out _);
+        => Map(message, ParserOptions.Default, [], out _);
 
     /// <summary>
     /// Header map plus structured participants built from the same effective address lists (ADR-025).
     /// <paramref name="options"/> are the options the message was parsed with; headers MimeKit does not parse itself use them too.
+    /// Each raw header and each key is guarded on its own (ADR-026): a failure loses only that key and adds its warning to
+    /// <paramref name="warnings"/>; the fixed keys keep "" and a failed participant list stays empty.
     /// </summary>
-    public static Dictionary<string, string> Map(MimeMessage message, ParserOptions options, out Dictionary<string, IReadOnlyList<EmailParticipant>> participants)
+    public static Dictionary<string, string> Map(MimeMessage message, ParserOptions options, List<string> warnings,
+        out Dictionary<string, IReadOnlyList<EmailParticipant>> participants)
     {
         var metadata = new Dictionary<string, string>(StringComparer.Ordinal);
         var xLines = new List<string>();
 
         foreach (var header in message.Headers)
         {
-            var value = header.Value ?? "";
-            Append(metadata, NormalizeKey(header.Field), value);
-            if (IsXHeader(header.Field))
-                xLines.Add($"{header.Field}: {value}");
+            var key = NormalizeKey(header.Field);
+            try
+            {
+                HeaderFault(key);
+                var value = header.Value ?? "";
+                Append(metadata, key, value);
+                if (IsXHeader(header.Field))
+                    xLines.Add($"{header.Field}: {value}");
+            }
+            catch (Exception ex) when (EmlExtractor.IsBug(ex))
+            {
+                FieldFailed(key, ex, warnings);
+            }
         }
 
         // MimeKit moves entity headers (Content-Type, ...) of a single-part message onto the body part.
         if (message.Body is not null)
+        {
             foreach (var header in message.Body.Headers.Where(h => h.Field.StartsWith("Content-", StringComparison.OrdinalIgnoreCase)))
-                Append(metadata, NormalizeKey(header.Field), header.Value ?? "");
+            {
+                var key = NormalizeKey(header.Field);
+                try
+                {
+                    HeaderFault(key);
+                    Append(metadata, key, header.Value ?? "");
+                }
+                catch (Exception ex) when (EmlExtractor.IsBug(ex))
+                {
+                    FieldFailed(key, ex, warnings);
+                }
+            }
+        }
 
         participants = EmptyParticipants();
-        EnsureAddress(metadata, MetadataKeys.From, Effective(message, message.From, h => h.Id == HeaderId.From, participants, MetadataKeys.From));
-        EnsureAddress(metadata, MetadataKeys.To, Effective(message, message.To, h => h.Id == HeaderId.To, participants, MetadataKeys.To));
-        EnsureAddress(metadata, MetadataKeys.Cc, Effective(message, message.Cc, h => h.Id == HeaderId.Cc, participants, MetadataKeys.Cc));
-        EnsureAddress(metadata, MetadataKeys.Bcc, Effective(message, message.Bcc, h => h.Id == HeaderId.Bcc, participants, MetadataKeys.Bcc));
-        Func<Header, bool> isReplyTo = h => h.Id == HeaderId.ReplyTo || NormalizeKey(h.Field) == MetadataKeys.ReplyTo;
-        var replyTo = message.Headers.Any(h => h.Id != HeaderId.ReplyTo && isReplyTo(h)) ? ParseHeaders(message, options, isReplyTo) : message.ReplyTo;
-        Set(metadata, MetadataKeys.ReplyTo, Effective(message, replyTo, isReplyTo, participants, MetadataKeys.ReplyTo));
-        Func<Header, bool> isRcptTo = h => RcptToNames.Contains(NormalizeKey(h.Field));
-        Func<Header, bool> isMailFrom = h => MailFromNames.Contains(NormalizeKey(h.Field));
-        if (message.Headers.Any(isRcptTo))
-            Effective(message, ParseHeaders(message, options, isRcptTo), isRcptTo, participants, MetadataKeys.RcptTo);
-        if (message.Headers.Any(isMailFrom))
-            Effective(message, ParseHeaders(message, options, isMailFrom), isMailFrom, participants, MetadataKeys.MailFrom);
-        if ((message.Sender is null || message.Sender.Address.Contains("=?", StringComparison.Ordinal))
-            && message.Headers.Any(h => h.Id == HeaderId.Sender && h.RawValue.AsSpan().IndexOf("=?"u8) >= 0))
-        {
-            Set(metadata, MetadataKeys.Sender, Effective(message, message.Sender is null ? [] : [message.Sender], h => h.Id == HeaderId.Sender, participants, MetadataKeys.Sender));
-        }
-        else
-        {
-            Set(metadata, MetadataKeys.Sender, message.Sender?.ToString());
-            if (message.Sender is not null)
-                participants[MetadataKeys.Sender] = new ReadOnlyCollection<EmailParticipant>([ToParticipant(message.Sender)]);
-        }
-        Set(metadata, MetadataKeys.Subject, message.Subject);
-        if (message.Date != DateTimeOffset.MinValue)
-            Set(metadata, MetadataKeys.Date, message.Date.ToString("o"));
-        Set(metadata, MetadataKeys.MessageId, message.MessageId);
-        Set(metadata, MetadataKeys.InReplyTo, message.InReplyTo);
-        Set(metadata, MetadataKeys.References, message.References.Count == 0 ? null : string.Join(" ", message.References));
+        MapAddress(message, message.From, static h => h.Id == HeaderId.From, metadata, participants, MetadataKeys.From, warnings);
+        MapAddress(message, message.To, static h => h.Id == HeaderId.To, metadata, participants, MetadataKeys.To, warnings);
+        MapAddress(message, message.Cc, static h => h.Id == HeaderId.Cc, metadata, participants, MetadataKeys.Cc, warnings);
+        MapAddress(message, message.Bcc, static h => h.Id == HeaderId.Bcc, metadata, participants, MetadataKeys.Bcc, warnings);
 
-        metadata[MetadataKeys.XFields] = string.Join("\n", xLines);
+        try
+        {
+            FieldFault(MetadataKeys.ReplyTo);
+            Func<Header, bool> isReplyTo = h => h.Id == HeaderId.ReplyTo || NormalizeKey(h.Field) == MetadataKeys.ReplyTo;
+            var replyTo = message.Headers.Any(h => h.Id != HeaderId.ReplyTo && isReplyTo(h)) ? ParseHeaders(message, options, isReplyTo) : message.ReplyTo;
+            Set(metadata, MetadataKeys.ReplyTo, Effective(message, replyTo, isReplyTo, participants, MetadataKeys.ReplyTo));
+        }
+        catch (Exception ex) when (EmlExtractor.IsBug(ex))
+        {
+            FieldFailed(MetadataKeys.ReplyTo, ex, warnings, metadata, participants);
+        }
+
+        try
+        {
+            FieldFault(MetadataKeys.RcptTo);
+            Func<Header, bool> isRcptTo = h => RcptToNames.Contains(NormalizeKey(h.Field));
+            if (message.Headers.Any(isRcptTo))
+                Effective(message, ParseHeaders(message, options, isRcptTo), isRcptTo, participants, MetadataKeys.RcptTo);
+        }
+        catch (Exception ex) when (EmlExtractor.IsBug(ex))
+        {
+            FieldFailed(MetadataKeys.RcptTo, ex, warnings, metadata, participants);
+        }
+
+        try
+        {
+            FieldFault(MetadataKeys.MailFrom);
+            Func<Header, bool> isMailFrom = h => MailFromNames.Contains(NormalizeKey(h.Field));
+            if (message.Headers.Any(isMailFrom))
+                Effective(message, ParseHeaders(message, options, isMailFrom), isMailFrom, participants, MetadataKeys.MailFrom);
+        }
+        catch (Exception ex) when (EmlExtractor.IsBug(ex))
+        {
+            FieldFailed(MetadataKeys.MailFrom, ex, warnings, metadata, participants);
+        }
+
+        try
+        {
+            FieldFault(MetadataKeys.Sender);
+            if ((message.Sender is null || message.Sender.Address.Contains("=?", StringComparison.Ordinal))
+                && message.Headers.Any(h => h.Id == HeaderId.Sender && h.RawValue.AsSpan().IndexOf("=?"u8) >= 0))
+            {
+                Set(metadata, MetadataKeys.Sender, Effective(message, message.Sender is null ? [] : [message.Sender], h => h.Id == HeaderId.Sender, participants, MetadataKeys.Sender));
+            }
+            else
+            {
+                Set(metadata, MetadataKeys.Sender, message.Sender?.ToString());
+                if (message.Sender is not null)
+                    participants[MetadataKeys.Sender] = new ReadOnlyCollection<EmailParticipant>([ToParticipant(message.Sender)]);
+            }
+        }
+        catch (Exception ex) when (EmlExtractor.IsBug(ex))
+        {
+            FieldFailed(MetadataKeys.Sender, ex, warnings, metadata, participants);
+        }
+
+        try
+        {
+            FieldFault(MetadataKeys.Subject);
+            Set(metadata, MetadataKeys.Subject, message.Subject);
+        }
+        catch (Exception ex) when (EmlExtractor.IsBug(ex))
+        {
+            FieldFailed(MetadataKeys.Subject, ex, warnings, metadata, participants);
+        }
+
+        try
+        {
+            FieldFault(MetadataKeys.Date);
+            if (message.Date != DateTimeOffset.MinValue)
+                Set(metadata, MetadataKeys.Date, message.Date.ToString("o"));
+        }
+        catch (Exception ex) when (EmlExtractor.IsBug(ex))
+        {
+            FieldFailed(MetadataKeys.Date, ex, warnings, metadata, participants);
+        }
+
+        try
+        {
+            FieldFault(MetadataKeys.MessageId);
+            Set(metadata, MetadataKeys.MessageId, message.MessageId);
+        }
+        catch (Exception ex) when (EmlExtractor.IsBug(ex))
+        {
+            FieldFailed(MetadataKeys.MessageId, ex, warnings, metadata, participants);
+        }
+
+        try
+        {
+            FieldFault(MetadataKeys.InReplyTo);
+            Set(metadata, MetadataKeys.InReplyTo, message.InReplyTo);
+        }
+        catch (Exception ex) when (EmlExtractor.IsBug(ex))
+        {
+            FieldFailed(MetadataKeys.InReplyTo, ex, warnings, metadata, participants);
+        }
+
+        try
+        {
+            FieldFault(MetadataKeys.References);
+            Set(metadata, MetadataKeys.References, message.References.Count == 0 ? null : string.Join(" ", message.References));
+        }
+        catch (Exception ex) when (EmlExtractor.IsBug(ex))
+        {
+            FieldFailed(MetadataKeys.References, ex, warnings, metadata, participants);
+        }
+
+        try
+        {
+            FieldFault(MetadataKeys.XFields);
+            metadata[MetadataKeys.XFields] = string.Join("\n", xLines);
+        }
+        catch (Exception ex) when (EmlExtractor.IsBug(ex))
+        {
+            FieldFailed(MetadataKeys.XFields, ex, warnings, metadata, participants);
+        }
+
         return metadata;
+    }
+
+    /// <summary>from / to / cc / bcc: the string and the participant list are guarded together.</summary>
+    private static void MapAddress(MimeMessage message, InternetAddressList list, Func<Header, bool> match, Dictionary<string, string> metadata,
+        Dictionary<string, IReadOnlyList<EmailParticipant>> participants, string key, List<string> warnings)
+    {
+        try
+        {
+            FieldFault(key);
+            EnsureAddress(metadata, key, Effective(message, list, match, participants, key));
+        }
+        catch (Exception ex) when (EmlExtractor.IsBug(ex))
+        {
+            FieldFailed(key, ex, warnings, metadata, participants);
+        }
+    }
+
+    /// <summary>Test seam point <c>metadata.&lt;key&gt;</c> for one key; builds the name only when a fault is set.</summary>
+    private static void FieldFault(string key)
+    {
+        if (EmlExtractor.StageFault is { } fault)
+            fault("metadata." + key);
+    }
+
+    /// <summary>Test seam point <c>metadata.header.&lt;key&gt;</c> for one raw header append.</summary>
+    private static void HeaderFault(string key)
+    {
+        if (EmlExtractor.StageFault is { } fault)
+            fault("metadata.header." + key);
+    }
+
+    /// <summary>
+    /// Records a failed key (ADR-026): a content exception gives <c>metadata_field_failed: &lt;key&gt;: &lt;Type&gt;</c>, any
+    /// other one <c>internal_error: metadata.&lt;key&gt;: &lt;Type&gt;</c> (counted under stage metadata). Never the exception message.
+    /// </summary>
+    private static void FieldFailed(string key, Exception ex, List<string> warnings)
+    {
+        if (EmlExtractor.IsContentFailure(ex))
+            warnings.Add($"metadata_field_failed: {key}: {ex.GetType().Name}");
+        else
+            EmlExtractor.RecordBug("metadata." + key, "metadata", ex, warnings);
+    }
+
+    /// <summary>Records a failed key and resets it: a fixed key keeps "", any other key is omitted, its participant list is empty.</summary>
+    private static void FieldFailed(string key, Exception ex, List<string> warnings, Dictionary<string, string> metadata,
+        Dictionary<string, IReadOnlyList<EmailParticipant>> participants)
+    {
+        FieldFailed(key, ex, warnings);
+        if (key is MetadataKeys.From or MetadataKeys.To or MetadataKeys.Cc or MetadataKeys.Bcc or MetadataKeys.XFields)
+            metadata[key] = "";
+        else
+            metadata.Remove(key);
+        if (participants.ContainsKey(key))
+            participants[key] = ReadOnlyCollection<EmailParticipant>.Empty;
     }
 
     /// <summary>Fixed always-present keys with empty values (parse_failed, ...).</summary>

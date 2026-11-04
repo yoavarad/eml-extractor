@@ -12,7 +12,7 @@ namespace EmlExtraction.Tests;
 internal sealed class CheckedExtractor : IEmlExtractor
 {
     private static readonly string[] ContentCodes =
-        ["parse_failed", "body_decode_failed", "part_decode_failed", "rfc822_extract_failed", "tnef_extract_failed"];
+        ["parse_failed", "body_decode_failed", "part_decode_failed", "rfc822_extract_failed", "tnef_extract_failed", "metadata_field_failed"];
 
     private readonly EmlExtractor _inner = new();
 

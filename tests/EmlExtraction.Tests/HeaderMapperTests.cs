@@ -97,4 +97,188 @@ public sealed class HeaderMapperTests
         var value = Extract("To: =?utf-8?B?!!!bad?=")[MetadataKeys.To];
         Assert.False(string.IsNullOrEmpty(value));
     }
+
+    // ADR-026 per-field guards, driven by the EmlExtractor.StageFault field points "metadata.<key>" and
+    // "metadata.header.<raw key>": one failing field loses only that field.
+
+    private const string AllHeaders = """
+        From: Alice <alice@example.com>
+        To: Bob <bob@example.com>
+        Cc: Carol <carol@example.com>
+        Bcc: Dan <dan@example.com>
+        Reply-To: Erin <erin@example.com>
+        Sender: Frank <frank@example.com>
+        Rcpt-To: <rcpt@example.com>
+        Mail-From: <mf@example.com>
+        Subject: Hello
+        Date: Tue, 15 Sep 2026 07:00:00 +0000
+        Message-ID: <m1@example.com>
+        In-Reply-To: <p1@example.com>
+        References: <r1@example.com>
+        X_Trace: abc
+        X-Custom: kept
+        MIME-Version: 1.0
+        Content-Type: multipart/mixed; boundary="b"
+
+        --b
+        Content-Type: text/plain; charset=utf-8
+
+        body text
+        --b
+        Content-Type: application/octet-stream
+        Content-Disposition: attachment; filename="data.bin"
+        Content-Transfer-Encoding: base64
+
+        AQIDBA==
+        --b--
+
+        """;
+
+    private const string SinglePart = """
+        From: Alice <alice@example.com>
+        Subject: Hello
+        MIME-Version: 1.0
+        Content-Type: text/plain; charset=utf-8
+
+        body text
+
+        """;
+
+    private static readonly string[] FixedKeys =
+        [MetadataKeys.From, MetadataKeys.To, MetadataKeys.Cc, MetadataKeys.Bcc, MetadataKeys.XFields];
+
+    public static TheoryData<string> GuardedKeys() =>
+    [
+        MetadataKeys.From, MetadataKeys.To, MetadataKeys.Cc, MetadataKeys.Bcc, MetadataKeys.ReplyTo,
+        MetadataKeys.RcptTo, MetadataKeys.MailFrom, MetadataKeys.Sender, MetadataKeys.Subject, MetadataKeys.Date,
+        MetadataKeys.MessageId, MetadataKeys.InReplyTo, MetadataKeys.References, MetadataKeys.XFields
+    ];
+
+    [Theory]
+    [MemberData(nameof(GuardedKeys))]
+    public void ContentFailureInOneFieldLosesOnlyThatField(string key)
+    {
+        var result = WithFieldFault("metadata." + key, new FormatException("SECRET"), AllHeaders);
+
+        Assert.Equal($"metadata_field_failed: {key}: FormatException", Assert.Single(result.Warnings));
+        AssertOnlyFieldLost(key, Clean(AllHeaders), result);
+    }
+
+    [Theory]
+    [MemberData(nameof(GuardedKeys))]
+    public void BugInOneFieldIsInternalErrorAndLosesOnlyThatField(string key)
+    {
+        var result = WithFieldFault("metadata." + key, new InvalidCastException("SECRET"), AllHeaders);
+
+        Assert.Equal($"internal_error: metadata.{key}: InvalidCastException", Assert.Single(result.Warnings));
+        AssertOnlyFieldLost(key, Clean(AllHeaders), result);
+    }
+
+    [Theory]
+    [InlineData("x-custom", AllHeaders)]
+    [InlineData("content-type", SinglePart)]
+    public void RawHeaderFailureLosesOnlyThatHeader(string key, string raw)
+    {
+        var clean = Clean(raw);
+        Assert.True(clean.Metadata.ContainsKey(key));
+
+        var content = WithFieldFault("metadata.header." + key, new FormatException("SECRET"), raw);
+        var bug = WithFieldFault("metadata.header." + key, new InvalidCastException("SECRET"), raw);
+
+        Assert.Equal($"metadata_field_failed: {key}: FormatException", Assert.Single(content.Warnings));
+        Assert.Equal($"internal_error: metadata.{key}: InvalidCastException", Assert.Single(bug.Warnings));
+        foreach (var result in new[] { content, bug })
+        {
+            Assert.False(result.Metadata.ContainsKey(key));
+            Assert.Equal(Sorted(clean.Metadata, key), Sorted(result.Metadata, key));
+            Assert.Equal(clean.MainContent, result.MainContent);
+        }
+    }
+
+    [Fact]
+    public void DateFailureKeepsSubjectAddressesBodyAndAttachments()
+    {
+        var bytes = SampleFactory.ToBytes(DateMessage());
+        var result = WithFieldFault("metadata.date", new FormatException("bad date"), bytes);
+
+        Assert.Equal("metadata_field_failed: date: FormatException", Assert.Single(result.Warnings));
+        Assert.False(result.Metadata.ContainsKey(MetadataKeys.Date));
+        Assert.Equal("Hello", result.Metadata[MetadataKeys.Subject]);
+        Assert.Equal("alice@example.com", Assert.Single(result.Participants[MetadataKeys.From]).Address);
+        Assert.Equal("bob@example.com", Assert.Single(result.Participants[MetadataKeys.To]).Address);
+        Assert.Equal("body text", result.MainContent?.Trim());
+        Assert.Equal("data.bin", Assert.Single(result.Attachments).FileName);
+    }
+
+    [Fact]
+    public void FieldFailureWarningCarriesNoExceptionMessage()
+    {
+        var result = WithFieldFault("metadata.subject", new InvalidCastException("SECRET"), AllHeaders);
+        Assert.DoesNotContain(result.Warnings, w => w.Contains("SECRET", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2201:Do not raise reserved exception types", Justification = "The test injects a runtime-reserved OutOfMemoryException to prove it propagates.")]
+    public void OutOfMemoryInAFieldPropagates()
+    {
+        var oom = new OutOfMemoryException("oom");
+        var thrown = Assert.Throws<OutOfMemoryException>(() => WithFieldFault("metadata.subject", oom, AllHeaders));
+        Assert.Same(oom, thrown);
+    }
+
+    [Fact]
+    public void CleanMessageHasNoWarnings()
+        => Assert.Empty(Clean(AllHeaders).Warnings);
+
+    private static List<KeyValuePair<string, string>> Sorted(IReadOnlyDictionary<string, string> map, string except)
+        => map.Where(p => p.Key != except).OrderBy(p => p.Key, StringComparer.Ordinal).ToList();
+
+    private static void AssertOnlyFieldLost(string key, EmlExtractionResult clean, EmlExtractionResult result)
+    {
+        if (FixedKeys.Contains(key))
+            Assert.Equal("", result.Metadata[key]);
+        else
+            Assert.False(result.Metadata.ContainsKey(key));
+        if (result.Participants.TryGetValue(key, out var list))
+            Assert.Empty(list);
+
+        Assert.Equal(Sorted(clean.Metadata, key), Sorted(result.Metadata, key));
+        foreach (var (k, participants) in clean.Participants.Where(p => p.Key != key))
+            Assert.Equal(participants, result.Participants[k]);
+        Assert.Equal(clean.MainContent, result.MainContent);
+        Assert.Equal(clean.Attachments.Select(a => a.FileName), result.Attachments.Select(a => a.FileName));
+    }
+
+    private static byte[] Bytes(string raw) => Encoding.UTF8.GetBytes(raw.ReplaceLineEndings("\r\n"));
+
+    private static EmlExtractionResult Clean(string raw) => new EmlExtractor().Extract(Bytes(raw));
+
+    private static EmlExtractionResult WithFieldFault(string point, Exception ex, string raw)
+        => WithFieldFault(point, ex, Bytes(raw));
+
+    private static EmlExtractionResult WithFieldFault(string point, Exception ex, byte[] bytes)
+    {
+        EmlExtractor.StageFault = s =>
+        {
+            if (s == point)
+                throw ex;
+        };
+        try
+        {
+            return new EmlExtractor().Extract(bytes);
+        }
+        finally
+        {
+            EmlExtractor.StageFault = null;
+        }
+    }
+
+    private static MimeKit.MimeMessage DateMessage()
+    {
+        var message = SampleFactory.Plain("Hello", "unused");
+        var builder = new MimeKit.BodyBuilder { TextBody = "body text" };
+        builder.Attachments.Add("data.bin", [1, 2, 3, 4], new MimeKit.ContentType("application", "octet-stream"));
+        message.Body = builder.ToMessageBody();
+        return message;
+    }
 }
