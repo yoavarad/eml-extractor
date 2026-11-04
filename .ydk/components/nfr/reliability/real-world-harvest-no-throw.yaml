@@ -5,10 +5,15 @@ description: >-
   under the gitignored corpus/internal/ and no call throws or records an internal_error warning (ADR-023/ADR-026:
   content problems are warnings; an exception or an internal_error warning on real mail means a library bug; the probe
   skips files over 40 MB, below maxInputBytes).
-  Last recorded harvest (2026-09-15, second pass): 12,853 detected messages, 0 throws, 0 parse_failed, 0 warnings,
-  ~3,500 extract/s (README, docs/edge-cases.md). ADR-026 (implemented): a bug inside Extract returns a result with an
+  Last recorded harvest (2026-11-04, post-ADR-026, corpus fetched with scripts/fetch-public-corpus.sh): 13,999 detected
+  messages, 3 throws, 0 internal_error, 0 parse_failed, 0 warnings, ~2,100 extract/s (README, docs/edge-cases.md).
+  STATUS: failing (target not met). The 3 throws are MimeKit FormatException ("Failed to parse message headers") from the
+  probe mbox split in nazario/phishing-2017.mbox#309, phishing-2019.mbox#156, phishing-2022.mbox#135 (not EmlExtractor);
+  they need triage, and the probe stops each affected mbox at that message. Nazario phishing3.mbox and private-phishing4.mbox
+  are removed by Windows Defender and were not scanned. ADR-026 (implemented): a bug inside Extract returns a result with an
   internal_error warning instead of throwing, so the probe also counts internal_error warnings and the target covers
-  them too (0 exceptions and 0 internal_error warnings). Harvest probe over corpus/internal could not be run in this checkout (the gitignored corpus is absent); the 12,853-message run predates ADR-026 and must be repeated where the corpus exists. Sources: SpamAssassin 2003/2005, Nazario phishing mboxes,
+  them too (0 exceptions and 0 internal_error warnings). The earlier 12,853-message run (2026-09-15) predates ADR-026.
+  Sources: SpamAssassin 2003/2005, Nazario phishing mboxes,
   cw-l/email-corpus, MimeKit TestData, Apache POI HMEF, php-mime-mail-parser, ProtonMail, Tika, GroupDocs, Chatwoot.
 category: reliability
 tags: [harvest, robustness]

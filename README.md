@@ -241,7 +241,7 @@ Reference `src/EmlExtraction/EmlExtraction.csproj` and call `EmlDetector` / `Eml
 ```bash
 dotnet test                                                    # unit tests + seed goldens (+ public fixtures if present)
 dotnet run --project tools/GoldenKit -c Release -- score       # 1200-case quality score
-dotnet run --project tools/GoldenKit -c Release -- probe       # harvest local public mail under corpus/internal/
+dotnet run --project tools/GoldenKit -c Release -- probe       # harvest local public mail under corpus/internal/ (populate: scripts/fetch-public-corpus.sh)
 dotnet run --project benches/EmlExtraction.Bench -c Release    # max files/sec on this machine
 ```
 
@@ -301,14 +301,14 @@ Quality bar in CI: **name + decoded SHA-256**. Payloads there are tiny typed stu
 
 Public mail, not in git (`corpus/internal/` is gitignored; licenses and PII vary). Two layers:
 
-1. **Harvest** — detector + extract over every local public sample (`golden probe`). Last run: **12,853** detected messages, **0** throws, **0** parse failures, **0** warnings, ~3,500 extract/s.
+1. **Harvest** — detector + extract over every local public sample (`golden probe`). Last run: 2026-11-04 (post-ADR-026; `scripts/fetch-public-corpus.sh`): **13,999** detected messages, **0** `internal_error`, **0** parse failures, **0** warnings, **3** throws, ~2,100 extract/s. The 3 throws are MimeKit `FormatException: Failed to parse message headers` raised by the probe's own mbox split (`nazario/phishing-2017.mbox#309`, `phishing-2019.mbox#156`, `phishing-2022.mbox#135`), not by `EmlExtractor`; the probe exits 1 and the target stays **failing** until triaged. Nazario `phishing3.mbox` and `private-phishing4.mbox` are removed by Windows Defender and were not scanned. Not comparable to the earlier 12,853-message run (2026-09-15, predates ADR-026): the corpus now includes the full Nazario set. Fetch with `scripts/fetch-public-corpus.sh`.
 2. **Targeted asserts** — `InternalCorpusTests` (17 cases). Skipped automatically if the files are not on disk; CI does not require them.
 
 `dotnet test` includes those asserts when the files exist. Re-run the harvest with `golden probe` (see commands above). Full map: [docs/edge-cases.md](docs/edge-cases.md).
 
 | What was proven | Source | Result |
 | --- | --- | --- |
-| Does not crash on mixed real mail | SpamAssassin 2003/2005, Nazario phishing mboxes, [cw-l/email-corpus](https://github.com/cw-l/email-corpus), MimeKit TestData | 12,853 / 12,853 detected; mbox `From ` handled |
+| Does not crash on mixed real mail | SpamAssassin 2003/2005, Nazario phishing mboxes, [cw-l/email-corpus](https://github.com/cw-l/email-corpus), MimeKit TestData | 13,999 / 13,999 detected (2026-11-04); mbox `From ` handled; 3 probe-side mbox split throws (see Harvest) |
 | TNEF / `winmail.dat` unpacks to real files | Apache POI HMEF `quick-winmail.dat`, `bug52400-…dat`; Zimbra Outlook 11 `tnef.msg`; MimeKit `ukr.eml` | OLE `.doc` + PDF + PNG; **0** leftover `winmail.dat` (82 TNEF-header mails) |
 | Real Office MIME (not stubs) | php-mime-mail-parser `issue274.eml`; ProtonMail parser `forwarding_html_attachment.eml` | OOXML `docx` (PK, 11 KB) + PDF + ODT; Proton `docx`/`xlsx`/`pdf` (PK / `%PDF-` magic; Proton zips are truncated) |
 | Nested `message/rfc822` stays opaque | `issue158a`, `issue274.eml`; 154 nested `.eml` in harvest | One `.eml` blob; inner parts not promoted |

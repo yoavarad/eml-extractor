@@ -33,7 +33,7 @@ related_components:
 acceptance_criteria:
   - Corrupt base64 body extracts the subject without throwing (ExtractionTests.CorruptBase64DoesNotCrash; golden corrupt-transfer-encoding 10/10)
   - Headers-only message records no parse_failed warning (HeadersOnlyDoesNotThrow)
-  - Public harvest of 12,853 detected messages records 0 exceptions, 0 parse_failed, 0 warnings (ydk:nfr:reliability/real-world-harvest-no-throw)
+  - Public harvest of 13,999 detected messages (2026-11-04) records 3 probe-side mbox split exceptions, 0 internal_error, 0 parse_failed, 0 warnings (ydk:nfr:reliability/real-world-harvest-no-throw)
   - "A content exception in one metadata key records metadata_field_failed and every other key, the body and the attachments are still returned (ADR-026)"
   - "A non-content exception injected into each of parse, metadata, one metadata key, body, attachments and one attachment part returns a result with internal_error naming that stage (and key), and Extract does not throw (ADR-026)"
   - A non-content exception inside a per-part catch site gives internal_error, a content one stays its warning (ContentCatchSiteTests)
