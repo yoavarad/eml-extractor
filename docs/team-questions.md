@@ -21,7 +21,7 @@ Default until answered: EML ships its target names; the template adapter maps OL
 
 ### Error model divergence
 
-- EML (ADR-023, owner 2026-10-18, target): throws typed exceptions for misuse (`ArgumentException` family), oversized input (`EmlInputTooLargeException : ArgumentException`), and library bugs (`EmlExtractionException`, naming the stage, original as `InnerException`). Malformed-but-readable content still returns a partial result with warning strings `"<code>: <detail>"`.
+- EML (ADR-023, ADR-026): throws typed exceptions for misuse (`ArgumentException` family), oversized input (`EmlInputTooLargeException : ArgumentException`), and library bugs in detection (`EmlExtractionException`, naming the stage, original as `InnerException`). Malformed-but-readable content and library bugs inside extraction (ADR-026) return a partial result with warning strings `"<code>: <detail>"`, e.g. `internal_error: <stage>: <Type>`.
 - OLE: throws typed exceptions.
 
 The two models now point the same way. Question: should the exception names and base types be shared across extractors (for example one `ExtractionException` base the template catches)? Default: EML ships `EmlExtractionException` and `EmlInputTooLargeException`; the template adapter maps them.

@@ -1,13 +1,13 @@
 $schema: ydk:schema:warning
 id: ydk:warning:extraction/internal-error
 description: >-
-  Target, not yet implemented (ADR-026, owner decision 2026-11-04; details proposed, for owner review). Recorded when
+  ADR-026, owner decision 2026-11-04. Recorded when
   an exception that is not one of the seven content exception types (EmlExtractor.IsContentFailure) is raised inside
   Extract, in the parse, metadata, body or attachments stage, in one metadata field, or in one attachment part. It
   signals a library bug, not bad input: tests, the GoldenKit score and the harvest probe fail on any internal_error
-  warning. Replaces the ADR-023 throw of ydk:entity:extraction/EmlExtractionException from Extract (detection still
+  warning. Extract does not throw ydk:entity:extraction/EmlExtractionException (detection still
   throws it). OutOfMemoryException, misuse (ArgumentException family), EmlInputTooLargeException and host listener
-  exceptions are not caught and still propagate. Today (ADR-023) such a bug throws EmlExtractionException instead.
+  exceptions are not caught and still propagate.
 code: internal_error
 message_template: "internal_error: ${Stage}: ${ExceptionTypeName}"
 triggers:
@@ -24,7 +24,7 @@ result_effect: >-
   "" / a participant list left empty. Body -> MainContent and MainContentMimeType null, both directions ltr.
   Attachments stage -> no attachments; one part -> that part skipped (TNEF keeps its raw-part fallback), other parts
   collected. The detail carries the exception type name only, never the exception message or any message content.
-  One warning per failed piece, in the order met.
+  One warning per failed piece, in the order met. Known: on a body-stage bug the text body part also comes back as an attachment (ADR-026, owner to confirm). A metadata field bug is reported as metadata.<key>.
 related:
   - ydk:contract:api/eml-extractor
   - ydk:entity:extraction/EmlExtractionResult

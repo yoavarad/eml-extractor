@@ -1,7 +1,7 @@
 # ADR-012: Shared team extractor contract (request, detection result, subfile names)
 
 ## Status
-Accepted for EML; proposed to team (per project owner, 2026-10-17; bytes overload and batch API settled by the owner on 2026-10-18). Implemented. Amended by ADR-023 (2026-10-18): the error model is now exceptions for misuse, limits and bugs, warnings for content. Extended by ADR-024 (2026-10-23): the request gains `InputStream`, and `Extract(Stream)` is added. Amended by the namespace layout (2026-10-23, task #149): see "Amendment: source layout and namespaces". Extended by ADR-025 (2026-10-31): the result gains the init-only `Participants` property and the `EmailParticipant` record; the result constructor is unchanged.
+Accepted for EML; proposed to team (per project owner, 2026-10-17; bytes overload and batch API settled by the owner on 2026-10-18). Implemented. Amended by ADR-023 (2026-10-18): the error model is now exceptions for misuse and limits, warnings for content. Amended by ADR-026 (2026-11-04): a library bug in `Extract` is no longer thrown; it becomes an `internal_error` warning on a partial result, and only `EmlDetector` throws `EmlExtractionException`. Extended by ADR-024 (2026-10-23): the request gains `InputStream`, and `Extract(Stream)` is added. Amended by the namespace layout (2026-10-23, task #149): see "Amendment: source layout and namespaces". Extended by ADR-025 (2026-10-31): the result gains the init-only `Participants` property and the `EmailParticipant` record; the result constructor is unchanged.
 
 ## Context
 The team brief gives two functions per extractor: a detection function (bytes in, "is this the format?") and an extraction function (metadata, main content, sub-files with name, size, full path if it exists, and the binary). The extracted component goes into the team's extraction template, and the team wires it into the factory.
@@ -12,7 +12,7 @@ Two extractors were built against the same brief: this repo (EML) and `yoavarad/
 - OLE takes request classes (`ExtractionRequest` with `FileBytes` / `InputStream` / `FilePath` + `FileName`; `MimeDetectionRequest` with `FileBytes` + `FileName`) "so fields can be added later".
 - EML detection returns `bool`; OLE returns `MimeDetectionResult { DetectedFormat, MimeType, IsSupported }`.
 - Subfile records differ: EML `ExtractedAttachment { Name, Size, FullPath, Data, ContentId, Disposition }`; OLE `EmbeddedFileItem { BinaryData, FileName, PackagePath, SizeInBytes }`.
-- Error model differs: EML never throws on content and records warnings (ADR-004); OLE throws typed exceptions.
+- Error model differs: EML never throws on content and records warnings (ADR-004); OLE throws typed exceptions. (ADR-026 later extended the EML side: library bugs no longer throw either; they become `internal_error:` warnings on a partial result.)
 
 A template that hosts both extractors needs one shape. There are no consumers of the EML API yet, so a breaking change costs nothing now and more later.
 
@@ -56,7 +56,7 @@ Net effect: OLE renames one field (`PackagePath` to `FullPath`); EML renames thr
 The record and list names are not part of this decision. EML keeps `ExtractedAttachment` and `Attachments`; OLE keeps `EmbeddedFileItem` and `EmbeddedFiles`. Aligning them is a team question.
 
 ### Error model
-- EML keeps no-throw + warnings (ADR-004). The batch pipeline must not lose a batch to one bad message.
+- `Extract` never throws for content problems or library bugs. It returns a partial result with warnings: content codes per ADR-004, and library bugs as `internal_error: <stage>: <Type>` (ADR-026). It throws only `EmlInputTooLargeException` for oversized input (`OutOfMemoryException` propagates). Only `EmlDetector` throws `EmlExtractionException`. The batch pipeline must not lose a batch to one bad message.
 - OLE throws typed exceptions. This is a divergence the team must decide on (`docs/team-questions.md`). Until then the template adapter for each extractor maps its error model to whatever the template expects.
 
 ## Alternatives
@@ -90,5 +90,5 @@ Owner decision 2026-10-23 (reviewer issue #141): `src/EmlExtraction` is split in
 Consequences:
 - Breaking change: callers replace `using EmlExtraction;` with the sub-namespaces they use. Accepted because there are no external consumers yet.
 - Unchanged: assembly name, package id, `InternalsVisibleTo`, Meter and ActivitySource name `EmlExtraction` (ADR-021), instrument names, behaviour.
-- The `error.type` telemetry tag carries the exception type's full name, so for the library's own exceptions it now reads `EmlExtraction.Exceptions.EmlExtractionException` / `EmlExtraction.Exceptions.EmlInputTooLargeException`.
+- The `error.type` telemetry tag carries the exception type's full name, so for the library's own exceptions it now reads `EmlExtraction.Exceptions.EmlInputTooLargeException` (from `Extract`) or `EmlExtraction.Exceptions.EmlExtractionException` (from `EmlDetector` only, ADR-026). A bug in `Extract` shows as an `internal_error` warning; its tag is the inner exception's full type name.
 - `NamespaceLayoutTests` pins the public layout and fails if any type lands outside the four namespaces.
