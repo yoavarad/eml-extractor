@@ -55,7 +55,7 @@ internal static class Probe
         File.WriteAllText(reportPath, stats.ToJson(root, files.Count, sw.Elapsed));
         Console.WriteLine(stats.ToText(root, files.Count, sw.Elapsed));
         Console.WriteLine($"report: {reportPath}");
-        return stats.Thrown > 0 ? 1 : 0;
+        return stats.Thrown > 0 || stats.InternalErrors > 0 ? 1 : 0;
     }
 
     private static IEnumerable<string> Discover(string root)
@@ -218,7 +218,7 @@ internal static class Probe
         EmlExtractionResult result;
         try
         {
-            result = extractor.Extract(bytes);
+            result = InternalErrors.Apply(extractor.Extract(bytes));
         }
         catch (Exception ex)
         {
@@ -237,7 +237,7 @@ internal static class Probe
         EmlExtractionResult result;
         try
         {
-            result = extractor.Extract(message);
+            result = InternalErrors.Apply(extractor.Extract(message));
         }
         catch (Exception ex)
         {
@@ -259,6 +259,13 @@ internal static class Probe
             {
                 var kind = w.Split(':', 2)[0];
                 stats.Bump("warn:" + kind);
+                if (InternalErrors.Is(w))
+                {
+                    // ADR-026: a library bug, counted next to throws and failing the run.
+                    stats.InternalErrors++;
+                    stats.Note("internal_error", label, size, w);
+                }
+
                 if (stats.Samples.Count < 80)
                     stats.Note("warning", label, size, w);
             }

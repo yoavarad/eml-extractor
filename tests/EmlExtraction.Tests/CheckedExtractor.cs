@@ -24,6 +24,8 @@ internal sealed class CheckedExtractor : IEmlExtractor
 
     public static EmlExtractionResult Check(EmlExtractionResult result)
     {
+        // ADR-026: an internal_error warning is a library bug; seed-golden, realistic-sample and internal-corpus fail on it.
+        Assert.DoesNotContain(result.Warnings, w => w.StartsWith("internal_error:", StringComparison.Ordinal));
         Assert.All(result.Warnings, w => Assert.Contains(w.Split(':', 2)[0], ContentCodes));
         return result;
     }
