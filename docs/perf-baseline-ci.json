@@ -1,0 +1,250 @@
+{
+  "schemaVersion": 1,
+  "hardware": {
+    "cpuModel": "AMD EPYC 7763 64-Core Processor",
+    "physicalCores": 2,
+    "logicalCores": 4,
+    "totalMemoryBytes": 16759443456,
+    "os": "Ubuntu 26.04.1 LTS",
+    "osArchitecture": "X64",
+    "runtime": ".NET 10.0.14",
+    "targetFramework": "net10.0",
+    "date": "2026-11-04T11:08:20Z",
+    "gitCommit": "642bc8efd08d6d870741a9a6615e8e843542428b"
+  },
+  "parameters": {
+    "warmupMs": 300,
+    "windowMs": 1500,
+    "minPasses": 2,
+    "sampleIntervalMs": 50,
+    "maxDop": 4,
+    "set": "synthetic",
+    "corpus": "/home/runner/work/eml-extractor/eml-extractor/corpus/internal"
+  },
+  "runs": [
+    {
+      "gcMode": "workstation",
+      "sets": [
+        {
+          "name": "synthetic",
+          "status": "measured",
+          "skipReason": null,
+          "messages": 1217,
+          "inputBytes": 1964778,
+          "extract": [
+            {
+              "dop": 1,
+              "filesPerSec": 5364.715059208864,
+              "p50Ms": 0.135434,
+              "p95Ms": 0.263734,
+              "peakWorkingSetBytes": 103276544,
+              "allocBytesPerInputByte": 22.81843396762517,
+              "efficiency": 1,
+              "messages": 8088,
+              "elapsedSec": 1.507629,
+              "passes": 6.645850451930978
+            },
+            {
+              "dop": 2,
+              "filesPerSec": 10833.104569745195,
+              "p50Ms": 0.102202,
+              "p95Ms": 0.214122,
+              "peakWorkingSetBytes": 106627072,
+              "allocBytesPerInputByte": 22.108272866424013,
+              "efficiency": 1.0096626242198552,
+              "messages": 16740,
+              "elapsedSec": 1.5452634,
+              "passes": 13.755135579293345
+            },
+            {
+              "dop": 3,
+              "filesPerSec": 20775.917316313044,
+              "p50Ms": 0.035055,
+              "p95Ms": 0.077706,
+              "peakWorkingSetBytes": 119668736,
+              "allocBytesPerInputByte": 21.60871268790775,
+              "efficiency": 1.2908990870291674,
+              "messages": 31462,
+              "elapsedSec": 1.5143495,
+              "passes": 25.852095316351683
+            },
+            {
+              "dop": 4,
+              "filesPerSec": 21956.586931358706,
+              "p50Ms": 0.035337,
+              "p95Ms": 0.070973,
+              "peakWorkingSetBytes": 120741888,
+              "allocBytesPerInputByte": 21.746084559485865,
+              "efficiency": 1.0231944608907453,
+              "messages": 34368,
+              "elapsedSec": 1.5652706,
+              "passes": 28.239934264585045
+            }
+          ],
+          "detect": [
+            {
+              "dop": 1,
+              "filesPerSec": 2657954.3247047677,
+              "p50Ms": 0.00027,
+              "p95Ms": 0.000411,
+              "peakWorkingSetBytes": 112185344,
+              "allocBytesPerInputByte": 7.712264839948022E-05,
+              "efficiency": 1,
+              "messages": 4024015,
+              "elapsedSec": 1.5139519,
+              "passes": 3306.5036976170913
+            },
+            {
+              "dop": 2,
+              "filesPerSec": 4760467.058753866,
+              "p50Ms": 0.000291,
+              "p95Ms": 0.000421,
+              "peakWorkingSetBytes": 103751680,
+              "allocBytesPerInputByte": 4.5908752665269955E-05,
+              "efficiency": 0.895513330403568,
+              "messages": 7211394,
+              "elapsedSec": 1.5148501,
+              "passes": 5925.549712407559
+            },
+            {
+              "dop": 3,
+              "filesPerSec": 4955220.647403511,
+              "p50Ms": 0.000491,
+              "p95Ms": 0.000671,
+              "peakWorkingSetBytes": 103960576,
+              "allocBytesPerInputByte": 4.665037878080988E-05,
+              "efficiency": 0.6214328818402993,
+              "messages": 7544095,
+              "elapsedSec": 1.5224539,
+              "passes": 6198.92769104355
+            },
+            {
+              "dop": 4,
+              "filesPerSec": 5377833.04303144,
+              "p50Ms": 0.000511,
+              "p95Ms": 0.000721,
+              "peakWorkingSetBytes": 105824256,
+              "allocBytesPerInputByte": 4.4756668945934314E-05,
+              "efficiency": 0.5058244410980222,
+              "messages": 8326664,
+              "elapsedSec": 1.5483307,
+              "passes": 6841.958915365653
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gcMode": "server",
+      "sets": [
+        {
+          "name": "synthetic",
+          "status": "measured",
+          "skipReason": null,
+          "messages": 1217,
+          "inputBytes": 1964780,
+          "extract": [
+            {
+              "dop": 1,
+              "filesPerSec": 6654.207011326806,
+              "p50Ms": 0.121626,
+              "p95Ms": 0.216996,
+              "peakWorkingSetBytes": 94760960,
+              "allocBytesPerInputByte": 21.937521846972498,
+              "efficiency": 1,
+              "messages": 10171,
+              "elapsedSec": 1.5285067,
+              "passes": 8.357436318816763
+            },
+            {
+              "dop": 2,
+              "filesPerSec": 19685.185269463647,
+              "p50Ms": 0.063067,
+              "p95Ms": 0.163275,
+              "peakWorkingSetBytes": 104497152,
+              "allocBytesPerInputByte": 21.117040536313688,
+              "efficiency": 1.4791533563620338,
+              "messages": 30278,
+              "elapsedSec": 1.538111,
+              "passes": 24.879211175020544
+            },
+            {
+              "dop": 3,
+              "filesPerSec": 42357.20925056849,
+              "p50Ms": 0.028904,
+              "p95Ms": 0.063789,
+              "peakWorkingSetBytes": 163495936,
+              "allocBytesPerInputByte": 21.213107268030484,
+              "efficiency": 2.12182604571153,
+              "messages": 65014,
+              "elapsedSec": 1.5348981,
+              "passes": 53.4215283483977
+            },
+            {
+              "dop": 4,
+              "filesPerSec": 47729.8863516156,
+              "p50Ms": 0.033452,
+              "p95Ms": 0.065933,
+              "peakWorkingSetBytes": 137715712,
+              "allocBytesPerInputByte": 21.3403755158049,
+              "efficiency": 1.7932221777279274,
+              "messages": 72915,
+              "elapsedSec": 1.5276592,
+              "passes": 59.91372226787182
+            }
+          ],
+          "detect": [
+            {
+              "dop": 1,
+              "filesPerSec": 3025149.087388491,
+              "p50Ms": 0.000221,
+              "p95Ms": 0.000331,
+              "peakWorkingSetBytes": 100847616,
+              "allocBytesPerInputByte": 0.0001012688617667633,
+              "efficiency": 1,
+              "messages": 4589444,
+              "elapsedSec": 1.5170968,
+              "passes": 3771.11257189811
+            },
+            {
+              "dop": 2,
+              "filesPerSec": 5362874.2593876785,
+              "p50Ms": 0.00025,
+              "p95Ms": 0.00037,
+              "peakWorkingSetBytes": 102887424,
+              "allocBytesPerInputByte": 5.967290493660106E-05,
+              "efficiency": 0.8863818120146381,
+              "messages": 8139489,
+              "elapsedSec": 1.5177475,
+              "passes": 6688.158586688579
+            },
+            {
+              "dop": 3,
+              "filesPerSec": 5620638.748200071,
+              "p50Ms": 0.000441,
+              "p95Ms": 0.000591,
+              "peakWorkingSetBytes": 103944192,
+              "allocBytesPerInputByte": 5.936280710686171E-05,
+              "efficiency": 0.6193236086150693,
+              "messages": 8533170,
+              "elapsedSec": 1.5181851,
+              "passes": 7011.64338537387
+            },
+            {
+              "dop": 4,
+              "filesPerSec": 6181997.603743175,
+              "p50Ms": 0.000451,
+              "p95Ms": 0.000631,
+              "peakWorkingSetBytes": 104886272,
+              "allocBytesPerInputByte": 5.562708525806722E-05,
+              "efficiency": 0.5108837139229959,
+              "messages": 9478907,
+              "elapsedSec": 1.5333081,
+              "passes": 7788.7485620377975
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

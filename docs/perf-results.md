@@ -61,12 +61,14 @@ dotnet run -c Release --project benches/EmlExtraction.Bench -- sweep [options]
 | --- | --- | --- |
 | `--set synthetic\|public\|mix\|all` | `all` | Input set(s). `synthetic` = the 5 bench messages + every `corpus/golden/**/input.eml`; `public` = every non-empty file under `--corpus` (mbox files split per message); `mix` = both, shuffled with a fixed seed. |
 | `--corpus <path>` | `<repo>/corpus/internal` | Public-mail corpus. A task worktree has no `corpus/internal`; pass the main checkout's path. Missing or empty: `SKIPPED: public corpus not found at <path>` is printed and the `public` and `mix` sets are reported with `status: "skipped"`. |
-| `--warmup-ms N` | `2000` | Warm-up per DOP (provisional). |
-| `--window-ms N` | `10000` | Minimum measured window per DOP (provisional). |
-| `--min-passes N` | `3` | Minimum full passes over the set per DOP (provisional). The window ends when both minimums are met. |
+| `--warmup-ms N` | `2000` | Warm-up per DOP (harness default; baselines use 300). |
+| `--window-ms N` | `10000` | Minimum measured window per DOP (harness default; baselines use 1500). |
+| `--min-passes N` | `3` | Minimum full passes over the set per DOP (harness default; baselines use 2). The window ends when both minimums are met. |
 | `--sample-ms N` | `50` | Working-set sampling interval (provisional). |
 | `--out <dir>` | `<repo>/sweep-results` | Where `sweep-<utc stamp>.json` and `.md` are written (gitignored). |
 | `--simulate-cpu-unreadable` | off | Test hook: forces the CPU-model lookup to fail. |
+
+The defaults above are the harness defaults (full window); the committed baselines and the nightly job pass the short settings `--warmup-ms 300 --window-ms 1500 --min-passes 2` (owner decision 2026-11-04, ADR-015).
 
 Smoke run (short window): `-- sweep --set synthetic --warmup-ms 100 --window-ms 200 --min-passes 1`.
 
@@ -153,13 +155,30 @@ Reading: at the limit the stream path's peak growth is 0.99 x input against 1.73
 
 ## Committed baseline and regression rule (ADR-015)
 
-`docs/perf-baseline.json` is a sweep JSON (schema v1, hardware block included), refreshed 2026-10-23 at commit `dc6525e` (task #75, after the ADR-022 optimizations; previous baseline `675b4eb`), measured on the dev machine: Intel Core Ultra 7 155H, 22 logical cores, .NET 10.0.12, Windows, `net10.0`, both GC modes. Command (short windows, so provisional):
+`docs/perf-baseline.json` is a sweep JSON (schema v1, hardware block included), refreshed 2026-11-04 at commit `db067ee` (task #62; previous baselines 2026-10-23 `dc6525e` and `675b4eb`), measured on the dev machine: Intel Core Ultra 7 155H, 22 logical cores, .NET 10.0.12, Windows, `net10.0`, both GC modes, all three sets (synthetic, public, mix). Command (short settings, kept by the owner on 2026-11-04 for the dev baseline and nightly CI, ADR-015):
 
 ```
-dotnet run -c Release --framework net10.0 --project benches/EmlExtraction.Bench -- sweep --set all --warmup-ms 300 --window-ms 1500 --min-passes 2 --out <dir>
+dotnet run -c Release --framework net10.0 --project benches/EmlExtraction.Bench -- sweep --set all --corpus <main checkout>/corpus/internal --warmup-ms 300 --window-ms 1500 --min-passes 2 --out <dir>
 ```
 
-The `public` and `mix` sets are recorded as `skipped`: no `corpus/internal` existed on the machine at baseline time. Refresh the baseline with the full-window command (and the corpus) when it exists.
+The public set is the gitignored `corpus/internal` (14,599 messages after mbox splitting, about 247 MB); the corpus itself is never committed. The sweep loaded it without errors. Extract, per set and GC mode (T in files/s; A in allocated bytes per input byte at DOP 22; P(22) in MB; "was" is the 2026-10-23 baseline, which had no public or mix data):
+
+| GC | Set | Messages | T(1) | T(max), DOP | E(max) | P(22) | A(22) |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Workstation | synthetic | 1,217 | 9,367 (was 8,701) | 43,517 at 9 (was 43,443) | 0.52 | 455 (was 115) | 21.5 (was 19.8) |
+| Workstation | public | 14,599 | 7,463 | 19,258 at 9 | 0.29 | 957 | 11.7 |
+| Workstation | mix | 15,816 | 7,860 | 20,310 at 9 | 0.29 | 756 | 11.7 |
+| Server | synthetic | 1,217 | 11,393 (was 9,480) | 108,045 at 8 (was 102,898) | 1.19 | 693 (was 346) | 21.3 (was 19.5) |
+| Server | public | 14,599 | 7,474 | 31,955 at 16 | 0.27 | 1,013 | 11.6 |
+| Server | mix | 15,816 | 7,609 | 30,197 at 19 | 0.21 | 817 | 12.4 |
+
+Reading, with caveats (single run, short settings, so throughput is noisy, see "Provisional limits (#51)"):
+- Real mail scales worse than the synthetic set: the public set tops out near 19-20k files/s on Workstation GC and 30-32k on Server GC, against 43k and 108k on the synthetic set (mostly tiny messages). Per-input-byte allocation is lower on public mail (11-12 against 21).
+- P(22) is the process working set. Since all sets are loaded into memory before timing, the synthetic P(22) now includes the resident public corpus, which is why it rose from 115 to 455 MB (Workstation) and 346 to 693 MB (Server); `compare` against the old baseline shows these two P warnings, and they are not a regression. P values are comparable only between baselines produced the same way (`--set all`).
+- The Server GC `mix` point at DOP 1 has A = 352, against about 12 at every other DOP: unexplained and not a real allocation rate (likely an allocated-bytes counting artifact of that one point; not investigated). The regression rule reads A at the highest DOP only, so it does not affect `compare`. Do not use that point.
+- Server GC "E(max)" above 1 for synthetic comes from a slow T(1) point, not super-linear scaling.
+
+Large-file pass, same day, same machine (`-- large --sweep docs/perf-baseline.json`, net10.0, Workstation GC, `maxInputBytes` 524,288,000, byte[] input): M 1.75 / 1.73 / 1.73 for the 25% / 50% / 100% passes (reported M = 1.75; 100% pass: pre WS 594 MB, peak WS 1,461 MB, 365 MB allocated, 2.2 s); the limit+1 message threw `EmlInputTooLargeException` without parsing. The previous recorded value is M max 1.76 (#75), so it is unchanged within noise. Sizing formula filled from the new mix / Workstation sweep: T(1) = 7,860 files/s, n_best = 9, T(n_best) = 20,310 files/s, E(n_best) = 0.287, P(n_best) = 553 MB, giving ram_per_server = about 8,411 MiB (the 500 is MiB, 524,288,000 B; P and the result are in MiB here, unlike the MB table above). These values are not stored in `perf-baseline.json` (no schema change); rerun `large` to reproduce them.
 
 Compare a run against a baseline:
 
@@ -173,11 +192,11 @@ dotnet run -c Release --framework net10.0 --project benches/EmlExtraction.Bench 
 
 ## Nightly synthetic job
 
-`.github/workflows/perf-nightly.yml` (schedule + `workflow_dispatch`, ubuntu-latest, no secrets) runs the `synthetic` set only with short windows, uploads `sweep-results/` as the `perf-nightly-report` artifact, and compares against `docs/perf-baseline-ci.json` (warn-only, GitHub annotations). That file does not exist until seeded: take the sweep JSON from the first nightly run's artifact, commit it as `docs/perf-baseline-ci.json`. Until then the job prints a notice. Runner CPUs vary between runs, so a `baseline not comparable` result is expected now and then.
+`.github/workflows/perf-nightly.yml` (schedule + `workflow_dispatch`, ubuntu-latest, no secrets) runs the `synthetic` set only with short windows, uploads `sweep-results/` as the `perf-nightly-report` artifact, and compares against `docs/perf-baseline-ci.json` (warn-only, GitHub annotations). `docs/perf-baseline-ci.json` is the sweep JSON from the `perf-nightly-report` artifact of nightly run 41818826405 (2026-11-04, commit `642bc8e`): AMD EPYC 7763, 2 physical / 4 logical cores, Ubuntu 26.04.1, .NET 10.0.14, `net10.0`, synthetic set only, both GC modes, 300 ms / 1.5 s / 2 passes (T(1) 5,365 files/s on Workstation GC). Comparing the file with itself reports no regression (8 metrics). Runner CPUs vary between runs, and the runtime patch version moves (10.0.14 on the runner against 10.0.12 locally; only major.minor must match), so a `baseline not comparable` result is expected now and then. Refresh it from a newer nightly artifact when the runner image, the runtime or the parser library changes.
 
 ## Provisional limits (#51)
 
-All values below are **PROVISIONAL**. Data caveat: synthetic set only (no `corpus/internal`), short windows (300 ms warm-up, 1.5 s window, 2 passes), one Windows machine (Intel Core Ultra 7 155H, 22 logical cores, .NET 10.0.12). Re-set them from a full-window run on the public corpus and on target hardware. Sources: the pre-batch `docs/perf-baseline.json` (commit 675b4eb, replaced by the 2026-10-23 refresh) plus local re-runs of the same command (2026-10-18, 3 invocations giving 6 sweep files; 7 sweeps in total with the baseline; the re-runs are not committed).
+All values below are **PROVISIONAL**, still unconfirmed after the 2026-11-04 baseline refresh (that refresh added public and mix data to the committed baseline but did not re-derive these limits; the owner kept the short run settings, ADR-015). Data caveat: derived from the synthetic set only (no `corpus/internal`), short windows (300 ms warm-up, 1.5 s window, 2 passes), one Windows machine (Intel Core Ultra 7 155H, 22 logical cores, .NET 10.0.12). Re-set them from a full-window run on the public corpus and on target hardware. Sources: the pre-batch `docs/perf-baseline.json` (commit 675b4eb, replaced by the 2026-10-23 refresh) plus local re-runs of the same command (2026-10-18, 3 invocations giving 6 sweep files; 7 sweeps in total with the baseline; the re-runs are not committed).
 
 | Limit | Value | Source and headroom |
 | --- | --- | --- |
@@ -185,7 +204,7 @@ All values below are **PROVISIONAL**. Data caveat: synthetic set only (no `corpu
 | Memory ceiling | peak WS growth <= 6 x `maxInputBytes` per extraction | M max 4.2 (#49); about 40% headroom. Replaces the placeholder 10. |
 | A ceiling | <= 32 allocated bytes per input byte (synthetic set) | Baseline + re-runs: A 22.5-26.3 (max 26.27, both GC modes); about 20% headroom. Replaces the placeholder 8, which sat below every measurement. A is high here because the set is mostly tiny messages; the 1 MB attachment message allocates about 3.9 per byte (table above). |
 | Regression threshold | 20%, **unchanged** | Run-to-run spread (max/min - 1): A 2-10%, P(22) 4-11%, so 20% is about 2x the noise. T(1) and T(22) varied 24-80% between short sweeps (workstation T(1) 5,549-9,110 files/s), so throughput warnings are noise at these windows. Revisit after a quiet full-window run. |
-| Warm-up / window / passes | 2000 ms / 10000 ms / 3, **unchanged** | The short windows used for the baseline show the T spread above; longer windows are the remedy, not shorter. |
+| Warm-up / window / passes | 300 ms / 1500 ms / 2, **OWNER-SET** (2026-11-04, replaces 2000 / 10000 / 3) | Owner decision: keep the short settings for the dev baseline and nightly CI (nightly about 1 min). The T spread above is accepted because the rule is warn-only; longer windows remain the remedy for a one-off confirmation run. |
 | Sampling interval | 50 ms, **unchanged** | P(n) spread 4-11% at 50 ms; no data argues for a change. |
 
 Re-run values (not committed as JSON; extract, synthetic set; 6 re-run sweep files, per GC mode, DOP 1 and DOP 22):

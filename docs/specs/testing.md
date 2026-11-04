@@ -10,7 +10,7 @@
 | Internal corpus | Behaviour on specific real public samples | Only when the samples are present locally; a visible skip otherwise |
 | Bulk golden score | 1,200 authored cases across 48 tags | Yes, a CI gate at the 1212 of 1212 baseline on .NET 10 (ADR-011) |
 | Harvest probe | No exception and no internal error warning on any local public sample (ADR-023, ADR-026) | No, run by hand |
-| Load test | Throughput, latency, and memory across every degree of parallelism | By hand on the owner's machine; target is a nightly warn-only synthetic run (ADR-015) |
+| Load test | Throughput, latency, and memory across every degree of parallelism | By hand on the owner's machine, plus a nightly warn-only synthetic run in CI (ADR-015) |
 | Telemetry | Every runtime measurement is emitted with its contracted name and labels, and no message content leaks into it | Yes, on both .NET versions (ADR-021; metrics #71, activities #72) |
 | Profiling | Where time and memory go per stage, and the cost of telemetry | No, run by hand on the owner's machine (ADR-020) |
 

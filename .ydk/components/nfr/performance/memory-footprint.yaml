@@ -1,8 +1,8 @@
 $schema: ydk:schema:nfr
 id: ydk:nfr:performance/memory-footprint
 description: >-
-  Memory ceiling for extraction (ADR-015). Target; not implemented (Stage 02). Today no RAM is measured. Allocation
-  rates in docs/perf-results.md imply about 3.9 allocated bytes per input byte for the 1 MB attachment message
+  Memory ceiling for extraction (ADR-015). Implemented: the large-file pass measures M. The
+  pre-sweep allocation rates in docs/perf-results.md imply about 3.9 allocated bytes per input byte for the 1 MB attachment message
   (1,363 MB/s at 259/s on 1,351,406 B) and about 6.8 for the 20 KB HTML message (2,893 MB/s at 16,881/s on 25,433 B).
   Per project owner (2026-10-18), measure first. Task #51 set the numbers below from measured data plus headroom; they
   stay PROVISIONAL because the data is synthetic-only, short-window, from one Windows machine (22 cores); see
@@ -15,7 +15,7 @@ target: >-
   both GC modes; max 26.27), about 20% headroom. The earlier placeholder 8 was below every measurement and is
   withdrawn; the synthetic set is dominated by tiny messages, which inflate A (the 1 MB attachment message was about
   3.9, docs/perf-results.md). Peak working-set growth for one extraction of a maxInputBytes input <= 6 x
-  maxInputBytes: M measured 1.3-4.2 in the large-file pass (#49, run at a 150 MiB input, about 730 MB peak working set; the default is now the OWNER-SET 500 MiB, M not re-measured there, ceiling 3 GB per extraction),
+  maxInputBytes: M measured 1.3-4.2 in the large-file pass (#49, run at a 150 MiB input, about 730 MB peak working set; the default is now the OWNER-SET 500 MiB, M re-measured there on 2026-11-04: 1.75, ceiling 3 GB per extraction),
   about 40% headroom over the max 4.2. M < ceiling, so streaming stays DEFERRED (docs/specs/scope.md). Both limits
   need re-checking on the public corpus and on target hardware. Optimization targets (ADR-022, PROVISIONAL, set by
   #74 from docs/perf/profile-2026-10-18.md, see docs/perf/triage-2026-10-18.md; closing re-profile #75 marks them met
