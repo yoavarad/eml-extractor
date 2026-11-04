@@ -97,7 +97,7 @@ public sealed class EmlExtractor : IEmlExtractor
 
         var message = ParseStage(input, eml, warnings, activity);
         if (message is null)
-            return Recorded(start, EmlExtractionTelemetry.OutcomeParseFailed, Empty(warnings), activity);
+            return Recorded(start, EmlExtractionTelemetry.OutcomeParseFailed, Empty(warnings), activity, parsed: false);
 
         return Recorded(start, null, Extract(message, warnings, activity), activity);
     }
@@ -129,7 +129,7 @@ public sealed class EmlExtractor : IEmlExtractor
         }
 
         if (message is null)
-            return Recorded(start, EmlExtractionTelemetry.OutcomeParseFailed, Empty(warnings), activity);
+            return Recorded(start, EmlExtractionTelemetry.OutcomeParseFailed, Empty(warnings), activity, parsed: false);
 
         return Recorded(start, null, Extract(message, warnings, activity), activity);
     }
@@ -210,12 +210,12 @@ public sealed class EmlExtractor : IEmlExtractor
         RecordBug(stage, ex, warnings);
     }
 
-    private static EmlExtractionResult Recorded(long start, string? outcome, EmlExtractionResult result, Activity? activity)
+    private static EmlExtractionResult Recorded(long start, string? outcome, EmlExtractionResult result, Activity? activity, bool parsed = true)
     {
         // ADR-026: a result with an internal_error warning has outcome internal_error, over warnings and parse_failed.
         if (result.Warnings.Any(w => w.StartsWith(InternalErrorCode + ":", StringComparison.Ordinal)))
             outcome = EmlExtractionTelemetry.OutcomeInternalError;
-        var resolved = EmlExtractionTelemetry.RecordExtract(start, outcome, result);
+        var resolved = EmlExtractionTelemetry.RecordExtract(start, outcome, result, parsed);
         EmlExtractionTelemetry.TagExtract(activity, resolved, result);
         return result;
     }

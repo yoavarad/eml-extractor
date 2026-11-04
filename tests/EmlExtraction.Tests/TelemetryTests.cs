@@ -33,7 +33,7 @@ public sealed class TelemetryTests
         ["eml_extraction.warning.code"] =
         [
             "parse_failed", "body_decode_failed", "part_decode_failed", "rfc822_extract_failed",
-            "tnef_extract_failed"
+            "tnef_extract_failed", "internal_error", "metadata_field_failed"
         ],
         ["eml_extraction.detect.result"] = ["supported", "not_supported"],
         ["eml_extraction.stage"] = ["parse", "metadata", "body", "attachments"],
@@ -222,8 +222,8 @@ public sealed class TelemetryTests
         Assert.Equal(
             [Tag("eml_extraction.stage", "attachments"), Tag("error.type", typeof(InvalidCastException).FullName)],
             error.Tags.OrderBy(t => t.Key, StringComparer.Ordinal));
-        Assert.Empty(rec.Of(Warnings));
-        Assert.Empty(rec.Of(Attachments));
+        Assert.Equal(Tag("eml_extraction.warning.code", "internal_error"), Assert.Single(Assert.Single(rec.Of(Warnings)).Tags));
+        Assert.Equal(0d, Assert.Single(rec.Of(Attachments)).Value);
         Assert.Equal(Tag("eml_extraction.outcome", "internal_error"), Assert.Single(Assert.Single(rec.Of(Duration)).Tags));
 
         var stage = Assert.Single(spans.Named("eml_extraction.attachments"));
@@ -240,6 +240,62 @@ public sealed class TelemetryTests
         Assert.Null(extract.GetTagItem("error.type"));
         Assert.Equal("internal_error", extract.GetTagItem("eml_extraction.outcome"));
         Assert.Equal((long)bytes.Length, extract.GetTagItem("eml_extraction.input.size"));
+    }
+
+    [Theory]
+    [InlineData("metadata", "metadata")]
+    [InlineData("body", "body")]
+    [InlineData("metadata.subject", "metadata")]
+    public void InternalErrorInStageOrMetadataKeyIsCountedUnderStageOnly(string point, string stage)
+    {
+        using var rec = new Recorder();
+        EmlExtractor.StageFault = s =>
+        {
+            if (s == point)
+                throw new InvalidCastException("boom");
+        };
+        try
+        {
+            var result = _extractor.Extract(SampleFactory.ToBytes(SampleFactory.Plain("s", "t")));
+            Assert.Single(result.Warnings, w => w.StartsWith("internal_error: ", StringComparison.Ordinal));
+        }
+        finally
+        {
+            EmlExtractor.StageFault = null;
+        }
+
+        var error = Assert.Single(rec.Of(InternalErrors));
+        Assert.Equal(1d, error.Value);
+        Assert.Contains(Tag("eml_extraction.stage", stage), error.Tags);
+        Assert.Contains(Tag("error.type", typeof(InvalidCastException).FullName), error.Tags);
+        Assert.Equal(Tag("eml_extraction.warning.code", "internal_error"), Assert.Single(Assert.Single(rec.Of(Warnings)).Tags));
+        Assert.Equal(Tag("eml_extraction.outcome", "internal_error"), Assert.Single(Assert.Single(rec.Of(Duration)).Tags));
+        Assert.Single(rec.Of(Attachments));
+    }
+
+    [Fact]
+    public void MetadataFieldFailedCountedAsWarningNotInternalError()
+    {
+        using var rec = new Recorder();
+        EmlExtractor.StageFault = s =>
+        {
+            if (s == "metadata.subject")
+                throw new FormatException("boom");
+        };
+        try
+        {
+            var result = _extractor.Extract(SampleFactory.ToBytes(SampleFactory.Plain("s", "t")));
+            Assert.Equal("metadata_field_failed: subject: FormatException", Assert.Single(result.Warnings));
+        }
+        finally
+        {
+            EmlExtractor.StageFault = null;
+        }
+
+        Assert.Empty(rec.Of(InternalErrors));
+        Assert.Equal(Tag("eml_extraction.warning.code", "metadata_field_failed"), Assert.Single(Assert.Single(rec.Of(Warnings)).Tags));
+        Assert.Equal(Tag("eml_extraction.outcome", "warnings"), Assert.Single(Assert.Single(rec.Of(Duration)).Tags));
+        Assert.Single(rec.Of(Attachments));
     }
 
     [Fact]
@@ -262,7 +318,7 @@ public sealed class TelemetryTests
         }
 
         Assert.Contains(Tag("eml_extraction.stage", "parse"), Assert.Single(rec.Of(InternalErrors)).Tags);
-        Assert.Empty(rec.Of(Warnings));
+        Assert.Equal(Tag("eml_extraction.warning.code", "internal_error"), Assert.Single(Assert.Single(rec.Of(Warnings)).Tags));
         Assert.Equal(Tag("eml_extraction.outcome", "internal_error"), Assert.Single(Assert.Single(rec.Of(Duration)).Tags));
         Assert.Empty(rec.Of(Attachments));
     }

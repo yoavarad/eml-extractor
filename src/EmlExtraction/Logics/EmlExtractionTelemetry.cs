@@ -146,7 +146,7 @@ internal static class EmlExtractionTelemetry
     }
 
     /// <summary>Records duration, attachment count (when parsed) and per-code warnings for one finished Extract call; returns the resolved outcome.</summary>
-    public static string RecordExtract(long startTimestamp, string? outcome, EmlExtractionResult result)
+    public static string RecordExtract(long startTimestamp, string? outcome, EmlExtractionResult result, bool parsed = true)
     {
         if (Warnings.Enabled)
         {
@@ -159,7 +159,7 @@ internal static class EmlExtractionTelemetry
         }
 
         outcome ??= result.Warnings.Count == 0 ? OutcomeClean : OutcomeWarnings;
-        if ((outcome is OutcomeClean or OutcomeWarnings) && Attachments.Enabled)
+        if (parsed && Attachments.Enabled)
             Attachments.Record(result.Attachments.Count);
 
         if (Duration.Enabled)
@@ -182,6 +182,8 @@ internal static class EmlExtractionTelemetry
             "part_decode_failed" => "part_decode_failed",
             "rfc822_extract_failed" => "rfc822_extract_failed",
             "tnef_extract_failed" => "tnef_extract_failed",
+            "internal_error" => "internal_error",
+            "metadata_field_failed" => "metadata_field_failed",
             _ => null
         };
     }
