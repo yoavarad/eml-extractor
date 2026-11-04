@@ -66,6 +66,12 @@ internal static class PartCollector
             warnings.Add($"tnef_extract_failed: {ex.Message}");
             AddMimePart(tnef, container, parts, warnings);
         }
+        catch (Exception ex) when (EmlExtractor.IsBug(ex))
+        {
+            // ADR-026: a bug in one part skips that part; TNEF keeps its raw-part fallback.
+            EmlExtractor.RecordBug("attachments", ex, warnings);
+            AddMimePart(tnef, container, parts, warnings);
+        }
     }
 
     private static bool Contains(MimeEntity haystack, MimeEntity needle)
@@ -101,6 +107,10 @@ internal static class PartCollector
         {
             warnings.Add($"rfc822_extract_failed: {ex.Message}");
         }
+        catch (Exception ex) when (EmlExtractor.IsBug(ex))
+        {
+            EmlExtractor.RecordBug("attachments", ex, warnings);
+        }
     }
 
     private static void AddMimePart(MimePart part, string? container, List<ExtractedAttachment> parts, List<string> warnings)
@@ -112,6 +122,10 @@ internal static class PartCollector
         catch (Exception ex) when (EmlExtractor.IsContentFailure(ex))
         {
             warnings.Add($"part_decode_failed: {part.FileName ?? part.ContentType.MimeType}: {ex.Message}");
+        }
+        catch (Exception ex) when (EmlExtractor.IsBug(ex))
+        {
+            EmlExtractor.RecordBug("attachments", ex, warnings);
         }
     }
 

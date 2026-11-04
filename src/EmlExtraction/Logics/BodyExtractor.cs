@@ -41,6 +41,13 @@ internal sealed class BodyExtractor
             {
                 warnings.Add($"body_decode_failed: {ex.Message}");
             }
+            catch (Exception ex) when (EmlExtractor.IsBug(ex))
+            {
+                // ADR-026: a bug reading the body leaves the content null; the part stays selected so it is not an attachment.
+                content = null;
+                contentType = null;
+                EmlExtractor.RecordBug("body", ex, warnings);
+            }
         }
 
         var html = contentType is not null

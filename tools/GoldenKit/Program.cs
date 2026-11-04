@@ -11,8 +11,9 @@ if (fault >= 0)
         return 2;
     }
 
-    // ADR-023 fault seam: proves score/probe exit non-zero when extraction throws.
-    // ADR-026: "internal_error" instead adds an internal_error warning to every result.
+    // Fault seam: a stage name injects a bug there, which Extract turns into an internal_error warning (ADR-026);
+    // score/probe must exit non-zero.
+    // "internal_error" instead adds that warning to every result directly.
     var stage = args[fault + 1];
     if (stage == InternalErrors.Code)
     {

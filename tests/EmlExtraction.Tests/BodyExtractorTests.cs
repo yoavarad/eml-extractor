@@ -49,12 +49,18 @@ public sealed class BodyExtractorTests
     }
 
     [Fact]
-    public void BodyDecodeBugPropagates()
+    public void BodyDecodeBugIsInternalError()
     {
         var message = SampleFactory.Plain("s", "t");
         message.Body = new TextPart("plain") { Content = new MimeContent(new ThrowingStream(new InvalidCastException("boom"))) };
+        var warnings = new List<string>();
 
-        Assert.Throws<InvalidCastException>(() => new BodyExtractor().ExtractBody(message, "s", []));
+        var body = new BodyExtractor().ExtractBody(message, "s", warnings);
+
+        Assert.Equal("internal_error: body: InvalidCastException", Assert.Single(warnings));
+        Assert.Null(body.Content);
+        Assert.Null(body.ContentType);
+        Assert.Same(message.Body, body.Part);
     }
 
     [Fact]

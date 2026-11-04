@@ -36,7 +36,7 @@ internal static class EmlExtractionTelemetry
         "eml_extraction.detect.calls", "{call}", "Detect and IsEml calls, by result.");
 
     private static readonly Counter<long> InternalErrors = Meter.CreateCounter<long>(
-        "eml_extraction.extract.internal_errors", "{error}", "Extract calls that threw EmlExtractionException, by stage.");
+        "eml_extraction.extract.internal_errors", "{error}", "internal_error warnings (library bugs) recorded by Extract, by stage.");
 
     private static readonly Counter<long> InputTooLarge = Meter.CreateCounter<long>(
         "eml_extraction.extract.input_too_large", "{request}", "Extract calls refused by the size guard.");
@@ -132,17 +132,11 @@ internal static class EmlExtractionTelemetry
         }
     }
 
-    /// <summary>Records the internal-error counter (stage, inner exception type) and a duration with outcome internal_error, for a call that throws EmlExtractionException.</summary>
-    public static void RecordInternalError(string stage, Exception inner, long startTimestamp)
+    /// <summary>Records the internal-error counter (stage, exception type) for one internal_error warning (ADR-026); the call's duration is recorded when it returns.</summary>
+    public static void RecordInternalError(string stage, Exception ex)
     {
         if (InternalErrors.Enabled)
-            InternalErrors.Add(1, new("eml_extraction.stage", stage), new("error.type", inner.GetType().FullName));
-
-        if (Duration.Enabled)
-        {
-            var elapsed = System.Diagnostics.Stopwatch.GetElapsedTime(startTimestamp).TotalSeconds;
-            Duration.Record(elapsed, new KeyValuePair<string, object?>("eml_extraction.outcome", OutcomeInternalError));
-        }
+            InternalErrors.Add(1, new("eml_extraction.stage", stage), new("error.type", ex.GetType().FullName));
     }
 
     public static void RecordDetect(bool supported)
