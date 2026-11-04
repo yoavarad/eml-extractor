@@ -16,7 +16,10 @@ public sealed class EmlExtractor : IEmlExtractor
 
     private const string InternalErrorCode = "internal_error";
 
-    /// <summary>Test seam (ADR-023, ADR-026): invoked with the stage name (detect, parse, metadata, body, attachments) inside that stage's guard, so a test can inject a throw.</summary>
+    /// <summary>
+    /// Test seam (ADR-023, ADR-026): invoked with the stage name (detect, parse, metadata, body, attachments) inside that stage's guard,
+    /// and with the metadata field points <c>metadata.&lt;key&gt;</c> and <c>metadata.header.&lt;raw key&gt;</c> inside each field guard, so a test can inject a throw. Stage names have no dot; field points do.
+    /// </summary>
     internal static Action<string>? StageFault
     {
         get => Fault.Value;
@@ -192,8 +195,12 @@ public sealed class EmlExtractor : IEmlExtractor
     /// exception type name only, never its message (MimeKit messages can quote input).
     /// </summary>
     internal static void RecordBug(string stage, Exception ex, List<string> warnings)
+        => RecordBug(stage, stage, ex, warnings);
+
+    /// <summary>As <see cref="RecordBug(string, Exception, List{string})"/> with a finer warning detail (<c>metadata.&lt;key&gt;</c>); the counter is tagged with <paramref name="stage"/> only.</summary>
+    internal static void RecordBug(string detail, string stage, Exception ex, List<string> warnings)
     {
-        warnings.Add($"{InternalErrorCode}: {stage}: {ex.GetType().Name}");
+        warnings.Add($"{InternalErrorCode}: {detail}: {ex.GetType().Name}");
         EmlExtractionTelemetry.RecordInternalError(stage, ex);
     }
 
@@ -224,7 +231,7 @@ public sealed class EmlExtractor : IEmlExtractor
             try
             {
                 StageFault?.Invoke("metadata");
-                metadata = HeaderMapper.Map(message, _parser.Options, out var mapped);
+                metadata = HeaderMapper.Map(message, _parser.Options, warnings, out var mapped);
                 participants = mapped;
             }
             catch (Exception ex) when (IsBug(ex))
