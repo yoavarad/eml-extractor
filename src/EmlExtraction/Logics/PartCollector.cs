@@ -45,7 +45,8 @@ internal static class PartCollector
                 return;
             case TextPart text when ReferenceEquals(text, body):
                 return;
-            case TextPart text when insideBodyAlternative && !text.IsAttachment && (text.IsPlain || text.IsHtml):
+            // Named text parts are files, not renderings (ADR-003 skips only renderings).
+            case TextPart text when insideBodyAlternative && !text.IsAttachment && ResolveName(text, string.Empty).Name.Length == 0 && (text.IsPlain || text.IsHtml):
                 return;
             case MimePart part:
                 AddMimePart(part, container, parts, warnings);

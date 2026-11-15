@@ -39,6 +39,7 @@ Added this pass (all public, gitignored): Apache POI HMEF TNEF (real `.doc` + `.
 | E29 | nameless part (no filename, no cid) | tested indirectly | fallback `part-{n}.{subtype}` |
 | E30 | 50MB+ single part | **internal-missing** | probe skips files >40 MB; no such public sample fetched |
 | E31 | RFC 2047 encoded-word covering an address or whole mailbox in participant headers | tested | `HeaderMapperTests`, `ParticipantsTests`; an encoded-word that does not decode is kept as raw text (never dropped): joined into the metadata value and listed as a participant (alone or beside valid mailboxes) with only Address = raw token; nickname, user and domain are empty; order and duplicates are kept; the same holds for bad members inside an address group (group name and comments never become participants) |
+| E32 | empty attachments mixed with real ones; named text parts inside the body's alternative group | tested | issue 64. About 20 ad-hoc synthetic layouts (not committed) kept every empty and real attachment; `AttachmentDecodeTests` pins the mixed empty/real case. The one loss found: named text parts inside the body's alternative group were dropped as renderings; fixed, now listed. Public corpus scan (10,620 files, 709 with named parts, 2026-11-15): 0 parts lost, and no named text part inside an alternative group at all; 3 named inline text parts are the message body and come back as main content |
 
 When adding a sample, drop it under local `corpus/internal/` (gitignored). `InternalCorpusTests` and `golden probe` run only if the files exist.
 
