@@ -89,4 +89,64 @@ public sealed class AttachmentDecodeTests
         Assert.Contains("inner body", text);
         Assert.DoesNotContain("\n", text.Replace("\r\n", string.Empty));
     }
+
+    private static readonly string[] MixedNames = ["e1.txt", "r1.pdf", "e2.bin", "e3.dat", "r2.csv", "e4.txt", "r3.bin"];
+    private static readonly string[] NamedTextNames = ["notes.txt", "a.txt"];
+
+    [Fact]
+    public void MultipleEmptyAndRealAttachmentsAreAllListed()
+    {
+        static string Part(string name, string encoding, string body) =>
+            "--b1\r\nContent-Type: application/octet-stream; name=\"" + name + "\"\r\n" +
+            "Content-Disposition: attachment; filename=\"" + name + "\"\r\n" +
+            "Content-Transfer-Encoding: " + encoding + "\r\n\r\n" + body + "\r\n";
+
+        var bytes = Encoding.ASCII.GetBytes(
+            "From: a@example.com\r\nTo: b@example.com\r\nSubject: s\r\nMIME-Version: 1.0\r\n" +
+            "Content-Type: multipart/mixed; boundary=\"b1\"\r\n\r\n" +
+            "--b1\r\nContent-Type: text/plain\r\n\r\nhello\r\n" +
+            Part("e1.txt", "base64", "") +
+            Part("r1.pdf", "base64", "SGVsbG8=") +
+            Part("e2.bin", "quoted-printable", "") +
+            Part("e3.dat", "7bit", "") +
+            Part("r2.csv", "quoted-printable", "a=3Db") +
+            // e4: headers run straight into the next boundary (no blank line); still one empty part.
+            "--b1\r\nContent-Type: application/octet-stream; name=\"e4.txt\"\r\n" +
+            "Content-Disposition: attachment; filename=\"e4.txt\"\r\n" +
+            "Content-Transfer-Encoding: base64\r\n" +
+            Part("r3.bin", "7bit", "xyz") +
+            "--b1--\r\n");
+
+        var result = _extractor.Extract(bytes);
+
+        Assert.Equal(MixedNames, result.Attachments.Select(a => a.FileName));
+        Assert.Equal(new long[] { 0, 5, 0, 0, 3, 0, 3 }, result.Attachments.Select(a => (long)a.SizeInBytes));
+        Assert.Equal(Encoding.ASCII.GetBytes("Hello"), result.Attachments[1].BinaryData);
+        Assert.Empty(result.Warnings);
+    }
+
+    [Fact]
+    public void NamedTextPartsInBodyAlternativeAreListed()
+    {
+        var bytes = Encoding.ASCII.GetBytes(
+            "From: a@example.com\r\nTo: b@example.com\r\nSubject: s\r\nMIME-Version: 1.0\r\n" +
+            "Content-Type: multipart/mixed; boundary=\"b1\"\r\n\r\n" +
+            "--b1\r\nContent-Type: multipart/alternative; boundary=\"b2\"\r\n\r\n" +
+            "--b2\r\nContent-Type: text/plain\r\n\r\nhello\r\n" +
+            "--b2\r\nContent-Type: text/html\r\n\r\n<p>x</p>\r\n" +
+            "--b2\r\nContent-Type: text/plain; name=\"notes.txt\"\r\n\r\n\r\n" +
+            "--b2\r\nContent-Type: text/plain; name=\"..\"\r\n\r\ndots-only name is no name\r\n" +
+            "--b2\r\nContent-Type: multipart/related; boundary=\"b3\"\r\n\r\n" +
+            "--b3\r\nContent-Type: text/plain\r\nContent-Disposition: inline; filename=\"a.txt\"\r\n\r\nreal\r\n" +
+            "--b3--\r\n" +
+            "--b2--\r\n" +
+            "--b1--\r\n");
+
+        var result = _extractor.Extract(bytes);
+
+        Assert.Contains("<p>x</p>", result.MainContent);
+        Assert.Equal(NamedTextNames, result.Attachments.Select(a => a.FileName));
+        Assert.Equal(new long[] { 0, 4 }, result.Attachments.Select(a => (long)a.SizeInBytes));
+        Assert.Empty(result.Warnings);
+    }
 }

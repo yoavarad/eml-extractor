@@ -37,13 +37,14 @@ When a user pastes an image into an HTML mail, the image travels as a related pa
 
 - The display name is the last segment of the sender's filename. A name that is empty or only dots after that step counts as missing.
 - A part without a usable filename is named from its content identifier when it has one, otherwise from its position and subtype. A nested message without a name gets a generic mail-file name. Separator characters inside a generated name are replaced, so a name never splits the path.
-- The non-chosen renderings of the body (the plain-text twin of an HTML body) are not attachments.
+- The non-chosen renderings of the body (the plain-text twin of an HTML body) are not attachments. A rendering is a plain-text or HTML part inside the body's alternative group that has no usable filename and is not marked as an attachment. A text part that carries a filename is a file, so it is listed even there (issue 64).
+- The part chosen as the main content is returned as the body, not also listed as an attachment, even when it carries a filename (for example a mail whose only part is an inline `notes.txt`).
 
 The exact rules are on [ydk:entity:extraction/ExtractedAttachment] and [ydk:req:attachments/container-path].
 
 ## Failures
 
-A part that cannot be decoded is skipped and recorded as [ydk:warning:extraction/part-decode-failed]. A nested message that cannot be serialised is skipped and recorded as [ydk:warning:extraction/rfc822-extract-failed]. Either way, the other parts are still returned.
+A part that cannot be decoded is skipped and recorded as [ydk:warning:extraction/part-decode-failed]. A nested message that cannot be serialised is skipped and recorded as [ydk:warning:extraction/rfc822-extract-failed]. Either way, the other parts are still returned. No part is dropped silently: every part is either listed, skipped by one of the rules above, or recorded as a warning (a library bug in one part records an internal error warning, ADR-026).
 
 ## Evidence
 
