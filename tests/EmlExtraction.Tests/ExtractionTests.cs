@@ -305,6 +305,14 @@ public sealed class ExtractionTests
     }
 
     [Fact]
+    public void EmptyFirstLineOfDateDoesNotLeakBody()
+    {
+        var raw = "From: a@example.com\r\nSubject: s\r\nDate:\r\n\tbody text\r\n";
+        var result = _extractor.Extract(Encoding.ASCII.GetBytes(raw));
+        Assert.DoesNotContain("body", result.Metadata.GetValueOrDefault(MetadataKeys.Date, ""));
+    }
+
+    [Fact]
     public void FoldedDateHeaderStillUnfolds()
     {
         var raw = "From: a@example.com\r\nSubject: s\r\nDate: Tue, 15 Sep 2026\r\n 07:00:00 +0000\r\n\r\nbody";

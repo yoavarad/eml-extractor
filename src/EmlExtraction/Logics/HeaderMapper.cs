@@ -142,8 +142,7 @@ internal static class HeaderMapper
                 var raw = dateHeader.RawValue.AsSpan();
                 var end = raw.IndexOfAny((byte)'\r', (byte)'\n');
                 var firstLine = Encoding.UTF8.GetString(end < 0 ? raw : raw[..end]).Trim();
-                if (firstLine.Length > 0)
-                    metadata[MetadataKeys.Date] = firstLine;
+                metadata[MetadataKeys.Date] = firstLine;
             }
         }
         catch (Exception ex) when (EmlExtractor.IsBug(ex))
