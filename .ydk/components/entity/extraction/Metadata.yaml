@@ -77,7 +77,7 @@ fields:
   date:
     type: string
     required: false
-    constraints: ISO 8601 round-trip format ("o") of the parsed Date; the raw value when it does not parse. Present only when the header is.
+    constraints: ISO 8601 round-trip format ("o") of the parsed Date; the raw value when it does not parse, cut at the first line break (an unterminated header block must not leak body text into it). Present only when the header is.
     description: Date overlay.
   message-id:
     type: string

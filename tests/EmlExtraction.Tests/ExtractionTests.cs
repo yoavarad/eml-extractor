@@ -297,6 +297,30 @@ public sealed class ExtractionTests
     }
 
     [Fact]
+    public void UnterminatedHeaderBlockDoesNotLeakBodyIntoDate()
+    {
+        var raw = "From: a@example.com\r\nSubject: s\r\nDate: garbage\r\n\tbody text\r\n\tmore\r\n";
+        var result = _extractor.Extract(Encoding.ASCII.GetBytes(raw));
+        Assert.Equal("garbage", result.Metadata[MetadataKeys.Date]);
+    }
+
+    [Fact]
+    public void EmptyFirstLineOfDateDoesNotLeakBody()
+    {
+        var raw = "From: a@example.com\r\nSubject: s\r\nDate:\r\n\tbody text\r\n";
+        var result = _extractor.Extract(Encoding.ASCII.GetBytes(raw));
+        Assert.DoesNotContain("body", result.Metadata.GetValueOrDefault(MetadataKeys.Date, ""));
+    }
+
+    [Fact]
+    public void FoldedDateHeaderStillUnfolds()
+    {
+        var raw = "From: a@example.com\r\nSubject: s\r\nDate: Tue, 15 Sep 2026\r\n 07:00:00 +0000\r\n\r\nbody";
+        var result = _extractor.Extract(Encoding.ASCII.GetBytes(raw));
+        Assert.StartsWith("2026-09-15T07:00:00", result.Metadata[MetadataKeys.Date]);
+    }
+
+    [Fact]
     public void CorruptBase64DoesNotCrash()
     {
         var raw = """

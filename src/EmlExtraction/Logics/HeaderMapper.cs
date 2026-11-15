@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Text;
 using EmlExtraction.Models;
 using MimeKit;
 using MimeKit.Utils;
@@ -135,6 +136,14 @@ internal static class HeaderMapper
             FieldFault(MetadataKeys.Date);
             if (message.Date != DateTimeOffset.MinValue)
                 Set(metadata, MetadataKeys.Date, message.Date.ToString("o"));
+            else if (metadata.ContainsKey(MetadataKeys.Date) && message.Headers.FirstOrDefault(h => h.Id == HeaderId.Date) is { } dateHeader)
+            {
+                // Unparsed date: keep only its first physical line. An unterminated header block makes MimeKit fold body text into it.
+                var raw = dateHeader.RawValue.AsSpan();
+                var end = raw.IndexOfAny((byte)'\r', (byte)'\n');
+                var firstLine = Encoding.UTF8.GetString(end < 0 ? raw : raw[..end]).Trim();
+                metadata[MetadataKeys.Date] = firstLine;
+            }
         }
         catch (Exception ex) when (EmlExtractor.IsBug(ex))
         {
